@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertProgramSchema, insertSessionSchema } from "@shared/schema";
+import { Stepper } from "./ui/stepper";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -87,9 +88,13 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>
-            {step === 1 ? "Create New Program - Details" : "Create New Program - Sessions"}
-          </DialogTitle>
+          <DialogTitle>Create New Program</DialogTitle>
+          <div className="mt-6 mb-8">
+            <Stepper
+              steps={["Program Details", "Session Outline"]}
+              currentStep={step}
+            />
+          </div>
         </DialogHeader>
 
         {step === 1 ? (
