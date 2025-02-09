@@ -1,4 +1,4 @@
-import { users, programs, sessions, type User, type InsertUser, type Program, type InsertProgram, type Session, type InsertSession } from "@shared/schema";
+import { users, programs, type User, type InsertUser, type Program, type InsertProgram } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import session from "express-session";
@@ -17,10 +17,6 @@ export interface IStorage {
   getProgramsByUserId(userId: number): Promise<Program[]>;
   getProgram(id: number): Promise<Program | undefined>;
   deleteProgram(id: number): Promise<void>;
-
-  // Session methods
-  createSessions(programId: number, sessions: InsertSession[]): Promise<Session[]>;
-  getSessionsByProgramId(programId: number): Promise<Session[]>;
 
   sessionStore: session.Store;
 }
@@ -78,25 +74,6 @@ export class DatabaseStorage implements IStorage {
 
   async deleteProgram(id: number): Promise<void> {
     await db.delete(programs).where(eq(programs.id, id));
-  }
-
-  async createSessions(programId: number, insertSessions: InsertSession[]): Promise<Session[]> {
-    const sessionsWithProgramId = insertSessions.map(session => ({
-      ...session,
-      programId,
-    }));
-
-    return await db
-      .insert(sessions)
-      .values(sessionsWithProgramId)
-      .returning();
-  }
-
-  async getSessionsByProgramId(programId: number): Promise<Session[]> {
-    return await db
-      .select()
-      .from(sessions)
-      .where(eq(sessions.programId, programId));
   }
 }
 

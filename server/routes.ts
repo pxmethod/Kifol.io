@@ -2,8 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { insertProgramSchema, insertSessionSchema } from "@shared/schema";
-import { z } from "zod";
+import { insertProgramSchema } from "@shared/schema";
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
@@ -19,12 +18,9 @@ export function registerRoutes(app: Express): Server {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 
     const programData = insertProgramSchema.parse(req.body.program);
-    const sessionsData = z.array(insertSessionSchema).parse(req.body.sessions);
-
     const program = await storage.createProgram(req.user.id, programData);
-    const sessions = await storage.createSessions(program.id, sessionsData);
 
-    res.status(201).json({ program, sessions });
+    res.status(201).json(program);
   });
 
   app.delete("/api/programs/:id", async (req, res) => {
