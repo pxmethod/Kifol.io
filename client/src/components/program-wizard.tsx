@@ -76,11 +76,17 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
     setStep(2);
   });
 
-  const onSessionSubmit = sessionForm.handleSubmit((data) => {
-    // TODO: Submit both program and session data to the backend
-    console.log("Program:", programData);
-    console.log("Sessions:", data);
-    onOpenChange(false);
+  const onSessionSubmit = sessionForm.handleSubmit(async (data) => {
+    try {
+      await apiRequest("POST", "/api/programs", {
+        program: programData,
+        sessions: data.sessions,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Failed to save program:", error);
+    }
   });
 
   return (
