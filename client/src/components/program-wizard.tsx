@@ -54,7 +54,7 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
   const createProgramMutation = useMutation({
     mutationFn: async (data: { program: z.infer<typeof programFormSchema>; sessions: z.infer<typeof insertSessionSchema>[] }) => {
       const res = await apiRequest("POST", "/api/programs", data);
-      return res.json();
+      return await res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
@@ -67,6 +67,7 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
       programForm.reset();
       sessionForm.reset();
       setStep(1);
+      setProgramData(null);
     },
     onError: (error: Error) => {
       toast({
