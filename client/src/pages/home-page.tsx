@@ -9,16 +9,41 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
-import { Layout, LayoutGrid, List, LogOut, Settings, User } from "lucide-react";
+import { Layout, LayoutGrid, List, LogOut, Settings, User, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { ProgramWizard } from "@/components/program-wizard";
+import { format } from "date-fns";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { Program } from "@shared/schema";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 type ViewMode = "list" | "grid";
 
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
   const [viewMode, setViewMode] = useState<ViewMode>("list");
-  // Temporary empty state for demonstration
-  const programs: any[] = [];
+  const [wizardOpen, setWizardOpen] = useState(false);
+
+  const { data: programs = [] } = useQuery<Program[]>({
+    queryKey: ["/api/programs"],
+  });
+
+  const deleteProgramMutation = useMutation({
+    mutationFn: async (programId: number) => {
+      await apiRequest("DELETE", `/api/programs/${programId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
+    },
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -80,7 +105,7 @@ export default function HomePage() {
                 <LayoutGrid className="h-4 w-4" />
               </Button>
             </div>
-            <Button>
+            <Button onClick={() => setWizardOpen(true)}>
               <Layout className="mr-2 h-4 w-4" />
               Add a Program
             </Button>
@@ -94,18 +119,91 @@ export default function HomePage() {
               <p className="text-muted-foreground mb-4">
                 Create your first program to start tracking student progress
               </p>
-              <Button>
+              <Button onClick={() => setWizardOpen(true)}>
                 <Layout className="mr-2 h-4 w-4" />
                 Create New Program
               </Button>
             </CardContent>
           </Card>
+        ) : viewMode === "list" ? (
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Start Date</TableHead>
+                  <TableHead>End Date</TableHead>
+                  <TableHead>Sessions</TableHead>
+                  <TableHead>Students</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {programs.map((program) => (
+                  <TableRow key={program.id}>
+                    <TableCell className="font-medium">{program.title}</TableCell>
+                    <TableCell>{format(new Date(program.startDate), 'PPP')}</TableCell>
+                    <TableCell>{format(new Date(program.endDate), 'PPP')}</TableCell>
+                    <TableCell>{program.sessionCount}</TableCell>
+                    <TableCell>{program.studentCount}</TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteProgramMutation.mutate(program.id)}
+                        disabled={deleteProgramMutation.isPending}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         ) : (
-          <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-4"}>
-            {/* Program cards will be rendered here */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {programs.map((program) => (
+              <Card key={program.id}>
+                <CardContent className="pt-6">
+                  <h3 className="text-lg font-semibold mb-2">{program.title}</h3>
+                  <p className="text-sm text-muted-foreground mb-4">{program.description}</p>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Start Date:</span>
+                      <span>{format(new Date(program.startDate), 'PPP')}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>End Date:</span>
+                      <span>{format(new Date(program.endDate), 'PPP')}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Sessions:</span>
+                      <span>{program.sessionCount}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Students:</span>
+                      <span>{program.studentCount}</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex justify-end">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteProgramMutation.mutate(program.id)}
+                      disabled={deleteProgramMutation.isPending}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         )}
       </main>
+
+      <ProgramWizard open={wizardOpen} onOpenChange={setWizardOpen} />
     </div>
   );
 }

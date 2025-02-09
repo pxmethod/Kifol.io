@@ -1,4 +1,4 @@
-import { users, type User, type InsertUser } from "@shared/schema";
+import { users, programs, sessions, type User, type InsertUser, type Program, type InsertProgram, type Session, type InsertSession } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import session from "express-session";
@@ -11,6 +11,17 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+
+  // Program methods
+  createProgram(userId: number, program: InsertProgram): Promise<Program>;
+  getProgramsByUserId(userId: number): Promise<Program[]>;
+  getProgram(id: number): Promise<Program | undefined>;
+  deleteProgram(id: number): Promise<void>;
+
+  // Session methods
+  createSessions(programId: number, sessions: InsertSession[]): Promise<Session[]>;
+  getSessionsByProgramId(programId: number): Promise<Session[]>;
+
   sessionStore: session.Store;
 }
 
@@ -40,6 +51,52 @@ export class DatabaseStorage implements IStorage {
       .values(insertUser)
       .returning();
     return user;
+  }
+
+  async createProgram(userId: number, program: InsertProgram): Promise<Program> {
+    const [newProgram] = await db
+      .insert(programs)
+      .values({ ...program, userId })
+      .returning();
+    return newProgram;
+  }
+
+  async getProgramsByUserId(userId: number): Promise<Program[]> {
+    return await db
+      .select()
+      .from(programs)
+      .where(eq(programs.userId, userId));
+  }
+
+  async getProgram(id: number): Promise<Program | undefined> {
+    const [program] = await db
+      .select()
+      .from(programs)
+      .where(eq(programs.id, id));
+    return program;
+  }
+
+  async deleteProgram(id: number): Promise<void> {
+    await db.delete(programs).where(eq(programs.id, id));
+  }
+
+  async createSessions(programId: number, insertSessions: InsertSession[]): Promise<Session[]> {
+    const sessionsWithProgramId = insertSessions.map(session => ({
+      ...session,
+      programId,
+    }));
+
+    return await db
+      .insert(sessions)
+      .values(sessionsWithProgramId)
+      .returning();
+  }
+
+  async getSessionsByProgramId(programId: number): Promise<Session[]> {
+    return await db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.programId, programId));
   }
 }
 
