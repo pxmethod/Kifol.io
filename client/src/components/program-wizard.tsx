@@ -29,6 +29,10 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 const programFormSchema = insertProgramSchema.extend({
   startDate: z.date().min(new Date(), "Start date must be in the future"),
@@ -46,8 +50,31 @@ type ProgramWizardProps = {
 };
 
 export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
+  const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [programData, setProgramData] = useState<z.infer<typeof programFormSchema> | null>(null);
+
+  const createProgramMutation = useMutation({
+    mutationFn: async (data: { program: z.infer<typeof programFormSchema>; sessions: z.infer<typeof sessionFormSchema> }) => {
+      const res = await apiRequest("POST", "/api/programs", data);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
+      toast({
+        title: "Success",
+        description: "Program created successfully",
+      });
+      onOpenChange(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   const programForm = useForm({
     resolver: zodResolver(programFormSchema),
@@ -77,10 +104,12 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
   });
 
   const onSessionSubmit = sessionForm.handleSubmit((data) => {
-    // TODO: Submit both program and session data to the backend
-    console.log("Program:", programData);
-    console.log("Sessions:", data);
-    onOpenChange(false);
+    if (!programData) return;
+
+    createProgramMutation.mutate({
+      program: programData,
+      sessions: data.sessions,
+    });
   });
 
   return (
@@ -294,7 +323,15 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
 
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
-                <Button type="submit">Save Program</Button>
+                <Button
+                  type="submit"
+                  disabled={createProgramMutation.isPending}
+                >
+                  {createProgramMutation.isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Save Program
+                </Button>
               </div>
             </form>
           </Form>
