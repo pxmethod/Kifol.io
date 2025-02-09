@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertProgramSchema, insertSessionSchema } from "@shared/schema";
@@ -19,19 +19,20 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, Loader2 } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 const programFormSchema = insertProgramSchema.extend({
   startDate: z.date().min(new Date(), "Start date must be in the future"),
@@ -40,6 +41,8 @@ const programFormSchema = insertProgramSchema.extend({
   message: "End date must be after start date",
   path: ["endDate"],
 });
+
+const sessionFormSchema = z.array(insertSessionSchema);
 
 type ProgramWizardProps = {
   open: boolean;
@@ -52,9 +55,9 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
   const [programData, setProgramData] = useState<z.infer<typeof programFormSchema> | null>(null);
 
   const createProgramMutation = useMutation({
-    mutationFn: async (data: { program: z.infer<typeof programFormSchema>; sessions: z.infer<typeof insertSessionSchema>[] }) => {
+    mutationFn: async (data: { program: z.infer<typeof programFormSchema>; sessions: z.infer<typeof sessionFormSchema> }) => {
       const res = await apiRequest("POST", "/api/programs", data);
-      return await res.json();
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
@@ -63,11 +66,6 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
         description: "Program created successfully",
       });
       onOpenChange(false);
-      // Reset forms and step
-      programForm.reset();
-      sessionForm.reset();
-      setStep(1);
-      setProgramData(null);
     },
     onError: (error: Error) => {
       toast({
@@ -91,7 +89,7 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
   });
 
   const sessionForm = useForm({
-    resolver: zodResolver(z.array(insertSessionSchema)),
+    resolver: zodResolver(sessionFormSchema),
     defaultValues: {
       sessions: [{
         name: "",
@@ -99,18 +97,6 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
       }],
     },
   });
-
-  // Update session fields when sessionCount changes
-  useEffect(() => {
-    if (programData) {
-      const currentSessions = sessionForm.getValues().sessions;
-      const newSessions = Array(programData.sessionCount).fill(0).map((_, index) => ({
-        name: currentSessions[index]?.name || "",
-        description: currentSessions[index]?.description || "",
-      }));
-      sessionForm.setValue("sessions", newSessions);
-    }
-  }, [programData, sessionForm]);
 
   const onProgramSubmit = programForm.handleSubmit((data) => {
     setProgramData(data);
@@ -125,16 +111,6 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
       sessions: data.sessions,
     });
   });
-
-  // Reset forms when dialog closes
-  useEffect(() => {
-    if (!open) {
-      programForm.reset();
-      sessionForm.reset();
-      setStep(1);
-      setProgramData(null);
-    }
-  }, [open, programForm, sessionForm]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
