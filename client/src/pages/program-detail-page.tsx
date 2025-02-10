@@ -2,7 +2,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Program } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Pencil, ArrowLeft } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
@@ -26,6 +26,7 @@ import { insertProgramSchema } from "@shared/schema";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { Link } from "wouter";
 
 export default function ProgramDetailPage({ params }: { params: { id: string } }) {
   const { toast } = useToast();
@@ -83,12 +84,18 @@ export default function ProgramDetailPage({ params }: { params: { id: string } }
     <div className="min-h-screen bg-background">
       <div className="bg-[#555555] text-white">
         <div className="container mx-auto px-4 py-8">
+          <Link href="/">
+            <Button variant="ghost" className="mb-4 text-white hover:text-white/80">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Programs
+            </Button>
+          </Link>
           <div className="flex justify-between items-start mb-4">
             <h1 className="text-3xl font-bold">{program.title}</h1>
             <Button
-              variant="outline"
               size="sm"
               onClick={() => setEditDialogOpen(true)}
+              className="bg-white text-gray-900 hover:bg-gray-100"
             >
               <Pencil className="h-4 w-4 mr-2" />
               Edit
