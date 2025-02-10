@@ -60,6 +60,12 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
         title: "Success",
         description: "Program created successfully",
       });
+      form.reset({
+        title: "",
+        description: "",
+        startDate: new Date(),
+        endDate: new Date(),
+      });
       onOpenChange(false);
     },
     onError: (error: Error) => {
