@@ -46,7 +46,9 @@ export default function ProgramDetailPage({ params }: { params: { id: string } }
       return res.json();
     },
     onSuccess: () => {
+      // Invalidate both the specific program query and the programs list query
       queryClient.invalidateQueries({ queryKey: [`/api/programs/${params.id}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
       setEditDialogOpen(false);
       toast({
         title: "Success",
