@@ -14,6 +14,8 @@ export const programs = pgTable("programs", {
   description: text("description").notNull(),
   startDate: date("start_date").notNull(),
   endDate: date("end_date").notNull(),
+  sessionCount: integer("session_count"),  
+  studentCount: integer("student_count"),  
   userId: integer("user_id").notNull().references(() => users.id),
 });
 
@@ -25,6 +27,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export const insertProgramSchema = createInsertSchema(programs).omit({
   id: true,
   userId: true,
+  sessionCount: true,
+  studentCount: true,
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
