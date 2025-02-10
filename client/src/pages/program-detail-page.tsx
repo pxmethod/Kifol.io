@@ -28,7 +28,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Link } from "wouter";
 
-export default function ProgramDetailPage({ params }: { params: { id: string } }) {
+export default function ProgramDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
@@ -38,16 +42,14 @@ export default function ProgramDetailPage({ params }: { params: { id: string } }
 
   const updateProgramMutation = useMutation({
     mutationFn: async (data: { title: string; description: string }) => {
-      const res = await apiRequest(
-        "PATCH",
-        `/api/programs/${params.id}`,
-        data
-      );
+      const res = await apiRequest("PATCH", `/api/programs/${params.id}`, data);
       return res.json();
     },
     onSuccess: () => {
       // Invalidate both the specific program query and the programs list query
-      queryClient.invalidateQueries({ queryKey: [`/api/programs/${params.id}`] });
+      queryClient.invalidateQueries({
+        queryKey: [`/api/programs/${params.id}`],
+      });
       queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
       setEditDialogOpen(false);
       toast({
@@ -66,7 +68,7 @@ export default function ProgramDetailPage({ params }: { params: { id: string } }
 
   const form = useForm({
     resolver: zodResolver(
-      insertProgramSchema.pick({ title: true, description: true })
+      insertProgramSchema.pick({ title: true, description: true }),
     ),
     defaultValues: {
       title: program?.title || "",
@@ -84,10 +86,13 @@ export default function ProgramDetailPage({ params }: { params: { id: string } }
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="bg-[#555555] text-white">
+      <div className="bg-[#000000] text-white">
         <div className="container mx-auto px-4 py-8">
           <Link href="/">
-            <Button variant="ghost" className="mb-4 text-white hover:text-white/80">
+            <Button
+              variant="ghost"
+              className="mb-4 text-white hover:text-white/80"
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Programs
             </Button>
