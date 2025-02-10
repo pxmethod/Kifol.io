@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/use-auth";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -161,7 +162,11 @@ export default function HomePage() {
               <TableBody>
                 {programs.map((program) => (
                   <TableRow key={program.id}>
-                    <TableCell className="font-medium">{program.title}</TableCell>
+                    <TableCell className="font-medium">
+                      <Link href={`/programs/${program.id}`} className="hover:underline">
+                        {program.title}
+                      </Link>
+                    </TableCell>
                     <TableCell>{format(new Date(program.startDate), 'PPP')}</TableCell>
                     <TableCell>{format(new Date(program.endDate), 'PPP')}</TableCell>
                     <TableCell className="text-right">
@@ -184,7 +189,11 @@ export default function HomePage() {
             {programs.map((program) => (
               <Card key={program.id}>
                 <CardContent className="pt-6">
-                  <h3 className="text-lg font-semibold mb-2">{program.title}</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    <Link href={`/programs/${program.id}`} className="hover:underline">
+                      {program.title}
+                    </Link>
+                  </h3>
                   <p className="text-sm text-muted-foreground mb-4">{program.description}</p>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">

@@ -16,6 +16,7 @@ export interface IStorage {
   createProgram(userId: number, program: InsertProgram): Promise<Program>;
   getProgramsByUserId(userId: number): Promise<Program[]>;
   getProgram(id: number): Promise<Program | undefined>;
+  updateProgram(id: number, program: Partial<InsertProgram>): Promise<Program>;
   deleteProgram(id: number): Promise<void>;
 
   sessionStore: session.Store;
@@ -70,6 +71,15 @@ export class DatabaseStorage implements IStorage {
       .from(programs)
       .where(eq(programs.id, id));
     return program;
+  }
+
+  async updateProgram(id: number, program: Partial<InsertProgram>): Promise<Program> {
+    const [updatedProgram] = await db
+      .update(programs)
+      .set(program)
+      .where(eq(programs.id, id))
+      .returning();
+    return updatedProgram;
   }
 
   async deleteProgram(id: number): Promise<void> {
