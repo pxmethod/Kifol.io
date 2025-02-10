@@ -7,6 +7,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Layout, LayoutGrid, List, LogOut, Settings, User, Trash2 } from "lucide-react";
@@ -31,6 +41,7 @@ export default function HomePage() {
   const { user, logoutMutation } = useAuth();
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [programToDelete, setProgramToDelete] = useState<Program | null>(null);
 
   const { data: programs = [] } = useQuery<Program[]>({
     queryKey: ["/api/programs"],
@@ -44,6 +55,17 @@ export default function HomePage() {
       queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
     },
   });
+
+  const handleDeleteClick = (program: Program) => {
+    setProgramToDelete(program);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (programToDelete) {
+      deleteProgramMutation.mutate(programToDelete.id);
+      setProgramToDelete(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -133,8 +155,6 @@ export default function HomePage() {
                   <TableHead>Title</TableHead>
                   <TableHead>Start Date</TableHead>
                   <TableHead>End Date</TableHead>
-                  <TableHead>Sessions</TableHead>
-                  <TableHead>Students</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -144,13 +164,11 @@ export default function HomePage() {
                     <TableCell className="font-medium">{program.title}</TableCell>
                     <TableCell>{format(new Date(program.startDate), 'PPP')}</TableCell>
                     <TableCell>{format(new Date(program.endDate), 'PPP')}</TableCell>
-                    <TableCell>{program.sessionCount}</TableCell>
-                    <TableCell>{program.studentCount}</TableCell>
                     <TableCell className="text-right">
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => deleteProgramMutation.mutate(program.id)}
+                        onClick={() => handleDeleteClick(program)}
                         disabled={deleteProgramMutation.isPending}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -177,20 +195,12 @@ export default function HomePage() {
                       <span>End Date:</span>
                       <span>{format(new Date(program.endDate), 'PPP')}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Sessions:</span>
-                      <span>{program.sessionCount}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Students:</span>
-                      <span>{program.studentCount}</span>
-                    </div>
                   </div>
                   <div className="mt-4 flex justify-end">
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => deleteProgramMutation.mutate(program.id)}
+                      onClick={() => handleDeleteClick(program)}
                       disabled={deleteProgramMutation.isPending}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -204,6 +214,21 @@ export default function HomePage() {
       </main>
 
       <ProgramWizard open={wizardOpen} onOpenChange={setWizardOpen} />
+
+      <AlertDialog open={!!programToDelete} onOpenChange={() => setProgramToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Program</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{programToDelete?.title}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
