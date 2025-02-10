@@ -21,7 +21,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Layout, LayoutGrid, List, LogOut, Settings, User, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { ProgramWizard } from "@/components/program-wizard";
 import { format } from "date-fns";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -162,11 +161,7 @@ export default function HomePage() {
               <TableBody>
                 {programs.map((program) => (
                   <TableRow key={program.id}>
-                    <TableCell className="font-medium">
-                      <Link to={`/programs/${program.id}`} className="hover:underline">
-                        {program.title}
-                      </Link>
-                    </TableCell>
+                    <TableCell className="font-medium">{program.title}</TableCell>
                     <TableCell>{format(new Date(program.startDate), 'PPP')}</TableCell>
                     <TableCell>{format(new Date(program.endDate), 'PPP')}</TableCell>
                     <TableCell className="text-right">

@@ -7,13 +7,11 @@ import HomePage from "@/pages/home-page";
 import AuthPage from "@/pages/auth-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { AuthProvider } from "./hooks/use-auth";
-import { ProgramDetailPage } from "@/pages/program-detail-page";
 
 function Router() {
   return (
     <Switch>
       <ProtectedRoute path="/" component={HomePage} />
-      <Route path="/programs/:programId" component={ProgramDetailPage} />
       <Route path="/auth" component={AuthPage} />
       <Route component={NotFound} />
     </Switch>
