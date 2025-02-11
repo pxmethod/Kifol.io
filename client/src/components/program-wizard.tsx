@@ -36,8 +36,12 @@ import { useToast } from "@/hooks/use-toast";
 const programFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  startDate: z.date().min(new Date(), "Start date must be in the future"),
-  endDate: z.date().min(new Date(), "End date must be in the future"),
+  startDate: z.date({
+    required_error: "Start date is required",
+  }),
+  endDate: z.date({
+    required_error: "End date is required",
+  }),
 }).refine(data => data.endDate > data.startDate, {
   message: "End date must be after start date",
   path: ["endDate"],
@@ -51,6 +55,16 @@ type ProgramWizardProps = {
 export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
   const { toast } = useToast();
 
+  const form = useForm({
+    resolver: zodResolver(programFormSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      startDate: new Date(),
+      endDate: new Date(new Date().setDate(new Date().getDate() + 30)), // Default to 30 days from now
+    },
+  });
+
   const createProgramMutation = useMutation({
     mutationFn: async (program: z.infer<typeof programFormSchema>) => {
       const res = await apiRequest("POST", "/api/programs", { program });
@@ -62,12 +76,7 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
         title: "Success",
         description: "Program created successfully",
       });
-      form.reset({
-        title: "",
-        description: "",
-        startDate: new Date(),
-        endDate: new Date(),
-      });
+      form.reset();
       onOpenChange(false);
     },
     onError: (error: Error) => {
@@ -76,16 +85,6 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
         description: error.message,
         variant: "destructive",
       });
-    },
-  });
-
-  const form = useForm({
-    resolver: zodResolver(programFormSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      startDate: new Date(),
-      endDate: new Date(),
     },
   });
 
@@ -121,7 +120,7 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Description (Optional)</FormLabel>
                   <FormControl>
                     <Textarea placeholder="Enter program description" {...field} />
                   </FormControl>
@@ -148,7 +147,7 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
                             )}
                           >
                             {field.value ? (
-                              format(field.value, "PPP")
+                              format(field.value, "MMMM dd, yyyy")
                             ) : (
                               <span>Pick a date</span>
                             )}
@@ -161,9 +160,6 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) =>
-                            date < new Date()
-                          }
                           initialFocus
                         />
                       </PopoverContent>
@@ -190,7 +186,7 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
                             )}
                           >
                             {field.value ? (
-                              format(field.value, "PPP")
+                              format(field.value, "MMMM dd, yyyy")
                             ) : (
                               <span>Pick a date</span>
                             )}
@@ -203,9 +199,6 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) =>
-                            date < new Date()
-                          }
                           initialFocus
                         />
                       </PopoverContent>
@@ -224,7 +217,7 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
                 {createProgramMutation.isPending && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                Save Program
+                Create Program
               </Button>
             </div>
           </form>

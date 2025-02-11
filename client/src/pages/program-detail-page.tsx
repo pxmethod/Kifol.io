@@ -40,8 +40,12 @@ import { z } from "zod";
 const editProgramSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  startDate: z.date(),
-  endDate: z.date(),
+  startDate: z.date({
+    required_error: "Start date is required",
+  }),
+  endDate: z.date({
+    required_error: "End date is required",
+  }),
 }).refine(data => data.endDate > data.startDate, {
   message: "End date must be after start date",
   path: ["endDate"],
@@ -65,7 +69,6 @@ export default function ProgramDetailPage({
       return res.json();
     },
     onSuccess: () => {
-      // Invalidate both the specific program query and the programs list query
       queryClient.invalidateQueries({ queryKey: [`/api/programs/${params.id}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
       setEditDialogOpen(false);
@@ -85,7 +88,7 @@ export default function ProgramDetailPage({
 
   const form = useForm({
     resolver: zodResolver(editProgramSchema),
-    defaultValues: {
+    values: {
       title: program?.title || "",
       description: program?.description || "",
       startDate: program ? new Date(program.startDate) : new Date(),
@@ -167,7 +170,7 @@ export default function ProgramDetailPage({
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>Description (Optional)</FormLabel>
                     <FormControl>
                       <Textarea {...field} />
                     </FormControl>
@@ -193,7 +196,7 @@ export default function ProgramDetailPage({
                               )}
                             >
                               {field.value ? (
-                                format(field.value, "PPP")
+                                format(field.value, "MMMM dd, yyyy")
                               ) : (
                                 <span>Pick a date</span>
                               )}
@@ -231,7 +234,7 @@ export default function ProgramDetailPage({
                               )}
                             >
                               {field.value ? (
-                                format(field.value, "PPP")
+                                format(field.value, "MMMM dd, yyyy")
                               ) : (
                                 <span>Pick a date</span>
                               )}

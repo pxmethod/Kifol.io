@@ -167,8 +167,8 @@ export default function HomePage() {
                         {program.title}
                       </Link>
                     </TableCell>
-                    <TableCell>{format(new Date(program.startDate), 'PPP')}</TableCell>
-                    <TableCell>{format(new Date(program.endDate), 'PPP')}</TableCell>
+                    <TableCell>{format(new Date(program.startDate), 'MMMM dd, yyyy')}</TableCell>
+                    <TableCell>{format(new Date(program.endDate), 'MMMM dd, yyyy')}</TableCell>
                     <TableCell className="text-right">
                       <Button
                         variant="ghost"
@@ -198,11 +198,11 @@ export default function HomePage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>Start Date:</span>
-                      <span>{format(new Date(program.startDate), 'PPP')}</span>
+                      <span>{format(new Date(program.startDate), 'MMMM dd, yyyy')}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>End Date:</span>
-                      <span>{format(new Date(program.endDate), 'PPP')}</span>
+                      <span>{format(new Date(program.endDate), 'MMMM dd, yyyy')}</span>
                     </div>
                   </div>
                   <div className="mt-4 flex justify-end">
