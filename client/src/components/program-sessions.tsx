@@ -9,6 +9,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -39,6 +41,7 @@ export function ProgramSessions({ programId }: ProgramSessionsProps) {
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editSession, setEditSession] = useState<Session | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const { data: sessions = [] } = useQuery<Session[]>({
     queryKey: [`/api/programs/${programId}/sessions`],
@@ -99,6 +102,29 @@ export function ProgramSessions({ programId }: ProgramSessionsProps) {
     },
   });
 
+  const deleteSessionMutation = useMutation({
+    mutationFn: async (sessionId: number) => {
+      await apiRequest("DELETE", `/api/programs/${programId}/sessions/${sessionId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/programs/${programId}/sessions`] });
+      toast({
+        title: "Success",
+        description: "Session deleted successfully",
+      });
+      setShowDeleteConfirm(false);
+      setDialogOpen(false);
+      setEditSession(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const onSubmit = form.handleSubmit((data) => {
     if (editSession) {
       updateSessionMutation.mutate({ id: editSession.id, data });
@@ -123,6 +149,18 @@ export function ProgramSessions({ programId }: ProgramSessionsProps) {
       description: "",
     });
     setDialogOpen(true);
+  };
+
+  const handleDelete = () => {
+    if (editSession) {
+      deleteSessionMutation.mutate(editSession.id);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setShowDeleteConfirm(false);
+    setEditSession(null);
   };
 
   return (
@@ -161,71 +199,115 @@ export function ProgramSessions({ programId }: ProgramSessionsProps) {
         Add Session
       </Button>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog open={dialogOpen} onOpenChange={handleCloseDialog}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {editSession ? "Edit Session" : "Add Session"}
-            </DialogTitle>
-          </DialogHeader>
+          {!showDeleteConfirm ? (
+            <>
+              <DialogHeader>
+                <DialogTitle>
+                  {editSession ? "Edit Session" : "Add Session"}
+                </DialogTitle>
+              </DialogHeader>
 
-          <Form {...form}>
-            <form onSubmit={onSubmit} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter session name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <Form {...form}>
+                <form onSubmit={onSubmit} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter session name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description (Optional)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Enter session description"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description (Optional)</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Enter session description"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <div className="flex justify-end gap-2">
+                  <div className="flex justify-between items-center pt-4">
+                    {editSession && (
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        onClick={() => setShowDeleteConfirm(true)}
+                      >
+                        Remove Session
+                      </Button>
+                    )}
+                    <div className="flex gap-2 ml-auto">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleCloseDialog}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={
+                          createSessionMutation.isPending ||
+                          updateSessionMutation.isPending
+                        }
+                      >
+                        {(createSessionMutation.isPending ||
+                          updateSessionMutation.isPending) && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        {editSession ? "Save Changes" : "Create Session"}
+                      </Button>
+                    </div>
+                  </div>
+                </form>
+              </Form>
+            </>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle>Remove Session</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to remove this session? This action cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter className="gap-2 sm:gap-0">
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setDialogOpen(false)}
+                  onClick={() => setShowDeleteConfirm(false)}
                 >
                   Cancel
                 </Button>
                 <Button
-                  type="submit"
-                  disabled={
-                    createSessionMutation.isPending ||
-                    updateSessionMutation.isPending
-                  }
+                  type="button"
+                  variant="destructive"
+                  onClick={handleDelete}
+                  disabled={deleteSessionMutation.isPending}
                 >
-                  {(createSessionMutation.isPending ||
-                    updateSessionMutation.isPending) && (
+                  {deleteSessionMutation.isPending && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  {editSession ? "Save Changes" : "Create Session"}
+                  Remove Session
                 </Button>
-              </div>
-            </form>
-          </Form>
+              </DialogFooter>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>
