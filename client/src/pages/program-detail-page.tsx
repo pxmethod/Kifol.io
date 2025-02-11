@@ -27,6 +27,8 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Link } from "wouter";
+import { format } from 'date-fns';
+
 
 export default function ProgramDetailPage({
   params,
@@ -90,7 +92,7 @@ export default function ProgramDetailPage({
         <div className="container mx-auto px-4 py-8">
           <Link href="/">
             <Button
-              variant="ghost"
+              variant="link"
               className="mb-4 text-white hover:text-white/80"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -98,7 +100,12 @@ export default function ProgramDetailPage({
             </Button>
           </Link>
           <div className="flex justify-between items-start mb-4">
-            <h1 className="text-3xl font-bold">{program.title}</h1>
+            <div>
+              <h1 className="text-3xl font-bold">{program.title}</h1>
+              <p className="text-gray-200 mt-2">
+                {format(new Date(program.startDate), 'MMMM dd, yyyy')} - {format(new Date(program.endDate), 'MMMM dd, yyyy')}
+              </p>
+            </div>
             <Button
               size="sm"
               onClick={() => setEditDialogOpen(true)}
