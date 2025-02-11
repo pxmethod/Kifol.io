@@ -33,7 +33,9 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-const programFormSchema = insertProgramSchema.extend({
+const programFormSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().optional(),
   startDate: z.date().min(new Date(), "Start date must be in the future"),
   endDate: z.date().min(new Date(), "End date must be in the future"),
 }).refine(data => data.endDate > data.startDate, {
