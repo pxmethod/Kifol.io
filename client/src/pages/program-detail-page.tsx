@@ -135,18 +135,21 @@ export default function ProgramDetailPage({
             </Button>
           </div>
           {program.description && (
-            <p className="text-gray-200 mb-8">{program.description}</p>
+            <p className="text-gray-200">{program.description}</p>
           )}
-          <Tabs defaultValue="sessions" className="w-full">
-            <TabsList>
-              <TabsTrigger value="sessions">Sessions</TabsTrigger>
-              <TabsTrigger value="portfolios">Student Portfolios</TabsTrigger>
-            </TabsList>
-            <TabsContent value="sessions" className="mt-8">
-              <ProgramSessions programId={parseInt(params.id)} />
-            </TabsContent>
-          </Tabs>
         </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8">
+        <Tabs defaultValue="sessions" className="w-full">
+          <TabsList>
+            <TabsTrigger value="sessions">Sessions</TabsTrigger>
+            <TabsTrigger value="portfolios">Student Portfolios</TabsTrigger>
+          </TabsList>
+          <TabsContent value="sessions" className="mt-8">
+            <ProgramSessions programId={parseInt(params.id)} />
+          </TabsContent>
+        </Tabs>
       </div>
 
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
