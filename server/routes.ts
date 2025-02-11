@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { insertProgramSchema } from "@shared/schema";
+import { insertProgramSchema, insertSessionSchema } from "@shared/schema";
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
@@ -54,6 +54,55 @@ export function registerRoutes(app: Express): Server {
     if (program.userId !== req.user.id) return res.sendStatus(403);
 
     await storage.deleteProgram(program.id);
+    res.sendStatus(200);
+  });
+
+  // Sessions
+  app.get("/api/programs/:programId/sessions", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    const program = await storage.getProgram(parseInt(req.params.programId));
+    if (!program) return res.sendStatus(404);
+    if (program.userId !== req.user.id) return res.sendStatus(403);
+
+    const sessions = await storage.getSessionsByProgramId(program.id);
+    res.json(sessions);
+  });
+
+  app.post("/api/programs/:programId/sessions", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    const program = await storage.getProgram(parseInt(req.params.programId));
+    if (!program) return res.sendStatus(404);
+    if (program.userId !== req.user.id) return res.sendStatus(403);
+
+    const sessionData = insertSessionSchema.parse(req.body);
+    const session = await storage.createSession(program.id, sessionData);
+
+    res.status(201).json(session);
+  });
+
+  app.patch("/api/programs/:programId/sessions/:sessionId", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    const program = await storage.getProgram(parseInt(req.params.programId));
+    if (!program) return res.sendStatus(404);
+    if (program.userId !== req.user.id) return res.sendStatus(403);
+
+    const sessionData = insertSessionSchema.partial().parse(req.body);
+    const session = await storage.updateSession(parseInt(req.params.sessionId), sessionData);
+
+    res.json(session);
+  });
+
+  app.delete("/api/programs/:programId/sessions/:sessionId", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    const program = await storage.getProgram(parseInt(req.params.programId));
+    if (!program) return res.sendStatus(404);
+    if (program.userId !== req.user.id) return res.sendStatus(403);
+
+    await storage.deleteSession(parseInt(req.params.sessionId));
     res.sendStatus(200);
   });
 

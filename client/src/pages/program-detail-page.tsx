@@ -36,6 +36,7 @@ import { Link } from "wouter";
 import { format } from 'date-fns';
 import { cn } from "@/lib/utils";
 import { z } from "zod";
+import { ProgramSessions } from "@/components/program-sessions";
 
 const editProgramSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -141,6 +142,9 @@ export default function ProgramDetailPage({
               <TabsTrigger value="sessions">Sessions</TabsTrigger>
               <TabsTrigger value="portfolios">Student Portfolios</TabsTrigger>
             </TabsList>
+            <TabsContent value="sessions" className="mt-8">
+              <ProgramSessions programId={parseInt(params.id)} />
+            </TabsContent>
           </Tabs>
         </div>
       </div>
