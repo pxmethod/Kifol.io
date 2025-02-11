@@ -25,7 +25,7 @@ export const sessions = pgTable("sessions", {
   programId: integer("program_id")
     .notNull()
     .references(() => programs.id),
-  title: text("title").notNull(),
+  name: text("name").notNull(),
   description: text("description"),
 });
 

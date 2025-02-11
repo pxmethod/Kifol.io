@@ -27,7 +27,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 const sessionSchema = insertSessionSchema.extend({
-  title: z.string().min(1, "Title is required"),
+  name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
 });
 
@@ -47,7 +47,7 @@ export function ProgramSessions({ programId }: ProgramSessionsProps) {
   const form = useForm({
     resolver: zodResolver(sessionSchema),
     defaultValues: {
-      title: "",
+      name: "",
       description: "",
     },
   });
@@ -110,7 +110,7 @@ export function ProgramSessions({ programId }: ProgramSessionsProps) {
   const handleEdit = (session: Session) => {
     setEditSession(session);
     form.reset({
-      title: session.title,
+      name: session.name,
       description: session.description || "",
     });
     setDialogOpen(true);
@@ -119,16 +119,16 @@ export function ProgramSessions({ programId }: ProgramSessionsProps) {
   const handleAdd = () => {
     setEditSession(null);
     form.reset({
-      title: "",
+      name: "",
       description: "",
     });
     setDialogOpen(true);
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Sessions</h2>
+        <h2 className="text-2xl font-semibold">Sessions</h2>
       </div>
 
       <div className="grid gap-4">
@@ -137,7 +137,7 @@ export function ProgramSessions({ programId }: ProgramSessionsProps) {
             <CardContent className="pt-6">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="font-medium">{session.title}</h3>
+                  <h3 className="font-medium">{session.name}</h3>
                   {session.description && (
                     <p className="mt-1 text-sm text-muted-foreground">
                       {session.description}
@@ -157,7 +157,7 @@ export function ProgramSessions({ programId }: ProgramSessionsProps) {
         ))}
       </div>
 
-      <Button onClick={handleAdd} className="w-full">
+      <Button onClick={handleAdd} className="w-full mt-6">
         Add Session
       </Button>
 
@@ -173,12 +173,12 @@ export function ProgramSessions({ programId }: ProgramSessionsProps) {
             <form onSubmit={onSubmit} className="space-y-4">
               <FormField
                 control={form.control}
-                name="title"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter session title" {...field} />
+                      <Input placeholder="Enter session name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
