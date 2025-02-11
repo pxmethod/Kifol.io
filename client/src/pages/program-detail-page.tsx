@@ -2,7 +2,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Program } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { Pencil, ArrowLeft } from "lucide-react";
+import { Pencil, ArrowLeft, CalendarIcon } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
@@ -20,6 +20,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertProgramSchema } from "@shared/schema";
@@ -28,7 +34,16 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Link } from "wouter";
 import { format } from 'date-fns';
+import { cn } from "@/lib/utils";
+import { z } from "zod";
 
+const editProgramSchema = insertProgramSchema.extend({
+  startDate: z.date(),
+  endDate: z.date(),
+}).refine(data => data.endDate > data.startDate, {
+  message: "End date must be after start date",
+  path: ["endDate"],
+});
 
 export default function ProgramDetailPage({
   params,
@@ -43,15 +58,13 @@ export default function ProgramDetailPage({
   });
 
   const updateProgramMutation = useMutation({
-    mutationFn: async (data: { title: string; description: string }) => {
+    mutationFn: async (data: z.infer<typeof editProgramSchema>) => {
       const res = await apiRequest("PATCH", `/api/programs/${params.id}`, data);
       return res.json();
     },
     onSuccess: () => {
       // Invalidate both the specific program query and the programs list query
-      queryClient.invalidateQueries({
-        queryKey: [`/api/programs/${params.id}`],
-      });
+      queryClient.invalidateQueries({ queryKey: [`/api/programs/${params.id}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
       setEditDialogOpen(false);
       toast({
@@ -69,12 +82,12 @@ export default function ProgramDetailPage({
   });
 
   const form = useForm({
-    resolver: zodResolver(
-      insertProgramSchema.pick({ title: true, description: true }),
-    ),
+    resolver: zodResolver(editProgramSchema),
     defaultValues: {
       title: program?.title || "",
       description: program?.description || "",
+      startDate: program ? new Date(program.startDate) : new Date(),
+      endDate: program ? new Date(program.endDate) : new Date(),
     },
   });
 
@@ -160,6 +173,84 @@ export default function ProgramDetailPage({
                   </FormItem>
                 )}
               />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="startDate"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Start Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="endDate"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>End Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <div className="flex justify-end gap-2">
                 <Button
                   type="button"
