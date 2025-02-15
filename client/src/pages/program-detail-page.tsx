@@ -33,24 +33,26 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Link } from "wouter";
-import { format } from 'date-fns';
+import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
 import { ProgramSessions } from "@/components/program-sessions";
 
-const editProgramSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
-  startDate: z.date({
-    required_error: "Start date is required",
-  }),
-  endDate: z.date({
-    required_error: "End date is required",
-  }),
-}).refine(data => data.endDate > data.startDate, {
-  message: "End date must be after start date",
-  path: ["endDate"],
-});
+const editProgramSchema = z
+  .object({
+    title: z.string().min(1, "Title is required"),
+    description: z.string().optional(),
+    startDate: z.date({
+      required_error: "Start date is required",
+    }),
+    endDate: z.date({
+      required_error: "End date is required",
+    }),
+  })
+  .refine((data) => data.endDate > data.startDate, {
+    message: "End date must be after start date",
+    path: ["endDate"],
+  });
 
 export default function ProgramDetailPage({
   params,
@@ -70,7 +72,9 @@ export default function ProgramDetailPage({
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/programs/${params.id}`] });
+      queryClient.invalidateQueries({
+        queryKey: [`/api/programs/${params.id}`],
+      });
       queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
       setEditDialogOpen(false);
       toast({
@@ -122,7 +126,8 @@ export default function ProgramDetailPage({
             <div>
               <h1 className="text-3xl font-bold">{program.title}</h1>
               <p className="text-gray-200 mt-2">
-                {format(new Date(program.startDate), 'MMMM dd, yyyy')} - {format(new Date(program.endDate), 'MMMM dd, yyyy')}
+                {format(new Date(program.startDate), "MMMM dd, yyyy")} -{" "}
+                {format(new Date(program.endDate), "MMMM dd, yyyy")}
               </p>
             </div>
             <Button
@@ -144,7 +149,7 @@ export default function ProgramDetailPage({
         <Tabs defaultValue="sessions" className="w-full">
           <TabsList>
             <TabsTrigger value="sessions">Sessions</TabsTrigger>
-            <TabsTrigger value="portfolios">Student Portfolios</TabsTrigger>
+            <TabsTrigger value="portfolios">Students</TabsTrigger>
           </TabsList>
           <TabsContent value="sessions" className="mt-8">
             <ProgramSessions programId={parseInt(params.id)} />
@@ -199,7 +204,7 @@ export default function ProgramDetailPage({
                               variant="outline"
                               className={cn(
                                 "pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
+                                !field.value && "text-muted-foreground",
                               )}
                             >
                               {field.value ? (
@@ -237,7 +242,7 @@ export default function ProgramDetailPage({
                               variant="outline"
                               className={cn(
                                 "pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
+                                !field.value && "text-muted-foreground",
                               )}
                             >
                               {field.value ? (
