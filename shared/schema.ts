@@ -29,6 +29,37 @@ export const sessions = pgTable("sessions", {
   description: text("description"),
 });
 
+// New tables for student management
+export const students = pgTable("students", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  grade: integer("grade").notNull(),
+});
+
+export const programStudents = pgTable("program_students", {
+  id: serial("id").primaryKey(),
+  programId: integer("program_id")
+    .notNull()
+    .references(() => programs.id),
+  studentId: integer("student_id")
+    .notNull()
+    .references(() => students.id),
+});
+
+export const portfolioEntries = pgTable("portfolio_entries", {
+  id: serial("id").primaryKey(),
+  studentId: integer("student_id")
+    .notNull()
+    .references(() => students.id),
+  title: text("title").notNull(),
+  description: text("description"),
+  achievementDate: date("achievement_date").notNull(),
+  type: text("type").notNull(),
+  grade: text("grade"),
+  feedback: text("feedback"),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   programs: many(programs),
@@ -40,6 +71,7 @@ export const programsRelations = relations(programs, ({ one, many }) => ({
     references: [users.id],
   }),
   sessions: many(sessions),
+  programStudents: many(programStudents),
 }));
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
@@ -49,10 +81,41 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
   }),
 }));
 
+export const studentsRelations = relations(students, ({ many }) => ({
+  programStudents: many(programStudents),
+  portfolioEntries: many(portfolioEntries),
+}));
+
+export const programStudentsRelations = relations(programStudents, ({ one }) => ({
+  program: one(programs, {
+    fields: [programStudents.programId],
+    references: [programs.id],
+  }),
+  student: one(students, {
+    fields: [programStudents.studentId],
+    references: [students.id],
+  }),
+}));
+
+export const portfolioEntriesRelations = relations(portfolioEntries, ({ one }) => ({
+  student: one(students, {
+    fields: [portfolioEntries.studentId],
+    references: [students.id],
+  }),
+}));
+
 // Schemas
 export const insertUserSchema = createInsertSchema(users);
 export const insertProgramSchema = createInsertSchema(programs).omit({ userId: true });
 export const insertSessionSchema = createInsertSchema(sessions).omit({ programId: true });
+export const insertStudentSchema = createInsertSchema(students);
+export const insertProgramStudentSchema = createInsertSchema(programStudents).omit({ 
+  programId: true,
+  studentId: true,
+});
+export const insertPortfolioEntrySchema = createInsertSchema(portfolioEntries).omit({ 
+  studentId: true,
+});
 
 // Types
 export type User = typeof users.$inferSelect;
@@ -61,3 +124,9 @@ export type Program = typeof programs.$inferSelect;
 export type InsertProgram = z.infer<typeof insertProgramSchema>;
 export type Session = typeof sessions.$inferSelect;
 export type InsertSession = z.infer<typeof insertSessionSchema>;
+export type Student = typeof students.$inferSelect;
+export type InsertStudent = z.infer<typeof insertStudentSchema>;
+export type ProgramStudent = typeof programStudents.$inferSelect;
+export type InsertProgramStudent = z.infer<typeof insertProgramStudentSchema>;
+export type PortfolioEntry = typeof portfolioEntries.$inferSelect;
+export type InsertPortfolioEntry = z.infer<typeof insertPortfolioEntrySchema>;

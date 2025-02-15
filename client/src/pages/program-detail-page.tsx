@@ -37,6 +37,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
 import { ProgramSessions } from "@/components/program-sessions";
+import { ProgramStudents } from "@/components/program-students";
 
 const editProgramSchema = z
   .object({
@@ -149,10 +150,13 @@ export default function ProgramDetailPage({
         <Tabs defaultValue="sessions" className="w-full">
           <TabsList>
             <TabsTrigger value="sessions">Sessions</TabsTrigger>
-            <TabsTrigger value="portfolios">Students</TabsTrigger>
+            <TabsTrigger value="students">Students</TabsTrigger>
           </TabsList>
           <TabsContent value="sessions" className="mt-8">
             <ProgramSessions programId={parseInt(params.id)} />
+          </TabsContent>
+          <TabsContent value="students" className="mt-8">
+            <ProgramStudents programId={parseInt(params.id)} />
           </TabsContent>
         </Tabs>
       </div>
