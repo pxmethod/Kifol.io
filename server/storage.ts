@@ -210,8 +210,10 @@ export class DatabaseStorage implements IStorage {
   async removeStudentFromProgram(programId: number, studentId: number): Promise<void> {
     await db
       .delete(programStudents)
-      .where(eq(programStudents.programId, programId))
-      .where(eq(programStudents.studentId, studentId));
+      .where(
+        eq(programStudents.programId, programId) &&
+        eq(programStudents.studentId, studentId)
+      );
   }
 
   // Portfolio methods implementation
