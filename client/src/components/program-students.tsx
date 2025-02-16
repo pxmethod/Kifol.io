@@ -159,7 +159,7 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
+                <TableHead>Parent's Email Address</TableHead>
                 <TableHead>Grade</TableHead>
                 <TableHead className="w-[100px]">Actions</TableHead>
               </TableRow>
@@ -233,7 +233,7 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Parent's Email Address</FormLabel>
                     <FormControl>
                       <Input
                         type="email"
