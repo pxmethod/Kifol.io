@@ -38,7 +38,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, GraduationCap, List, LayoutGrid, Search, Trash2, Mail } from "lucide-react";
+import { Loader2, GraduationCap, List, LayoutGrid, Search, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -51,10 +51,6 @@ const studentSchema = insertStudentSchema.extend({
   grade: z.number().min(1, "Grade is required"),
 });
 
-const inviteParentSchema = z.object({
-  email: z.string().email("Invalid email address"),
-});
-
 type ProgramStudentsProps = {
   programId: number;
 };
@@ -63,8 +59,6 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [searchQuery, setSearchQuery] = useState("");
@@ -79,40 +73,6 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
       name: "",
       email: "",
       grade: 1,
-    },
-  });
-
-  const inviteForm = useForm({
-    resolver: zodResolver(inviteParentSchema),
-    defaultValues: {
-      email: "",
-    },
-  });
-
-  const inviteParentMutation = useMutation({
-    mutationFn: async ({ studentId, email }: { studentId: number; email: string }) => {
-      const res = await apiRequest(
-        "POST",
-        `/api/students/${studentId}/invite-parent`,
-        { email }
-      );
-      return res.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Parent invitation sent successfully",
-      });
-      inviteForm.reset();
-      setInviteDialogOpen(false);
-      setSelectedStudent(null);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
     },
   });
 
@@ -180,20 +140,6 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
     }
   };
 
-  const handleInviteParent = (student: Student) => {
-    setSelectedStudent(student);
-    setInviteDialogOpen(true);
-  };
-
-  const onInviteSubmit = inviteForm.handleSubmit((data) => {
-    if (selectedStudent) {
-      inviteParentMutation.mutate({
-        studentId: selectedStudent.id,
-        email: data.email,
-      });
-    }
-  });
-
   const filteredStudents = students.filter((student) =>
     searchQuery
       ? student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -260,7 +206,7 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                 <TableHead>Name</TableHead>
                 <TableHead>Parent's Email Address</TableHead>
                 <TableHead>Grade</TableHead>
-                <TableHead className="w-[280px]">Actions</TableHead>
+                <TableHead className="w-[200px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -271,13 +217,8 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                   <TableCell>{student.grade}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleInviteParent(student)}
-                      >
-                        <Mail className="h-4 w-4 mr-2" />
-                        Invite Parent
+                      <Button variant="ghost" size="sm">
+                        View Details
                       </Button>
                       <Button
                         variant="ghost"
@@ -311,13 +252,8 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleInviteParent(student)}
-                    >
-                      <Mail className="h-4 w-4 mr-2" />
-                      Invite Parent
+                    <Button variant="ghost" size="sm">
+                      View Details
                     </Button>
                     <Button
                       variant="ghost"
@@ -412,58 +348,6 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
                   Add Student
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Invite Parent</DialogTitle>
-          </DialogHeader>
-
-          <Form {...inviteForm}>
-            <form onSubmit={onInviteSubmit} className="space-y-4">
-              <FormField
-                control={inviteForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Parent's Email Address</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="Enter parent's email"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex justify-end gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setInviteDialogOpen(false);
-                    setSelectedStudent(null);
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={inviteParentMutation.isPending}
-                >
-                  {inviteParentMutation.isPending && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Send Invitation
                 </Button>
               </div>
             </form>
