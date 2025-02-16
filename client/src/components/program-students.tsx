@@ -66,9 +66,13 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
 
   const addStudentMutation = useMutation({
     mutationFn: async (data: z.infer<typeof studentSchema>) => {
-      const res = await apiRequest("POST", `/api/programs/${programId}/students`, {
-        student: data,
-      });
+      const res = await apiRequest(
+        "POST",
+        `/api/programs/${programId}/students`,
+        {
+          student: data,
+        },
+      );
       return res.json();
     },
     onSuccess: () => {
@@ -99,7 +103,7 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
     searchQuery
       ? student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         student.email.toLowerCase().includes(searchQuery.toLowerCase())
-      : true
+      : true,
   );
 
   return (
@@ -221,7 +225,10 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter student name" {...field} />
+                      <Input
+                        placeholder="Enter first and last name"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -237,7 +244,7 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="Enter student email"
+                        placeholder="Enter parent email"
                         {...field}
                       />
                     </FormControl>
@@ -275,10 +282,7 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                 >
                   Cancel
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={addStudentMutation.isPending}
-                >
+                <Button type="submit" disabled={addStudentMutation.isPending}>
                   {addStudentMutation.isPending && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
