@@ -20,9 +20,16 @@
 2. Created new `verification_tokens` table:
    - `id`: serial primary key
    - `token`: text (unique)
-   - `studentId`: integer (foreign key to students)
+   - `parentEmail`: text (not null)
+   - `programId`: integer (foreign key to programs)
    - `expiresAt`: timestamp
    - `createdAt`: timestamp
+
+3. Created new `parent_verifications` table:
+   - `id`: serial primary key
+   - `email`: text (unique)
+   - `isVerified`: boolean (default: false)
+   - `verifiedAt`: timestamp
 
 #### Problems Encountered:
 
@@ -32,38 +39,44 @@
 
 2. **Problem**: PostgresSessionStore Import Error
    - **Issue**: `PostgresSessionStore` not found in storage.ts
-   - **Solution Pending**: Need to properly import and initialize PostgresSessionStore
+   - **Solution**: Added proper import and initialization for PostgresSessionStore
 
 3. **Problem**: Type Error in Student Query
    - **Issue**: Missing fields in `getStudentsByProgramId` query
-   - **Solution Pending**: Update query to include all required fields
+   - **Solution**: Updated query to include all required fields including verification status and parent information
 
 ### 3. Email Service Implementation (2025-02-16)
 
 #### Added Features:
 1. Email verification system:
-   - Token generation
-   - Verification email sending
-   - Token verification endpoints
+   - Global parent verification
+   - One-time verification for all programs
+   - Automatic verification inheritance for new enrollments
 
 #### Implementation Details:
 1. Created `server/email.ts`:
    - SendGrid integration
    - Email templates
    - Token generation and verification logic
+   - Smart duplicate prevention for tokens
 
 2. Updated `storage.ts` with new methods:
-   - `createVerificationToken`
-   - `getVerificationToken`
-   - `deleteVerificationToken`
-   - `markStudentAsVerified`
+   - `createParentVerification`
+   - `getParentVerification`
+   - `markParentAsVerified`
+   - `getStudentsByParentEmail`
+   - `getActiveVerificationToken`
+
+3. Implemented parent-centric verification:
+   - Single verification applies to all current and future programs
+   - Automatic verification of siblings with same parent email
+   - Prevention of duplicate verification emails
 
 ## Next Steps:
-1. Fix PostgresSessionStore initialization
-2. Update student query to include all fields
-3. Execute schema migrations
-4. Implement frontend verification flow
-5. Add email templates for parent verification
+1. Execute schema migrations
+2. Implement frontend verification flow
+3. Add email templates for parent verification
+4. Add error handling for verification edge cases
 
 ## Notes:
 - All database changes are being made through Drizzle ORM

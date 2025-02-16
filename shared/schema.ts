@@ -150,7 +150,6 @@ export const insertParentVerificationSchema = createInsertSchema(parentVerificat
 export const insertVerificationTokenSchema = createInsertSchema(verificationTokens).omit({
   id: true,
   createdAt: true,
-  verifiedAt: true,
 });
 export const insertProgramStudentSchema = createInsertSchema(programStudents).omit({
   programId: true,
