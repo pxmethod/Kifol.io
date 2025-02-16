@@ -8,6 +8,7 @@ import { eq } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
+import { verificationTokens, type VerificationToken, type InsertVerificationToken } from "@shared/schema";
 
 const PostgresSessionStore = connectPg(session);
 
@@ -48,6 +49,12 @@ export interface IStorage {
   deletePortfolioEntry(id: number): Promise<void>;
 
   sessionStore: session.Store;
+
+  // New verification methods
+  createVerificationToken(token: InsertVerificationToken): Promise<VerificationToken>;
+  getVerificationToken(token: string): Promise<VerificationToken | undefined>;
+  deleteVerificationToken(token: string): Promise<void>;
+  markStudentAsVerified(studentId: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -186,6 +193,9 @@ export class DatabaseStorage implements IStorage {
         name: students.name,
         email: students.email,
         grade: students.grade,
+        isVerified: students.isVerified,
+        parentEmail: students.parentEmail,
+        parentName: students.parentName,
       })
       .from(programStudents)
       .innerJoin(students, eq(programStudents.studentId, students.id))
@@ -243,6 +253,36 @@ export class DatabaseStorage implements IStorage {
 
   async deletePortfolioEntry(id: number): Promise<void> {
     await db.delete(portfolioEntries).where(eq(portfolioEntries.id, id));
+  }
+
+  // New verification methods implementation
+  async createVerificationToken(token: InsertVerificationToken): Promise<VerificationToken> {
+    const [newToken] = await db
+      .insert(verificationTokens)
+      .values(token)
+      .returning();
+    return newToken;
+  }
+
+  async getVerificationToken(token: string): Promise<VerificationToken | undefined> {
+    const [verificationToken] = await db
+      .select()
+      .from(verificationTokens)
+      .where(eq(verificationTokens.token, token));
+    return verificationToken;
+  }
+
+  async deleteVerificationToken(token: string): Promise<void> {
+    await db
+      .delete(verificationTokens)
+      .where(eq(verificationTokens.token, token));
+  }
+
+  async markStudentAsVerified(studentId: number): Promise<void> {
+    await db
+      .update(students)
+      .set({ isVerified: true })
+      .where(eq(students.id, studentId));
   }
 }
 

@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { text, serial, integer, date, pgTable } from "drizzle-orm/pg-core";
+import { text, serial, integer, date, pgTable, boolean, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -29,12 +29,26 @@ export const sessions = pgTable("sessions", {
   description: text("description"),
 });
 
-// New tables for student management
 export const students = pgTable("students", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   grade: integer("grade").notNull(),
+  isVerified: boolean("is_verified").notNull().default(false),
+  parentEmail: text("parent_email").notNull(),
+  parentName: text("parent_name"),
+});
+
+export const verificationTokens = pgTable("verification_tokens", {
+  id: serial("id").primaryKey(),
+  token: text("token").notNull().unique(),
+  studentId: integer("student_id")
+    .notNull()
+    .references(() => students.id),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at")
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const programStudents = pgTable("program_students", {
@@ -84,6 +98,14 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 export const studentsRelations = relations(students, ({ many }) => ({
   programStudents: many(programStudents),
   portfolioEntries: many(portfolioEntries),
+  verificationTokens: many(verificationTokens),
+}));
+
+export const verificationTokensRelations = relations(verificationTokens, ({ one }) => ({
+  student: one(students, {
+    fields: [verificationTokens.studentId],
+    references: [students.id],
+  }),
 }));
 
 export const programStudentsRelations = relations(programStudents, ({ one }) => ({
@@ -109,6 +131,10 @@ export const insertUserSchema = createInsertSchema(users);
 export const insertProgramSchema = createInsertSchema(programs).omit({ userId: true });
 export const insertSessionSchema = createInsertSchema(sessions).omit({ programId: true });
 export const insertStudentSchema = createInsertSchema(students);
+export const insertVerificationTokenSchema = createInsertSchema(verificationTokens).omit({
+  id: true,
+  createdAt: true,
+});
 export const insertProgramStudentSchema = createInsertSchema(programStudents).omit({ 
   programId: true,
   studentId: true,
@@ -126,6 +152,8 @@ export type Session = typeof sessions.$inferSelect;
 export type InsertSession = z.infer<typeof insertSessionSchema>;
 export type Student = typeof students.$inferSelect;
 export type InsertStudent = z.infer<typeof insertStudentSchema>;
+export type VerificationToken = typeof verificationTokens.$inferSelect;
+export type InsertVerificationToken = z.infer<typeof insertVerificationTokenSchema>;
 export type ProgramStudent = typeof programStudents.$inferSelect;
 export type InsertProgramStudent = z.infer<typeof insertProgramStudentSchema>;
 export type PortfolioEntry = typeof portfolioEntries.$inferSelect;
