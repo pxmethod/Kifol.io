@@ -2,13 +2,12 @@ import { users, programs, sessions, students, programStudents, portfolioEntries,
   type User, type InsertUser, type Program, type InsertProgram, 
   type Session, type InsertSession, type Student, type InsertStudent,
   type ProgramStudent, type InsertProgramStudent, type PortfolioEntry, 
-  type InsertPortfolioEntry } from "@shared/schema";
+  type InsertPortfolioEntry, type VerificationToken, type InsertVerificationToken, parentVerifications, type ParentVerification, type InsertParentVerification } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and, gt } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
-import { verificationTokens, type VerificationToken, type InsertVerificationToken } from "@shared/schema";
 
 const PostgresSessionStore = connectPg(session);
 
@@ -55,6 +54,18 @@ export interface IStorage {
   getVerificationToken(token: string): Promise<VerificationToken | undefined>;
   deleteVerificationToken(token: string): Promise<void>;
   markStudentAsVerified(studentId: number): Promise<void>;
+
+  // Parent verification methods
+  getParentVerification(email: string): Promise<ParentVerification | undefined>;
+  createParentVerification(verification: InsertParentVerification): Promise<ParentVerification>;
+  markParentAsVerified(email: string): Promise<void>;
+
+  // Updated verification methods
+  getVerificationTokensByParentEmail(email: string): Promise<VerificationToken[]>;
+  getActiveVerificationToken(programId: number, parentEmail: string): Promise<VerificationToken | undefined>;
+
+  // New method for getting all students by parent email
+  getStudentsByParentEmail(parentEmail: string): Promise<Student[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -222,7 +233,7 @@ export class DatabaseStorage implements IStorage {
       .delete(programStudents)
       .where(
         eq(programStudents.programId, programId) &&
-        eq(programStudents.studentId, studentId)
+          eq(programStudents.studentId, studentId)
       );
   }
 
@@ -283,6 +294,60 @@ export class DatabaseStorage implements IStorage {
       .update(students)
       .set({ isVerified: true })
       .where(eq(students.id, studentId));
+  }
+
+  async getParentVerification(email: string): Promise<ParentVerification | undefined> {
+    const [verification] = await db
+      .select()
+      .from(parentVerifications)
+      .where(eq(parentVerifications.email, email));
+    return verification;
+  }
+
+  async createParentVerification(verification: InsertParentVerification): Promise<ParentVerification> {
+    const [newVerification] = await db
+      .insert(parentVerifications)
+      .values(verification)
+      .returning();
+    return newVerification;
+  }
+
+  async markParentAsVerified(email: string): Promise<void> {
+    await db
+      .update(parentVerifications)
+      .set({ 
+        isVerified: true,
+        verifiedAt: new Date()
+      })
+      .where(eq(parentVerifications.email, email));
+  }
+
+  async getVerificationTokensByParentEmail(email: string): Promise<VerificationToken[]> {
+    return await db
+      .select()
+      .from(verificationTokens)
+      .where(eq(verificationTokens.parentEmail, email));
+  }
+
+  async getActiveVerificationToken(programId: number, parentEmail: string): Promise<VerificationToken | undefined> {
+    const [token] = await db
+      .select()
+      .from(verificationTokens)
+      .where(
+        and(
+          eq(verificationTokens.programId, programId),
+          eq(verificationTokens.parentEmail, parentEmail),
+          gt(verificationTokens.expiresAt, new Date())
+        )
+      );
+    return token;
+  }
+
+  async getStudentsByParentEmail(parentEmail: string): Promise<Student[]> {
+    return await db
+      .select()
+      .from(students)
+      .where(eq(students.parentEmail, parentEmail));
   }
 }
 

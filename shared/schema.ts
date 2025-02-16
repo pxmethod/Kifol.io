@@ -39,12 +39,20 @@ export const students = pgTable("students", {
   parentName: text("parent_name"),
 });
 
+export const parentVerifications = pgTable("parent_verifications", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  isVerified: boolean("is_verified").notNull().default(false),
+  verifiedAt: timestamp("verified_at"),
+});
+
 export const verificationTokens = pgTable("verification_tokens", {
   id: serial("id").primaryKey(),
   token: text("token").notNull().unique(),
-  studentId: integer("student_id")
+  parentEmail: text("parent_email").notNull(),
+  programId: integer("program_id")
     .notNull()
-    .references(() => students.id),
+    .references(() => programs.id),
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at")
     .notNull()
@@ -95,16 +103,23 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
   }),
 }));
 
-export const studentsRelations = relations(students, ({ many }) => ({
+export const studentsRelations = relations(students, ({ many, one }) => ({
   programStudents: many(programStudents),
   portfolioEntries: many(portfolioEntries),
-  verificationTokens: many(verificationTokens),
+  parentVerification: one(parentVerifications, {
+    fields: [students.parentEmail],
+    references: [parentVerifications.email],
+  }),
+}));
+
+export const parentVerificationsRelations = relations(parentVerifications, ({ many }) => ({
+  students: many(students),
 }));
 
 export const verificationTokensRelations = relations(verificationTokens, ({ one }) => ({
-  student: one(students, {
-    fields: [verificationTokens.studentId],
-    references: [students.id],
+  program: one(programs, {
+    fields: [verificationTokens.programId],
+    references: [programs.id],
   }),
 }));
 
@@ -131,15 +146,17 @@ export const insertUserSchema = createInsertSchema(users);
 export const insertProgramSchema = createInsertSchema(programs).omit({ userId: true });
 export const insertSessionSchema = createInsertSchema(sessions).omit({ programId: true });
 export const insertStudentSchema = createInsertSchema(students);
+export const insertParentVerificationSchema = createInsertSchema(parentVerifications);
 export const insertVerificationTokenSchema = createInsertSchema(verificationTokens).omit({
   id: true,
   createdAt: true,
+  verifiedAt: true,
 });
-export const insertProgramStudentSchema = createInsertSchema(programStudents).omit({ 
+export const insertProgramStudentSchema = createInsertSchema(programStudents).omit({
   programId: true,
   studentId: true,
 });
-export const insertPortfolioEntrySchema = createInsertSchema(portfolioEntries).omit({ 
+export const insertPortfolioEntrySchema = createInsertSchema(portfolioEntries).omit({
   studentId: true,
 });
 
@@ -158,3 +175,5 @@ export type ProgramStudent = typeof programStudents.$inferSelect;
 export type InsertProgramStudent = z.infer<typeof insertProgramStudentSchema>;
 export type PortfolioEntry = typeof portfolioEntries.$inferSelect;
 export type InsertPortfolioEntry = z.infer<typeof insertPortfolioEntrySchema>;
+export type ParentVerification = typeof parentVerifications.$inferSelect;
+export type InsertParentVerification = z.infer<typeof insertParentVerificationSchema>;
