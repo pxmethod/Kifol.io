@@ -262,6 +262,16 @@ export class DatabaseStorage implements IStorage {
   async deletePortfolioEntry(id: number): Promise<void> {
     await db.delete(portfolioEntries).where(eq(portfolioEntries.id, id));
   }
+
+  async getStudentByNameAndEmail(name: string, email: string): Promise<Student | undefined> {
+    const [student] = await db
+      .select()
+      .from(students)
+      .where(
+        sql`${students.name} = ${name} AND ${students.email} = ${email}`
+      );
+    return student;
+  }
 }
 
 export const storage = new DatabaseStorage();

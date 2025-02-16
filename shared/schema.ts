@@ -33,7 +33,7 @@ export const sessions = pgTable("sessions", {
 export const students = pgTable("students", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  email: text("email").notNull().unique(),
+  email: text("email").notNull(), // Removed .unique()
   grade: integer("grade").notNull(),
 });
 

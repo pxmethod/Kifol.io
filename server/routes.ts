@@ -127,12 +127,22 @@ export function registerRoutes(app: Express): Server {
 
     const studentData = insertStudentSchema.parse(req.body);
 
-    // Check if student already exists
-    let student = await storage.getStudentByEmail(studentData.email);
+    // Check if exact student (same name and email) already exists
+    let student = await storage.getStudentByNameAndEmail(studentData.name, studentData.email);
 
     if (!student) {
       // Create new student if doesn't exist
       student = await storage.createStudent(studentData);
+    }
+
+    // Check if student is already in the program
+    const existingStudents = await storage.getStudentsByProgramId(program.id);
+    const isAlreadyEnrolled = existingStudents.some(s => s.id === student.id);
+
+    if (isAlreadyEnrolled) {
+      return res.status(400).json({
+        message: "This student is already enrolled in this program"
+      });
     }
 
     // Add student to program
