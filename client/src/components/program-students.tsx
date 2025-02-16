@@ -19,11 +19,21 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, GraduationCap } from "lucide-react";
+import { Loader2, GraduationCap, List, LayoutGrid, Search } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+
+type ViewMode = "list" | "grid";
 
 const studentSchema = insertStudentSchema.extend({
   name: z.string().min(1, "Name is required"),
@@ -38,6 +48,8 @@ type ProgramStudentsProps = {
 export function ProgramStudents({ programId }: ProgramStudentsProps) {
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: students = [] } = useQuery<Student[]>({
     queryKey: [`/api/programs/${programId}/students`],
@@ -83,36 +95,116 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
     addStudentMutation.mutate(data);
   });
 
+  const filteredStudents = students.filter((student) =>
+    searchQuery
+      ? student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        student.email.toLowerCase().includes(searchQuery.toLowerCase())
+      : true
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Students</h2>
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search students..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 w-[250px]"
+            />
+          </div>
+          <div className="flex items-center border rounded-lg p-1">
+            <Button
+              variant={viewMode === "list" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("list")}
+              className="px-3"
+            >
+              <List className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === "grid" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("grid")}
+              className="px-3"
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+          </div>
+          <Button onClick={() => setDialogOpen(true)}>Add Student</Button>
+        </div>
       </div>
 
-      <div className="grid gap-4">
-        {students.map((student) => (
-          <Card key={student.id}>
-            <CardContent className="pt-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium">{student.name}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {student.email}
-                  </p>
-                  <p className="mt-1 text-sm">
-                    Grade: {student.grade}
-                  </p>
+      {filteredStudents.length === 0 ? (
+        <Card className="border-dashed">
+          <CardContent className="pt-6 text-center">
+            <h3 className="text-xl font-semibold mb-2">No Students Found</h3>
+            <p className="text-muted-foreground mb-4">
+              {searchQuery
+                ? "Try adjusting your search terms"
+                : "Add students to this program to get started"}
+            </p>
+            <Button onClick={() => setDialogOpen(true)}>
+              <GraduationCap className="mr-2 h-4 w-4" />
+              Add First Student
+            </Button>
+          </CardContent>
+        </Card>
+      ) : viewMode === "list" ? (
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Grade</TableHead>
+                <TableHead className="w-[100px]">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredStudents.map((student) => (
+                <TableRow key={student.id}>
+                  <TableCell className="font-medium">{student.name}</TableCell>
+                  <TableCell>{student.email}</TableCell>
+                  <TableCell>{student.grade}</TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="sm">
+                      View Details
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredStudents.map((student) => (
+            <Card key={student.id}>
+              <CardContent className="pt-6">
+                <div className="flex justify-between items-start">
+                  <div className="space-y-1">
+                    <h3 className="font-medium">{student.name}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {student.email}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <GraduationCap className="h-4 w-4" />
+                      <span className="text-sm">Grade {student.grade}</span>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    View Details
+                  </Button>
                 </div>
-                <GraduationCap className="h-5 w-5 text-muted-foreground" />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <Button onClick={() => setDialogOpen(true)} className="w-full mt-6">
-        Add Student
-      </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
