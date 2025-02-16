@@ -80,7 +80,10 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
 
   const addStudentMutation = useMutation({
     mutationFn: async (data: z.infer<typeof studentSchema> & { force?: boolean }) => {
-      const res = await apiRequest("POST", `/api/programs/${programId}/students`, data);
+      const res = await apiRequest("POST", `/api/programs/${programId}/students`, {
+        ...data,
+        force: data.force
+      });
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.message, { cause: error });
