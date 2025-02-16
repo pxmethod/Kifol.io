@@ -3,7 +3,6 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertProgramSchema, insertSessionSchema, insertStudentSchema } from "@shared/schema";
-import { sendParentVerificationEmail } from "./email";
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
@@ -141,43 +140,6 @@ export function registerRoutes(app: Express): Server {
 
     res.status(201).json({ ...student, programStudent });
   });
-
-  // Test endpoint for email verification (Development only)
-  if (app.get("env") === "development") {
-    app.post("/api/test-verification-email", async (req, res) => {
-      if (!req.isAuthenticated()) return res.sendStatus(401);
-
-      try {
-        const testStudent = {
-          id: 999,
-          name: "Test Student",
-          email: "test.student@example.com",
-          grade: 8,
-          isVerified: false,
-          parentEmail: req.body.parentEmail || "test.parent@example.com",
-          parentName: "Test Parent"
-        };
-
-        const success = await sendParentVerificationEmail(
-          [testStudent],
-          "Test Program",
-          1
-        );
-
-        if (success) {
-          res.json({ message: "Verification email sent successfully" });
-        } else {
-          res.status(500).json({ message: "Failed to send verification email" });
-        }
-      } catch (error) {
-        console.error("Error in test verification endpoint:", error);
-        res.status(500).json({
-          message: "Error sending verification email",
-          error: error.message
-        });
-      }
-    });
-  }
 
   const httpServer = createServer(app);
   return httpServer;

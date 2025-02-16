@@ -57,7 +57,7 @@ export default function AuthPage() {
     registerMutation.mutate(data);
   });
 
-  const SocialButton = ({ icon: Icon, label }: { icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; label: string }) => (
+  const SocialButton = ({ icon: Icon, label }: { icon: React.ComponentType; label: string }) => (
     <Button variant="outline" className="w-full flex gap-2 items-center justify-center" type="button">
       <Icon className="w-5 h-5" />
       <span>Continue with {label}</span>
@@ -184,9 +184,9 @@ export default function AuthPage() {
         </Card>
       </div>
 
-      <div
+      <div 
         className="hidden md:flex flex-col justify-center p-12 bg-cover bg-center"
-        style={{
+        style={{ 
           backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url(https://images.unsplash.com/photo-1503455637927-730bce8583c0)'
         }}
       >
