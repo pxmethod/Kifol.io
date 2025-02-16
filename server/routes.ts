@@ -2,7 +2,8 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { insertProgramSchema, insertSessionSchema, insertStudentSchema } from "@shared/schema";
+import { insertProgramSchema, insertSessionSchema, insertStudentSchema, insertParentSchema } from "@shared/schema";
+import { sendGrid } from "./email";  // We'll need to set this up later for sending invitations
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
@@ -172,6 +173,119 @@ export function registerRoutes(app: Express): Server {
 
     await storage.deleteStudent(studentId);
     res.sendStatus(200);
+  });
+
+  // Parent Authentication Routes
+  app.post("/api/parents/register", async (req, res) => {
+    const parentData = insertParentSchema.parse(req.body);
+
+    // Check if parent already exists
+    const existingParent = await storage.getParentByEmail(parentData.email);
+    if (existingParent) {
+      return res.status(400).json({
+        message: "A parent with this email already exists"
+      });
+    }
+
+    // Get pending invitations for this email
+    const invitations = await storage.getParentInvitationsByEmail(parentData.email);
+    if (invitations.length === 0) {
+      return res.status(400).json({
+        message: "No pending invitations found for this email"
+      });
+    }
+
+    // Create parent account
+    const parent = await storage.createParent(parentData);
+
+    // Accept all pending invitations
+    await Promise.all(
+      invitations
+        .filter(inv => !inv.accepted)
+        .map(inv => storage.acceptParentInvitation(inv.token, parent.id))
+    );
+
+    res.status(201).json({ 
+      message: "Parent account created successfully",
+      parent: {
+        id: parent.id,
+        username: parent.username,
+        email: parent.email,
+        name: parent.name,
+        verified: parent.verified
+      }
+    });
+  });
+
+  // Parent Invitation Routes
+  app.post("/api/students/:studentId/invite-parent", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    const studentId = parseInt(req.params.studentId);
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        message: "Email is required"
+      });
+    }
+
+    // Check if student exists and user has access
+    const student = await storage.getStudent(studentId);
+    if (!student) return res.sendStatus(404);
+
+    const studentPrograms = await storage.getProgramsByStudentId(studentId);
+    const hasAccess = studentPrograms.some(program => program.userId === req.user.id);
+    if (!hasAccess) return res.sendStatus(403);
+
+    // Create invitation
+    const invitation = await storage.createParentInvitation(studentId, email);
+
+    // TODO: Send invitation email using SendGrid
+    // await sendGrid.send({
+    //   to: email,
+    //   subject: "Invitation to Join as Parent",
+    //   text: `You've been invited to join as a parent. Click here to register: ${process.env.APP_URL}/register?token=${invitation.token}`
+    // });
+
+    res.status(201).json({
+      message: "Invitation sent successfully"
+    });
+  });
+
+  app.get("/api/parent-invitations/:token", async (req, res) => {
+    const invitation = await storage.getParentInvitation(req.params.token);
+
+    if (!invitation) {
+      return res.status(404).json({
+        message: "Invitation not found"
+      });
+    }
+
+    if (invitation.accepted) {
+      return res.status(400).json({
+        message: "Invitation has already been accepted"
+      });
+    }
+
+    if (new Date() > invitation.expiresAt) {
+      return res.status(400).json({
+        message: "Invitation has expired"
+      });
+    }
+
+    const student = await storage.getStudent(invitation.studentId);
+    if (!student) {
+      return res.status(404).json({
+        message: "Associated student not found"
+      });
+    }
+
+    res.json({
+      email: invitation.email,
+      studentName: student.name,
+      expiresAt: invitation.expiresAt
+    });
   });
 
   const httpServer = createServer(app);

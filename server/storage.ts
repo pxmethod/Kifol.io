@@ -1,13 +1,15 @@
-import { users, programs, sessions, students, programStudents, portfolioEntries, 
-  type User, type InsertUser, type Program, type InsertProgram, 
+import { users, programs, sessions, students, programStudents, portfolioEntries,
+  parents, parentInvitations,
+  type User, type InsertUser, type Program, type InsertProgram,
   type Session, type InsertSession, type Student, type InsertStudent,
-  type ProgramStudent, type InsertProgramStudent, type PortfolioEntry, 
-  type InsertPortfolioEntry } from "@shared/schema";
+  type ProgramStudent, type InsertProgramStudent, type PortfolioEntry,
+  type InsertPortfolioEntry, type Parent, type InsertParent, type ParentInvitation } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
+import crypto from 'crypto';
 
 const PostgresSessionStore = connectPg(session);
 
@@ -47,6 +49,18 @@ export interface IStorage {
   getPortfolioEntriesByStudentId(studentId: number): Promise<PortfolioEntry[]>;
   updatePortfolioEntry(id: number, entry: Partial<InsertPortfolioEntry>): Promise<PortfolioEntry>;
   deletePortfolioEntry(id: number): Promise<void>;
+
+  // Parent methods
+  createParent(parent: InsertParent): Promise<Parent>;
+  getParentByEmail(email: string): Promise<Parent | undefined>;
+  getParentByUsername(username: string): Promise<Parent | undefined>;
+  verifyParent(id: number): Promise<Parent>;
+
+  // Parent Invitation methods
+  createParentInvitation(studentId: number, email: string): Promise<ParentInvitation>;
+  getParentInvitation(token: string): Promise<ParentInvitation | undefined>;
+  acceptParentInvitation(token: string, parentId: number): Promise<void>;
+  getParentInvitationsByEmail(email: string): Promise<ParentInvitation[]>;
 
   sessionStore: session.Store;
 }
@@ -204,6 +218,7 @@ export class DatabaseStorage implements IStorage {
         name: students.name,
         email: students.email,
         grade: students.grade,
+        parentId: students.parentId,
       })
       .from(programStudents)
       .innerJoin(students, eq(programStudents.studentId, students.id))
@@ -271,6 +286,92 @@ export class DatabaseStorage implements IStorage {
         sql`${students.name} = ${name} AND ${students.email} = ${email}`
       );
     return student;
+  }
+
+  // Parent methods implementation
+  async createParent(parent: InsertParent): Promise<Parent> {
+    const [newParent] = await db
+      .insert(parents)
+      .values(parent)
+      .returning();
+    return newParent;
+  }
+
+  async getParentByEmail(email: string): Promise<Parent | undefined> {
+    const [parent] = await db
+      .select()
+      .from(parents)
+      .where(eq(parents.email, email));
+    return parent;
+  }
+
+  async getParentByUsername(username: string): Promise<Parent | undefined> {
+    const [parent] = await db
+      .select()
+      .from(parents)
+      .where(eq(parents.username, username));
+    return parent;
+  }
+
+  async verifyParent(id: number): Promise<Parent> {
+    const [parent] = await db
+      .update(parents)
+      .set({ verified: true })
+      .where(eq(parents.id, id))
+      .returning();
+    return parent;
+  }
+
+  // Parent Invitation methods implementation
+  async createParentInvitation(studentId: number, email: string): Promise<ParentInvitation> {
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7); // Invitation expires in 7 days
+
+    const [invitation] = await db
+      .insert(parentInvitations)
+      .values({
+        studentId,
+        email,
+        token,
+        expiresAt,
+      })
+      .returning();
+    return invitation;
+  }
+
+  async getParentInvitation(token: string): Promise<ParentInvitation | undefined> {
+    const [invitation] = await db
+      .select()
+      .from(parentInvitations)
+      .where(eq(parentInvitations.token, token));
+    return invitation;
+  }
+
+  async acceptParentInvitation(token: string, parentId: number): Promise<void> {
+    const invitation = await this.getParentInvitation(token);
+    if (!invitation) throw new Error("Invalid invitation token");
+
+    await db.transaction(async (tx) => {
+      // Mark invitation as accepted
+      await tx
+        .update(parentInvitations)
+        .set({ accepted: true })
+        .where(eq(parentInvitations.token, token));
+
+      // Update student with parent ID
+      await tx
+        .update(students)
+        .set({ parentId })
+        .where(eq(students.id, invitation.studentId));
+    });
+  }
+
+  async getParentInvitationsByEmail(email: string): Promise<ParentInvitation[]> {
+    return await db
+      .select()
+      .from(parentInvitations)
+      .where(eq(parentInvitations.email, email));
   }
 }
 

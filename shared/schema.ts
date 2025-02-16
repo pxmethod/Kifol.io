@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { text, serial, integer, date, pgTable } from "drizzle-orm/pg-core";
+import { text, serial, integer, date, pgTable, boolean, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -7,6 +7,39 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+});
+
+// New parent table
+export const parents = pgTable("parents", {
+  id: serial("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
+  email: text("email").notNull().unique(),
+  name: text("name").notNull(),
+  phone: text("phone"),
+  verified: boolean("verified").notNull().default(false),
+});
+
+// New parent invitations table
+export const parentInvitations = pgTable("parent_invitations", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull(),
+  studentId: integer("student_id")
+    .notNull()
+    .references(() => students.id),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  accepted: boolean("accepted").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Update students table to include parentId
+export const students = pgTable("students", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  grade: integer("grade").notNull(),
+  parentId: integer("parent_id").references(() => parents.id),
 });
 
 export const programs = pgTable("programs", {
@@ -27,14 +60,6 @@ export const sessions = pgTable("sessions", {
     .references(() => programs.id),
   name: text("name").notNull(),
   description: text("description"),
-});
-
-// New tables for student management
-export const students = pgTable("students", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  email: text("email").notNull(), // Removed .unique()
-  grade: integer("grade").notNull(),
 });
 
 export const programStudents = pgTable("program_students", {
@@ -60,7 +85,6 @@ export const portfolioEntries = pgTable("portfolio_entries", {
   feedback: text("feedback"),
 });
 
-// Relations
 export const usersRelations = relations(users, ({ many }) => ({
   programs: many(programs),
 }));
@@ -81,9 +105,14 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
   }),
 }));
 
-export const studentsRelations = relations(students, ({ many }) => ({
+export const studentsRelations = relations(students, ({ one, many }) => ({
+  parent: one(parents, {
+    fields: [students.parentId],
+    references: [parents.id],
+  }),
   programStudents: many(programStudents),
   portfolioEntries: many(portfolioEntries),
+  parentInvitations: many(parentInvitations),
 }));
 
 export const programStudentsRelations = relations(programStudents, ({ one }) => ({
@@ -104,20 +133,32 @@ export const portfolioEntriesRelations = relations(portfolioEntries, ({ one }) =
   }),
 }));
 
-// Schemas
+export const parentsRelations = relations(parents, ({ many }) => ({
+  students: many(students),
+}));
+
+
 export const insertUserSchema = createInsertSchema(users);
 export const insertProgramSchema = createInsertSchema(programs).omit({ userId: true });
 export const insertSessionSchema = createInsertSchema(sessions).omit({ programId: true });
 export const insertStudentSchema = createInsertSchema(students);
-export const insertProgramStudentSchema = createInsertSchema(programStudents).omit({ 
+export const insertProgramStudentSchema = createInsertSchema(programStudents).omit({
   programId: true,
   studentId: true,
 });
-export const insertPortfolioEntrySchema = createInsertSchema(portfolioEntries).omit({ 
+export const insertPortfolioEntrySchema = createInsertSchema(portfolioEntries).omit({
   studentId: true,
 });
 
-// Types
+export const insertParentSchema = createInsertSchema(parents, {
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
+export const insertParentInvitationSchema = createInsertSchema(parentInvitations, {
+  email: z.string().email("Invalid email address"),
+});
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Program = typeof programs.$inferSelect;
@@ -130,3 +171,7 @@ export type ProgramStudent = typeof programStudents.$inferSelect;
 export type InsertProgramStudent = z.infer<typeof insertProgramStudentSchema>;
 export type PortfolioEntry = typeof portfolioEntries.$inferSelect;
 export type InsertPortfolioEntry = z.infer<typeof insertPortfolioEntrySchema>;
+export type Parent = typeof parents.$inferSelect;
+export type InsertParent = z.infer<typeof insertParentSchema>;
+export type ParentInvitation = typeof parentInvitations.$inferSelect;
+export type InsertParentInvitation = z.infer<typeof insertParentInvitationSchema>;
