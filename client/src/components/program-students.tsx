@@ -79,6 +79,10 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
   const addStudentMutation = useMutation({
     mutationFn: async (data: z.infer<typeof studentSchema>) => {
       const res = await apiRequest("POST", `/api/programs/${programId}/students`, data);
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message, { cause: error });
+      }
       return res.json();
     },
     onSuccess: () => {
@@ -93,11 +97,24 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
       setDialogOpen(false);
     },
     onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      // Check if it's a duplicate name error
+      if ((error as any).cause?.type === "DUPLICATE_NAME") {
+        // Show confirmation dialog
+        if (window.confirm(`${error.message}. Would you like to add this student anyway?`)) {
+          // Re-submit with force flag
+          const formData = form.getValues();
+          addStudentMutation.mutate({
+            ...formData,
+            force: true
+          });
+        }
+      } else {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     },
   });
 

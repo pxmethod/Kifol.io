@@ -127,7 +127,21 @@ export function registerRoutes(app: Express): Server {
 
     const studentData = insertStudentSchema.parse(req.body);
 
-    // Check if exact student (same name and email) already exists
+    // First check if there's a student with the same name in the program
+    const existingStudents = await storage.getStudentsByProgramId(program.id);
+    const duplicateNameStudent = existingStudents.find(
+      s => s.name.toLowerCase() === studentData.name.toLowerCase()
+    );
+
+    if (duplicateNameStudent) {
+      return res.status(409).json({
+        message: "A student with this name already exists in the program",
+        type: "DUPLICATE_NAME",
+        existingStudent: duplicateNameStudent
+      });
+    }
+
+    // Check if exact student (same name and email) already exists in the system
     let student = await storage.getStudentByNameAndEmail(studentData.name, studentData.email);
 
     if (!student) {
@@ -136,7 +150,6 @@ export function registerRoutes(app: Express): Server {
     }
 
     // Check if student is already in the program
-    const existingStudents = await storage.getStudentsByProgramId(program.id);
     const isAlreadyEnrolled = existingStudents.some(s => s.id === student.id);
 
     if (isAlreadyEnrolled) {
