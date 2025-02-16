@@ -1,8 +1,8 @@
-import { users, programs, sessions, students, programStudents, portfolioEntries, parentInvitations,
+import { users, programs, sessions, students, programStudents, portfolioEntries, 
   type User, type InsertUser, type Program, type InsertProgram, 
   type Session, type InsertSession, type Student, type InsertStudent,
   type ProgramStudent, type InsertProgramStudent, type PortfolioEntry, 
-  type InsertPortfolioEntry, type ParentInvitation } from "@shared/schema";
+  type InsertPortfolioEntry } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import session from "express-session";
@@ -34,7 +34,6 @@ export interface IStorage {
   createStudent(student: InsertStudent): Promise<Student>;
   getStudent(id: number): Promise<Student | undefined>;
   getStudentByEmail(email: string): Promise<Student | undefined>;
-  updateStudent(id: number, data: Partial<InsertStudent>): Promise<Student>;
 
   // Program-Student relationship methods
   addStudentToProgram(programId: number, studentId: number): Promise<ProgramStudent>;
@@ -47,11 +46,6 @@ export interface IStorage {
   getPortfolioEntriesByStudentId(studentId: number): Promise<PortfolioEntry[]>;
   updatePortfolioEntry(id: number, entry: Partial<InsertPortfolioEntry>): Promise<PortfolioEntry>;
   deletePortfolioEntry(id: number): Promise<void>;
-
-  // Parent invitation methods
-  createParentInvitation(studentId: number, email: string, token: string): Promise<ParentInvitation>;
-  getParentInvitationByToken(token: string): Promise<ParentInvitation | undefined>;
-  markParentInvitationUsed(id: number): Promise<void>;
 
   sessionStore: session.Store;
 }
@@ -186,19 +180,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getStudentsByProgramId(programId: number): Promise<Student[]> {
-    const result = await db
+    return await db
       .select({
         id: students.id,
         name: students.name,
         email: students.email,
         grade: students.grade,
-        isParentRegistered: students.isParentRegistered,
       })
       .from(programStudents)
       .innerJoin(students, eq(programStudents.studentId, students.id))
       .where(eq(programStudents.programId, programId));
-
-    return result;
   }
 
   async getProgramsByStudentId(studentId: number): Promise<Program[]> {
@@ -252,51 +243,6 @@ export class DatabaseStorage implements IStorage {
 
   async deletePortfolioEntry(id: number): Promise<void> {
     await db.delete(portfolioEntries).where(eq(portfolioEntries.id, id));
-  }
-
-  async createParentInvitation(
-    studentId: number,
-    email: string,
-    token: string
-  ): Promise<ParentInvitation> {
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiry
-
-    const [invitation] = await db
-      .insert(parentInvitations)
-      .values({
-        studentId,
-        email,
-        token,
-        expiresAt,
-      })
-      .returning();
-
-    return invitation;
-  }
-
-  async getParentInvitationByToken(token: string): Promise<ParentInvitation | undefined> {
-    const [invitation] = await db
-      .select()
-      .from(parentInvitations)
-      .where(eq(parentInvitations.token, token));
-
-    return invitation;
-  }
-
-  async markParentInvitationUsed(id: number): Promise<void> {
-    await db
-      .update(parentInvitations)
-      .set({ usedAt: new Date() })
-      .where(eq(parentInvitations.id, id));
-  }
-  async updateStudent(id: number, data: Partial<InsertStudent>): Promise<Student> {
-    const [updatedStudent] = await db
-      .update(students)
-      .set(data)
-      .where(eq(students.id, id))
-      .returning();
-    return updatedStudent;
   }
 }
 
