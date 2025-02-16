@@ -11,6 +11,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Form,
   FormControl,
   FormField,
@@ -28,7 +38,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, GraduationCap, List, LayoutGrid, Search } from "lucide-react";
+import { Loader2, GraduationCap, List, LayoutGrid, Search, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -48,6 +58,8 @@ type ProgramStudentsProps = {
 export function ProgramStudents({ programId }: ProgramStudentsProps) {
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -91,9 +103,44 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
     },
   });
 
+  const deleteStudentMutation = useMutation({
+    mutationFn: async (studentId: number) => {
+      await apiRequest("DELETE", `/api/students/${studentId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [`/api/programs/${programId}/students`],
+      });
+      toast({
+        title: "Success",
+        description: "Student removed successfully",
+      });
+      setStudentToDelete(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const onSubmit = form.handleSubmit((data) => {
     addStudentMutation.mutate(data);
   });
+
+  const handleDeleteClick = (student: Student) => {
+    setStudentToDelete(student);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (studentToDelete) {
+      deleteStudentMutation.mutate(studentToDelete.id);
+      setDeleteDialogOpen(false);
+    }
+  };
 
   const filteredStudents = students.filter((student) =>
     searchQuery
@@ -161,7 +208,7 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                 <TableHead>Name</TableHead>
                 <TableHead>Parent's Email Address</TableHead>
                 <TableHead>Grade</TableHead>
-                <TableHead className="w-[100px]">Actions</TableHead>
+                <TableHead className="w-[200px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -171,9 +218,19 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                   <TableCell>{student.email}</TableCell>
                   <TableCell>{student.grade}</TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="sm">
-                      View Details
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="sm">
+                        View Details
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteClick(student)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -196,9 +253,19 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                       <span className="text-sm">Grade {student.grade}</span>
                     </div>
                   </div>
-                  <Button variant="ghost" size="sm">
-                    View Details
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="ghost" size="sm">
+                      View Details
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteClick(student)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -289,6 +356,30 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
           </Form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Student</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove {studentToDelete?.name} from this program? This action cannot be undone and will permanently delete all their data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteStudentMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Remove Student"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
