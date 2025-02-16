@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { text, serial, integer, date, pgTable } from "drizzle-orm/pg-core";
+import { text, serial, integer, date, pgTable, boolean, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -35,6 +35,7 @@ export const students = pgTable("students", {
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   grade: integer("grade").notNull(),
+  isParentRegistered: boolean("is_parent_registered").notNull().default(false),
 });
 
 export const programStudents = pgTable("program_students", {
@@ -58,6 +59,18 @@ export const portfolioEntries = pgTable("portfolio_entries", {
   type: text("type").notNull(),
   grade: text("grade"),
   feedback: text("feedback"),
+});
+
+export const parentInvitations = pgTable("parent_invitations", {
+  id: serial("id").primaryKey(),
+  studentId: integer("student_id")
+    .notNull()
+    .references(() => students.id),
+  token: text("token").notNull().unique(),
+  email: text("email").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  usedAt: timestamp("used_at"),
+  createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
 // Relations
@@ -84,6 +97,7 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 export const studentsRelations = relations(students, ({ many }) => ({
   programStudents: many(programStudents),
   portfolioEntries: many(portfolioEntries),
+  parentInvitations: many(parentInvitations),
 }));
 
 export const programStudentsRelations = relations(programStudents, ({ one }) => ({
@@ -104,17 +118,29 @@ export const portfolioEntriesRelations = relations(portfolioEntries, ({ one }) =
   }),
 }));
 
+export const parentInvitationsRelations = relations(parentInvitations, ({ one }) => ({
+  student: one(students, {
+    fields: [parentInvitations.studentId],
+    references: [students.id],
+  }),
+}));
+
 // Schemas
 export const insertUserSchema = createInsertSchema(users);
 export const insertProgramSchema = createInsertSchema(programs).omit({ userId: true });
 export const insertSessionSchema = createInsertSchema(sessions).omit({ programId: true });
 export const insertStudentSchema = createInsertSchema(students);
-export const insertProgramStudentSchema = createInsertSchema(programStudents).omit({ 
+export const insertProgramStudentSchema = createInsertSchema(programStudents).omit({
   programId: true,
   studentId: true,
 });
-export const insertPortfolioEntrySchema = createInsertSchema(portfolioEntries).omit({ 
+export const insertPortfolioEntrySchema = createInsertSchema(portfolioEntries).omit({
   studentId: true,
+});
+export const insertParentInvitationSchema = createInsertSchema(parentInvitations).omit({
+  id: true,
+  createdAt: true,
+  usedAt: true,
 });
 
 // Types
@@ -130,3 +156,5 @@ export type ProgramStudent = typeof programStudents.$inferSelect;
 export type InsertProgramStudent = z.infer<typeof insertProgramStudentSchema>;
 export type PortfolioEntry = typeof portfolioEntries.$inferSelect;
 export type InsertPortfolioEntry = z.infer<typeof insertPortfolioEntrySchema>;
+export type ParentInvitation = typeof parentInvitations.$inferSelect;
+export type InsertParentInvitation = z.infer<typeof insertParentInvitationSchema>;
