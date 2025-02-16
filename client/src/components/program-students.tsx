@@ -9,8 +9,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -21,23 +19,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Loader2, ArrowUpDown, Search, Pencil } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Loader2, GraduationCap } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 const studentSchema = insertStudentSchema.extend({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  parentEmail: z.string().email("Invalid parent email address"),
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
   grade: z.number().min(1, "Grade is required"),
 });
 
@@ -48,10 +38,6 @@ type ProgramStudentsProps = {
 export function ProgramStudents({ programId }: ProgramStudentsProps) {
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: "lastName", direction: "asc" });
-  const [editStudent, setEditStudent] = useState<Student | null>(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const { data: students = [] } = useQuery<Student[]>({
     queryKey: [`/api/programs/${programId}/students`],
@@ -60,9 +46,8 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
   const form = useForm({
     resolver: zodResolver(studentSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      parentEmail: "",
+      name: "",
+      email: "",
       grade: 1,
     },
   });
@@ -94,199 +79,73 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
     },
   });
 
-  const updateStudentMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: z.infer<typeof studentSchema> }) => {
-      const res = await apiRequest("PATCH", `/api/programs/${programId}/students/${id}`, data);
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [`/api/programs/${programId}/students`],
-      });
-      toast({
-        title: "Success",
-        description: "Student updated successfully",
-      });
-      form.reset();
-      setEditStudent(null);
-      setDialogOpen(false);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
   const onSubmit = form.handleSubmit((data) => {
-    if (editStudent) {
-      updateStudentMutation.mutate({ id: editStudent.id, data });
-    } else {
-      addStudentMutation.mutate(data);
-    }
+    addStudentMutation.mutate(data);
   });
-
-  const handleEdit = (student: Student) => {
-    setEditStudent(student);
-    form.reset({
-      firstName: student.firstName,
-      lastName: student.lastName,
-      parentEmail: student.parentEmail,
-      grade: student.grade,
-    });
-    setDialogOpen(true);
-  };
-
-  const handleAdd = () => {
-    setEditStudent(null);
-    form.reset({
-      firstName: "",
-      lastName: "",
-      parentEmail: "",
-      grade: 1,
-    });
-    setDialogOpen(true);
-  };
-
-  const filteredStudents = students.filter(
-    (student) =>
-      student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.parentEmail.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const sortedStudents = [...filteredStudents].sort((a, b) => {
-    const direction = sortConfig.direction === "asc" ? 1 : -1;
-    if (sortConfig.key === "name") {
-      return (a.lastName + a.firstName).localeCompare(b.lastName + b.firstName) * direction;
-    }
-    return a[sortConfig.key as keyof Student] > b[sortConfig.key as keyof Student] ? direction : -direction;
-  });
-
-  const handleSort = (key: string) => {
-    setSortConfig({
-      key,
-      direction:
-        sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc",
-    });
-  };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Students</h2>
-        <div className="flex gap-4">
-          <div className="relative">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search students..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8"
-            />
-          </div>
-          <Button onClick={handleAdd}>Add Student</Button>
-        </div>
       </div>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead onClick={() => handleSort("lastName")} className="cursor-pointer">
-                <div className="flex items-center">
-                  Name
-                  <ArrowUpDown className="ml-2 h-4 w-4" />
+      <div className="grid gap-4">
+        {students.map((student) => (
+          <Card key={student.id}>
+            <CardContent className="pt-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="font-medium">{student.name}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {student.email}
+                  </p>
+                  <p className="mt-1 text-sm">
+                    Grade: {student.grade}
+                  </p>
                 </div>
-              </TableHead>
-              <TableHead onClick={() => handleSort("parentEmail")} className="cursor-pointer">
-                <div className="flex items-center">
-                  Parent Email
-                  <ArrowUpDown className="ml-2 h-4 w-4" />
-                </div>
-              </TableHead>
-              <TableHead onClick={() => handleSort("grade")} className="cursor-pointer">
-                <div className="flex items-center">
-                  Grade
-                  <ArrowUpDown className="ml-2 h-4 w-4" />
-                </div>
-              </TableHead>
-              <TableHead className="w-[50px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sortedStudents.map((student) => (
-              <TableRow key={student.id}>
-                <TableCell>{student.lastName}, {student.firstName}</TableCell>
-                <TableCell>{student.parentEmail}</TableCell>
-                <TableCell>{student.grade}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleEdit(student)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                <GraduationCap className="h-5 w-5 text-muted-foreground" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
+
+      <Button onClick={() => setDialogOpen(true)} className="w-full mt-6">
+        Add Student
+      </Button>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {editStudent ? "Edit Student" : "Add Student"}
-            </DialogTitle>
+            <DialogTitle>Add Student</DialogTitle>
           </DialogHeader>
 
           <Form {...form}>
             <form onSubmit={onSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="firstName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>First Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter first name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="lastName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Last Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter last name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter student name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <FormField
                 control={form.control}
-                name="parentEmail"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Parent Email</FormLabel>
+                    <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="Enter parent email"
+                        placeholder="Enter student email"
                         {...field}
                       />
                     </FormControl>
@@ -326,12 +185,12 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={addStudentMutation.isPending || updateStudentMutation.isPending}
+                  disabled={addStudentMutation.isPending}
                 >
-                  {(addStudentMutation.isPending || updateStudentMutation.isPending) && (
+                  {addStudentMutation.isPending && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  {editStudent ? "Save Changes" : "Add Student"}
+                  Add Student
                 </Button>
               </div>
             </form>
