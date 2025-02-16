@@ -59,7 +59,9 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
+  const [duplicateStudent, setDuplicateStudent] = useState<Student | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -77,7 +79,7 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
   });
 
   const addStudentMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof studentSchema>) => {
+    mutationFn: async (data: z.infer<typeof studentSchema> & { force?: boolean }) => {
       const res = await apiRequest("POST", `/api/programs/${programId}/students`, data);
       if (!res.ok) {
         const error = await res.json();
@@ -95,19 +97,12 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
       });
       form.reset();
       setDialogOpen(false);
+      setDuplicateDialogOpen(false);
     },
     onError: (error: Error) => {
-      // Check if it's a duplicate name error
       if ((error as any).cause?.type === "DUPLICATE_NAME") {
-        // Show confirmation dialog
-        if (window.confirm(`${error.message}. Would you like to add this student anyway?`)) {
-          // Re-submit with force flag
-          const formData = form.getValues();
-          addStudentMutation.mutate({
-            ...formData,
-            force: true
-          });
-        }
+        setDuplicateStudent((error as any).cause.existingStudent);
+        setDuplicateDialogOpen(true);
       } else {
         toast({
           title: "Error",
@@ -155,6 +150,12 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
       deleteStudentMutation.mutate(studentToDelete.id);
       setDeleteDialogOpen(false);
     }
+  };
+
+  const handleConfirmDuplicate = () => {
+    const formData = form.getValues();
+    addStudentMutation.mutate({ ...formData, force: true });
+    setDuplicateDialogOpen(false);
   };
 
   const filteredStudents = students.filter((student) =>
@@ -390,6 +391,33 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 "Remove Student"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={duplicateDialogOpen} onOpenChange={setDuplicateDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Duplicate Student Name</AlertDialogTitle>
+            <AlertDialogDescription>
+              A student named "{duplicateStudent?.name}" already exists in this program. 
+              Would you like to add another student with the same name?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDuplicateDialogOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDuplicate}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              {addStudentMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Add Anyway"
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -133,7 +133,7 @@ export function registerRoutes(app: Express): Server {
       s => s.name.toLowerCase() === studentData.name.toLowerCase()
     );
 
-    if (duplicateNameStudent) {
+    if (duplicateNameStudent && !req.body.force) {
       return res.status(409).json({
         message: "A student with this name already exists in the program",
         type: "DUPLICATE_NAME",
