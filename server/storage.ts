@@ -34,6 +34,7 @@ export interface IStorage {
   createStudent(student: InsertStudent): Promise<Student>;
   getStudent(id: number): Promise<Student | undefined>;
   getStudentByEmail(email: string): Promise<Student | undefined>;
+  updateStudent(id: number, student: Partial<InsertStudent>): Promise<Student>;
 
   // Program-Student relationship methods
   addStudentToProgram(programId: number, studentId: number): Promise<ProgramStudent>;
@@ -166,8 +167,17 @@ export class DatabaseStorage implements IStorage {
     const [student] = await db
       .select()
       .from(students)
-      .where(eq(students.email, email));
+      .where(eq(students.parentEmail, email));
     return student;
+  }
+
+  async updateStudent(id: number, student: Partial<InsertStudent>): Promise<Student> {
+    const [updatedStudent] = await db
+      .update(students)
+      .set(student)
+      .where(eq(students.id, id))
+      .returning();
+    return updatedStudent;
   }
 
   // Program-Student relationship methods implementation
@@ -183,8 +193,9 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select({
         id: students.id,
-        name: students.name,
-        email: students.email,
+        firstName: students.firstName,
+        lastName: students.lastName,
+        parentEmail: students.parentEmail,
         grade: students.grade,
       })
       .from(programStudents)

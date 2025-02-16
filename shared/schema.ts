@@ -32,8 +32,9 @@ export const sessions = pgTable("sessions", {
 // New tables for student management
 export const students = pgTable("students", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  email: text("email").notNull().unique(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  parentEmail: text("parent_email").notNull().unique(),
   grade: integer("grade").notNull(),
 });
 
@@ -108,12 +109,17 @@ export const portfolioEntriesRelations = relations(portfolioEntries, ({ one }) =
 export const insertUserSchema = createInsertSchema(users);
 export const insertProgramSchema = createInsertSchema(programs).omit({ userId: true });
 export const insertSessionSchema = createInsertSchema(sessions).omit({ programId: true });
-export const insertStudentSchema = createInsertSchema(students);
-export const insertProgramStudentSchema = createInsertSchema(programStudents).omit({ 
+export const insertStudentSchema = createInsertSchema(students).extend({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  parentEmail: z.string().email("Invalid parent email address"),
+  grade: z.number().min(1, "Grade is required"),
+});
+export const insertProgramStudentSchema = createInsertSchema(programStudents).omit({
   programId: true,
   studentId: true,
 });
-export const insertPortfolioEntrySchema = createInsertSchema(portfolioEntries).omit({ 
+export const insertPortfolioEntrySchema = createInsertSchema(portfolioEntries).omit({
   studentId: true,
 });
 
