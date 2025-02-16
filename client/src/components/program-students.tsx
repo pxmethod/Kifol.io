@@ -50,6 +50,30 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
+  
+  const deleteStudentMutation = useMutation({
+    mutationFn: async (studentId: number) => {
+      await apiRequest("DELETE", `/api/programs/${programId}/students/${studentId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/programs/${programId}/students`] });
+      toast({
+        title: "Success",
+        description: "Student removed from program successfully",
+      });
+      setShowDeleteConfirm(false);
+      setStudentToDelete(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   const { data: students = [] } = useQuery<Student[]>({
     queryKey: [`/api/programs/${programId}/students`],
@@ -175,9 +199,21 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                   <TableCell>{student.email}</TableCell>
                   <TableCell>{student.grade}</TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="sm">
-                      View Details
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="sm">
+                        View Details
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => {
+                          setStudentToDelete(student);
+                          setShowDeleteConfirm(true);
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -293,6 +329,29 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
           </Form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Student</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove {studentToDelete?.name} from this program? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => {
+                if (studentToDelete) {
+                  deleteStudentMutation.mutate(studentToDelete.id);
+                }
+              }}
+            >
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

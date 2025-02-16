@@ -162,6 +162,17 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  app.delete("/api/programs/:programId/students/:studentId", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    const program = await storage.getProgram(parseInt(req.params.programId));
+    if (!program) return res.sendStatus(404);
+    if (program.userId !== req.user.id) return res.sendStatus(403);
+
+    await storage.removeStudentFromProgram(program.id, parseInt(req.params.studentId));
+    res.sendStatus(200);
+  });
+
   app.post("/api/parent-registration", async (req, res) => {
     const { token, password } = req.body;
 
