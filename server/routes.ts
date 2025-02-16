@@ -141,21 +141,21 @@ export function registerRoutes(app: Express): Server {
       });
     }
 
-    // Check if exact student (same name and email) already exists in the system
-    let student = await storage.getStudentByNameAndEmail(studentData.name, studentData.email);
-
-    if (!student) {
-      // Create new student if doesn't exist
-      student = await storage.createStudent(studentData);
-    }
-
     // Check if student is already in the program
-    const isAlreadyEnrolled = existingStudents.some(s => s.id === student.id);
+    const isAlreadyEnrolled = existingStudents.some(s => s.email === studentData.email);
 
     if (isAlreadyEnrolled) {
       return res.status(400).json({
         message: "This student is already enrolled in this program"
       });
+    }
+
+    // Create or find student
+    let student = await storage.getStudentByEmail(studentData.email);
+
+    if (!student) {
+      // Create new student if doesn't exist
+      student = await storage.createStudent(studentData);
     }
 
     // Add student to program
