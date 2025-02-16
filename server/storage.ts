@@ -4,7 +4,7 @@ import { users, programs, sessions, students, programStudents, portfolioEntries,
   type ProgramStudent, type InsertProgramStudent, type PortfolioEntry, 
   type InsertPortfolioEntry } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
@@ -172,7 +172,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteStudent(id: number): Promise<void> {
-    // First delete related portfolio entries
+    // First delete any parent invitations
+    await db.execute(sql`DELETE FROM parent_invitations WHERE student_id = ${id}`);
+
+    // Then delete related portfolio entries
     await db.delete(portfolioEntries)
       .where(eq(portfolioEntries.studentId, id));
 
