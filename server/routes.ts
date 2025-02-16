@@ -125,7 +125,7 @@ export function registerRoutes(app: Express): Server {
     if (!program) return res.sendStatus(404);
     if (program.userId !== req.user.id) return res.sendStatus(403);
 
-    const studentData = insertStudentSchema.parse(req.body.student);
+    const studentData = insertStudentSchema.parse(req.body);
 
     // Check if student already exists
     let student = await storage.getStudentByEmail(studentData.email);
