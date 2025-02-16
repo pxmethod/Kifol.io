@@ -145,7 +145,7 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
       return res.json();
     },
     onSuccess: (student: Student | null) => {
-      if (student) {
+      if (student && student.id) {
         setExistingStudent(student);
         setConfirmExistingStudentOpen(true);
         setDialogOpen(false);
