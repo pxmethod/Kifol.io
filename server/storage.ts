@@ -34,6 +34,7 @@ export interface IStorage {
   createStudent(student: InsertStudent): Promise<Student>;
   getStudent(id: number): Promise<Student | undefined>;
   getStudentByEmail(email: string): Promise<Student | undefined>;
+  deleteStudent(id: number): Promise<void>;
 
   // Program-Student relationship methods
   addStudentToProgram(programId: number, studentId: number): Promise<ProgramStudent>;
@@ -168,6 +169,20 @@ export class DatabaseStorage implements IStorage {
       .from(students)
       .where(eq(students.email, email));
     return student;
+  }
+
+  async deleteStudent(id: number): Promise<void> {
+    // First delete related portfolio entries
+    await db.delete(portfolioEntries)
+      .where(eq(portfolioEntries.studentId, id));
+
+    // Then delete program enrollments
+    await db.delete(programStudents)
+      .where(eq(programStudents.studentId, id));
+
+    // Finally delete the student
+    await db.delete(students)
+      .where(eq(students.id, id));
   }
 
   // Program-Student relationship methods implementation
