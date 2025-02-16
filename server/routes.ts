@@ -107,6 +107,19 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Students
+  // Add this new endpoint before the existing student endpoints
+  app.get("/api/students/check", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    const email = req.query.email as string;
+    if (!email) {
+      return res.status(400).send("Email is required");
+    }
+
+    const student = await storage.getStudentByEmail(email);
+    res.json(student || null);
+  });
+
   app.get("/api/programs/:programId/students", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 

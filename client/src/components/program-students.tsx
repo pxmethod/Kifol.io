@@ -9,6 +9,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -60,6 +61,8 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
+  const [existingStudent, setExistingStudent] = useState<Student | null>(null);
+  const [confirmExistingStudentOpen, setConfirmExistingStudentOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -93,13 +96,23 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
       });
       form.reset();
       setDialogOpen(false);
+      setExistingStudent(null);
     },
     onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      // Check if the error indicates a duplicate student
+      if (error.message.includes("already exists")) {
+        toast({
+          title: "Student Already Exists",
+          description: "This email is already registered. You can add this student to the program.",
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     },
   });
 
@@ -126,9 +139,46 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
     },
   });
 
-  const onSubmit = form.handleSubmit((data) => {
-    addStudentMutation.mutate(data);
+  const checkExistingStudentMutation = useMutation({
+    mutationFn: async (email: string) => {
+      const res = await apiRequest("GET", `/api/students/check?email=${encodeURIComponent(email)}`);
+      return res.json();
+    },
+    onSuccess: (student: Student | null) => {
+      if (student) {
+        setExistingStudent(student);
+        setConfirmExistingStudentOpen(true);
+        setDialogOpen(false);
+      } else {
+        // If no existing student, proceed with normal form submission
+        const formData = form.getValues();
+        addStudentMutation.mutate(formData);
+      }
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
+
+  const onSubmit = form.handleSubmit((data) => {
+    // First check if student exists
+    checkExistingStudentMutation.mutate(data.email);
+  });
+
+  const handleAddExistingStudent = () => {
+    if (existingStudent) {
+      addStudentMutation.mutate({
+        name: existingStudent.name,
+        email: existingStudent.email,
+        grade: existingStudent.grade,
+      });
+      setConfirmExistingStudentOpen(false);
+    }
+  };
 
   const handleDeleteClick = (student: Student) => {
     setStudentToDelete(student);
@@ -304,7 +354,7 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="Enter student email"
+                        placeholder="Enter parent's email"
                         {...field}
                       />
                     </FormControl>
@@ -344,9 +394,9 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={addStudentMutation.isPending}
+                  disabled={addStudentMutation.isPending || checkExistingStudentMutation.isPending}
                 >
-                  {addStudentMutation.isPending && (
+                  {(addStudentMutation.isPending || checkExistingStudentMutation.isPending) && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
                   Add Student
@@ -376,6 +426,34 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
               ) : (
                 "Remove Student"
               )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog 
+        open={confirmExistingStudentOpen} 
+        onOpenChange={setConfirmExistingStudentOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Student Already Exists</AlertDialogTitle>
+            <AlertDialogDescription>
+              A student with email {existingStudent?.email} already exists in the system. 
+              Would you like to add this existing student to the current program?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setConfirmExistingStudentOpen(false);
+              setDialogOpen(true);
+            }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleAddExistingStudent}
+            >
+              Add to Program
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
