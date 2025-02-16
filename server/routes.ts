@@ -238,19 +238,22 @@ export function registerRoutes(app: Express): Server {
     const hasAccess = studentPrograms.some(program => program.userId === req.user.id);
     if (!hasAccess) return res.sendStatus(403);
 
-    // Create invitation
-    const invitation = await storage.createParentInvitation(studentId, email);
+    try {
+      // Create invitation
+      const invitation = await storage.createParentInvitation(studentId, email);
 
-    // TODO: Send invitation email using SendGrid
-    // await sendGrid.send({
-    //   to: email,
-    //   subject: "Invitation to Join as Parent",
-    //   text: `You've been invited to join as a parent. Click here to register: ${process.env.APP_URL}/register?token=${invitation.token}`
-    // });
+      // Send invitation email
+      await sendGrid.sendParentInvitation(email, student.name, invitation.token);
 
-    res.status(201).json({
-      message: "Invitation sent successfully"
-    });
+      res.status(201).json({
+        message: "Invitation sent successfully"
+      });
+    } catch (error) {
+      console.error('Error sending invitation:', error);
+      res.status(500).json({
+        message: "Failed to send invitation"
+      });
+    }
   });
 
   app.get("/api/parent-invitations/:token", async (req, res) => {
