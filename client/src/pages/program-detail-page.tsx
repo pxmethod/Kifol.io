@@ -28,33 +28,27 @@ import {
 } from "@/components/ui/popover";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertProgramSchema } from "@shared/schema";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { z } from "zod";
 import { ProgramSessions } from "@/components/program-sessions";
 import { ProgramStudents } from "@/components/program-students";
+import { programFormSchema, ProgramFormData } from "@/types/program";
 
-const editProgramSchema = z
-  .object({
-    title: z.string().min(1, "Title is required"),
-    description: z.string().optional(),
-    startDate: z.date({
-      required_error: "Start date is required",
-    }),
-    endDate: z.date({
-      required_error: "End date is required",
-    }),
-  })
-  .refine((data) => data.endDate > data.startDate, {
-    message: "End date must be after start date",
-    path: ["endDate"],
-  });
-
+/**
+ * ProgramDetailPage Component
+ * 
+ * Displays detailed information about an educational program and allows editing.
+ * Shows program sessions and enrolled students in separate tabs.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {Object} props.params - URL parameters
+ * @param {string} props.params.id - Program ID from the URL
+ */
 export default function ProgramDetailPage({
   params,
 }: {
@@ -63,12 +57,14 @@ export default function ProgramDetailPage({
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
+  // Fetch program details
   const { data: program } = useQuery<Program>({
     queryKey: [`/api/programs/${params.id}`],
   });
 
+  // Update program mutation
   const updateProgramMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof editProgramSchema>) => {
+    mutationFn: async (data: ProgramFormData) => {
       const res = await apiRequest("PATCH", `/api/programs/${params.id}`, data);
       return res.json();
     },
@@ -92,8 +88,8 @@ export default function ProgramDetailPage({
     },
   });
 
-  const form = useForm({
-    resolver: zodResolver(editProgramSchema),
+  const form = useForm<ProgramFormData>({
+    resolver: zodResolver(programFormSchema),
     values: {
       title: program?.title || "",
       description: program?.description || "",
@@ -112,6 +108,7 @@ export default function ProgramDetailPage({
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Header Section */}
       <div className="bg-[#000000] text-white">
         <div className="container mx-auto px-4 py-8">
           <Link href="/">
@@ -146,6 +143,7 @@ export default function ProgramDetailPage({
         </div>
       </div>
 
+      {/* Content Section */}
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="sessions" className="w-full">
           <TabsList>
@@ -161,6 +159,7 @@ export default function ProgramDetailPage({
         </Tabs>
       </div>
 
+      {/* Edit Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent>
           <DialogHeader>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertProgramSchema } from "@shared/schema";
+import { programFormSchema, ProgramFormData } from "@/types/program";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,25 +29,21 @@ import {
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-const programFormSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
-  startDate: z.date({
-    required_error: "Start date is required",
-  }),
-  endDate: z.date({
-    required_error: "End date is required",
-  }),
-}).refine(data => data.endDate > data.startDate, {
-  message: "End date must be after start date",
-  path: ["endDate"],
-});
-
+/**
+ * ProgramWizard Component
+ * 
+ * A dialog component for creating new educational programs.
+ * Handles form validation, date selection, and API integration.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {boolean} props.open - Controls dialog visibility
+ * @param {(open: boolean) => void} props.onOpenChange - Callback for dialog state changes
+ */
 type ProgramWizardProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -55,7 +52,7 @@ type ProgramWizardProps = {
 export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
   const { toast } = useToast();
 
-  const form = useForm({
+  const form = useForm<ProgramFormData>({
     resolver: zodResolver(programFormSchema),
     defaultValues: {
       title: "",
@@ -66,7 +63,7 @@ export function ProgramWizard({ open, onOpenChange }: ProgramWizardProps) {
   });
 
   const createProgramMutation = useMutation({
-    mutationFn: async (program: z.infer<typeof programFormSchema>) => {
+    mutationFn: async (program: ProgramFormData) => {
       const res = await apiRequest("POST", "/api/programs", { program });
       return res.json();
     },
