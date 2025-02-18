@@ -1,19 +1,13 @@
-import { 
-  users, programs, sessions, students, programStudents, portfolioEntries,
-  parents, parentStudents, parentInvitations,
-  type User, type InsertUser, type Program, type InsertProgram,
+import { users, programs, sessions, students, programStudents, portfolioEntries, 
+  type User, type InsertUser, type Program, type InsertProgram, 
   type Session, type InsertSession, type Student, type InsertStudent,
-  type ProgramStudent, type InsertProgramStudent, type PortfolioEntry,
-  type InsertPortfolioEntry, type Parent, type InsertParent,
-  type ParentStudent, type InsertParentStudent, type ParentInvitation,
-  type InsertParentInvitation
-} from "@shared/schema";
+  type ProgramStudent, type InsertProgramStudent, type PortfolioEntry, 
+  type InsertPortfolioEntry } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
-import crypto from 'crypto';
 
 const PostgresSessionStore = connectPg(session);
 
@@ -53,21 +47,6 @@ export interface IStorage {
   getPortfolioEntriesByStudentId(studentId: number): Promise<PortfolioEntry[]>;
   updatePortfolioEntry(id: number, entry: Partial<InsertPortfolioEntry>): Promise<PortfolioEntry>;
   deletePortfolioEntry(id: number): Promise<void>;
-
-  // New parent-related methods
-  createParent(userId: number, parent: InsertParent): Promise<Parent>;
-  getParentByUserId(userId: number): Promise<Parent | undefined>;
-  getParentById(id: number): Promise<Parent | undefined>;
-
-  // Parent-student relationship methods
-  addStudentToParent(parentId: number, studentId: number, relationship: string): Promise<ParentStudent>;
-  getStudentsByParentId(parentId: number): Promise<Student[]>;
-  getParentsByStudentId(studentId: number): Promise<Parent[]>;
-
-  // Parent invitation methods
-  createParentInvitation(studentId: number, email: string): Promise<ParentInvitation>;
-  getParentInvitation(token: string): Promise<ParentInvitation | undefined>;
-  acceptParentInvitation(token: string, userId: number): Promise<void>;
 
   sessionStore: session.Store;
 }
@@ -204,9 +183,6 @@ export class DatabaseStorage implements IStorage {
     await db.delete(programStudents)
       .where(eq(programStudents.studentId, id));
 
-    //Then delete parent-student relationships
-    await db.delete(parentStudents).where(eq(parentStudents.studentId, id));
-
     // Finally delete the student
     await db.delete(students)
       .where(eq(students.id, id));
@@ -295,113 +271,6 @@ export class DatabaseStorage implements IStorage {
         sql`${students.name} = ${name} AND ${students.email} = ${email}`
       );
     return student;
-  }
-
-  // New parent-related methods implementation
-  async createParent(userId: number, parent: InsertParent): Promise<Parent> {
-    const [newParent] = await db
-      .insert(parents)
-      .values({ ...parent, userId })
-      .returning();
-    return newParent;
-  }
-
-  async getParentByUserId(userId: number): Promise<Parent | undefined> {
-    const [parent] = await db
-      .select()
-      .from(parents)
-      .where(eq(parents.userId, userId));
-    return parent;
-  }
-
-  async getParentById(id: number): Promise<Parent | undefined> {
-    const [parent] = await db
-      .select()
-      .from(parents)
-      .where(eq(parents.id, id));
-    return parent;
-  }
-
-  // Parent-student relationship methods implementation
-  async addStudentToParent(
-    parentId: number,
-    studentId: number,
-    relationship: string
-  ): Promise<ParentStudent> {
-    const [parentStudent] = await db
-      .insert(parentStudents)
-      .values({ parentId, studentId, relationship })
-      .returning();
-    return parentStudent;
-  }
-
-  async getStudentsByParentId(parentId: number): Promise<Student[]> {
-    return await db
-      .select({
-        id: students.id,
-        name: students.name,
-        email: students.email,
-        grade: students.grade,
-      })
-      .from(parentStudents)
-      .innerJoin(students, eq(parentStudents.studentId, students.id))
-      .where(eq(parentStudents.parentId, parentId));
-  }
-
-  async getParentsByStudentId(studentId: number): Promise<Parent[]> {
-    return await db
-      .select({
-        id: parents.id,
-        userId: parents.userId,
-        name: parents.name,
-        phone: parents.phone,
-      })
-      .from(parentStudents)
-      .innerJoin(parents, eq(parentStudents.parentId, parents.id))
-      .where(eq(parentStudents.studentId, studentId));
-  }
-
-  // Parent invitation methods implementation
-  async createParentInvitation(
-    studentId: number,
-    email: string
-  ): Promise<ParentInvitation> {
-    const token = crypto.randomBytes(32).toString('hex');
-    const expires = new Date();
-    expires.setDate(expires.getDate() + 7); // Token expires in 7 days
-
-    const [invitation] = await db
-      .insert(parentInvitations)
-      .values({
-        studentId,
-        email,
-        token,
-        expires,
-        accepted: false,
-      })
-      .returning();
-    return invitation;
-  }
-
-  async getParentInvitation(token: string): Promise<ParentInvitation | undefined> {
-    const [invitation] = await db
-      .select()
-      .from(parentInvitations)
-      .where(
-        and(
-          eq(parentInvitations.token, token),
-          eq(parentInvitations.accepted, false),
-          sql`${parentInvitations.expires} > CURRENT_TIMESTAMP`
-        )
-      );
-    return invitation;
-  }
-
-  async acceptParentInvitation(token: string, userId: number): Promise<void> {
-    await db
-      .update(parentInvitations)
-      .set({ accepted: true })
-      .where(eq(parentInvitations.token, token));
   }
 }
 
