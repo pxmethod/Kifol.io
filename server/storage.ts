@@ -2,7 +2,8 @@ import { users, programs, sessions, students, programStudents, portfolioEntries,
   type User, type InsertUser, type Program, type InsertProgram, 
   type Session, type InsertSession, type Student, type InsertStudent,
   type ProgramStudent, type InsertProgramStudent, type PortfolioEntry, 
-  type InsertPortfolioEntry } from "@shared/schema";
+  type InsertPortfolioEntry, type ParentInvitation, type InsertParentInvitation,
+  type ParentStudent, type InsertParentStudent, parentInvitations, parentStudents } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql } from "drizzle-orm";
 import session from "express-session";
@@ -30,7 +31,7 @@ export interface IStorage {
   updateSession(id: number, session: Partial<InsertSession>): Promise<Session>;
   deleteSession(id: number): Promise<void>;
 
-  // New Student methods
+  // Student methods
   createStudent(student: InsertStudent): Promise<Student>;
   getStudent(id: number): Promise<Student | undefined>;
   getStudentByEmail(email: string): Promise<Student | undefined>;
@@ -41,6 +42,15 @@ export interface IStorage {
   getStudentsByProgramId(programId: number): Promise<Student[]>;
   getProgramsByStudentId(studentId: number): Promise<Program[]>;
   removeStudentFromProgram(programId: number, studentId: number): Promise<void>;
+
+  // Parent invitation methods
+  createParentInvitation(invitation: InsertParentInvitation): Promise<ParentInvitation>;
+  getParentInvitationByToken(token: string): Promise<ParentInvitation | undefined>;
+  acceptParentInvitation(token: string, userId: number): Promise<void>;
+
+  // Parent-Student relationship methods
+  getParentsByStudentId(studentId: number): Promise<User[]>;
+  getStudentsByParentId(parentId: number): Promise<Student[]>;
 
   // Portfolio methods
   createPortfolioEntry(studentId: number, entry: InsertPortfolioEntry): Promise<PortfolioEntry>;
@@ -146,7 +156,7 @@ export class DatabaseStorage implements IStorage {
     await db.delete(sessions).where(eq(sessions.id, id));
   }
 
-  // New Student methods implementation
+  // Student methods implementation
   async createStudent(student: InsertStudent): Promise<Student> {
     const [newStudent] = await db
       .insert(students)
@@ -232,6 +242,75 @@ export class DatabaseStorage implements IStorage {
         eq(programStudents.programId, programId) &&
         eq(programStudents.studentId, studentId)
       );
+  }
+
+  // New parent invitation methods implementation
+  async createParentInvitation(invitation: InsertParentInvitation): Promise<ParentInvitation> {
+    const [newInvitation] = await db
+      .insert(parentInvitations)
+      .values(invitation)
+      .returning();
+    return newInvitation;
+  }
+
+  async getParentInvitationByToken(token: string): Promise<ParentInvitation | undefined> {
+    const [invitation] = await db
+      .select()
+      .from(parentInvitations)
+      .where(eq(parentInvitations.token, token));
+    return invitation;
+  }
+
+  async acceptParentInvitation(token: string, userId: number): Promise<void> {
+    const [invitation] = await db
+      .select()
+      .from(parentInvitations)
+      .where(eq(parentInvitations.token, token));
+
+    if (!invitation) {
+      throw new Error("Invalid invitation token");
+    }
+
+    await db
+      .update(parentInvitations)
+      .set({ accepted: true })
+      .where(eq(parentInvitations.token, token));
+
+    await db
+      .insert(parentStudents)
+      .values({
+        parentId: userId,
+        studentId: invitation.studentId,
+        relationship: "parent",
+        isPrimaryContact: true,
+      });
+  }
+
+  // New parent-student relationship methods implementation
+  async getParentsByStudentId(studentId: number): Promise<User[]> {
+    return await db
+      .select({
+        id: users.id,
+        username: users.username,
+        password: users.password,
+        role: users.role,
+      })
+      .from(parentStudents)
+      .innerJoin(users, eq(parentStudents.parentId, users.id))
+      .where(eq(parentStudents.studentId, studentId));
+  }
+
+  async getStudentsByParentId(parentId: number): Promise<Student[]> {
+    return await db
+      .select({
+        id: students.id,
+        name: students.name,
+        email: students.email,
+        grade: students.grade,
+      })
+      .from(parentStudents)
+      .innerJoin(students, eq(parentStudents.studentId, students.id))
+      .where(eq(parentStudents.parentId, parentId));
   }
 
   // Portfolio methods implementation
