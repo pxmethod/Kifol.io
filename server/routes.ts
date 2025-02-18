@@ -142,7 +142,16 @@ export function registerRoutes(app: Express): Server {
 
     if (isAlreadyEnrolled) {
       return res.status(400).json({
-        message: "This student is already enrolled in this program"
+        message: `Student ${student.name} is already enrolled in the program "${program.title}". You can view their enrollment details in the program's student list.`,
+        student: {
+          id: student.id,
+          name: student.name,
+          email: student.email
+        },
+        program: {
+          id: program.id,
+          title: program.title
+        }
       });
     }
 
