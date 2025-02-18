@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { insertProgramSchema, insertSessionSchema, insertStudentSchema } from "@shared/schema";
+import { insertProgramSchema, insertSessionSchema, insertStudentSchema, insertParentSchema, insertParentInvitationSchema } from "@shared/schema";
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
@@ -106,7 +106,7 @@ export function registerRoutes(app: Express): Server {
     res.sendStatus(200);
   });
 
-  // Students
+  // Students and Parent Invitations
   app.get("/api/programs/:programId/students", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 
@@ -148,7 +148,72 @@ export function registerRoutes(app: Express): Server {
     // Add student to program
     const programStudent = await storage.addStudentToProgram(program.id, student.id);
 
+    // Create parent invitation if parent email is provided
+    if (req.body.parentEmail) {
+      const invitationData = insertParentInvitationSchema.parse({
+        studentId: student.id,
+        email: req.body.parentEmail
+      });
+      await storage.createParentInvitation(student.id, invitationData.email);
+    }
+
     res.status(201).json({ ...student, programStudent });
+  });
+
+  // Parent Invitation Management
+  app.get("/api/parent-invitation/:token", async (req, res) => {
+    const invitation = await storage.getParentInvitation(req.params.token);
+    if (!invitation) {
+      return res.status(404).json({ message: "Invalid or expired invitation" });
+    }
+    res.json(invitation);
+  });
+
+  app.post("/api/parent-invitation/:token/accept", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    const invitation = await storage.getParentInvitation(req.params.token);
+    if (!invitation) {
+      return res.status(404).json({ message: "Invalid or expired invitation" });
+    }
+
+    // Create parent profile
+    const parentData = insertParentSchema.parse(req.body);
+    const parent = await storage.createParent(req.user.id, parentData);
+
+    // Link parent to student
+    await storage.addStudentToParent(parent.id, invitation.studentId, req.body.relationship);
+
+    // Mark invitation as accepted
+    await storage.acceptParentInvitation(req.params.token, req.user.id);
+
+    res.status(200).json({ message: "Parent account created successfully" });
+  });
+
+  // Parent Data Access
+  app.get("/api/parent/students", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    const parent = await storage.getParentByUserId(req.user.id);
+    if (!parent) return res.sendStatus(404);
+
+    const students = await storage.getStudentsByParentId(parent.id);
+    res.json(students);
+  });
+
+  app.get("/api/parent/students/:studentId/programs", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    const parent = await storage.getParentByUserId(req.user.id);
+    if (!parent) return res.sendStatus(404);
+
+    // Verify parent has access to this student
+    const students = await storage.getStudentsByParentId(parent.id);
+    const hasAccess = students.some(s => s.id === parseInt(req.params.studentId));
+    if (!hasAccess) return res.sendStatus(403);
+
+    const programs = await storage.getProgramsByStudentId(parseInt(req.params.studentId));
+    res.json(programs);
   });
 
   // New delete student endpoint
