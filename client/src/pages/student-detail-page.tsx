@@ -6,6 +6,7 @@ import { Link } from "wouter";
 import { Card } from "@/components/ui/card";
 import { GraduationCap } from "lucide-react";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { ApiError } from "@/types/common";
 
 /**
  * StudentDetailPage Component
@@ -29,7 +30,7 @@ export default function StudentDetailPage({
     isLoading,
     isError,
     error
-  } = useQuery<Student>({
+  } = useQuery<Student, ApiError>({
     queryKey: [`/api/students/${params.studentId}`],
   });
 
