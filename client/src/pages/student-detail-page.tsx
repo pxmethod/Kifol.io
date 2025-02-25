@@ -21,7 +21,7 @@ export default function StudentDetailPage({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Fetch student details
-  const {
+  const { 
     data: student,
     isLoading: isLoadingStudent,
     isError: isStudentError,
@@ -40,23 +40,12 @@ export default function StudentDetailPage({
 
   // Create portfolio entry mutation
   const createEntryMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const formData = new FormData();
-      formData.append("title", data.title);
-      formData.append("description", data.description || "");
-      formData.append("type", data.type);
-
-      if (data.mediaFiles && data.mediaFiles.length > 0) {
-        data.mediaFiles.forEach((file: File) => {
-          formData.append("media", file);
-        });
-      }
-
+    mutationFn: async (formData: FormData) => {
       const res = await apiRequest(
         "POST",
         `/api/students/${params.studentId}/portfolio`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        { isFormData: true }
       );
       return res.json();
     },
@@ -79,8 +68,18 @@ export default function StudentDetailPage({
     },
   });
 
-  const handleCreateEntry = (data: any) => {
-    createEntryMutation.mutate(data);
+  const handleCreateEntry = async (data: any) => {
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("description", data.description || "");
+    formData.append("type", data.type);
+
+    // Append each file to the FormData
+    data.mediaFiles.forEach((file: File) => {
+      formData.append("media", file);
+    });
+
+    createEntryMutation.mutate(formData);
   };
 
   if (isLoadingStudent) {
@@ -115,6 +114,7 @@ export default function StudentDetailPage({
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background">
+        {/* Header Section */}
         <div className="bg-[#000000] text-white">
           <div className="container mx-auto px-4 py-8">
             <Link href={`/programs/${params.programId}`}>
@@ -135,6 +135,7 @@ export default function StudentDetailPage({
           </div>
         </div>
 
+        {/* Timeline Section */}
         <div className="container mx-auto px-4 py-8">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold">Timeline</h2>
