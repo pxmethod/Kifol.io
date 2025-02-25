@@ -94,7 +94,7 @@ export default function StudentDetailPage({
         {/* Timeline Section */}
         <div className="container mx-auto px-4 py-8">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold">Portfolio Timeline</h2>
+            <h2 className="text-2xl font-semibold">Timeline</h2>
             <Button>
               <Plus className="h-4 w-4 mr-2" />
               Add Event
