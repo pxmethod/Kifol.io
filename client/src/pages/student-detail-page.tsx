@@ -31,7 +31,7 @@ export default function StudentDetailPage({
     isError,
     error
   } = useQuery<Student>({
-    queryKey: [`/api/students/${params.studentId}`],
+    queryKey: [`/api/programs/${params.programId}/students/${params.studentId}`],
   });
 
   if (isLoading) {
@@ -46,7 +46,7 @@ export default function StudentDetailPage({
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
-          <Link href={`/programs/${params.programId}`}>
+          <Link href={`/programs/${params.programId}?tab=students`}>
             <Button variant="link">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Program
@@ -67,7 +67,7 @@ export default function StudentDetailPage({
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         {/* Navigation */}
-        <Link href={`/programs/${params.programId}`}>
+        <Link href={`/programs/${params.programId}?tab=students`}>
           <Button variant="link">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Program

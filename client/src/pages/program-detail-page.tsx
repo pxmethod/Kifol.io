@@ -22,7 +22,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { ProgramSessions } from "@/components/program-sessions";
@@ -31,17 +31,6 @@ import { programFormSchema, ProgramFormData } from "@/types/program";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ApiError } from "@/types/common";
 
-/**
- * ProgramDetailPage Component
- * 
- * Displays detailed information about an educational program and allows editing.
- * Shows program sessions and enrolled students in separate tabs.
- *
- * @component
- * @param {Object} props - Component props
- * @param {Object} props.params - URL parameters
- * @param {string} props.params.id - Program ID from the URL
- */
 export default function ProgramDetailPage({
   params,
 }: {
@@ -49,6 +38,10 @@ export default function ProgramDetailPage({
 }) {
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [location] = useLocation();
+
+  // Extract tab from URL query parameter
+  const defaultTab = new URLSearchParams(location.split('?')[1]).get('tab') || 'sessions';
 
   // Fetch program details
   const { 
@@ -169,7 +162,7 @@ export default function ProgramDetailPage({
 
         {/* Content Section */}
         <div className="container mx-auto px-4 py-8">
-          <Tabs defaultValue="sessions" className="w-full">
+          <Tabs defaultValue={defaultTab} className="w-full">
             <TabsList>
               <TabsTrigger value="sessions">Sessions</TabsTrigger>
               <TabsTrigger value="students">Students</TabsTrigger>
