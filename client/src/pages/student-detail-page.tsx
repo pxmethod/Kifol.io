@@ -85,7 +85,7 @@ export default function StudentDetailPage({
                   <GraduationCap className="h-4 w-4" />
                   <span>Grade {student.grade}</span>
                 </div>
-                <p className="text-gray-200 mt-2">{student.email}</p>
+                <p className="text-gray-200 mt-2">Parent Email: {student.email}</p>
               </div>
             </div>
           </div>
