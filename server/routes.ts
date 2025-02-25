@@ -3,6 +3,11 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertProgramSchema, insertSessionSchema, insertStudentSchema } from "@shared/schema";
+import multer from "multer";
+import path from "path";
+import { promises as fs } from "fs";
+import express from 'express';
+
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
@@ -194,6 +199,106 @@ export function registerRoutes(app: Express): Server {
     await storage.deleteStudent(studentId);
     res.sendStatus(200);
   });
+
+  // Set up multer for file uploads
+  const multerStorage = multer.diskStorage({
+    destination: async (req, file, cb) => {
+      const uploadDir = path.join(process.cwd(), 'uploads');
+      try {
+        await fs.mkdir(uploadDir, { recursive: true });
+        cb(null, uploadDir);
+      } catch (error) {
+        cb(error as Error, uploadDir);
+      }
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+      cb(null, `${uniqueSuffix}-${file.originalname}`);
+    }
+  });
+
+  const upload = multer({
+    storage: multerStorage,
+    fileFilter: (req, file, cb) => {
+      const allowedTypes = [
+        'image/jpeg',
+        'image/gif',
+        'image/svg+xml',
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ];
+      if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error('Invalid file type'));
+      }
+    },
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB
+    }
+  });
+
+  // Portfolio Entries endpoints
+  app.get("/api/students/:studentId/portfolio", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    const studentId = parseInt(req.params.studentId);
+    const student = await storage.getStudent(studentId);
+
+    if (!student) {
+      return res.sendStatus(404);
+    }
+
+    // Check if the user has access to any programs this student is enrolled in
+    const studentPrograms = await storage.getProgramsByStudentId(studentId);
+    const hasAccess = studentPrograms.some(program => program.userId === req.user.id);
+
+    if (!hasAccess) {
+      return res.sendStatus(403);
+    }
+
+    const entries = await storage.getPortfolioEntriesByStudentId(studentId);
+    res.json(entries);
+  });
+
+  app.post(
+    "/api/students/:studentId/portfolio",
+    upload.array("media", 10),
+    async (req, res) => {
+      if (!req.isAuthenticated()) return res.sendStatus(401);
+
+      const studentId = parseInt(req.params.studentId);
+      const student = await storage.getStudent(studentId);
+
+      if (!student) {
+        return res.sendStatus(404);
+      }
+
+      // Check if the user has access to any programs this student is enrolled in
+      const studentPrograms = await storage.getProgramsByStudentId(studentId);
+      const hasAccess = studentPrograms.some(program => program.userId === req.user.id);
+
+      if (!hasAccess) {
+        return res.sendStatus(403);
+      }
+
+      const files = req.files as Express.Multer.File[];
+      const mediaUrls = files.map(file => `/uploads/${file.filename}`);
+
+      const entry = await storage.createPortfolioEntry(studentId, {
+        title: req.body.title,
+        description: req.body.description,
+        type: req.body.type,
+        mediaUrls,
+      });
+
+      res.status(201).json(entry);
+    }
+  );
+
+  // Serve uploaded files
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
   const httpServer = createServer(app);
   return httpServer;
