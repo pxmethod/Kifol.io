@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertProgramSchema, insertSessionSchema, insertStudentSchema } from "@shared/schema";
+import {insertPortfolioEntrySchema} from "@shared/schema"; //Import missing schema
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
@@ -193,6 +194,53 @@ export function registerRoutes(app: Express): Server {
 
     await storage.deleteStudent(studentId);
     res.sendStatus(200);
+  });
+
+  // Portfolio Entry Routes
+  app.get("/api/students/:studentId/portfolio", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    const studentId = parseInt(req.params.studentId);
+    const student = await storage.getStudent(studentId);
+
+    if (!student) {
+      return res.sendStatus(404);
+    }
+
+    // Check if the user has access to any programs this student is enrolled in
+    const studentPrograms = await storage.getProgramsByStudentId(studentId);
+    const hasAccess = studentPrograms.some(program => program.userId === req.user.id);
+
+    if (!hasAccess) {
+      return res.sendStatus(403);
+    }
+
+    const entries = await storage.getPortfolioEntriesByStudentId(studentId);
+    res.json(entries);
+  });
+
+  app.post("/api/students/:studentId/portfolio", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    const studentId = parseInt(req.params.studentId);
+    const student = await storage.getStudent(studentId);
+
+    if (!student) {
+      return res.sendStatus(404);
+    }
+
+    // Check if the user has access to any programs this student is enrolled in
+    const studentPrograms = await storage.getProgramsByStudentId(studentId);
+    const hasAccess = studentPrograms.some(program => program.userId === req.user.id);
+
+    if (!hasAccess) {
+      return res.sendStatus(403);
+    }
+
+    const entryData = insertPortfolioEntrySchema.parse(req.body);
+    const entry = await storage.createPortfolioEntry(studentId, entryData);
+
+    res.status(201).json(entry);
   });
 
   const httpServer = createServer(app);
