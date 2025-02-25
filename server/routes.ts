@@ -151,7 +151,28 @@ export function registerRoutes(app: Express): Server {
     res.status(201).json({ ...student, programStudent });
   });
 
-  // New delete student endpoint
+  // Add new GET student endpoint before the delete endpoint
+  app.get("/api/students/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    const studentId = parseInt(req.params.id);
+    const student = await storage.getStudent(studentId);
+
+    if (!student) {
+      return res.sendStatus(404);
+    }
+
+    // Check if the user has access to any programs this student is enrolled in
+    const studentPrograms = await storage.getProgramsByStudentId(studentId);
+    const hasAccess = studentPrograms.some(program => program.userId === req.user.id);
+
+    if (!hasAccess) {
+      return res.sendStatus(403);
+    }
+
+    res.json(student);
+  });
+
   app.delete("/api/students/:id", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 
