@@ -8,7 +8,6 @@ import path from "path";
 import { promises as fs } from "fs";
 import express from 'express';
 
-
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
 
@@ -295,7 +294,8 @@ export function registerRoutes(app: Express): Server {
         return res.sendStatus(403);
       }
 
-      const files = req.files as Express.Multer.File[];
+      // Handle case when no files are uploaded
+      const files = (req.files || []) as Express.Multer.File[];
       const mediaUrl = files.map(file => `/uploads/${file.filename}`);
 
       const entry = await storage.createPortfolioEntry(studentId, {

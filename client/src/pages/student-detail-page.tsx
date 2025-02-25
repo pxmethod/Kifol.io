@@ -21,7 +21,7 @@ export default function StudentDetailPage({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Fetch student details
-  const { 
+  const {
     data: student,
     isLoading: isLoadingStudent,
     isError: isStudentError,
@@ -75,9 +75,11 @@ export default function StudentDetailPage({
     formData.append("type", data.type);
 
     // Append each file to the FormData
-    data.mediaFiles.forEach((file: File) => {
-      formData.append("media", file);
-    });
+    if (data.mediaFiles && data.mediaFiles.length > 0) {
+      data.mediaFiles.forEach((file: File) => {
+        formData.append("media", file);
+      });
+    }
 
     createEntryMutation.mutate(formData);
   };
