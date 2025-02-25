@@ -278,6 +278,9 @@ export function registerRoutes(app: Express): Server {
         mediaUrl: req.file ? `/uploads/${req.file.filename}` : undefined,
       };
 
+      // Log the data before validation
+      console.log('Portfolio entry data before validation:', entryData);
+
       const validatedData = insertPortfolioEntrySchema.parse(entryData);
       const entry = await storage.createPortfolioEntry(studentId, validatedData);
 
@@ -288,6 +291,7 @@ export function registerRoutes(app: Express): Server {
         fs.unlink(req.file.path, () => {});
       }
       if (error instanceof Error) {
+        console.error('Portfolio entry error:', error);
         res.status(400).json({ message: error.message });
       } else {
         res.status(500).json({ message: "An unexpected error occurred" });

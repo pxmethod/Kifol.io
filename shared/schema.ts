@@ -114,6 +114,7 @@ export const insertProgramStudentSchema = createInsertSchema(programStudents).om
   studentId: true,
 });
 export const insertPortfolioEntrySchema = createInsertSchema(portfolioEntries).omit({ 
+  id: true,
   studentId: true,
 });
 
