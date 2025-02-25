@@ -25,7 +25,7 @@ export function PortfolioEntryDialog({
   isSubmitting
 }: PortfolioEntryDialogProps) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  
+
   const form = useForm<InsertPortfolioEntry & { mediaFiles: File[] }>({
     resolver: zodResolver(insertPortfolioEntrySchema),
     defaultValues: {
@@ -62,12 +62,12 @@ export function PortfolioEntryDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle>Add Portfolio Entry</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 flex-1 overflow-y-auto pr-4">
             <FormField
               control={form.control}
               name="title"
@@ -81,7 +81,7 @@ export function PortfolioEntryDialog({
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="description"
@@ -122,16 +122,18 @@ export function PortfolioEntryDialog({
               <FormLabel>Media (Optional)</FormLabel>
               <FormControl>
                 <div className="space-y-4">
-                  <Input
-                    type="file"
-                    accept=".jpg,.jpeg,.gif,.svg,.doc,.docx,.pdf"
-                    multiple
-                    onChange={handleFileChange}
-                    className="file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                  />
-                  
+                  <div className="flex items-center justify-center border-2 border-dashed rounded-lg p-6">
+                    <Input
+                      type="file"
+                      accept=".jpg,.jpeg,.gif,.svg,.doc,.docx,.pdf"
+                      multiple
+                      onChange={handleFileChange}
+                      className="file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                    />
+                  </div>
+
                   {selectedFiles.length > 0 && (
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-2 mt-4">
                       {selectedFiles.map((file, index) => (
                         <div
                           key={index}
@@ -156,7 +158,7 @@ export function PortfolioEntryDialog({
               </FormControl>
             </FormItem>
 
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-end gap-2 sticky bottom-0 pt-4 bg-background">
               <Button
                 type="button"
                 variant="outline"
