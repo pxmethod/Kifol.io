@@ -116,8 +116,8 @@ export const insertPortfolioEntrySchema = createInsertSchema(portfolioEntries)
   .extend({
     mediaFiles: z.array(z.object({
       name: z.string(),
+      type: z.string(),
       url: z.string(),
-      type: z.string()
     })).optional(),
   })
   .omit({ 
