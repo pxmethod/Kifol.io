@@ -6,7 +6,6 @@ import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home-page";
 import AuthPage from "@/pages/auth-page";
 import ProgramDetailPage from "@/pages/program-detail-page";
-import StudentDetailPage from "@/pages/student-detail-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { AuthProvider } from "./hooks/use-auth";
 
@@ -19,14 +18,6 @@ function Router() {
         component={({ params }) => (
           <ProtectedRoute 
             component={() => <ProgramDetailPage params={params} />}
-          />
-        )}
-      />
-      <Route 
-        path="/programs/:programId/students/:studentId"
-        component={({ params }) => (
-          <ProtectedRoute 
-            component={() => <StudentDetailPage params={params} />}
           />
         )}
       />

@@ -42,7 +42,6 @@ import { Loader2, GraduationCap, List, LayoutGrid, Search, Trash2 } from "lucide
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Link } from "wouter";
 
 type ViewMode = "list" | "grid";
 
@@ -218,11 +217,9 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                   <TableCell>{student.grade}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Link href={`/programs/${programId}/students/${student.id}`}>
-                        <Button variant="ghost" size="sm">
-                          View Details
-                        </Button>
-                      </Link>
+                      <Button variant="ghost" size="sm">
+                        View Details
+                      </Button>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -255,11 +252,9 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Link href={`/programs/${programId}/students/${student.id}`}>
-                      <Button variant="ghost" size="sm">
-                        View Details
-                      </Button>
-                    </Link>
+                    <Button variant="ghost" size="sm">
+                      View Details
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
