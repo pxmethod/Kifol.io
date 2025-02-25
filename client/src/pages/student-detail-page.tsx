@@ -2,7 +2,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Student, PortfolioEntry, insertPortfolioEntrySchema } from "@shared/schema";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Plus, GraduationCap, Calendar } from "lucide-react";
+import { ArrowLeft, Plus, Upload, X, Image as ImageIcon } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ApiError } from "@/types/common";
@@ -30,14 +30,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import * as z from 'zod';
 
 const portfolioTypes = [
   "achievement",
@@ -49,7 +46,7 @@ const portfolioTypes = [
 
 // Schema for the form
 const portfolioEntryFormSchema = insertPortfolioEntrySchema.extend({
-  achievementDate: insertPortfolioEntrySchema.shape.achievementDate,
+  mediaFile: z.instanceof(File).optional(),
 });
 
 type PortfolioEntryFormData = z.infer<typeof portfolioEntryFormSchema>;
@@ -61,6 +58,8 @@ export default function StudentDetailPage({
 }) {
   const { toast } = useToast();
   const [addEventDialogOpen, setAddEventDialogOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   // Fetch student details
   const { 
@@ -85,18 +84,49 @@ export default function StudentDetailPage({
     defaultValues: {
       title: "",
       description: "",
-      achievementDate: new Date(),
       type: "achievement",
     },
   });
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      form.setValue("mediaFile", file);
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+  };
+
+  const clearPreview = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewUrl(null);
+    form.setValue("mediaFile", undefined);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   // Add portfolio entry mutation
   const addEntryMutation = useMutation({
     mutationFn: async (data: PortfolioEntryFormData) => {
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== undefined) {
+          if (key === "mediaFile") {
+            formData.append("media", value as File);
+          } else {
+            formData.append(key, value as string);
+          }
+        }
+      });
+
       const res = await apiRequest(
         "POST",
         `/api/students/${params.studentId}/portfolio`,
-        data
+        formData,
+        { isFormData: true }
       );
       return res.json();
     },
@@ -108,6 +138,7 @@ export default function StudentDetailPage({
         title: "Success",
         description: "Portfolio entry added successfully",
       });
+      clearPreview();
       form.reset();
       setAddEventDialogOpen(false);
     },
@@ -205,17 +236,28 @@ export default function StudentDetailPage({
                     className="bg-card rounded-lg p-6 border shadow-sm"
                   >
                     <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold">{entry.title}</h3>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          {format(new Date(entry.achievementDate), "MMMM dd, yyyy")} ·{" "}
-                          <span className="capitalize">{entry.type}</span>
-                        </p>
+                      <div className="space-y-4 w-full">
+                        <div>
+                          <h3 className="text-lg font-semibold">{entry.title}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            {format(new Date(entry.achievementDate), "MMMM dd, yyyy")} ·{" "}
+                            <span className="capitalize">{entry.type}</span>
+                          </p>
+                        </div>
                         {entry.description && (
-                          <p className="text-sm mt-2">{entry.description}</p>
+                          <p className="text-sm">{entry.description}</p>
+                        )}
+                        {entry.mediaUrl && (
+                          <div className="relative rounded-lg overflow-hidden max-h-[400px]">
+                            <img
+                              src={entry.mediaUrl}
+                              alt={entry.title}
+                              className="w-full h-auto object-contain"
+                            />
+                          </div>
                         )}
                         {entry.feedback && (
-                          <div className="mt-4 p-4 bg-muted rounded-md">
+                          <div className="p-4 bg-muted rounded-md">
                             <p className="text-sm font-medium mb-1">Feedback</p>
                             <p className="text-sm">{entry.feedback}</p>
                           </div>
@@ -296,53 +338,55 @@ export default function StudentDetailPage({
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="achievementDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                "pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <Calendar className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <CalendarComponent
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <FormItem>
+                  <FormLabel>Media (Optional)</FormLabel>
+                  <div className="mt-2">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                    {!previewUrl ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full h-32 flex flex-col items-center justify-center gap-2"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <Upload className="h-8 w-8" />
+                        <span>Click to upload media</span>
+                      </Button>
+                    ) : (
+                      <div className="relative rounded-lg overflow-hidden">
+                        <img
+                          src={previewUrl}
+                          alt="Preview"
+                          className="w-full h-auto max-h-[200px] object-contain"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute top-2 right-2 bg-background/80 hover:bg-background"
+                          onClick={clearPreview}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </FormItem>
 
                 <div className="flex justify-end gap-2">
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setAddEventDialogOpen(false)}
+                    onClick={() => {
+                      clearPreview();
+                      setAddEventDialogOpen(false);
+                    }}
                   >
                     Cancel
                   </Button>
