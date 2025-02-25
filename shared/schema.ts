@@ -56,7 +56,7 @@ export const portfolioEntries = pgTable("portfolio_entries", {
   description: text("description"),
   achievementDate: date("achievement_date").notNull().default(sql`CURRENT_DATE`),
   type: text("type", { enum: ['accomplishment', 'project'] }).notNull(),
-  mediaUrls: text("media_urls").array(),
+  mediaUrl: text("media_url").array(),
 });
 
 // Relations
@@ -122,7 +122,7 @@ export const insertPortfolioEntrySchema = createInsertSchema(portfolioEntries)
   })
   .omit({ 
     studentId: true,
-    mediaUrls: true,
+    mediaUrl: true,
   });
 
 // Types

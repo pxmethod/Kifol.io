@@ -53,7 +53,7 @@ export function PortfolioTimeline({ entries }: PortfolioTimelineProps) {
                   </div>
                   <div className={cn(
                     "text-sm font-medium px-2.5 py-0.5 rounded-full",
-                    entry.type === 'accomplishment' 
+                    entry.type === 'accomplishment'
                       ? "bg-green-100 text-green-800"
                       : "bg-blue-100 text-blue-800"
                   )}>
@@ -67,9 +67,9 @@ export function PortfolioTimeline({ entries }: PortfolioTimelineProps) {
                     {entry.description}
                   </p>
                 )}
-                {entry.mediaUrls && entry.mediaUrls.length > 0 && (
+                {entry.mediaUrl && entry.mediaUrl.length > 0 && (
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {entry.mediaUrls.map((url, index) => (
+                    {entry.mediaUrl.map((url, index) => (
                       <a
                         key={index}
                         href={url}

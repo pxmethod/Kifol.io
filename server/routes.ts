@@ -284,13 +284,13 @@ export function registerRoutes(app: Express): Server {
       }
 
       const files = req.files as Express.Multer.File[];
-      const mediaUrls = files.map(file => `/uploads/${file.filename}`);
+      const mediaUrl = files.map(file => `/uploads/${file.filename}`);
 
       const entry = await storage.createPortfolioEntry(studentId, {
         title: req.body.title,
         description: req.body.description,
         type: req.body.type,
-        mediaUrls,
+        mediaUrl,
       });
 
       res.status(201).json(entry);
