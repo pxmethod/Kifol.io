@@ -46,7 +46,7 @@ const portfolioTypes = [
   "reflection",
 ] as const;
 
-// Schema for the form
+// Update the form schema
 const portfolioEntryFormSchema = insertPortfolioEntrySchema.extend({
   mediaFile: z.instanceof(File).optional(),
 });
@@ -64,7 +64,7 @@ export default function StudentDetailPage({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   // Fetch student details
-  const { 
+  const {
     data: student,
     isLoading: isLoadingStudent,
     isError: isStudentError,
@@ -74,7 +74,7 @@ export default function StudentDetailPage({
   });
 
   // Fetch portfolio entries
-  const { 
+  const {
     data: portfolioEntries = [],
     isLoading: isLoadingEntries
   } = useQuery<PortfolioEntry[]>({
@@ -114,15 +114,19 @@ export default function StudentDetailPage({
   const addEntryMutation = useMutation({
     mutationFn: async (data: PortfolioEntryFormData) => {
       const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined) {
-          if (key === "mediaFile") {
-            formData.append("media", value as File);
-          } else {
-            formData.append(key, value as string);
-          }
-        }
-      });
+
+      // Ensure required fields are always included
+      formData.append("title", data.title);
+      formData.append("type", data.type);
+
+      // Add optional fields only if they exist
+      if (data.description) {
+        formData.append("description", data.description);
+      }
+
+      if (data.mediaFile) {
+        formData.append("media", data.mediaFile);
+      }
 
       const res = await apiRequest(
         "POST",
