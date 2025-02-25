@@ -4,6 +4,7 @@ import { Student, insertStudentSchema } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
 import {
   Dialog,
   DialogContent,
@@ -217,9 +218,11 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                   <TableCell>{student.grade}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Button variant="ghost" size="sm">
-                        View Details
-                      </Button>
+                      <Link href={`/programs/${programId}/students/${student.id}`}>
+                        <Button variant="ghost" size="sm">
+                          View Details
+                        </Button>
+                      </Link>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -252,9 +255,11 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="ghost" size="sm">
-                      View Details
-                    </Button>
+                    <Link href={`/programs/${programId}/students/${student.id}`}>
+                      <Button variant="ghost" size="sm">
+                        View Details
+                      </Button>
+                    </Link>
                     <Button
                       variant="ghost"
                       size="sm"
