@@ -35,6 +35,8 @@ import { useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import * as z from 'zod';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const portfolioTypes = [
   "achievement",
@@ -151,9 +153,9 @@ export default function StudentDetailPage({
     },
   });
 
-  const onSubmit = form.handleSubmit((data) => {
+  const onSubmit = (data: PortfolioEntryFormData) => {
     addEntryMutation.mutate(data);
-  });
+  };
 
   if (isLoadingStudent) {
     return (
@@ -229,7 +231,11 @@ export default function StudentDetailPage({
           ) : (
             <div className="space-y-4">
               {portfolioEntries
-                .sort((a, b) => new Date(b.achievementDate).getTime() - new Date(a.achievementDate).getTime())
+                .sort((a, b) => {
+                  const dateA = a.achievementDate ? new Date(a.achievementDate).getTime() : 0;
+                  const dateB = b.achievementDate ? new Date(b.achievementDate).getTime() : 0;
+                  return dateB - dateA;
+                })
                 .map((entry) => (
                   <div
                     key={entry.id}
@@ -240,7 +246,7 @@ export default function StudentDetailPage({
                         <div>
                           <h3 className="text-lg font-semibold">{entry.title}</h3>
                           <p className="text-sm text-muted-foreground">
-                            {format(new Date(entry.achievementDate), "MMMM dd, yyyy")} ·{" "}
+                            {entry.achievementDate ? format(new Date(entry.achievementDate), "MMMM dd, yyyy") : ""} ·{" "}
                             <span className="capitalize">{entry.type}</span>
                           </p>
                         </div>
@@ -277,7 +283,7 @@ export default function StudentDetailPage({
               <DialogTitle>Add Portfolio Entry</DialogTitle>
             </DialogHeader>
             <Form {...form}>
-              <form onSubmit={onSubmit} className="space-y-4">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
                   control={form.control}
                   name="title"
