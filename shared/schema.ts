@@ -54,10 +54,10 @@ export const portfolioEntries = pgTable("portfolio_entries", {
     .references(() => students.id),
   title: text("title").notNull(),
   description: text("description"),
-  achievementDate: date("achievement_date").default(sql`CURRENT_DATE`),
+  achievementDate: date("achievement_date").notNull(),
   type: text("type").notNull(),
+  grade: text("grade"),
   feedback: text("feedback"),
-  mediaUrl: text("media_url"),
 });
 
 // Relations
@@ -114,7 +114,6 @@ export const insertProgramStudentSchema = createInsertSchema(programStudents).om
   studentId: true,
 });
 export const insertPortfolioEntrySchema = createInsertSchema(portfolioEntries).omit({ 
-  id: true,
   studentId: true,
 });
 

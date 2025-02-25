@@ -2,46 +2,10 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import multer from "multer";
-import path from "path";
-import fs from "fs";
-import express from "express"; // Added express import
-import { insertProgramSchema, insertSessionSchema, insertStudentSchema, insertPortfolioEntrySchema } from "@shared/schema";
-
-// Configure multer for media uploads
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, "uploads/");
-    },
-    filename: (req, file, cb) => {
-      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-      cb(null, `${uniqueSuffix}${path.extname(file.originalname)}`);
-    },
-  }),
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error("Invalid file type. Only JPEG, PNG and GIF are allowed."));
-    }
-  },
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
-  },
-});
+import { insertProgramSchema, insertSessionSchema, insertStudentSchema } from "@shared/schema";
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
-
-  // Serve uploaded files
-  app.use("/uploads", express.static("uploads"));
-
-  // Create uploads directory if it doesn't exist
-  if (!fs.existsSync("uploads")) {
-    fs.mkdirSync("uploads");
-  }
 
   // Programs
   app.get("/api/programs", async (req, res) => {
@@ -229,74 +193,6 @@ export function registerRoutes(app: Express): Server {
 
     await storage.deleteStudent(studentId);
     res.sendStatus(200);
-  });
-
-  // Portfolio Entry Routes
-  app.get("/api/students/:studentId/portfolio", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
-
-    const studentId = parseInt(req.params.studentId);
-    const student = await storage.getStudent(studentId);
-
-    if (!student) {
-      return res.sendStatus(404);
-    }
-
-    // Check if the user has access to any programs this student is enrolled in
-    const studentPrograms = await storage.getProgramsByStudentId(studentId);
-    const hasAccess = studentPrograms.some(program => program.userId === req.user.id);
-
-    if (!hasAccess) {
-      return res.sendStatus(403);
-    }
-
-    const entries = await storage.getPortfolioEntriesByStudentId(studentId);
-    res.json(entries);
-  });
-
-  app.post("/api/students/:studentId/portfolio", upload.single("media"), async (req, res) => {
-    try {
-      if (!req.isAuthenticated()) return res.sendStatus(401);
-
-      const studentId = parseInt(req.params.studentId);
-      const student = await storage.getStudent(studentId);
-
-      if (!student) {
-        return res.sendStatus(404);
-      }
-
-      // Check if the user has access to any programs this student is enrolled in
-      const studentPrograms = await storage.getProgramsByStudentId(studentId);
-      const hasAccess = studentPrograms.some(program => program.userId === req.user.id);
-
-      if (!hasAccess) {
-        return res.sendStatus(403);
-      }
-
-      const entryData = {
-        ...req.body,
-        mediaUrl: req.file ? `/uploads/${req.file.filename}` : undefined,
-      };
-
-      // Log the data before validation
-      console.log('Portfolio entry data before validation:', entryData);
-
-      const validatedData = insertPortfolioEntrySchema.parse(entryData);
-      const entry = await storage.createPortfolioEntry(studentId, validatedData);
-
-      res.status(201).json(entry);
-    } catch (error) {
-      // Clean up uploaded file if validation fails
-      if (req.file) {
-        fs.unlink(req.file.path, () => {});
-      }
-      if (error instanceof Error) {
-        console.error('Portfolio entry error:', error);
-        res.status(400).json({ message: error.message });
-      } else {
-        res.status(500).json({ message: "An unexpected error occurred" });
-      }
-    }
   });
 
   const httpServer = createServer(app);
