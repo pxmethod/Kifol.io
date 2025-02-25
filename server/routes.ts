@@ -222,20 +222,32 @@ export function registerRoutes(app: Express): Server {
     fileFilter: (req, file, cb) => {
       const allowedTypes = [
         'image/jpeg',
+        'image/png',
         'image/gif',
         'image/svg+xml',
         'application/pdf',
         'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'video/mp4',
+        'video/quicktime',
+        'video/x-msvideo',
+        'video/webm'
       ];
       if (allowedTypes.includes(file.mimetype)) {
-        cb(null, true);
+        // For video files, check size limit of 20MB
+        if (file.mimetype.startsWith('video/') && file.size > 20 * 1024 * 1024) {
+          cb(new Error('Video files must not exceed 20MB'));
+        } else if (!file.mimetype.startsWith('video/') && file.size > 5 * 1024 * 1024) {
+          cb(new Error('Non-video files must not exceed 5MB'));
+        } else {
+          cb(null, true);
+        }
       } else {
         cb(new Error('Invalid file type'));
       }
     },
     limits: {
-      fileSize: 5 * 1024 * 1024, // 5MB
+      fileSize: 20 * 1024 * 1024, // 20MB max for videos
     }
   });
 
