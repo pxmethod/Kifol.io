@@ -277,35 +277,49 @@ export function registerRoutes(app: Express): Server {
     "/api/students/:studentId/portfolio",
     upload.array("media", 10),
     async (req, res) => {
-      if (!req.isAuthenticated()) return res.sendStatus(401);
+      try {
+        if (!req.isAuthenticated()) return res.sendStatus(401);
 
-      const studentId = parseInt(req.params.studentId);
-      const student = await storage.getStudent(studentId);
+        const studentId = parseInt(req.params.studentId);
+        const student = await storage.getStudent(studentId);
 
-      if (!student) {
-        return res.sendStatus(404);
+        if (!student) {
+          return res.sendStatus(404);
+        }
+
+        // Check if the user has access to any programs this student is enrolled in
+        const studentPrograms = await storage.getProgramsByStudentId(studentId);
+        const hasAccess = studentPrograms.some(program => program.userId === req.user.id);
+
+        if (!hasAccess) {
+          return res.sendStatus(403);
+        }
+
+        // Validate required fields
+        if (!req.body.title || !req.body.type) {
+          return res.status(400).json({
+            message: "Title and type are required fields"
+          });
+        }
+
+        // Handle case when no files are uploaded
+        const files = (req.files || []) as Express.Multer.File[];
+        const mediaUrl = files.map(file => `/uploads/${file.filename}`);
+
+        const entry = await storage.createPortfolioEntry(studentId, {
+          title: req.body.title,
+          description: req.body.description || null,
+          type: req.body.type,
+          mediaUrl,
+        });
+
+        res.status(201).json(entry);
+      } catch (error) {
+        console.error('Error creating portfolio entry:', error);
+        res.status(500).json({
+          message: "An error occurred while creating the portfolio entry"
+        });
       }
-
-      // Check if the user has access to any programs this student is enrolled in
-      const studentPrograms = await storage.getProgramsByStudentId(studentId);
-      const hasAccess = studentPrograms.some(program => program.userId === req.user.id);
-
-      if (!hasAccess) {
-        return res.sendStatus(403);
-      }
-
-      // Handle case when no files are uploaded
-      const files = (req.files || []) as Express.Multer.File[];
-      const mediaUrl = files.map(file => `/uploads/${file.filename}`);
-
-      const entry = await storage.createPortfolioEntry(studentId, {
-        title: req.body.title,
-        description: req.body.description,
-        type: req.body.type,
-        mediaUrl,
-      });
-
-      res.status(201).json(entry);
     }
   );
 
