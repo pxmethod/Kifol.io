@@ -1,88 +1,40 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { Student, PortfolioEntry } from "@shared/schema";
+import { useQuery } from "@tanstack/react-query";
+import { Student } from "@shared/schema";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Plus, GraduationCap } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ApiError } from "@/types/common";
-import { PortfolioEntryDialog } from "@/components/portfolio-entry-dialog";
-import { PortfolioTimeline } from "@/components/portfolio-timeline";
-import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { format } from "date-fns";
 
+/**
+ * StudentDetailPage Component
+ * 
+ * Displays detailed information about a student and their portfolio timeline.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {Object} props.params - URL parameters
+ * @param {string} props.params.programId - Program ID from the URL
+ * @param {string} props.params.studentId - Student ID from the URL
+ */
 export default function StudentDetailPage({
   params,
 }: {
   params: { programId: string; studentId: string };
 }) {
-  const { toast } = useToast();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
   // Fetch student details
   const { 
     data: student,
-    isLoading: isLoadingStudent,
-    isError: isStudentError,
-    error: studentError
+    isLoading,
+    isError,
+    error
   } = useQuery<Student, ApiError>({
     queryKey: [`/api/students/${params.studentId}`],
   });
 
-  // Fetch portfolio entries
-  const {
-    data: portfolioEntries = [],
-    isLoading: isLoadingEntries,
-  } = useQuery<PortfolioEntry[]>({
-    queryKey: [`/api/students/${params.studentId}/portfolio`],
-  });
-
-  // Create portfolio entry mutation
-  const createEntryMutation = useMutation({
-    mutationFn: async (formData: FormData) => {
-      const res = await apiRequest(
-        "POST",
-        `/api/students/${params.studentId}/portfolio`,
-        formData,
-        { isFormData: true }
-      );
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [`/api/students/${params.studentId}/portfolio`],
-      });
-      setIsDialogOpen(false);
-      toast({
-        title: "Success",
-        description: "Portfolio entry created successfully",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleCreateEntry = async (data: any) => {
-    const formData = new FormData();
-    formData.append("title", data.title);
-    formData.append("description", data.description || "");
-    formData.append("type", data.type);
-
-    // Append each file to the FormData
-    data.mediaFiles.forEach((file: File) => {
-      formData.append("media", file);
-    });
-
-    createEntryMutation.mutate(formData);
-  };
-
-  if (isLoadingStudent) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -90,7 +42,7 @@ export default function StudentDetailPage({
     );
   }
 
-  if (isStudentError || !student) {
+  if (isError || !student) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
@@ -103,7 +55,7 @@ export default function StudentDetailPage({
           <div className="mt-8 text-center">
             <h2 className="text-xl font-semibold mb-2">Error Loading Student</h2>
             <p className="text-muted-foreground mb-4">
-              {studentError?.message || "Unable to load student details"}
+              {error?.message || "Unable to load student details"}
             </p>
           </div>
         </div>
@@ -129,6 +81,10 @@ export default function StudentDetailPage({
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h1 className="text-3xl font-bold">{student.name}</h1>
+                <div className="flex items-center gap-2 text-gray-200 mt-2">
+                  <GraduationCap className="h-4 w-4" />
+                  <span>Grade {student.grade}</span>
+                </div>
                 <p className="text-gray-200 mt-2">Parent Email: {student.email}</p>
               </div>
             </div>
@@ -139,27 +95,17 @@ export default function StudentDetailPage({
         <div className="container mx-auto px-4 py-8">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold">Timeline</h2>
-            <Button onClick={() => setIsDialogOpen(true)}>
+            <Button>
               <Plus className="h-4 w-4 mr-2" />
               Add Event
             </Button>
           </div>
-
-          {isLoadingEntries ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : (
-            <PortfolioTimeline entries={portfolioEntries} />
-          )}
+          
+          {/* Placeholder for timeline - will be implemented in next phase */}
+          <div className="text-center text-muted-foreground py-12">
+            Timeline events will appear here
+          </div>
         </div>
-
-        <PortfolioEntryDialog
-          open={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
-          onSubmit={handleCreateEntry}
-          isSubmitting={createEntryMutation.isPending}
-        />
       </div>
     </ErrorBoundary>
   );

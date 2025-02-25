@@ -54,9 +54,10 @@ export const portfolioEntries = pgTable("portfolio_entries", {
     .references(() => students.id),
   title: text("title").notNull(),
   description: text("description"),
-  achievementDate: date("achievement_date").notNull().default(sql`CURRENT_DATE`),
-  type: text("type", { enum: ['accomplishment', 'project'] }).notNull(),
-  mediaUrl: text("media_url").array(),
+  achievementDate: date("achievement_date").notNull(),
+  type: text("type").notNull(),
+  grade: text("grade"),
+  feedback: text("feedback"),
 });
 
 // Relations
@@ -112,18 +113,9 @@ export const insertProgramStudentSchema = createInsertSchema(programStudents).om
   programId: true,
   studentId: true,
 });
-export const insertPortfolioEntrySchema = createInsertSchema(portfolioEntries)
-  .extend({
-    mediaFiles: z.array(z.object({
-      name: z.string(),
-      type: z.string(),
-      url: z.string(),
-    })).optional(),
-  })
-  .omit({ 
-    studentId: true,
-    mediaUrl: true,
-  });
+export const insertPortfolioEntrySchema = createInsertSchema(portfolioEntries).omit({ 
+  studentId: true,
+});
 
 // Types
 export type User = typeof users.$inferSelect;
