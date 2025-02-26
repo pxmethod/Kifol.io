@@ -62,6 +62,7 @@ export interface IStorage {
   createParentInvitation(email: string): Promise<ParentInvitation>;
   getParentInvitation(token: string): Promise<ParentInvitation | undefined>;
   acceptParentInvitation(token: string): Promise<void>;
+  linkStudentToParent(studentId: number, parentId: number): Promise<void>;
 
   sessionStore: session.Store;
 }
@@ -168,16 +169,33 @@ export class DatabaseStorage implements IStorage {
     // Generate a unique slug for the student
     const slug = nanoid();
 
-    // Create the student record
-    const [newStudent] = await db
-      .insert(students)
-      .values({
-        ...studentData,
-        slug,
-      })
-      .returning();
+    // Start a transaction
+    return await db.transaction(async (tx) => {
+      // Create the student record
+      const [newStudent] = await tx
+        .insert(students)
+        .values({
+          ...studentData,
+          slug,
+        })
+        .returning();
 
-    return newStudent;
+      // Check if parent already exists
+      const existingParent = await this.getParentUserByEmail(parentEmail);
+
+      if (!existingParent) {
+        // Create parent invitation
+        await this.createParentInvitation(parentEmail);
+      } else {
+        // If parent exists, link student to parent
+        await tx
+          .update(students)
+          .set({ parentId: existingParent.id })
+          .where(eq(students.id, newStudent.id));
+      }
+
+      return newStudent;
+    });
   }
 
   async getStudent(id: number): Promise<Student | undefined> {
@@ -225,7 +243,8 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(students)
-      .where(eq(students.parentId, parentId));
+      .where(eq(students.parentId, parentId))
+      .orderBy(students.name);
   }
 
 
@@ -376,6 +395,12 @@ export class DatabaseStorage implements IStorage {
       .update(parentInvitations)
       .set({ isAccepted: true })
       .where(eq(parentInvitations.token, token));
+  }
+  async linkStudentToParent(studentId: number, parentId: number): Promise<void> {
+    await db
+      .update(students)
+      .set({ parentId })
+      .where(eq(students.id, studentId));
   }
 }
 
