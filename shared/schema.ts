@@ -24,12 +24,11 @@ export const parentInvitations = pgTable("parent_invitations", {
   id: serial("id").primaryKey(),
   email: text("email").notNull(),
   token: text("token").notNull().unique(),
-  accepted: boolean("accepted").default(false),
+  isAccepted: boolean("is_accepted").default(false),
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Programs table unchanged
 export const programs = pgTable("programs", {
   id: serial("id").primaryKey(),
   userId: integer("user_id")
@@ -41,7 +40,6 @@ export const programs = pgTable("programs", {
   endDate: date("end_date").notNull(),
 });
 
-// Sessions table unchanged
 export const sessions = pgTable("sessions", {
   id: serial("id").primaryKey(),
   programId: integer("program_id")
@@ -144,7 +142,7 @@ export const insertParentUserSchema = createInsertSchema(parentUsers).omit({
 });
 export const insertParentInvitationSchema = createInsertSchema(parentInvitations).omit({ 
   createdAt: true,
-  accepted: true,
+  isAccepted: true,
 });
 export const insertProgramSchema = createInsertSchema(programs).omit({ userId: true });
 export const insertSessionSchema = createInsertSchema(sessions).omit({ programId: true });

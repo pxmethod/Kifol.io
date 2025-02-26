@@ -3,7 +3,7 @@ import { users, programs, sessions, students, programStudents, portfolioEntries,
   type User, type InsertUser, type Program, type InsertProgram, 
   type Session, type InsertSession, type Student, type InsertStudent,
   type ProgramStudent, type InsertProgramStudent, type PortfolioEntry, 
-  type ParentUser, type InsertParentUser,
+  type InsertPortfolioEntry, type ParentUser, type InsertParentUser,
   type ParentInvitation, type InsertParentInvitation } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, and } from "drizzle-orm";
@@ -11,32 +11,14 @@ import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 import { nanoid } from 'nanoid';
-import { generateParentInvitationEmail, sendEmail } from './services/mail';
 
 const PostgresSessionStore = connectPg(session);
 
 export interface IStorage {
-  // User methods
+  // Existing user methods
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-
-  // Student methods
-  createStudent(data: { student: InsertStudent; parentEmail: string }): Promise<Student>;
-  getStudent(id: number): Promise<Student | undefined>;
-  getStudentByEmail(email: string): Promise<Student | undefined>;
-  getStudentBySlug(slug: string): Promise<Student | undefined>;
-  deleteStudent(id: number): Promise<void>;
-  getStudentsByParentId(parentId: number): Promise<Student[]>;
-
-  // Parent methods
-  createParentUser(user: InsertParentUser): Promise<ParentUser>;
-  getParentUser(id: number): Promise<ParentUser | undefined>;
-  getParentUserByEmail(email: string): Promise<ParentUser | undefined>;
-  createParentInvitation(email: string): Promise<ParentInvitation>;
-  getParentInvitation(token: string): Promise<ParentInvitation | undefined>;
-  acceptParentInvitation(token: string): Promise<void>;
-  linkStudentToParent(studentId: number, parentId: number): Promise<void>;
 
   // Program methods
   createProgram(userId: number, program: InsertProgram): Promise<Program>;
@@ -51,6 +33,14 @@ export interface IStorage {
   updateSession(id: number, session: Partial<InsertSession>): Promise<Session>;
   deleteSession(id: number): Promise<void>;
 
+  // New Student methods
+  createStudent(student: InsertStudent & { parentEmail: string }): Promise<Student>;
+  getStudent(id: number): Promise<Student | undefined>;
+  getStudentByEmail(email: string): Promise<Student | undefined>;
+  getStudentBySlug(slug: string): Promise<Student | undefined>;
+  deleteStudent(id: number): Promise<void>;
+  getStudentsByParentId(parentId: number): Promise<Student[]>;
+
   // Program-Student relationship methods
   addStudentToProgram(programId: number, studentId: number): Promise<ProgramStudent>;
   getStudentsByProgramId(programId: number): Promise<Student[]>;
@@ -62,6 +52,17 @@ export interface IStorage {
   getPortfolioEntriesByStudentId(studentId: number): Promise<PortfolioEntry[]>;
   updatePortfolioEntry(id: number, entry: Partial<InsertPortfolioEntry>): Promise<PortfolioEntry>;
   deletePortfolioEntry(id: number): Promise<void>;
+
+  // New parent user methods
+  createParentUser(user: InsertParentUser): Promise<ParentUser>;
+  getParentUser(id: number): Promise<ParentUser | undefined>;
+  getParentUserByEmail(email: string): Promise<ParentUser | undefined>;
+
+  // New parent invitation methods
+  createParentInvitation(email: string): Promise<ParentInvitation>;
+  getParentInvitation(token: string): Promise<ParentInvitation | undefined>;
+  acceptParentInvitation(token: string): Promise<void>;
+  linkStudentToParent(studentId: number, parentId: number): Promise<void>;
 
   sessionStore: session.Store;
 }
@@ -162,12 +163,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   // New Student methods implementation
-  async createStudent(data: { student: InsertStudent; parentEmail: string }): Promise<Student> {
-    const { student: studentData, parentEmail } = data;
-
-    if (!parentEmail) {
-      throw new Error("Parent email is required");
-    }
+  async createStudent(student: InsertStudent & { parentEmail: string }): Promise<Student> {
+    const { parentEmail, ...studentData } = student;
 
     // Generate a unique slug for the student
     const slug = nanoid();
@@ -187,11 +184,8 @@ export class DatabaseStorage implements IStorage {
       const existingParent = await this.getParentUserByEmail(parentEmail);
 
       if (!existingParent) {
-        // Create parent invitation with the parent's email
-        const invitation = await this.createParentInvitation(parentEmail);
-        if (!invitation) {
-          throw new Error("Failed to create parent invitation");
-        }
+        // Create parent invitation
+        await this.createParentInvitation(parentEmail);
       } else {
         // If parent exists, link student to parent
         await tx
@@ -366,10 +360,6 @@ export class DatabaseStorage implements IStorage {
 
   // New parent invitation methods
   async createParentInvitation(email: string): Promise<ParentInvitation> {
-    if (!email) {
-      throw new Error("Email is required for parent invitation");
-    }
-
     const token = nanoid();
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiration
@@ -380,17 +370,9 @@ export class DatabaseStorage implements IStorage {
         email,
         token,
         expiresAt,
-        accepted: false,
+        isAccepted: false,
       })
       .returning();
-
-    // Send invitation email
-    const { subject, text, html } = generateParentInvitationEmail(
-      "your student", // We'll update this once we have the student name
-      token
-    );
-    await sendEmail({ to: email, subject, text, html });
-
     return invitation;
   }
 
@@ -401,7 +383,7 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(parentInvitations.token, token),
-          eq(parentInvitations.accepted, false),
+          eq(parentInvitations.isAccepted, false),
           sql`${parentInvitations.expiresAt} > NOW()`
         )
       );
@@ -411,7 +393,7 @@ export class DatabaseStorage implements IStorage {
   async acceptParentInvitation(token: string): Promise<void> {
     await db
       .update(parentInvitations)
-      .set({ accepted: true })
+      .set({ isAccepted: true })
       .where(eq(parentInvitations.token, token));
   }
   async linkStudentToParent(studentId: number, parentId: number): Promise<void> {
