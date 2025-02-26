@@ -29,6 +29,7 @@ export const parentInvitations = pgTable("parent_invitations", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Programs table unchanged
 export const programs = pgTable("programs", {
   id: serial("id").primaryKey(),
   userId: integer("user_id")
@@ -40,6 +41,7 @@ export const programs = pgTable("programs", {
   endDate: date("end_date").notNull(),
 });
 
+// Sessions table unchanged
 export const sessions = pgTable("sessions", {
   id: serial("id").primaryKey(),
   programId: integer("program_id")

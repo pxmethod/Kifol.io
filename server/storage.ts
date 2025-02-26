@@ -3,7 +3,7 @@ import { users, programs, sessions, students, programStudents, portfolioEntries,
   type User, type InsertUser, type Program, type InsertProgram, 
   type Session, type InsertSession, type Student, type InsertStudent,
   type ProgramStudent, type InsertProgramStudent, type PortfolioEntry, 
-  type InsertPortfolioEntry, type ParentUser, type InsertParentUser,
+  type ParentUser, type InsertParentUser,
   type ParentInvitation, type InsertParentInvitation } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, and } from "drizzle-orm";
@@ -11,6 +11,7 @@ import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 import { nanoid } from 'nanoid';
+import { generateParentInvitationEmail, sendEmail } from './services/mail';
 
 const PostgresSessionStore = connectPg(session);
 
@@ -184,8 +185,11 @@ export class DatabaseStorage implements IStorage {
       const existingParent = await this.getParentUserByEmail(parentEmail);
 
       if (!existingParent) {
-        // Create parent invitation
-        await this.createParentInvitation(parentEmail);
+        // Create parent invitation with the parent's email
+        const invitation = await this.createParentInvitation(parentEmail);
+        if (!invitation) {
+          throw new Error("Failed to create parent invitation");
+        }
       } else {
         // If parent exists, link student to parent
         await tx
@@ -360,6 +364,10 @@ export class DatabaseStorage implements IStorage {
 
   // New parent invitation methods
   async createParentInvitation(email: string): Promise<ParentInvitation> {
+    if (!email) {
+      throw new Error("Email is required for parent invitation");
+    }
+
     const token = nanoid();
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiration
@@ -373,6 +381,14 @@ export class DatabaseStorage implements IStorage {
         accepted: false,
       })
       .returning();
+
+    // Send invitation email
+    const { subject, text, html } = generateParentInvitationEmail(
+      "your student", // We'll update this once we have the student name
+      token
+    );
+    await sendEmail({ to: email, subject, text, html });
+
     return invitation;
   }
 
