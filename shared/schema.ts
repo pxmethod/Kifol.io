@@ -1,12 +1,32 @@
 import { relations, sql } from "drizzle-orm";
-import { text, serial, integer, date, pgTable } from "drizzle-orm/pg-core";
+import { text, serial, integer, date, pgTable, timestamp, boolean, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Existing users table (for instructors/admins)
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+});
+
+// New parent_users table
+export const parentUsers = pgTable("parent_users", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(),
+  name: text("name").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// New parent_invitations table
+export const parentInvitations = pgTable("parent_invitations", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull(),
+  token: text("token").notNull().unique(),
+  isAccepted: boolean("is_accepted").default(false),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const programs = pgTable("programs", {
@@ -29,12 +49,15 @@ export const sessions = pgTable("sessions", {
   description: text("description"),
 });
 
-// New tables for student management
+// Modified students table with parent relationship and slug
 export const students = pgTable("students", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  email: text("email").notNull(), // Removed .unique()
+  email: text("email").notNull(),
   grade: integer("grade").notNull(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  parentId: integer("parent_id").references(() => parentUsers.id),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const programStudents = pgTable("program_students", {
@@ -65,6 +88,10 @@ export const usersRelations = relations(users, ({ many }) => ({
   programs: many(programs),
 }));
 
+export const parentUsersRelations = relations(parentUsers, ({ many }) => ({
+  students: many(students),
+}));
+
 export const programsRelations = relations(programs, ({ one, many }) => ({
   user: one(users, {
     fields: [programs.userId],
@@ -81,9 +108,13 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
   }),
 }));
 
-export const studentsRelations = relations(students, ({ many }) => ({
+export const studentsRelations = relations(students, ({ many, one }) => ({
   programStudents: many(programStudents),
   portfolioEntries: many(portfolioEntries),
+  parent: one(parentUsers, {
+    fields: [students.parentId],
+    references: [parentUsers.id],
+  }),
 }));
 
 export const programStudentsRelations = relations(programStudents, ({ one }) => ({
@@ -106,9 +137,20 @@ export const portfolioEntriesRelations = relations(portfolioEntries, ({ one }) =
 
 // Schemas
 export const insertUserSchema = createInsertSchema(users);
+export const insertParentUserSchema = createInsertSchema(parentUsers).omit({ 
+  createdAt: true 
+});
+export const insertParentInvitationSchema = createInsertSchema(parentInvitations).omit({ 
+  createdAt: true,
+  isAccepted: true,
+});
 export const insertProgramSchema = createInsertSchema(programs).omit({ userId: true });
 export const insertSessionSchema = createInsertSchema(sessions).omit({ programId: true });
-export const insertStudentSchema = createInsertSchema(students);
+export const insertStudentSchema = createInsertSchema(students).omit({
+  parentId: true,
+  slug: true,
+  createdAt: true,
+});
 export const insertProgramStudentSchema = createInsertSchema(programStudents).omit({ 
   programId: true,
   studentId: true,
@@ -120,6 +162,10 @@ export const insertPortfolioEntrySchema = createInsertSchema(portfolioEntries).o
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type ParentUser = typeof parentUsers.$inferSelect;
+export type InsertParentUser = z.infer<typeof insertParentUserSchema>;
+export type ParentInvitation = typeof parentInvitations.$inferSelect;
+export type InsertParentInvitation = z.infer<typeof insertParentInvitationSchema>;
 export type Program = typeof programs.$inferSelect;
 export type InsertProgram = z.infer<typeof insertProgramSchema>;
 export type Session = typeof sessions.$inferSelect;
