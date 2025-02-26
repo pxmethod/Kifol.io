@@ -370,7 +370,7 @@ export class DatabaseStorage implements IStorage {
         email,
         token,
         expiresAt,
-        isAccepted: false,
+        accepted: false,
       })
       .returning();
     return invitation;
@@ -383,7 +383,7 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(parentInvitations.token, token),
-          eq(parentInvitations.isAccepted, false),
+          eq(parentInvitations.accepted, false),
           sql`${parentInvitations.expiresAt} > NOW()`
         )
       );
@@ -393,7 +393,7 @@ export class DatabaseStorage implements IStorage {
   async acceptParentInvitation(token: string): Promise<void> {
     await db
       .update(parentInvitations)
-      .set({ isAccepted: true })
+      .set({ accepted: true })
       .where(eq(parentInvitations.token, token));
   }
   async linkStudentToParent(studentId: number, parentId: number): Promise<void> {

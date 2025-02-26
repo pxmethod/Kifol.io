@@ -24,7 +24,7 @@ export const parentInvitations = pgTable("parent_invitations", {
   id: serial("id").primaryKey(),
   email: text("email").notNull(),
   token: text("token").notNull().unique(),
-  isAccepted: boolean("is_accepted").default(false),
+  accepted: boolean("accepted").default(false),
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -142,7 +142,7 @@ export const insertParentUserSchema = createInsertSchema(parentUsers).omit({
 });
 export const insertParentInvitationSchema = createInsertSchema(parentInvitations).omit({ 
   createdAt: true,
-  isAccepted: true,
+  accepted: true,
 });
 export const insertProgramSchema = createInsertSchema(programs).omit({ userId: true });
 export const insertSessionSchema = createInsertSchema(sessions).omit({ programId: true });
