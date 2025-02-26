@@ -184,8 +184,10 @@ export class DatabaseStorage implements IStorage {
       const existingParent = await this.getParentUserByEmail(parentEmail);
 
       if (!existingParent) {
-        // Create parent invitation
-        await this.createParentInvitation(parentEmail);
+        // Create parent invitation only if we have a valid email
+        if (parentEmail) {
+          await this.createParentInvitation(parentEmail);
+        }
       } else {
         // If parent exists, link student to parent
         await tx
