@@ -16,10 +16,27 @@ import { generateParentInvitationEmail, sendEmail } from './services/mail';
 const PostgresSessionStore = connectPg(session);
 
 export interface IStorage {
-  // Existing user methods
+  // User methods
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+
+  // Student methods
+  createStudent(data: { student: InsertStudent; parentEmail: string }): Promise<Student>;
+  getStudent(id: number): Promise<Student | undefined>;
+  getStudentByEmail(email: string): Promise<Student | undefined>;
+  getStudentBySlug(slug: string): Promise<Student | undefined>;
+  deleteStudent(id: number): Promise<void>;
+  getStudentsByParentId(parentId: number): Promise<Student[]>;
+
+  // Parent methods
+  createParentUser(user: InsertParentUser): Promise<ParentUser>;
+  getParentUser(id: number): Promise<ParentUser | undefined>;
+  getParentUserByEmail(email: string): Promise<ParentUser | undefined>;
+  createParentInvitation(email: string): Promise<ParentInvitation>;
+  getParentInvitation(token: string): Promise<ParentInvitation | undefined>;
+  acceptParentInvitation(token: string): Promise<void>;
+  linkStudentToParent(studentId: number, parentId: number): Promise<void>;
 
   // Program methods
   createProgram(userId: number, program: InsertProgram): Promise<Program>;
@@ -34,14 +51,6 @@ export interface IStorage {
   updateSession(id: number, session: Partial<InsertSession>): Promise<Session>;
   deleteSession(id: number): Promise<void>;
 
-  // New Student methods
-  createStudent(student: InsertStudent & { parentEmail: string }): Promise<Student>;
-  getStudent(id: number): Promise<Student | undefined>;
-  getStudentByEmail(email: string): Promise<Student | undefined>;
-  getStudentBySlug(slug: string): Promise<Student | undefined>;
-  deleteStudent(id: number): Promise<void>;
-  getStudentsByParentId(parentId: number): Promise<Student[]>;
-
   // Program-Student relationship methods
   addStudentToProgram(programId: number, studentId: number): Promise<ProgramStudent>;
   getStudentsByProgramId(programId: number): Promise<Student[]>;
@@ -53,17 +62,6 @@ export interface IStorage {
   getPortfolioEntriesByStudentId(studentId: number): Promise<PortfolioEntry[]>;
   updatePortfolioEntry(id: number, entry: Partial<InsertPortfolioEntry>): Promise<PortfolioEntry>;
   deletePortfolioEntry(id: number): Promise<void>;
-
-  // New parent user methods
-  createParentUser(user: InsertParentUser): Promise<ParentUser>;
-  getParentUser(id: number): Promise<ParentUser | undefined>;
-  getParentUserByEmail(email: string): Promise<ParentUser | undefined>;
-
-  // New parent invitation methods
-  createParentInvitation(email: string): Promise<ParentInvitation>;
-  getParentInvitation(token: string): Promise<ParentInvitation | undefined>;
-  acceptParentInvitation(token: string): Promise<void>;
-  linkStudentToParent(studentId: number, parentId: number): Promise<void>;
 
   sessionStore: session.Store;
 }
@@ -164,8 +162,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   // New Student methods implementation
-  async createStudent(student: InsertStudent & { parentEmail: string }): Promise<Student> {
-    const { parentEmail, ...studentData } = student;
+  async createStudent(data: { student: InsertStudent; parentEmail: string }): Promise<Student> {
+    const { student: studentData, parentEmail } = data;
+
+    if (!parentEmail) {
+      throw new Error("Parent email is required");
+    }
 
     // Generate a unique slug for the student
     const slug = nanoid();
