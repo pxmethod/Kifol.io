@@ -2,7 +2,7 @@ import mailgun from 'mailgun-js';
 
 const mg = mailgun({
   apiKey: process.env.MAILGUN_API_KEY!,
-  domain: process.env.MAILGUN_DOMAIN!
+  domain: 'sandbox087f00a7106a482bbf6cf2c685d0e40d.mailgun.org' // Using sandbox domain for testing
 });
 
 interface SendEmailParams {
@@ -15,15 +15,17 @@ interface SendEmailParams {
 export async function sendEmail({ to, subject, text, html }: SendEmailParams): Promise<boolean> {
   try {
     await mg.messages().send({
-      from: `Student Progress <noreply@${process.env.MAILGUN_DOMAIN}>`,
+      from: `Student Progress <noreply@sandbox087f00a7106a482bbf6cf2c685d0e40d.mailgun.org>`,
       to,
       subject,
       text,
       html
     });
+    console.log('Successfully sent email to:', to);
     return true;
   } catch (error) {
     console.error('Failed to send email:', error);
+    console.warn('Note: When using sandbox domain, recipient email must be authorized in Mailgun first');
     return false;
   }
 }
@@ -34,18 +36,18 @@ export function generateParentInvitationEmail(studentName: string, invitationTok
   html: string;
 } {
   const invitationLink = `${process.env.REPLIT_DOMAIN}/parent-signup/${invitationToken}`;
-  
+
   const subject = `Invitation to Track ${studentName}'s Progress`;
-  
+
   const text = `
     You've been invited to track ${studentName}'s educational progress!
-    
+
     Click the following link to create your parent account:
     ${invitationLink}
-    
+
     This link will expire in 7 days.
   `;
-  
+
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2>Welcome to Student Progress Tracking!</h2>
