@@ -14,6 +14,12 @@ interface SendEmailParams {
 
 export async function sendEmail({ to, subject, text, html }: SendEmailParams): Promise<boolean> {
   try {
+    console.log('Attempting to send email to:', to);
+    console.log('Using Mailgun configuration:', {
+      domain: mg.domain,
+      fromEmail: `Student Progress <noreply@sandbox087f00a7106a482bbf6cf2c685d0e40d.mailgun.org>`,
+    });
+
     await mg.messages().send({
       from: `Student Progress <noreply@sandbox087f00a7106a482bbf6cf2c685d0e40d.mailgun.org>`,
       to,
@@ -28,6 +34,22 @@ export async function sendEmail({ to, subject, text, html }: SendEmailParams): P
     console.warn('Note: When using sandbox domain, recipient email must be authorized in Mailgun first');
     return false;
   }
+}
+
+// Test function to verify email functionality
+export async function sendTestEmail(recipientEmail: string): Promise<boolean> {
+  return sendEmail({
+    to: recipientEmail,
+    subject: 'Test Email from Student Progress App',
+    text: 'This is a test email to verify the Mailgun integration is working correctly.',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2>Test Email</h2>
+        <p>This is a test email to verify the Mailgun integration is working correctly.</p>
+        <p>If you received this email, the integration is successful!</p>
+      </div>
+    `
+  });
 }
 
 export function generateParentInvitationEmail(studentName: string, invitationToken: string): {
