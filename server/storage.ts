@@ -226,8 +226,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteStudent(id: number): Promise<void> {
-    // First delete any parent invitations
-    await db.execute(sql`DELETE FROM parent_invitations WHERE student_id = ${id}`);
+    // Delete any parent invitations for this student's email
+    const student = await this.getStudent(id);
+    if (student) {
+      await db.delete(parentInvitations)
+        .where(eq(parentInvitations.email, student.email));
+    }
 
     // Then delete related portfolio entries
     await db.delete(portfolioEntries)
