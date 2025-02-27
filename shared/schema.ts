@@ -29,6 +29,7 @@ export const parentInvitations = pgTable("parent_invitations", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Update programs table to include coverImage
 export const programs = pgTable("programs", {
   id: serial("id").primaryKey(),
   userId: integer("user_id")
@@ -38,6 +39,7 @@ export const programs = pgTable("programs", {
   description: text("description"),
   startDate: date("start_date").notNull(),
   endDate: date("end_date").notNull(),
+  coverImage: text("cover_image"),  // New field for storing image URL
 });
 
 export const sessions = pgTable("sessions", {

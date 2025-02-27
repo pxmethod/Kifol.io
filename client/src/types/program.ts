@@ -13,6 +13,8 @@ export const programFormSchema = z.object({
   endDate: z.date({
     required_error: "End date is required",
   }),
+  coverImage: z.instanceof(File).optional(),
+  removeCoverImage: z.boolean().default(false),
 }).refine(data => data.endDate > data.startDate, {
   message: "End date must be after start date",
   path: ["endDate"],

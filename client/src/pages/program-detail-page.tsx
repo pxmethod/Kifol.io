@@ -30,6 +30,8 @@ import { ProgramStudents } from "@/components/program-students";
 import { programFormSchema, ProgramFormData } from "@/types/program";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ApiError } from "@/types/common";
+import { Label } from "@/components/ui/label";
+import { Trash2, Upload } from "lucide-react";
 
 /**
  * ProgramDetailPage Component
@@ -63,7 +65,19 @@ export default function ProgramDetailPage({
   // Update program mutation
   const updateProgramMutation = useMutation({
     mutationFn: async (data: ProgramFormData) => {
-      const res = await apiRequest("PATCH", `/api/programs/${params.id}`, data);
+      const formData = new FormData();
+      formData.append('title', data.title);
+      if (data.description) formData.append('description', data.description);
+      formData.append('startDate', data.startDate.toISOString());
+      formData.append('endDate', data.endDate.toISOString());
+      if (data.coverImage) formData.append('coverImage', data.coverImage);
+      formData.append('removeCoverImage', String(data.removeCoverImage));
+
+      const res = await fetch(`/api/programs/${params.id}`, {
+        method: 'PATCH',
+        body: formData,
+      });
+      if (!res.ok) throw new Error('Failed to update program');
       return res.json();
     },
     onSuccess: () => {
@@ -93,6 +107,8 @@ export default function ProgramDetailPage({
       description: program?.description || "",
       startDate: program ? new Date(program.startDate) : new Date(),
       endDate: program ? new Date(program.endDate) : new Date(),
+      coverImage: null,
+      removeCoverImage: false,
     },
   });
 
@@ -133,8 +149,20 @@ export default function ProgramDetailPage({
     <ErrorBoundary>
       <div className="min-h-screen bg-background">
         {/* Header Section */}
-        <header className="bg-[#000000] text-white" role="banner">
-          <div className="container mx-auto px-4 py-8">
+        <header 
+          className="relative bg-[#000000] text-white" 
+          role="banner"
+        >
+          {program.coverImage && (
+            <>
+              <div 
+                className="absolute inset-0 bg-cover bg-center" 
+                style={{ backgroundImage: `url(${program.coverImage})` }}
+              />
+              <div className="absolute inset-0 bg-black/50" /> {/* Overlay */}
+            </>
+          )}
+          <div className="relative container mx-auto px-4 py-8">
             <nav aria-label="Main navigation">
               <Link href="/">
                 <Button
@@ -303,6 +331,74 @@ export default function ProgramDetailPage({
                     )}
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label>Cover Image</Label>
+                  {program.coverImage ? (
+                    <div className="flex items-center gap-4">
+                      <img 
+                        src={program.coverImage} 
+                        alt="Current cover" 
+                        className="h-20 w-32 object-cover rounded-md"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => form.setValue('removeCoverImage', true)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Remove
+                      </Button>
+                    </div>
+                  ) : (
+                    <FormField
+                      control={form.control}
+                      name="coverImage"
+                      render={({ field: { onChange, ...field } }) => (
+                        <FormItem>
+                          <FormControl>
+                            <div className="flex items-center gap-4">
+                              <Input
+                                type="file"
+                                accept="image/jpeg,image/png"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    onChange(file);
+                                    form.setValue('removeCoverImage', false);
+                                  }
+                                }}
+                                {...field}
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                  const fileInput = document.createElement('input');
+                                  fileInput.type = 'file';
+                                  fileInput.accept = 'image/jpeg,image/png';
+                                  fileInput.onchange = (e) => {
+                                    const file = (e.target as HTMLInputElement).files?.[0];
+                                    if (file) {
+                                      onChange(file);
+                                      form.setValue('removeCoverImage', false);
+                                    }
+                                  };
+                                  fileInput.click();
+                                }}
+                              >
+                                <Upload className="h-4 w-4 mr-2" />
+                                Upload
+                              </Button>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                </div>
+
                 <div className="flex justify-end gap-2">
                   <Button
                     type="button"
