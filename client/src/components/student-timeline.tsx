@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CalendarIcon, Loader2, Trophy, Book, Star, Award } from "lucide-react";
+import { CalendarIcon, Loader2, Trophy, Book, Star, Award, Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
@@ -59,9 +59,31 @@ type StudentTimelineProps = {
   studentId: number;
 };
 
+// Create a singleton for dialog state management
+let globalDialogState = {
+  isOpen: false,
+  setIsOpen: null as null | ((isOpen: boolean) => void),
+};
+
+// Add Event Button Component
+function AddEventButton() {
+  return (
+    <Button 
+      onClick={() => globalDialogState.setIsOpen?.(true)} 
+      aria-label="Add new timeline event"
+    >
+      <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
+      Add Event
+    </Button>
+  );
+}
+
 export function StudentTimeline({ studentId }: StudentTimelineProps) {
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  // Register the dialog state setter
+  globalDialogState.setIsOpen = setDialogOpen;
 
   const { data: entries = [], isLoading } = useQuery<PortfolioEntry[]>({
     queryKey: [`/api/students/${studentId}/portfolio`],
@@ -92,7 +114,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
         `/api/students/${studentId}/portfolio`,
         apiData
       );
-      
+
       // Check if response is valid before parsing JSON
       if (!res.ok) {
         const text = await res.text();
@@ -102,7 +124,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
         }
         throw new Error(`Server error: ${text}`);
       }
-      
+
       return res.json();
     },
     onSuccess: () => {
@@ -151,7 +173,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
           <p className="text-muted-foreground mb-4">
             Start tracking this student's progress by adding their first achievement or milestone.
           </p>
-          <Button onClick={() => setDialogOpen(true)}>Add First Entry</Button>
+          <StudentTimeline.AddEventButton />
         </div>
       ) : (
         <div className="space-y-8">
@@ -207,7 +229,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   <FormItem>
                     <FormLabel>Title</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter entry title" {...field} />
+                      <Input placeholder="Enter entry title" {...field} value={field.value || ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -295,6 +317,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                         placeholder="Enter description"
                         className="resize-none"
                         {...field}
+                        value={field.value || ''}
                       />
                     </FormControl>
                     <FormMessage />
@@ -309,7 +332,11 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   <FormItem>
                     <FormLabel>Grade (Optional)</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter grade" {...field} />
+                      <Input 
+                        placeholder="Enter grade" 
+                        {...field}
+                        value={field.value || ''} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -327,6 +354,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                         placeholder="Enter feedback"
                         className="resize-none"
                         {...field}
+                        value={field.value || ''}
                       />
                     </FormControl>
                     <FormMessage />
@@ -359,3 +387,6 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
     </div>
   );
 }
+
+// Export the AddEventButton as a static property
+StudentTimeline.AddEventButton = AddEventButton;

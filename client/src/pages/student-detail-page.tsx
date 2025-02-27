@@ -7,7 +7,6 @@ import { LoadingSpinner } from "@/components/loading-spinner";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ApiError } from "@/types/common";
 import { StudentTimeline } from "@/components/student-timeline";
-import { useState } from 'react';
 
 /**
  * StudentDetailPage Component
@@ -25,7 +24,6 @@ export default function StudentDetailPage({
 }: {
   params: { programId: string; studentId: string };
 }) {
-  const [dialogOpen, setDialogOpen] = useState(false); // Added state variable
   // Fetch student details
   const { 
     data: student,
@@ -95,10 +93,7 @@ export default function StudentDetailPage({
           <section aria-labelledby="timeline-heading">
             <div className="flex justify-between items-center mb-6">
               <h2 id="timeline-heading" className="text-2xl font-semibold">Timeline</h2>
-              <Button onClick={() => setDialogOpen(true)} aria-label="Add new timeline event">
-                <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
-                Add Event
-              </Button>
+              <StudentTimeline.AddEventButton />
             </div>
 
             <StudentTimeline studentId={parseInt(params.studentId)} />
