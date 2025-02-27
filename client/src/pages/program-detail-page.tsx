@@ -101,7 +101,6 @@ export default function ProgramDetailPage({
         queryKey: [`/api/programs/${params.id}`],
       });
       queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
-      setEditDialogOpen(false);
       toast({
         title: "Success",
         description: "Program updated successfully",
@@ -140,12 +139,8 @@ export default function ProgramDetailPage({
     }
   };
 
-  // Update removeImage function
+  // Update removeImage function to not trigger dialog close
   const removeImage = () => {
-    // Clear the form state
-    form.setValue('coverImage', undefined);
-    setImagePreview(null);
-
     // Create FormData to update the server
     const formData = new FormData();
     const currentValues = form.getValues();
@@ -156,8 +151,12 @@ export default function ProgramDetailPage({
     formData.append('endDate', currentValues.endDate.toISOString());
     formData.append('removeCoverImage', 'true');
 
-    // Update the program
+    // Update the program but keep dialog open
     updateProgramMutation.mutate(formData);
+
+    // Clear the form state and preview
+    form.setValue('coverImage', undefined);
+    setImagePreview(null);
   };
 
   if (isLoading) {
@@ -191,6 +190,7 @@ export default function ProgramDetailPage({
 
   const onSubmit = form.handleSubmit((data) => {
     updateProgramMutation.mutate(data);
+    setEditDialogOpen(false); // Only close dialog on form submit
   });
 
   return (
