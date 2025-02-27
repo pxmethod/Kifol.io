@@ -2,7 +2,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Program } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { Pencil, ArrowLeft, CalendarIcon } from "lucide-react";
+import { Pencil, ArrowLeft, CalendarIcon, X } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -31,6 +31,7 @@ import { programFormSchema, ProgramFormData } from "@/types/program";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ApiError } from "@/types/common";
 
+
 /**
  * ProgramDetailPage Component
  * 
@@ -49,6 +50,7 @@ export default function ProgramDetailPage({
 }) {
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Fetch program details
   const { 
@@ -63,7 +65,25 @@ export default function ProgramDetailPage({
   // Update program mutation
   const updateProgramMutation = useMutation({
     mutationFn: async (data: ProgramFormData) => {
-      const res = await apiRequest("PATCH", `/api/programs/${params.id}`, data);
+      const formData = new FormData();
+      formData.append('title', data.title);
+      formData.append('description', data.description || '');
+      formData.append('startDate', data.startDate.toISOString());
+      formData.append('endDate', data.endDate.toISOString());
+
+      if (data.coverImage) {
+        formData.append('coverImage', data.coverImage);
+      }
+
+      const res = await fetch(`/api/programs/${params.id}`, {
+        method: 'PATCH',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to update program');
+      }
+
       return res.json();
     },
     onSuccess: () => {
@@ -93,8 +113,27 @@ export default function ProgramDetailPage({
       description: program?.description || "",
       startDate: program ? new Date(program.startDate) : new Date(),
       endDate: program ? new Date(program.endDate) : new Date(),
+      coverImage: undefined, //Added this line
     },
   });
+
+  // Handle image preview
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      form.setValue('coverImage', file);
+    }
+  };
+
+  const removeImage = () => {
+    form.setValue('coverImage', undefined);
+    setImagePreview(null);
+  };
 
   if (isLoading) {
     return (
@@ -133,8 +172,26 @@ export default function ProgramDetailPage({
     <ErrorBoundary>
       <div className="min-h-screen bg-background">
         {/* Header Section */}
-        <header className="bg-[#000000] text-white" role="banner">
-          <div className="container mx-auto px-4 py-8">
+        <header 
+          className="relative text-white" 
+          role="banner"
+          style={{
+            background: program.coverImage 
+              ? `url(${program.coverImage}) no-repeat center center` 
+              : '#000000',
+            backgroundSize: 'cover',
+          }}
+        >
+          {/* Overlay for text legibility when image is present */}
+          {program.coverImage && (
+            <div 
+              className="absolute inset-0" 
+              style={{ 
+                backgroundColor: 'rgba(0, 0, 0, 0.6)',
+              }}
+            />
+          )}
+          <div className="container mx-auto px-4 py-8 relative">
             <nav aria-label="Main navigation">
               <Link href="/">
                 <Button
@@ -225,6 +282,47 @@ export default function ProgramDetailPage({
                     </FormItem>
                   )}
                 />
+
+                {/* Cover Image Upload */}
+                <FormField
+                  control={form.control}
+                  name="coverImage"
+                  render={({ field: { onChange, value, ...field } }) => (
+                    <FormItem>
+                      <FormLabel>Cover Image</FormLabel>
+                      <FormControl>
+                        <div className="space-y-4">
+                          <Input
+                            type="file"
+                            accept="image/jpeg,image/png"
+                            onChange={handleImageChange}
+                            {...field}
+                          />
+                          {(imagePreview || program.coverImage) && (
+                            <div className="relative w-full h-40 rounded-lg overflow-hidden">
+                              <img
+                                src={imagePreview || program.coverImage}
+                                alt="Cover preview"
+                                className="w-full h-full object-cover"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="icon"
+                                className="absolute top-2 right-2"
+                                onClick={removeImage}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}

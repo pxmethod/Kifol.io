@@ -6,7 +6,7 @@ import { users, programs, sessions, students, programStudents, portfolioEntries,
   type InsertPortfolioEntry, type ParentUser, type InsertParentUser,
   type ParentInvitation, type InsertParentInvitation } from "@shared/schema";
 import { db } from "./db";
-import { eq, sql, and } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
@@ -24,7 +24,7 @@ export interface IStorage {
   createProgram(userId: number, program: InsertProgram): Promise<Program>;
   getProgramsByUserId(userId: number): Promise<Program[]>;
   getProgram(id: number): Promise<Program | undefined>;
-  updateProgram(id: number, program: Partial<InsertProgram>): Promise<Program>;
+  updateProgram(id: number, program: Partial<InsertProgram> & { coverImage?: string }): Promise<Program>;
   deleteProgram(id: number): Promise<void>;
 
   // Session methods
@@ -120,7 +120,7 @@ export class DatabaseStorage implements IStorage {
     return program;
   }
 
-  async updateProgram(id: number, program: Partial<InsertProgram>): Promise<Program> {
+  async updateProgram(id: number, program: Partial<InsertProgram> & { coverImage?: string }): Promise<Program> {
     const [updatedProgram] = await db
       .update(programs)
       .set(program)

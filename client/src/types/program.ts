@@ -13,6 +13,18 @@ export const programFormSchema = z.object({
   endDate: z.date({
     required_error: "End date is required",
   }),
+  coverImage: z
+    .instanceof(File)
+    .optional()
+    .refine(
+      (file) => {
+        if (!file) return true;
+        return ['image/jpeg', 'image/png'].includes(file.type);
+      },
+      {
+        message: "Only JPEG and PNG images are allowed",
+      }
+    ),
 }).refine(data => data.endDate > data.startDate, {
   message: "End date must be after start date",
   path: ["endDate"],

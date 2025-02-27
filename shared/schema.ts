@@ -38,6 +38,7 @@ export const programs = pgTable("programs", {
   description: text("description"),
   startDate: date("start_date").notNull(),
   endDate: date("end_date").notNull(),
+  coverImage: text("cover_image"), // New field for the cover image URL
 });
 
 export const sessions = pgTable("sessions", {
