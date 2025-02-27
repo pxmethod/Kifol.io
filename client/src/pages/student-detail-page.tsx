@@ -3,11 +3,11 @@ import { Student } from "@shared/schema";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Plus, GraduationCap } from "lucide-react";
-import { Loader2 } from "lucide-react";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ApiError } from "@/types/common";
-import { format } from "date-fns";
+import { StudentTimeline } from "@/components/student-timeline";
+import { useState } from 'react';
 
 /**
  * StudentDetailPage Component
@@ -25,6 +25,7 @@ export default function StudentDetailPage({
 }: {
   params: { programId: string; studentId: string };
 }) {
+  const [dialogOpen, setDialogOpen] = useState(false); // Added state variable
   // Fetch student details
   const { 
     data: student,
@@ -94,16 +95,13 @@ export default function StudentDetailPage({
           <section aria-labelledby="timeline-heading">
             <div className="flex justify-between items-center mb-6">
               <h2 id="timeline-heading" className="text-2xl font-semibold">Timeline</h2>
-              <Button aria-label="Add new timeline event">
+              <Button onClick={() => setDialogOpen(true)} aria-label="Add new timeline event">
                 <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
                 Add Event
               </Button>
             </div>
-            
-            {/* Placeholder for timeline - will be implemented in next phase */}
-            <div className="text-center text-muted-foreground py-12" aria-live="polite" role="status">
-              Timeline events will appear here
-            </div>
+
+            <StudentTimeline studentId={parseInt(params.studentId)} />
           </section>
         </main>
       </div>
