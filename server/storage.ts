@@ -6,7 +6,7 @@ import { users, programs, sessions, students, programStudents, portfolioEntries,
   type InsertPortfolioEntry, type ParentUser, type InsertParentUser,
   type ParentInvitation, type InsertParentInvitation } from "@shared/schema";
 import { db } from "./db";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, and } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
@@ -107,7 +107,15 @@ export class DatabaseStorage implements IStorage {
 
   async getProgramsByUserId(userId: number): Promise<Program[]> {
     return await db
-      .select()
+      .select({
+        id: programs.id,
+        userId: programs.userId,
+        title: programs.title,
+        description: programs.description,
+        startDate: programs.startDate,
+        endDate: programs.endDate,
+        coverImage: programs.coverImage
+      })
       .from(programs)
       .where(eq(programs.userId, userId));
   }
@@ -280,11 +288,12 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select({
         id: programs.id,
+        userId: programs.userId,
         title: programs.title,
         description: programs.description,
         startDate: programs.startDate,
         endDate: programs.endDate,
-        userId: programs.userId,
+        coverImage: programs.coverImage
       })
       .from(programStudents)
       .innerJoin(programs, eq(programStudents.programId, programs.id))
@@ -295,8 +304,10 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(programStudents)
       .where(
-        eq(programStudents.programId, programId) &&
-        eq(programStudents.studentId, studentId)
+        and(
+          eq(programStudents.programId, programId),
+          eq(programStudents.studentId, studentId)
+        )
       );
   }
 
