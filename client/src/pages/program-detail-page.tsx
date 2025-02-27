@@ -169,7 +169,10 @@ export default function ProgramDetailPage({
 
         {/* Content Section */}
         <div className="container mx-auto px-4 py-8">
-          <Tabs defaultValue="sessions" className="w-full">
+          <Tabs 
+            defaultValue={window.location.search.includes('tab=students') ? 'students' : 'sessions'} 
+            className="w-full"
+          >
             <TabsList>
               <TabsTrigger value="sessions">Sessions</TabsTrigger>
               <TabsTrigger value="students">Students</TabsTrigger>

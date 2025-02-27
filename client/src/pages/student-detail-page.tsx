@@ -69,7 +69,7 @@ export default function StudentDetailPage({
         {/* Header Section */}
         <div className="bg-[#000000] text-white">
           <div className="container mx-auto px-4 py-8">
-            <Link href={`/programs/${params.programId}`}>
+            <Link href={`/programs/${params.programId}?tab=students`}>
               <Button
                 variant="link"
                 className="mb-4 text-white hover:text-white/80"
