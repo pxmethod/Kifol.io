@@ -2,7 +2,7 @@ import mailgun from 'mailgun-js';
 
 const mg = mailgun({
   apiKey: process.env.MAILGUN_API_KEY!,
-  domain: 'sandbox087f00a7106a482bbf6cf2c685d0e40d.mailgun.org' // Using sandbox domain for testing
+  domain: process.env.MAILGUN_DOMAIN!
 });
 
 interface SendEmailParams {
@@ -14,42 +14,18 @@ interface SendEmailParams {
 
 export async function sendEmail({ to, subject, text, html }: SendEmailParams): Promise<boolean> {
   try {
-    console.log('Attempting to send email to:', to);
-    console.log('Using Mailgun configuration:', {
-      domain: mg.domain,
-      fromEmail: `Student Progress <noreply@sandbox087f00a7106a482bbf6cf2c685d0e40d.mailgun.org>`,
-    });
-
     await mg.messages().send({
-      from: `Student Progress <noreply@sandbox087f00a7106a482bbf6cf2c685d0e40d.mailgun.org>`,
+      from: `Student Progress <noreply@${process.env.MAILGUN_DOMAIN}>`,
       to,
       subject,
       text,
       html
     });
-    console.log('Successfully sent email to:', to);
     return true;
   } catch (error) {
     console.error('Failed to send email:', error);
-    console.warn('Note: When using sandbox domain, recipient email must be authorized in Mailgun first');
     return false;
   }
-}
-
-// Test function to verify email functionality
-export async function sendTestEmail(recipientEmail: string): Promise<boolean> {
-  return sendEmail({
-    to: recipientEmail,
-    subject: 'Test Email from Student Progress App',
-    text: 'This is a test email to verify the Mailgun integration is working correctly.',
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2>Test Email</h2>
-        <p>This is a test email to verify the Mailgun integration is working correctly.</p>
-        <p>If you received this email, the integration is successful!</p>
-      </div>
-    `
-  });
 }
 
 export function generateParentInvitationEmail(studentName: string, invitationToken: string): {
@@ -58,18 +34,18 @@ export function generateParentInvitationEmail(studentName: string, invitationTok
   html: string;
 } {
   const invitationLink = `${process.env.REPLIT_DOMAIN}/parent-signup/${invitationToken}`;
-
+  
   const subject = `Invitation to Track ${studentName}'s Progress`;
-
+  
   const text = `
     You've been invited to track ${studentName}'s educational progress!
-
+    
     Click the following link to create your parent account:
     ${invitationLink}
-
+    
     This link will expire in 7 days.
   `;
-
+  
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2>Welcome to Student Progress Tracking!</h2>

@@ -11,7 +11,6 @@ import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 import { nanoid } from 'nanoid';
-import { sendEmail, generateParentInvitationEmail } from "./services/mail";
 
 const PostgresSessionStore = connectPg(session);
 
@@ -226,12 +225,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteStudent(id: number): Promise<void> {
-    // Delete any parent invitations for this student's email
-    const student = await this.getStudent(id);
-    if (student) {
-      await db.delete(parentInvitations)
-        .where(eq(parentInvitations.email, student.email));
-    }
+    // First delete any parent invitations
+    await db.execute(sql`DELETE FROM parent_invitations WHERE student_id = ${id}`);
 
     // Then delete related portfolio entries
     await db.delete(portfolioEntries)
@@ -371,26 +366,15 @@ export class DatabaseStorage implements IStorage {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiration
 
-    // Create the invitation record
     const [invitation] = await db
       .insert(parentInvitations)
       .values({
         email,
         token,
         expiresAt,
-        accepted: false,
+        accepted: false, 
       })
       .returning();
-
-    try {
-      // Generate and send the invitation email
-      const { subject, text, html } = generateParentInvitationEmail("Your Student", token);
-      await sendEmail({ to: email, subject, text, html });
-    } catch (error) {
-      console.error('Failed to send parent invitation email:', error);
-      // We don't throw here as we want to return the invitation even if email fails
-    }
-
     return invitation;
   }
 
@@ -401,7 +385,7 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(parentInvitations.token, token),
-          eq(parentInvitations.accepted, false),
+          eq(parentInvitations.accepted, false), 
           sql`${parentInvitations.expiresAt} > NOW()`
         )
       );
@@ -411,7 +395,7 @@ export class DatabaseStorage implements IStorage {
   async acceptParentInvitation(token: string): Promise<void> {
     await db
       .update(parentInvitations)
-      .set({ accepted: true })
+      .set({ accepted: true }) 
       .where(eq(parentInvitations.token, token));
   }
   async linkStudentToParent(studentId: number, parentId: number): Promise<void> {

@@ -3,33 +3,9 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertProgramSchema, insertSessionSchema, insertStudentSchema } from "@shared/schema";
-import { sendTestEmail } from "./services/mail";
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
-
-  // Test email endpoint
-  app.post("/api/test-email", async (req, res) => {
-    const { email } = req.body;
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
-    }
-
-    try {
-      console.log("Attempting to send test email to:", email);
-      const success = await sendTestEmail(email);
-      if (success) {
-        console.log("Email sent successfully to:", email);
-        return res.status(200).json({ message: "Test email sent successfully" });
-      } else {
-        console.error("Failed to send email to:", email);
-        return res.status(500).json({ message: "Failed to send test email" });
-      }
-    } catch (error) {
-      console.error("Error sending test email:", error);
-      return res.status(500).json({ message: "Error sending test email" });
-    }
-  });
 
   // Programs
   app.get("/api/programs", async (req, res) => {
