@@ -62,10 +62,23 @@ export default function ProgramDetailPage({
     queryKey: [`/api/programs/${params.id}`],
   });
 
-  // Update program mutation
+  // Update mutation typing and FormData handling
   const updateProgramMutation = useMutation({
-    mutationFn: async (data: ProgramFormData | FormData) => {
+    mutationFn: async (data: FormData | ProgramFormData) => {
       const formData = new FormData();
+
+      if (data instanceof FormData) {
+        // If it's already FormData, use it directly
+        return fetch(`/api/programs/${params.id}`, {
+          method: 'PATCH',
+          body: data,
+        }).then(res => {
+          if (!res.ok) throw new Error('Failed to update program');
+          return res.json();
+        });
+      }
+
+      // Otherwise, create FormData from ProgramFormData
       formData.append('title', data.title);
       formData.append('description', data.description || '');
       formData.append('startDate', data.startDate.toISOString());
@@ -74,20 +87,14 @@ export default function ProgramDetailPage({
       if (data.coverImage) {
         formData.append('coverImage', data.coverImage);
       }
-      if(data.hasOwnProperty('removeCoverImage')){
-        formData.append('removeCoverImage', data.removeCoverImage);
-      }
 
-      const res = await fetch(`/api/programs/${params.id}`, {
+      return fetch(`/api/programs/${params.id}`, {
         method: 'PATCH',
         body: formData,
+      }).then(res => {
+        if (!res.ok) throw new Error('Failed to update program');
+        return res.json();
       });
-
-      if (!res.ok) {
-        throw new Error('Failed to update program');
-      }
-
-      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -133,19 +140,23 @@ export default function ProgramDetailPage({
     }
   };
 
+  // Update removeImage function
   const removeImage = () => {
+    // Clear the form state
     form.setValue('coverImage', undefined);
     setImagePreview(null);
 
-    // Create a new FormData object
+    // Create FormData to update the server
     const formData = new FormData();
-    formData.append('title', form.getValues('title'));
-    formData.append('description', form.getValues('description') || '');
-    formData.append('startDate', form.getValues('startDate').toISOString());
-    formData.append('endDate', form.getValues('endDate').toISOString());
+    const currentValues = form.getValues();
+
+    formData.append('title', currentValues.title);
+    formData.append('description', currentValues.description || '');
+    formData.append('startDate', currentValues.startDate.toISOString());
+    formData.append('endDate', currentValues.endDate.toISOString());
     formData.append('removeCoverImage', 'true');
 
-    // Update the program immediately to remove the image
+    // Update the program
     updateProgramMutation.mutate(formData);
   };
 
