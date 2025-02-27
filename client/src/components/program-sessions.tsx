@@ -28,6 +28,15 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
+// Added LoadingSpinner component
+const LoadingSpinner = ({ message }: { message: string }) => (
+  <div className="py-12 flex items-center justify-center">
+    <Loader2 className="h-8 w-8 animate-spin text-border" />
+    <p className="ml-4">{message}</p>
+  </div>
+);
+
+
 const sessionSchema = insertSessionSchema.extend({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
@@ -43,7 +52,7 @@ export function ProgramSessions({ programId }: ProgramSessionsProps) {
   const [editSession, setEditSession] = useState<Session | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const { data: sessions = [] } = useQuery<Session[]>({
+  const { data: sessions = [], isLoading } = useQuery<Session[]>({
     queryKey: [`/api/programs/${programId}/sessions`],
   });
 
@@ -162,6 +171,11 @@ export function ProgramSessions({ programId }: ProgramSessionsProps) {
     setShowDeleteConfirm(false);
     setEditSession(null);
   };
+
+  // Added isLoading check
+  if (isLoading) {
+    return <LoadingSpinner message="Loading sessions..." />;
+  }
 
   return (
     <div className="space-y-6">

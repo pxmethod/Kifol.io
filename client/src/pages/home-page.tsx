@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Layout, LayoutGrid, List, LogOut, Settings, User, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { ProgramWizard } from "@/components/program-wizard";
 import { format } from "date-fns";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -44,7 +45,10 @@ export default function HomePage() {
   const [wizardOpen, setWizardOpen] = useState(false);
   const [programToDelete, setProgramToDelete] = useState<Program | null>(null);
 
-  const { data: programs = [] } = useQuery<Program[]>({
+  const { 
+    data: programs = [],
+    isLoading
+  } = useQuery<Program[]>({
     queryKey: ["/api/programs"],
   });
 
@@ -74,6 +78,9 @@ export default function HomePage() {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded-md"></div>
+
+  {isLoading && <LoadingSpinner message="Loading your programs..." />}
+
             <span className="text-xl font-semibold">EduTrack</span>
           </div>
 

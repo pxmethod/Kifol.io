@@ -56,6 +56,15 @@ type ProgramStudentsProps = {
   programId: number;
 };
 
+// Added LoadingSpinner component
+const LoadingSpinner = ({ message }: { message: string }) => (
+  <div className="py-12 flex items-center justify-center">
+    <Loader2 className="h-8 w-8 animate-spin text-border" />
+    <p className="ml-4">{message}</p>
+  </div>
+);
+
+
 export function ProgramStudents({ programId }: ProgramStudentsProps) {
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -64,7 +73,7 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: students = [] } = useQuery<Student[]>({
+  const { data: students = [], isLoading } = useQuery<Student[]>({
     queryKey: [`/api/programs/${programId}/students`],
   });
 
@@ -147,6 +156,11 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
         student.email.toLowerCase().includes(searchQuery.toLowerCase())
       : true
   );
+
+  //Loading spinner implemented here
+  if (isLoading) {
+    return <LoadingSpinner message="Loading students..." />;
+  }
 
   return (
     <div className="space-y-6">

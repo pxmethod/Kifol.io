@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/use-auth";
-import { Loader2 } from "lucide-react";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { Redirect } from "wouter";
 
 type ProtectedRouteProps = {
@@ -10,11 +10,7 @@ export function ProtectedRoute({ component: Component }: ProtectedRouteProps) {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-border" />
-      </div>
-    );
+    return <LoadingSpinner fullScreen message="Loading your account..." />;
   }
 
   if (!user) {

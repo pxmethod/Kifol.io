@@ -4,6 +4,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Plus, GraduationCap } from "lucide-react";
 import { Loader2 } from "lucide-react";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ApiError } from "@/types/common";
 import { format } from "date-fns";
@@ -35,11 +36,7 @@ export default function StudentDetailPage({
   });
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <LoadingSpinner fullScreen message="Loading student details..." />;
   }
 
   if (isError || !student) {
