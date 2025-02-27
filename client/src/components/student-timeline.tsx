@@ -105,7 +105,12 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
   });
 
   const onSubmit = form.handleSubmit((data) => {
-    addEntryMutation.mutate(data);
+    // Convert the Date object to ISO string before sending
+    const formattedData = {
+      ...data,
+      achievementDate: data.achievementDate.toISOString().split('T')[0],
+    };
+    addEntryMutation.mutate(formattedData);
   });
 
   const getEntryIcon = (type: string) => {
