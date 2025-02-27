@@ -3,6 +3,19 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertProgramSchema, insertSessionSchema, insertStudentSchema } from "@shared/schema";
+import multer from "multer";
+
+// Configure multer for handling file uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+      cb(null, true);
+    } else {
+      cb(null, false);
+    }
+  },
+});
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
@@ -33,16 +46,30 @@ export function registerRoutes(app: Express): Server {
     res.status(201).json(program);
   });
 
-  app.patch("/api/programs/:id", async (req, res) => {
+  app.patch("/api/programs/:id", upload.single('coverImage'), async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 
     const program = await storage.getProgram(parseInt(req.params.id));
     if (!program) return res.sendStatus(404);
     if (program.userId !== req.user.id) return res.sendStatus(403);
 
-    const programData = insertProgramSchema.partial().parse(req.body);
-    const updatedProgram = await storage.updateProgram(program.id, programData);
+    // Parse form data fields
+    const updateData = {
+      title: req.body.title,
+      description: req.body.description,
+      startDate: new Date(req.body.startDate),
+      endDate: new Date(req.body.endDate),
+    };
 
+    // Add cover image if uploaded
+    if (req.file) {
+      // Convert buffer to base64 string for storage
+      const base64Image = req.file.buffer.toString('base64');
+      const imageUrl = `data:${req.file.mimetype};base64,${base64Image}`;
+      updateData['coverImage'] = imageUrl;
+    }
+
+    const updatedProgram = await storage.updateProgram(program.id, updateData);
     res.json(updatedProgram);
   });
 
