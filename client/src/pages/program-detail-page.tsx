@@ -252,8 +252,10 @@ export default function ProgramDetailPage({
 
         {/* Content Section */}
         <main className="container mx-auto px-4 py-8">
+          {/* Using regular state instead of defaultValue with window check */}
           <Tabs 
-            defaultValue={typeof window !== 'undefined' && window.location.search.includes('tab=students') ? 'students' : 'sessions'} 
+            defaultValue="sessions" 
+            value={typeof window !== 'undefined' && window.location.search.includes('tab=students') ? 'students' : 'sessions'}
             className="w-full"
             aria-label="Program content tabs"
           >
