@@ -92,6 +92,17 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
         `/api/students/${studentId}/portfolio`,
         apiData
       );
+      
+      // Check if response is valid before parsing JSON
+      if (!res.ok) {
+        const text = await res.text();
+        // If the response contains HTML, it's likely an error page
+        if (text.includes('<!DOCTYPE html>')) {
+          throw new Error('Server returned an HTML error page instead of JSON. Please check the server logs.');
+        }
+        throw new Error(`Server error: ${text}`);
+      }
+      
       return res.json();
     },
     onSuccess: () => {
