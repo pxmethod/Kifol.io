@@ -34,19 +34,19 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
+import { z } from "zod";
 
-const timelineSchema = insertPortfolioEntrySchema.extend({
+// Modified schema to handle Date object in the form
+const timelineFormSchema = z.object({
   title: insertPortfolioEntrySchema.shape.title,
   description: insertPortfolioEntrySchema.shape.description,
-  achievementDate: insertPortfolioEntrySchema.shape.achievementDate,
+  achievementDate: z.date(),
   type: insertPortfolioEntrySchema.shape.type,
   grade: insertPortfolioEntrySchema.shape.grade.optional(),
   feedback: insertPortfolioEntrySchema.shape.feedback.optional(),
 });
 
-type StudentTimelineProps = {
-  studentId: number;
-};
+type TimelineFormData = z.infer<typeof timelineFormSchema>;
 
 const ENTRY_TYPES = [
   { value: "achievement", label: "Achievement", icon: Trophy },
@@ -54,6 +54,10 @@ const ENTRY_TYPES = [
   { value: "milestone", label: "Milestone", icon: Star },
   { value: "award", label: "Award", icon: Award },
 ];
+
+type StudentTimelineProps = {
+  studentId: number;
+};
 
 export function StudentTimeline({ studentId }: StudentTimelineProps) {
   const { toast } = useToast();
@@ -63,8 +67,8 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
     queryKey: [`/api/students/${studentId}/portfolio`],
   });
 
-  const form = useForm({
-    resolver: zodResolver(timelineSchema),
+  const form = useForm<TimelineFormData>({
+    resolver: zodResolver(timelineFormSchema),
     defaultValues: {
       title: "",
       description: "",
@@ -76,11 +80,17 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
   });
 
   const addEntryMutation = useMutation({
-    mutationFn: async (data: typeof timelineSchema._type) => {
+    mutationFn: async (data: TimelineFormData) => {
+      // Convert form data to API format
+      const apiData = {
+        ...data,
+        achievementDate: data.achievementDate.toISOString().split('T')[0],
+      };
+
       const res = await apiRequest(
         "POST",
         `/api/students/${studentId}/portfolio`,
-        data
+        apiData
       );
       return res.json();
     },
@@ -105,12 +115,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
   });
 
   const onSubmit = form.handleSubmit((data) => {
-    // Convert the Date object to ISO string before sending
-    const formattedData = {
-      ...data,
-      achievementDate: data.achievementDate.toISOString().split('T')[0],
-    };
-    addEntryMutation.mutate(formattedData);
+    addEntryMutation.mutate(data);
   });
 
   const getEntryIcon = (type: string) => {
