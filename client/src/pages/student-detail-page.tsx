@@ -67,14 +67,15 @@ export default function StudentDetailPage({
     <ErrorBoundary>
       <div className="min-h-screen bg-background">
         {/* Header Section */}
-        <div className="bg-[#000000] text-white">
-          <div className="container mx-auto px-4 py-8">
+        <header className="bg-[#000000] text-white" role="banner">
+          <nav className="container mx-auto px-4 py-8" aria-label="Back navigation">
             <Link href={`/programs/${params.programId}?tab=students`}>
               <Button
                 variant="link"
                 className="mb-4 text-white hover:text-white/80"
+                aria-label="Back to Program"
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <ArrowLeft className="h-4 w-4 mr-2" aria-hidden="true" />
                 Back to Program
               </Button>
             </Link>
@@ -82,30 +83,32 @@ export default function StudentDetailPage({
               <div>
                 <h1 className="text-3xl font-bold">{student.name}</h1>
                 <div className="flex items-center gap-2 text-gray-200 mt-2">
-                  <GraduationCap className="h-4 w-4" />
+                  <GraduationCap className="h-4 w-4" aria-hidden="true" />
                   <span>Grade {student.grade}</span>
                 </div>
                 <p className="text-gray-200 mt-2">Parent Email: {student.email}</p>
               </div>
             </div>
-          </div>
-        </div>
+          </nav>
+        </header>
 
         {/* Timeline Section */}
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold">Timeline</h2>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Event
-            </Button>
-          </div>
-          
-          {/* Placeholder for timeline - will be implemented in next phase */}
-          <div className="text-center text-muted-foreground py-12">
-            Timeline events will appear here
-          </div>
-        </div>
+        <main className="container mx-auto px-4 py-8">
+          <section aria-labelledby="timeline-heading">
+            <div className="flex justify-between items-center mb-6">
+              <h2 id="timeline-heading" className="text-2xl font-semibold">Timeline</h2>
+              <Button aria-label="Add new timeline event">
+                <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
+                Add Event
+              </Button>
+            </div>
+            
+            {/* Placeholder for timeline - will be implemented in next phase */}
+            <div className="text-center text-muted-foreground py-12" aria-live="polite" role="status">
+              Timeline events will appear here
+            </div>
+          </section>
+        </main>
       </div>
     </ErrorBoundary>
   );

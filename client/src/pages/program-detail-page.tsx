@@ -133,31 +133,35 @@ export default function ProgramDetailPage({
     <ErrorBoundary>
       <div className="min-h-screen bg-background">
         {/* Header Section */}
-        <div className="bg-[#000000] text-white">
+        <header className="bg-[#000000] text-white" role="banner">
           <div className="container mx-auto px-4 py-8">
-            <Link href="/">
-              <Button
-                variant="link"
-                className="mb-4 text-white hover:text-white/80"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Programs
-              </Button>
-            </Link>
+            <nav aria-label="Main navigation">
+              <Link href="/">
+                <Button
+                  variant="link"
+                  className="mb-4 text-white hover:text-white/80"
+                  aria-label="Back to Programs"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" aria-hidden="true" />
+                  Back to Programs
+                </Button>
+              </Link>
+            </nav>
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h1 className="text-3xl font-bold">{program.title}</h1>
-                <p className="text-gray-200 mt-2">
+                <time className="text-gray-200 mt-2 block">
                   {format(new Date(program.startDate), "MMMM dd, yyyy")} -{" "}
                   {format(new Date(program.endDate), "MMMM dd, yyyy")}
-                </p>
+                </time>
               </div>
               <Button
                 size="sm"
                 onClick={() => setEditDialogOpen(true)}
                 className="bg-white text-gray-900 hover:bg-gray-100"
+                aria-label="Edit program details"
               >
-                <Pencil className="h-4 w-4 mr-2" />
+                <Pencil className="h-4 w-4 mr-2" aria-hidden="true" />
                 Edit
               </Button>
             </div>
@@ -165,26 +169,27 @@ export default function ProgramDetailPage({
               <p className="text-gray-200">{program.description}</p>
             )}
           </div>
-        </div>
+        </header>
 
         {/* Content Section */}
-        <div className="container mx-auto px-4 py-8">
+        <main className="container mx-auto px-4 py-8">
           <Tabs 
             defaultValue={window.location.search.includes('tab=students') ? 'students' : 'sessions'} 
             className="w-full"
+            aria-label="Program content tabs"
           >
             <TabsList>
               <TabsTrigger value="sessions">Sessions</TabsTrigger>
               <TabsTrigger value="students">Students</TabsTrigger>
             </TabsList>
-            <TabsContent value="sessions" className="mt-8">
+            <TabsContent value="sessions" className="mt-8" role="tabpanel" aria-labelledby="sessions-tab">
               <ProgramSessions programId={parseInt(params.id)} />
             </TabsContent>
-            <TabsContent value="students" className="mt-8">
+            <TabsContent value="students" className="mt-8" role="tabpanel" aria-labelledby="students-tab">
               <ProgramStudents programId={parseInt(params.id)} />
             </TabsContent>
           </Tabs>
-        </div>
+        </main>
 
         {/* Edit Dialog */}
         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
