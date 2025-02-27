@@ -64,7 +64,7 @@ export default function ProgramDetailPage({
 
   // Update program mutation
   const updateProgramMutation = useMutation({
-    mutationFn: async (data: ProgramFormData) => {
+    mutationFn: async (data: ProgramFormData | FormData) => {
       const formData = new FormData();
       formData.append('title', data.title);
       formData.append('description', data.description || '');
@@ -73,6 +73,9 @@ export default function ProgramDetailPage({
 
       if (data.coverImage) {
         formData.append('coverImage', data.coverImage);
+      }
+      if(data.hasOwnProperty('removeCoverImage')){
+        formData.append('removeCoverImage', data.removeCoverImage);
       }
 
       const res = await fetch(`/api/programs/${params.id}`, {
@@ -113,7 +116,7 @@ export default function ProgramDetailPage({
       description: program?.description || "",
       startDate: program ? new Date(program.startDate) : new Date(),
       endDate: program ? new Date(program.endDate) : new Date(),
-      coverImage: undefined, //Added this line
+      coverImage: undefined,
     },
   });
 
@@ -133,6 +136,17 @@ export default function ProgramDetailPage({
   const removeImage = () => {
     form.setValue('coverImage', undefined);
     setImagePreview(null);
+
+    // Create a new FormData object
+    const formData = new FormData();
+    formData.append('title', form.getValues('title'));
+    formData.append('description', form.getValues('description') || '');
+    formData.append('startDate', form.getValues('startDate').toISOString());
+    formData.append('endDate', form.getValues('endDate').toISOString());
+    formData.append('removeCoverImage', 'true');
+
+    // Update the program immediately to remove the image
+    updateProgramMutation.mutate(formData);
   };
 
   if (isLoading) {

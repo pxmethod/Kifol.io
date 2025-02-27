@@ -61,12 +61,15 @@ export function registerRoutes(app: Express): Server {
       endDate: new Date(req.body.endDate),
     };
 
-    // Add cover image if uploaded
+    // Handle cover image update
     if (req.file) {
       // Convert buffer to base64 string for storage
       const base64Image = req.file.buffer.toString('base64');
       const imageUrl = `data:${req.file.mimetype};base64,${base64Image}`;
       updateData['coverImage'] = imageUrl;
+    } else if (req.body.removeCoverImage === 'true') {
+      // Explicitly set coverImage to null when removal is requested
+      updateData['coverImage'] = null;
     }
 
     const updatedProgram = await storage.updateProgram(program.id, updateData);
