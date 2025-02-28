@@ -107,12 +107,11 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
 
   const addEntryMutation = useMutation({
     mutationFn: async (data: TimelineFormData) => {
-      // Format the date to preserve the local date
-      const localDate = new Date(data.achievementDate);
-      const year = localDate.getFullYear();
-      const month = String(localDate.getMonth() + 1).padStart(2, '0');
-      const day = String(localDate.getDate()).padStart(2, '0');
-      const formattedDate = `${year}-${month}-${day}`;
+      // Format the date to preserve the local date while considering timezone offset
+      const localDate = data.achievementDate;
+      const offset = localDate.getTimezoneOffset();
+      const adjustedDate = new Date(localDate.getTime() - (offset * 60 * 1000));
+      const formattedDate = adjustedDate.toISOString().split('T')[0];
 
       // Convert form data to API format
       const apiData = {
