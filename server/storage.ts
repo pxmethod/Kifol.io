@@ -278,6 +278,9 @@ export class DatabaseStorage implements IStorage {
         name: students.name,
         email: students.email,
         grade: students.grade,
+        slug: students.slug,
+        parentId: students.parentId,
+        createdAt: students.createdAt,
       })
       .from(programStudents)
       .innerJoin(students, eq(programStudents.studentId, students.id))
