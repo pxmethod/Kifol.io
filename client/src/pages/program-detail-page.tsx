@@ -19,7 +19,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { LoadingSpinner } from "@/components/loading-spinner";
@@ -69,52 +69,6 @@ export default function ProgramDetailPage({
       const formData = new FormData();
 
       if (data instanceof FormData) {
-
-// TabsWithStateManagement component to handle tab state properly
-function TabsWithStateManagement({ programId }: { programId: number }) {
-  // Initialize tab state based on URL once during component mount
-  const [activeTab, setActiveTab] = useState<string>(() => {
-    return typeof window !== 'undefined' && window.location.search.includes('tab=students') 
-      ? 'students' 
-      : 'sessions';
-  });
-  
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-    // Update URL without page reload
-    if (typeof window !== 'undefined') {
-      const url = new URL(window.location.href);
-      if (value === 'students') {
-        url.searchParams.set('tab', 'students');
-      } else {
-        url.searchParams.delete('tab');
-      }
-      window.history.pushState({}, '', url);
-    }
-  };
-  
-  return (
-    <Tabs 
-      defaultValue="sessions"
-      value={activeTab}
-      onValueChange={handleTabChange}
-      className="w-full"
-      aria-label="Program content tabs"
-    >
-      <TabsList>
-        <TabsTrigger value="sessions">Sessions</TabsTrigger>
-        <TabsTrigger value="students">Students</TabsTrigger>
-      </TabsList>
-      <TabsContent value="sessions" className="mt-8" role="tabpanel" aria-labelledby="sessions-tab">
-        <ProgramSessions programId={programId} />
-      </TabsContent>
-      <TabsContent value="students" className="mt-8" role="tabpanel" aria-labelledby="students-tab">
-        <ProgramStudents programId={programId} />
-      </TabsContent>
-    </Tabs>
-  );
-}
-
         // If it's already FormData, use it directly
         return fetch(`/api/programs/${params.id}`, {
           method: 'PATCH',
@@ -298,7 +252,34 @@ function TabsWithStateManagement({ programId }: { programId: number }) {
 
         {/* Content Section */}
         <main className="container mx-auto px-4 py-8">
-          <TabsWithStateManagement programId={parseInt(params.id)} />
+          {/* Add useState for tab management */}
+          <Tabs 
+            defaultValue="sessions" 
+            value={typeof window !== 'undefined' && window.location.search.includes('tab=students') ? 'students' : 'sessions'}
+            onValueChange={(value) => {
+              // Update URL without page reload
+              const url = new URL(window.location.href);
+              if (value === 'students') {
+                url.searchParams.set('tab', 'students');
+              } else {
+                url.searchParams.delete('tab');
+              }
+              window.history.pushState({}, '', url);
+            }}
+            className="w-full"
+            aria-label="Program content tabs"
+          >
+            <TabsList>
+              <TabsTrigger value="sessions">Sessions</TabsTrigger>
+              <TabsTrigger value="students">Students</TabsTrigger>
+            </TabsList>
+            <TabsContent value="sessions" className="mt-8" role="tabpanel" aria-labelledby="sessions-tab">
+              <ProgramSessions programId={parseInt(params.id)} />
+            </TabsContent>
+            <TabsContent value="students" className="mt-8" role="tabpanel" aria-labelledby="students-tab">
+              <ProgramStudents programId={parseInt(params.id)} />
+            </TabsContent>
+          </Tabs>
         </main>
 
         {/* Edit Dialog */}
