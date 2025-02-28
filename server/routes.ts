@@ -268,6 +268,17 @@ export function registerRoutes(app: Express): Server {
     
     try {
       // Create portfolio entry
+      // Validate required fields server-side
+      if (!req.body.title?.trim()) {
+        return res.status(400).json({ message: "Title is required" });
+      }
+      if (!req.body.type?.trim()) {
+        return res.status(400).json({ message: "Type is required" });
+      }
+      if (!req.body.achievementDate) {
+        return res.status(400).json({ message: "Date is required" });
+      }
+      
       const entry = await storage.createPortfolioEntry(studentId, req.body);
       res.status(201).json(entry);
     } catch (error) {

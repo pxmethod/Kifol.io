@@ -38,10 +38,14 @@ import { z } from "zod";
 
 // Modified schema to handle Date object in the form
 const timelineFormSchema = z.object({
-  title: insertPortfolioEntrySchema.shape.title,
+  title: z.string().min(1, "Title is required"),
   description: insertPortfolioEntrySchema.shape.description,
-  achievementDate: z.date(),
-  type: insertPortfolioEntrySchema.shape.type,
+  achievementDate: z.date({
+    required_error: "Date is required",
+  }),
+  type: z.string({
+    required_error: "Type is required",
+  }).min(1, "Type is required"),
   grade: insertPortfolioEntrySchema.shape.grade.optional(),
   feedback: insertPortfolioEntrySchema.shape.feedback.optional(),
 });
@@ -148,6 +152,16 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
   });
 
   const onSubmit = form.handleSubmit((data) => {
+    // Validate that we have the required fields with actual content
+    if (!data.title?.trim()) {
+      form.setError('title', { message: 'Title is required' });
+      return;
+    }
+    if (!data.type?.trim()) {
+      form.setError('type', { message: 'Type is required' });
+      return;
+    }
+    
     addEntryMutation.mutate(data);
   });
 
@@ -372,7 +386,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={addEntryMutation.isPending}
+                  disabled={addEntryMutation.isPending || !form.formState.isValid}
                 >
                   {addEntryMutation.isPending && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
