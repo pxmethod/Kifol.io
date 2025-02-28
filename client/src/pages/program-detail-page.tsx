@@ -252,10 +252,20 @@ export default function ProgramDetailPage({
 
         {/* Content Section */}
         <main className="container mx-auto px-4 py-8">
-          {/* Using regular state instead of defaultValue with window check */}
+          {/* Add useState for tab management */}
           <Tabs 
             defaultValue="sessions" 
             value={typeof window !== 'undefined' && window.location.search.includes('tab=students') ? 'students' : 'sessions'}
+            onValueChange={(value) => {
+              // Update URL without page reload
+              const url = new URL(window.location.href);
+              if (value === 'students') {
+                url.searchParams.set('tab', 'students');
+              } else {
+                url.searchParams.delete('tab');
+              }
+              window.history.pushState({}, '', url);
+            }}
             className="w-full"
             aria-label="Program content tabs"
           >
