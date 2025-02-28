@@ -69,6 +69,52 @@ export default function ProgramDetailPage({
       const formData = new FormData();
 
       if (data instanceof FormData) {
+
+// TabsWithStateManagement component to handle tab state properly
+function TabsWithStateManagement({ programId }: { programId: number }) {
+  // Initialize tab state based on URL once during component mount
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    return typeof window !== 'undefined' && window.location.search.includes('tab=students') 
+      ? 'students' 
+      : 'sessions';
+  });
+  
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    // Update URL without page reload
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (value === 'students') {
+        url.searchParams.set('tab', 'students');
+      } else {
+        url.searchParams.delete('tab');
+      }
+      window.history.pushState({}, '', url);
+    }
+  };
+  
+  return (
+    <Tabs 
+      defaultValue="sessions"
+      value={activeTab}
+      onValueChange={handleTabChange}
+      className="w-full"
+      aria-label="Program content tabs"
+    >
+      <TabsList>
+        <TabsTrigger value="sessions">Sessions</TabsTrigger>
+        <TabsTrigger value="students">Students</TabsTrigger>
+      </TabsList>
+      <TabsContent value="sessions" className="mt-8" role="tabpanel" aria-labelledby="sessions-tab">
+        <ProgramSessions programId={programId} />
+      </TabsContent>
+      <TabsContent value="students" className="mt-8" role="tabpanel" aria-labelledby="students-tab">
+        <ProgramStudents programId={programId} />
+      </TabsContent>
+    </Tabs>
+  );
+}
+
         // If it's already FormData, use it directly
         return fetch(`/api/programs/${params.id}`, {
           method: 'PATCH',
@@ -252,51 +298,7 @@ export default function ProgramDetailPage({
 
         {/* Content Section */}
         <main className="container mx-auto px-4 py-8">
-          {/* Use proper React state for tab management */}
-          {(() => {
-            // Using IIFE to contain the useState hook without conditional rendering
-            const [activeTab, setActiveTab] = useState<string>(() => {
-              // Initialize tab state based on URL only once during component mount
-              return typeof window !== 'undefined' && window.location.search.includes('tab=students') 
-                ? 'students' 
-                : 'sessions';
-            });
-            
-            const handleTabChange = (value: string) => {
-              setActiveTab(value);
-              // Update URL without page reload
-              if (typeof window !== 'undefined') {
-                const url = new URL(window.location.href);
-                if (value === 'students') {
-                  url.searchParams.set('tab', 'students');
-                } else {
-                  url.searchParams.delete('tab');
-                }
-                window.history.pushState({}, '', url);
-              }
-            };
-            
-            return (
-              <Tabs 
-                defaultValue="sessions"
-                value={activeTab}
-                onValueChange={handleTabChange}
-                className="w-full"
-                aria-label="Program content tabs"
-              >
-                <TabsList>
-                  <TabsTrigger value="sessions">Sessions</TabsTrigger>
-                  <TabsTrigger value="students">Students</TabsTrigger>
-                </TabsList>
-                <TabsContent value="sessions" className="mt-8" role="tabpanel" aria-labelledby="sessions-tab">
-                  <ProgramSessions programId={parseInt(params.id)} />
-                </TabsContent>
-                <TabsContent value="students" className="mt-8" role="tabpanel" aria-labelledby="students-tab">
-                  <ProgramStudents programId={parseInt(params.id)} />
-                </TabsContent>
-              </Tabs>
-            );
-          })()}
+          <TabsWithStateManagement programId={parseInt(params.id)} />
         </main>
 
         {/* Edit Dialog */}
