@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Program } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -32,6 +33,50 @@ import { programFormSchema, ProgramFormData } from "@/types/program";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ApiError } from "@/types/common";
 
+// TabsWithStateManagement component to handle tab state properly
+function TabsWithStateManagement({ programId }: { programId: number }) {
+  // Initialize tab state based on URL once during component mount
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    return typeof window !== 'undefined' && window.location.search.includes('tab=students') 
+      ? 'students' 
+      : 'sessions';
+  });
+  
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    // Update URL without page reload
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (value === 'students') {
+        url.searchParams.set('tab', 'students');
+      } else {
+        url.searchParams.delete('tab');
+      }
+      window.history.pushState({}, '', url);
+    }
+  };
+  
+  return (
+    <Tabs 
+      defaultValue="sessions"
+      value={activeTab}
+      onValueChange={handleTabChange}
+      className="w-full"
+      aria-label="Program content tabs"
+    >
+      <TabsList>
+        <TabsTrigger value="sessions">Sessions</TabsTrigger>
+        <TabsTrigger value="students">Students</TabsTrigger>
+      </TabsList>
+      <TabsContent value="sessions" className="mt-8" role="tabpanel" aria-labelledby="sessions-tab">
+        <ProgramSessions programId={programId} />
+      </TabsContent>
+      <TabsContent value="students" className="mt-8" role="tabpanel" aria-labelledby="students-tab">
+        <ProgramStudents programId={programId} />
+      </TabsContent>
+    </Tabs>
+  );
+}
 
 /**
  * ProgramDetailPage Component
@@ -252,37 +297,7 @@ export default function ProgramDetailPage({
 
         {/* Content Section */}
         <main className="container mx-auto px-4 py-8">
-          {(() => {
-            // Using IIFE to contain the useState hook
-            const [activeTab, setActiveTab] = useState<string>("sessions");
-            
-            // Effect to handle URL params, runs only once on mount
-            useEffect(() => {
-              if (typeof window !== 'undefined' && window.location.search.includes('tab=students')) {
-                setActiveTab('students');
-              }
-            }, []);
-            
-            return (
-              <Tabs 
-                value={activeTab}
-                onValueChange={setActiveTab}
-                className="w-full"
-                aria-label="Program content tabs"
-              >
-            );
-          })()}
-            <TabsList>
-              <TabsTrigger value="sessions">Sessions</TabsTrigger>
-              <TabsTrigger value="students">Students</TabsTrigger>
-            </TabsList>
-            <TabsContent value="sessions" className="mt-8" role="tabpanel" aria-labelledby="sessions-tab">
-              <ProgramSessions programId={parseInt(params.id)} />
-            </TabsContent>
-            <TabsContent value="students" className="mt-8" role="tabpanel" aria-labelledby="students-tab">
-              <ProgramStudents programId={parseInt(params.id)} />
-            </TabsContent>
-          </Tabs>
+          <TabsWithStateManagement programId={parseInt(params.id)} />
         </main>
 
         {/* Edit Dialog */}
