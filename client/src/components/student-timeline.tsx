@@ -217,7 +217,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Timeline Entry</DialogTitle>
+            <DialogTitle>Add Event</DialogTitle>
           </DialogHeader>
 
           <Form {...form}>
