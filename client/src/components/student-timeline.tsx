@@ -107,10 +107,17 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
 
   const addEntryMutation = useMutation({
     mutationFn: async (data: TimelineFormData) => {
+      // Format the date to preserve the local date
+      const localDate = new Date(data.achievementDate);
+      const year = localDate.getFullYear();
+      const month = String(localDate.getMonth() + 1).padStart(2, '0');
+      const day = String(localDate.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+
       // Convert form data to API format
       const apiData = {
         ...data,
-        achievementDate: data.achievementDate.toISOString().split('T')[0],
+        achievementDate: formattedDate,
       };
 
       const res = await apiRequest(
@@ -152,16 +159,6 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
   });
 
   const onSubmit = form.handleSubmit((data) => {
-    // Validate that we have the required fields with actual content
-    if (!data.title?.trim()) {
-      form.setError('title', { message: 'Title is required' });
-      return;
-    }
-    if (!data.type?.trim()) {
-      form.setError('type', { message: 'Type is required' });
-      return;
-    }
-    
     addEntryMutation.mutate(data);
   });
 
@@ -386,7 +383,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={addEntryMutation.isPending || !form.formState.isValid}
+                  disabled={addEntryMutation.isPending}
                 >
                   {addEntryMutation.isPending && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
