@@ -19,7 +19,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { LoadingSpinner } from "@/components/loading-spinner";
@@ -252,23 +252,39 @@ export default function ProgramDetailPage({
 
         {/* Content Section */}
         <main className="container mx-auto px-4 py-8">
-          {/* Add useState for tab management */}
-          <Tabs 
-            defaultValue="sessions" 
-            value={typeof window !== 'undefined' && window.location.search.includes('tab=students') ? 'students' : 'sessions'}
-            onValueChange={(value) => {
+          {/* Use proper React state for tab management */}
+          {(() => {
+            // Using IIFE to contain the useState hook without conditional rendering
+            const [activeTab, setActiveTab] = useState<string>(() => {
+              // Initialize tab state based on URL only once during component mount
+              return typeof window !== 'undefined' && window.location.search.includes('tab=students') 
+                ? 'students' 
+                : 'sessions';
+            });
+            
+            const handleTabChange = (value: string) => {
+              setActiveTab(value);
               // Update URL without page reload
-              const url = new URL(window.location.href);
-              if (value === 'students') {
-                url.searchParams.set('tab', 'students');
-              } else {
-                url.searchParams.delete('tab');
+              if (typeof window !== 'undefined') {
+                const url = new URL(window.location.href);
+                if (value === 'students') {
+                  url.searchParams.set('tab', 'students');
+                } else {
+                  url.searchParams.delete('tab');
+                }
+                window.history.pushState({}, '', url);
               }
-              window.history.pushState({}, '', url);
-            }}
-            className="w-full"
-            aria-label="Program content tabs"
-          >
+            };
+            
+            return (
+              <Tabs 
+                defaultValue="sessions"
+                value={activeTab}
+                onValueChange={handleTabChange}
+                className="w-full"
+                aria-label="Program content tabs"
+              >
+          })()}
             <TabsList>
               <TabsTrigger value="sessions">Sessions</TabsTrigger>
               <TabsTrigger value="students">Students</TabsTrigger>
@@ -280,6 +296,7 @@ export default function ProgramDetailPage({
               <ProgramStudents programId={parseInt(params.id)} />
             </TabsContent>
           </Tabs>
+          )}
         </main>
 
         {/* Edit Dialog */}

@@ -81,6 +81,11 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
   if (isLoading) {
     return <LoadingSpinner message="Loading students..." />;
   }
+  
+  // Even if the request is not loading anymore, ensure stable rendering of hooks
+  if (!students) {
+    return <div className="text-center py-4">No students found</div>;
+  }
 
   const form = useForm({
     resolver: zodResolver(studentSchema),
