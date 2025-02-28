@@ -252,13 +252,26 @@ export default function ProgramDetailPage({
 
         {/* Content Section */}
         <main className="container mx-auto px-4 py-8">
-          {/* Using regular state instead of defaultValue with window check */}
-          <Tabs 
-            defaultValue="sessions" 
-            value={typeof window !== 'undefined' && window.location.search.includes('tab=students') ? 'students' : 'sessions'}
-            className="w-full"
-            aria-label="Program content tabs"
-          >
+          {(() => {
+            // Using IIFE to contain the useState hook
+            const [activeTab, setActiveTab] = useState<string>("sessions");
+            
+            // Effect to handle URL params, runs only once on mount
+            useEffect(() => {
+              if (typeof window !== 'undefined' && window.location.search.includes('tab=students')) {
+                setActiveTab('students');
+              }
+            }, []);
+            
+            return (
+              <Tabs 
+                value={activeTab}
+                onValueChange={setActiveTab}
+                className="w-full"
+                aria-label="Program content tabs"
+              >
+            );
+          })()}
             <TabsList>
               <TabsTrigger value="sessions">Sessions</TabsTrigger>
               <TabsTrigger value="students">Students</TabsTrigger>
