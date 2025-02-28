@@ -76,11 +76,6 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
   const { data: students = [], isLoading } = useQuery<Student[]>({
     queryKey: [`/api/programs/${programId}/students`],
   });
-  
-  // Show loading spinner while data is being fetched
-  if (isLoading) {
-    return <LoadingSpinner message="Loading students..." />;
-  }
 
   const form = useForm({
     resolver: zodResolver(studentSchema),
