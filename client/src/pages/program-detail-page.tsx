@@ -31,6 +31,7 @@ import { ProgramStudents } from "@/components/program-students";
 import { programFormSchema, ProgramFormData } from "@/types/program";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ApiError } from "@/types/common";
+import { useLocation } from "wouter";
 
 
 /**
@@ -52,6 +53,7 @@ export default function ProgramDetailPage({
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [, setLocation] = useLocation();
 
   // Fetch program details
   const { 
@@ -252,19 +254,16 @@ export default function ProgramDetailPage({
 
         {/* Content Section */}
         <main className="container mx-auto px-4 py-8">
-          {/* Add useState for tab management */}
           <Tabs 
-            defaultValue="sessions" 
+            defaultValue="sessions"
             value={typeof window !== 'undefined' && window.location.search.includes('tab=students') ? 'students' : 'sessions'}
             onValueChange={(value) => {
               // Update URL without page reload
-              const url = new URL(window.location.href);
               if (value === 'students') {
-                url.searchParams.set('tab', 'students');
+                setLocation(`/programs/${params.id}?tab=students`, { replace: true });
               } else {
-                url.searchParams.delete('tab');
+                setLocation(`/programs/${params.id}`, { replace: true });
               }
-              window.history.pushState({}, '', url);
             }}
             className="w-full"
             aria-label="Program content tabs"
