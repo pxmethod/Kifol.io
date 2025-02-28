@@ -284,19 +284,19 @@ export default function ProgramDetailPage({
                 className="w-full"
                 aria-label="Program content tabs"
               >
+                <TabsList>
+                  <TabsTrigger value="sessions">Sessions</TabsTrigger>
+                  <TabsTrigger value="students">Students</TabsTrigger>
+                </TabsList>
+                <TabsContent value="sessions" className="mt-8" role="tabpanel" aria-labelledby="sessions-tab">
+                  <ProgramSessions programId={parseInt(params.id)} />
+                </TabsContent>
+                <TabsContent value="students" className="mt-8" role="tabpanel" aria-labelledby="students-tab">
+                  <ProgramStudents programId={parseInt(params.id)} />
+                </TabsContent>
+              </Tabs>
+            );
           })()}
-            <TabsList>
-              <TabsTrigger value="sessions">Sessions</TabsTrigger>
-              <TabsTrigger value="students">Students</TabsTrigger>
-            </TabsList>
-            <TabsContent value="sessions" className="mt-8" role="tabpanel" aria-labelledby="sessions-tab">
-              <ProgramSessions programId={parseInt(params.id)} />
-            </TabsContent>
-            <TabsContent value="students" className="mt-8" role="tabpanel" aria-labelledby="students-tab">
-              <ProgramStudents programId={parseInt(params.id)} />
-            </TabsContent>
-          </Tabs>
-          )}
         </main>
 
         {/* Edit Dialog */}
