@@ -38,14 +38,10 @@ import { z } from "zod";
 
 // Modified schema to handle Date object in the form
 const timelineFormSchema = z.object({
-  title: z.string().min(1, "Title is required"),
+  title: insertPortfolioEntrySchema.shape.title,
   description: insertPortfolioEntrySchema.shape.description,
-  achievementDate: z.date({
-    required_error: "Date is required",
-  }),
-  type: z.string({
-    required_error: "Type is required",
-  }).min(1, "Type is required"),
+  achievementDate: z.date(),
+  type: insertPortfolioEntrySchema.shape.type,
   grade: insertPortfolioEntrySchema.shape.grade.optional(),
   feedback: insertPortfolioEntrySchema.shape.feedback.optional(),
 });
@@ -107,16 +103,10 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
 
   const addEntryMutation = useMutation({
     mutationFn: async (data: TimelineFormData) => {
-      // Format the date to preserve the local date while considering timezone offset
-      const localDate = data.achievementDate;
-      const offset = localDate.getTimezoneOffset();
-      const adjustedDate = new Date(localDate.getTime() - (offset * 60 * 1000));
-      const formattedDate = adjustedDate.toISOString().split('T')[0];
-
       // Convert form data to API format
       const apiData = {
         ...data,
-        achievementDate: formattedDate,
+        achievementDate: data.achievementDate.toISOString().split('T')[0],
       };
 
       const res = await apiRequest(
@@ -227,7 +217,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Event</DialogTitle>
+            <DialogTitle>Add Timeline Entry</DialogTitle>
           </DialogHeader>
 
           <Form {...form}>
