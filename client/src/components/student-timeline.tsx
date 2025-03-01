@@ -104,7 +104,7 @@ function EventDetailDialog({
   onClose: () => void;
 }) {
   const { toast } = useToast();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'detail' | 'delete_confirmation'>('detail');
 
   const deleteMutation = useMutation({
     mutationFn: async (eventId: number) => {
@@ -138,79 +138,110 @@ function EventDetailDialog({
   if (!event) return null;
 
   const handleDelete = () => {
-    setDeleteDialogOpen(true);
+    setDialogMode('delete_confirmation');
   };
 
   const confirmDelete = () => {
     deleteMutation.mutate(event.id);
   };
 
+  const handleCancel = () => {
+    setDialogMode('detail');
+  };
+
   return (
-    <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>{event.title}</DialogTitle>
-            <DialogDescription>
-              {format(new Date(event.achievementDate), "MMMM d, yyyy")}
-            </DialogDescription>
-          </DialogHeader>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      if (!open) {
+        onClose();
+        // Reset the dialog mode when closing
+        setDialogMode('detail');
+      }
+    }}>
+      <DialogContent className="sm:max-w-[500px]">
+        {dialogMode === 'detail' ? (
+          <>
+            <DialogHeader>
+              <DialogTitle>{event.title}</DialogTitle>
+              <DialogDescription>
+                {format(new Date(event.achievementDate), "MMMM d, yyyy")}
+              </DialogDescription>
+            </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            {event.description && (
+            <div className="space-y-4 py-4">
+              {event.description && (
+                <div>
+                  <h4 className="text-sm font-medium mb-1">Description</h4>
+                  <p className="text-sm text-muted-foreground">{event.description}</p>
+                </div>
+              )}
+
               <div>
-                <h4 className="text-sm font-medium mb-1">Description</h4>
-                <p className="text-sm text-muted-foreground">{event.description}</p>
+                <h4 className="text-sm font-medium mb-1">Type</h4>
+                <p className="text-sm text-muted-foreground capitalize">{event.type}</p>
               </div>
-            )}
 
-            <div>
-              <h4 className="text-sm font-medium mb-1">Type</h4>
-              <p className="text-sm text-muted-foreground capitalize">{event.type}</p>
+              {event.feedback && (
+                <div>
+                  <h4 className="text-sm font-medium mb-1">Feedback</h4>
+                  <p className="text-sm text-muted-foreground">{event.feedback}</p>
+                </div>
+              )}
             </div>
 
-            {event.feedback && (
-              <div>
-                <h4 className="text-sm font-medium mb-1">Feedback</h4>
-                <p className="text-sm text-muted-foreground">{event.feedback}</p>
+            <DialogFooter>
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={deleteMutation.isPending}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Event
+              </Button>
+            </DialogFooter>
+          </>
+        ) : (
+          <>
+            <DialogHeader>
+              <DialogTitle>Delete Timeline Event</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this event? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="py-4">
+              <div className="bg-muted/20 p-4 rounded-md mb-4">
+                <h3 className="font-medium">{event.title}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {format(new Date(event.achievementDate), "MMMM d, yyyy")}
+                </p>
               </div>
-            )}
-          </div>
+            </div>
 
-          <DialogFooter>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={deleteMutation.isPending}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete Event
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the timeline event.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>
-              {deleteMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                "Delete"
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+            <DialogFooter className="flex justify-between sm:justify-between">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCancel}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={confirmDelete}
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <Trash2 className="h-4 w-4 mr-2" />
+                )}
+                Delete Event
+              </Button>
+            </DialogFooter>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
 
