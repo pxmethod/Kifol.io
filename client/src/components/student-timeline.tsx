@@ -106,7 +106,7 @@ function AddEventButton() {
 function EventDetailDialog({
   event,
   isOpen,
-  onClose
+  onClose,
 }: {
   event: PortfolioEntry | null;
   isOpen: boolean;
@@ -421,7 +421,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel>Title<span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Enter entry title"
@@ -433,7 +433,6 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="type"
@@ -464,7 +463,6 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="achievementDate"
@@ -504,7 +502,6 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="description"
@@ -523,7 +520,6 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="feedback"
@@ -542,7 +538,6 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   </FormItem>
                 )}
               />
-
               <div className="flex justify-end gap-2">
                 <Button
                   type="button"
@@ -551,7 +546,10 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={addEntryMutation.isPending}>
+                <Button
+                  type="submit"
+                  disabled={addEntryMutation.isPending || !form.formState.isValid}
+                >
                   {addEntryMutation.isPending && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
