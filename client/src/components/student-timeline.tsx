@@ -168,7 +168,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
   const getEntryIcon = (type: string) => {
     const entry = ENTRY_TYPES.find((t) => t.value === type);
     const Icon = entry?.icon || Trophy;
-    return <Icon className="h-8 w-8" />;
+    return <Icon className="h-6 w-6" />;
   };
 
   if (isLoading) {
@@ -203,7 +203,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   key={entry.id}
                   className="flex gap-4 items-start pl-12 pb-8 relative"
                 >
-                  <div className="absolute left-0 p-1 rounded-full bg-background border-2 border-primary z-10">
+                  <div className="absolute left-0 p-0.5 rounded-full bg-background border-2 border-primary z-10">
                     {getEntryIcon(entry.type)}
                   </div>
                   <div className="pt-1 space-y-2">
