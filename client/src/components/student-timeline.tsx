@@ -63,7 +63,7 @@ import { z } from "zod";
 
 // Modified schema to handle Date object in the form
 const timelineFormSchema = z.object({
-  title: insertPortfolioEntrySchema.shape.title,
+  title: insertPortfolioEntrySchema.shape.title.min(1, "Title is required"),
   description: insertPortfolioEntrySchema.shape.description,
   achievementDate: z.date().max(new Date(), "Cannot select future dates"),
   type: insertPortfolioEntrySchema.shape.type,
@@ -426,6 +426,10 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                       <Input
                         placeholder="Enter entry title"
                         {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          form.trigger("title"); // Trigger validation on change
+                        }}
                         value={field.value || ""}
                       />
                     </FormControl>
@@ -548,7 +552,11 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={addEntryMutation.isPending || !form.formState.isValid}
+                  disabled={
+                    addEntryMutation.isPending ||
+                    !form.formState.isValid ||
+                    !form.getValues("title")?.trim()
+                  }
                 >
                   {addEntryMutation.isPending && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
