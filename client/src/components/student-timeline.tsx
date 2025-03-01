@@ -31,7 +31,16 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CalendarIcon, Loader2, Trophy, Book, Star, Award, Plus, Trash2 } from "lucide-react";
+import {
+  CalendarIcon,
+  Loader2,
+  Trophy,
+  Book,
+  Star,
+  Award,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
@@ -108,22 +117,20 @@ function EventDetailDialog({
 
   const deleteMutation = useMutation({
     mutationFn: async (eventId: number) => {
-      const res = await apiRequest(
-        "DELETE",
-        `/api/portfolio/${eventId}`,
-      );
+      const res = await apiRequest("DELETE", `/api/portfolio/${eventId}`);
       if (!res.ok) {
         throw new Error("Failed to delete event");
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`/api/students/${event?.studentId}/portfolio`]
+        queryKey: [`/api/students/${event?.studentId}/portfolio`],
       });
       toast({
         title: "Success",
         description: "Timeline event deleted successfully",
       });
+      setDeleteDialogOpen(false);
       onClose();
     },
     onError: (error: Error) => {
@@ -145,9 +152,17 @@ function EventDetailDialog({
     deleteMutation.mutate(event.id);
   };
 
+  const handleClose = () => {
+    if (deleteDialogOpen) {
+      setDeleteDialogOpen(false);
+    } else {
+      onClose();
+    }
+  };
+
   return (
     <>
-      <Dialog open={isOpen && !deleteDialogOpen} onOpenChange={onClose}>
+      <Dialog open={isOpen && !deleteDialogOpen} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>{event.title}</DialogTitle>
@@ -160,19 +175,25 @@ function EventDetailDialog({
             {event.description && (
               <div>
                 <h4 className="text-sm font-medium mb-1">Description</h4>
-                <p className="text-sm text-muted-foreground">{event.description}</p>
+                <p className="text-sm text-muted-foreground">
+                  {event.description}
+                </p>
               </div>
             )}
 
             <div>
               <h4 className="text-sm font-medium mb-1">Type</h4>
-              <p className="text-sm text-muted-foreground capitalize">{event.type}</p>
+              <p className="text-sm text-muted-foreground capitalize">
+                {event.type}
+              </p>
             </div>
 
             {event.feedback && (
               <div>
                 <h4 className="text-sm font-medium mb-1">Feedback</h4>
-                <p className="text-sm text-muted-foreground">{event.feedback}</p>
+                <p className="text-sm text-muted-foreground">
+                  {event.feedback}
+                </p>
               </div>
             )}
           </div>
@@ -181,6 +202,7 @@ function EventDetailDialog({
             <Button
               variant="destructive"
               onClick={handleDelete}
+              className="bg-red-600 text-white hover:bg-red-700"
               disabled={deleteMutation.isPending}
             >
               <Trash2 className="h-4 w-4 mr-2" />
@@ -189,6 +211,7 @@ function EventDetailDialog({
             <Button
               variant="outline"
               onClick={onClose}
+              className="ml-auto"
             >
               Cancel
             </Button>
@@ -201,16 +224,20 @@ function EventDetailDialog({
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the timeline event.
+              This action cannot be undone. This will permanently delete this
+              timeline event.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-red-600 text-white hover:bg-red-700"
+            >
               {deleteMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                "Delete"
+                "Yes, Delete"
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -223,7 +250,9 @@ function EventDetailDialog({
 export function StudentTimeline({ studentId }: StudentTimelineProps) {
   const { toast } = useToast();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<PortfolioEntry | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<PortfolioEntry | null>(
+    null,
+  );
 
   // Register the dialog state setter for the Add button
   globalDialogState.setIsOpen = setAddDialogOpen;
@@ -342,7 +371,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   role="button"
                   tabIndex={0}
                   onKeyPress={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
+                    if (e.key === "Enter" || e.key === " ") {
                       setSelectedEvent(entry);
                     }
                   }}
