@@ -147,7 +147,7 @@ function EventDetailDialog({
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
+      <Dialog open={isOpen && !deleteDialogOpen} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>{event.title}</DialogTitle>
@@ -177,7 +177,7 @@ function EventDetailDialog({
             )}
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex justify-between items-center">
             <Button
               variant="destructive"
               onClick={handleDelete}
@@ -185,6 +185,12 @@ function EventDetailDialog({
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Delete Event
+            </Button>
+            <Button
+              variant="outline"
+              onClick={onClose}
+            >
+              Cancel
             </Button>
           </DialogFooter>
         </DialogContent>
