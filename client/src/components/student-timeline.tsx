@@ -58,14 +58,7 @@ const timelineFormSchema = z.object({
   achievementDate: z
     .date()
     .refine(
-      (date) => {
-        // Clone the date to avoid mutating the original
-        const dateClone = new Date(date);
-        // Set time to end of day for today's comparison
-        const todayEnd = new Date();
-        todayEnd.setHours(23, 59, 59, 999);
-        return dateClone <= todayEnd;
-      },
+      (date) => date.setHours(0, 0, 0, 0) <= today.getTime(),
       "Cannot select future dates",
     ),
   type: insertPortfolioEntrySchema.shape.type,
