@@ -40,9 +40,8 @@ import { z } from "zod";
 const timelineFormSchema = z.object({
   title: insertPortfolioEntrySchema.shape.title,
   description: insertPortfolioEntrySchema.shape.description,
-  achievementDate: z.date(),
+  achievementDate: z.date().max(new Date(), "Cannot select future dates"),
   type: insertPortfolioEntrySchema.shape.type,
-  grade: insertPortfolioEntrySchema.shape.grade.optional(),
   feedback: insertPortfolioEntrySchema.shape.feedback.optional(),
 });
 
@@ -68,8 +67,8 @@ let globalDialogState = {
 // Add Event Button Component
 function AddEventButton() {
   return (
-    <Button 
-      onClick={() => globalDialogState.setIsOpen?.(true)} 
+    <Button
+      onClick={() => globalDialogState.setIsOpen?.(true)}
       aria-label="Add new timeline event"
     >
       <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
@@ -96,7 +95,6 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
       description: "",
       achievementDate: new Date(),
       type: "achievement",
-      grade: "",
       feedback: "",
     },
   });
@@ -197,11 +195,6 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   {entry.description && (
                     <p className="text-muted-foreground">{entry.description}</p>
                   )}
-                  {entry.grade && (
-                    <p className="text-sm">
-                      <span className="font-medium">Grade:</span> {entry.grade}
-                    </p>
-                  )}
                   {entry.feedback && (
                     <p className="text-sm">
                       <span className="font-medium">Feedback:</span>{" "}
@@ -297,6 +290,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
+                          disabled={(date) => date > new Date()}
                           initialFocus
                         />
                       </PopoverContent>
@@ -318,24 +312,6 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                         className="resize-none"
                         {...field}
                         value={field.value || ''}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="grade"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Grade (Optional)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Enter grade" 
-                        {...field}
-                        value={field.value || ''} 
                       />
                     </FormControl>
                     <FormMessage />
