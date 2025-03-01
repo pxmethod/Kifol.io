@@ -23,7 +23,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { ProgramSessions } from "@/components/program-sessions";
@@ -32,6 +32,18 @@ import { programFormSchema, ProgramFormData } from "@/types/program";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ApiError } from "@/types/common";
 
+
+/**
+ * ProgramDetailPage Component
+ * 
+ * Displays detailed information about an educational program and allows editing.
+ * Shows program sessions and enrolled students in separate tabs.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {Object} props.params - URL parameters
+ * @param {string} props.params.id - Program ID from the URL
+ */
 export default function ProgramDetailPage({
   params,
 }: {
@@ -40,25 +52,8 @@ export default function ProgramDetailPage({
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [location, setLocation] = useLocation();
 
-  // Get current tab from URL search params
-  const searchParams = typeof window !== 'undefined' 
-    ? new URLSearchParams(window.location.search) 
-    : new URLSearchParams();
-  const currentTab = searchParams.get('tab') === 'students' ? 'students' : 'sessions';
-
-  // Handle tab change
-  const handleTabChange = (value: string) => {
-    const newParams = new URLSearchParams(searchParams);
-    if (value === 'students') {
-      newParams.set('tab', 'students');
-    } else {
-      newParams.delete('tab');
-    }
-    setLocation(`/programs/${params.id}${newParams.toString() ? `?${newParams.toString()}` : ''}`);
-  };
-
+  // Fetch program details
   const { 
     data: program,
     isLoading,
@@ -68,11 +63,13 @@ export default function ProgramDetailPage({
     queryKey: [`/api/programs/${params.id}`],
   });
 
+  // Update mutation typing and FormData handling
   const updateProgramMutation = useMutation({
     mutationFn: async (data: FormData | ProgramFormData) => {
       const formData = new FormData();
 
       if (data instanceof FormData) {
+        // If it's already FormData, use it directly
         return fetch(`/api/programs/${params.id}`, {
           method: 'PATCH',
           body: data,
@@ -82,6 +79,7 @@ export default function ProgramDetailPage({
         });
       }
 
+      // Otherwise, create FormData from ProgramFormData
       formData.append('title', data.title);
       formData.append('description', data.description || '');
       formData.append('startDate', data.startDate.toISOString());
@@ -129,6 +127,7 @@ export default function ProgramDetailPage({
     },
   });
 
+  // Handle image preview
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -141,7 +140,9 @@ export default function ProgramDetailPage({
     }
   };
 
+  // Update removeImage function to not trigger dialog close
   const removeImage = () => {
+    // Create FormData to update the server
     const formData = new FormData();
     const currentValues = form.getValues();
 
@@ -151,8 +152,10 @@ export default function ProgramDetailPage({
     formData.append('endDate', currentValues.endDate.toISOString());
     formData.append('removeCoverImage', 'true');
 
+    // Update the program but keep dialog open
     updateProgramMutation.mutate(formData);
 
+    // Clear the form state and preview
     form.setValue('coverImage', undefined);
     setImagePreview(null);
   };
@@ -184,12 +187,13 @@ export default function ProgramDetailPage({
 
   const onSubmit = form.handleSubmit((data) => {
     updateProgramMutation.mutate(data);
-    setEditDialogOpen(false); 
+    setEditDialogOpen(false); // Only close dialog on form submit
   });
 
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background">
+        {/* Header Section */}
         <header 
           className="relative text-white" 
           role="banner"
@@ -200,6 +204,7 @@ export default function ProgramDetailPage({
             backgroundSize: 'cover',
           }}
         >
+          {/* Overlay for text legibility when image is present */}
           {program.coverImage && (
             <div 
               className="absolute inset-0" 
@@ -233,8 +238,9 @@ export default function ProgramDetailPage({
                 size="sm"
                 onClick={() => setEditDialogOpen(true)}
                 className="bg-white text-gray-900 hover:bg-gray-100"
+                aria-label="Edit program details"
               >
-                <Pencil className="h-4 w-4 mr-2" />
+                <Pencil className="h-4 w-4 mr-2" aria-hidden="true" />
                 Edit
               </Button>
             </div>
@@ -244,25 +250,29 @@ export default function ProgramDetailPage({
           </div>
         </header>
 
+        {/* Content Section */}
         <main className="container mx-auto px-4 py-8">
+          {/* Using regular state instead of defaultValue with window check */}
           <Tabs 
-            value={currentTab}
-            onValueChange={handleTabChange}
+            defaultValue="sessions" 
+            value={typeof window !== 'undefined' && window.location.search.includes('tab=students') ? 'students' : 'sessions'}
             className="w-full"
+            aria-label="Program content tabs"
           >
             <TabsList>
               <TabsTrigger value="sessions">Sessions</TabsTrigger>
               <TabsTrigger value="students">Students</TabsTrigger>
             </TabsList>
-            <TabsContent value="sessions" className="mt-8">
+            <TabsContent value="sessions" className="mt-8" role="tabpanel" aria-labelledby="sessions-tab">
               <ProgramSessions programId={parseInt(params.id)} />
             </TabsContent>
-            <TabsContent value="students" className="mt-8">
+            <TabsContent value="students" className="mt-8" role="tabpanel" aria-labelledby="students-tab">
               <ProgramStudents programId={parseInt(params.id)} />
             </TabsContent>
           </Tabs>
         </main>
 
+        {/* Edit Dialog */}
         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
           <DialogContent>
             <DialogHeader>
@@ -297,6 +307,7 @@ export default function ProgramDetailPage({
                   )}
                 />
 
+                {/* Cover Image Upload */}
                 <FormField
                   control={form.control}
                   name="coverImage"
