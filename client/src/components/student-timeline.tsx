@@ -174,17 +174,21 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
           <StudentTimeline.AddEventButton />
         </div>
       ) : (
-        <div className="space-y-8">
-          {entries
-            .sort((a, b) => new Date(b.achievementDate).getTime() - new Date(a.achievementDate).getTime())
-            .map((entry) => (
-              <div
-                key={entry.id}
-                className="flex gap-4 items-start border-l-2 border-primary/20 pl-4 pb-8 relative"
-              >
-                <div className="absolute -left-4 p-1 rounded-full bg-background border-2 border-primary">
-                  {getEntryIcon(entry.type)}
-                </div>
+        <div className="relative">
+          {/* Continuous vertical timeline line */}
+          <div className="absolute top-0 bottom-0 left-4 w-0.5 bg-primary/20"></div>
+          
+          <div className="space-y-8 relative">
+            {entries
+              .sort((a, b) => new Date(b.achievementDate).getTime() - new Date(a.achievementDate).getTime())
+              .map((entry) => (
+                <div
+                  key={entry.id}
+                  className="flex gap-4 items-start pl-12 pb-8 relative"
+                >
+                  <div className="absolute left-0 p-1 rounded-full bg-background border-2 border-primary z-10">
+                    {getEntryIcon(entry.type)}
+                  </div>
                 <div className="pt-1 space-y-2">
                   <div className="flex items-baseline gap-2">
                     <h3 className="text-lg font-semibold">{entry.title}</h3>
@@ -204,6 +208,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                 </div>
               </div>
             ))}
+          </div>
         </div>
       )}
 
