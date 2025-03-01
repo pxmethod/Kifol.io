@@ -242,13 +242,13 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
       // Convert form data to API format
       const apiData = {
         ...data,
-        achievementDate: data.achievementDate.toISOString().split('T')[0],
+        achievementDate: data.achievementDate.toISOString().split("T")[0],
       };
 
       const res = await apiRequest(
         "POST",
         `/api/students/${studentId}/portfolio`,
-        apiData
+        apiData,
       );
 
       // Check if response is valid before parsing JSON

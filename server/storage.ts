@@ -64,6 +64,8 @@ export interface IStorage {
   acceptParentInvitation(token: string): Promise<void>;
   linkStudentToParent(studentId: number, parentId: number): Promise<void>;
 
+  // Add new method for getting a single portfolio entry
+  getPortfolioEntry(id: number): Promise<PortfolioEntry | undefined>;
   sessionStore: session.Store;
 }
 
@@ -418,6 +420,13 @@ export class DatabaseStorage implements IStorage {
       .update(students)
       .set({ parentId })
       .where(eq(students.id, studentId));
+  }
+  async getPortfolioEntry(id: number): Promise<PortfolioEntry | undefined> {
+    const [entry] = await db
+      .select()
+      .from(portfolioEntries)
+      .where(eq(portfolioEntries.id, id));
+    return entry;
   }
 }
 
