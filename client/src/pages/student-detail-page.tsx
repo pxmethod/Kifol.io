@@ -84,7 +84,7 @@ export default function StudentDetailPage({
                 </div>
                 <p className="text-gray-200 mt-2">
                   Parent Email:{" "}
-                  <a href={`mailto:${student.email}`} className="text-blue-400 underline">
+                  <a href={`mailto:${student.email}`} className="hover:underline">
                     {student.email}
                   </a>
                 </p>

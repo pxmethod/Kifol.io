@@ -168,7 +168,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
   const getEntryIcon = (type: string) => {
     const entry = ENTRY_TYPES.find((t) => t.value === type);
     const Icon = entry?.icon || Trophy;
-    return <Icon className="h-6 w-6" />;
+    return <Icon className="h-6 w-6"/>;
   };
 
   if (isLoading) {
