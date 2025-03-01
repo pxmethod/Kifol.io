@@ -82,7 +82,12 @@ export default function StudentDetailPage({
                   <GraduationCap className="h-4 w-4" aria-hidden="true" />
                   <span>Grade {student.grade}</span>
                 </div>
-                <p className="text-gray-200 mt-2">Parent Email: {student.email}</p>
+                <p className="text-gray-200 mt-2">
+                  Parent Email:{" "}
+                  <a href={`mailto:${student.email}`} className="text-blue-400 underline">
+                    {student.email}
+                  </a>
+                </p>
               </div>
             </div>
           </nav>
