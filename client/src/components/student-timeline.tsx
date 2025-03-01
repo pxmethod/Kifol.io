@@ -2,6 +2,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { PortfolioEntry, insertPortfolioEntrySchema } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -18,15 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  CalendarIcon,
-  Loader2,
-  Trophy,
-  Book,
-  Star,
-  Award,
-  Plus,
-} from "lucide-react";
+import { CalendarIcon, Loader2, Trophy, Book, Star, Award, Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
@@ -43,22 +36,11 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
 
-const today = new Date();
-today.setHours(0, 0, 0, 0); // Normalize today's date to midnight
-
+// Modified schema to handle Date object in the form
 const timelineFormSchema = z.object({
   title: insertPortfolioEntrySchema.shape.title,
   description: insertPortfolioEntrySchema.shape.description,
-  achievementDate: z
-    .date()
-    .transform((date) => {
-      // Convert to YYYY-MM-DD string to prevent timezone shifts
-      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    })
-    .refine(
-      (date) => date.getTime() <= today.getTime(),
-      "Cannot select future dates",
-    ),
+  achievementDate: z.date().max(new Date(), "Cannot select future dates"),
   type: insertPortfolioEntrySchema.shape.type,
   feedback: insertPortfolioEntrySchema.shape.feedback.optional(),
 });
@@ -122,23 +104,21 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
       // Convert form data to API format
       const apiData = {
         ...data,
-        achievementDate: data.achievementDate.toISOString().split("T")[0],
+        achievementDate: data.achievementDate.toISOString().split('T')[0],
       };
 
       const res = await apiRequest(
         "POST",
         `/api/students/${studentId}/portfolio`,
-        apiData,
+        apiData
       );
 
       // Check if response is valid before parsing JSON
       if (!res.ok) {
         const text = await res.text();
         // If the response contains HTML, it's likely an error page
-        if (text.includes("<!DOCTYPE html>")) {
-          throw new Error(
-            "Server returned an HTML error page instead of JSON. Please check the server logs.",
-          );
+        if (text.includes('<!DOCTYPE html>')) {
+          throw new Error('Server returned an HTML error page instead of JSON. Please check the server logs.');
         }
         throw new Error(`Server error: ${text}`);
       }
@@ -172,7 +152,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
   const getEntryIcon = (type: string) => {
     const entry = ENTRY_TYPES.find((t) => t.value === type);
     const Icon = entry?.icon || Trophy;
-    return <Icon className="h-6 w-6" />;
+    return <Icon className="h-8 w-8" />;
   };
 
   if (isLoading) {
@@ -187,61 +167,43 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
     <div className="space-y-8">
       {entries.length === 0 ? (
         <div className="text-center py-8 border rounded-lg bg-muted/10">
-          <h3 className="text-lg font-semibold mb-2">
-            No Timeline Entries Yet
-          </h3>
+          <h3 className="text-lg font-semibold mb-2">No Timeline Entries Yet</h3>
           <p className="text-muted-foreground mb-4">
-            Start tracking this student's progress by adding their first
-            achievement or milestone.
+            Start tracking this student's progress by adding their first achievement or milestone.
           </p>
           <StudentTimeline.AddEventButton />
         </div>
       ) : (
-        <div className="relative">
-          {/* Continuous vertical timeline line */}
-          <div className="absolute top-0 bottom-0 left-4 w-0.5 bg-primary/20"></div>
-
-          {/* Timeline entries */}
-          <div className="space-y-8 relative">
-            {entries
-              .sort(
-                (a, b) =>
-                  new Date(b.achievementDate).getTime() -
-                  new Date(a.achievementDate).getTime(),
-              )
-              .map((entry) => (
-                <div
-                  key={entry.id}
-                  className="flex gap-4 items-start pl-12 pb-8 relative"
-                >
-                  <div className="absolute left-0 p-0.5 rounded-full bg-background border-2 border-primary z-10">
-                    {getEntryIcon(entry.type)}
-                  </div>
-                  <div className="pt-1 space-y-2">
-                    <div className="flex items-baseline gap-2">
-                      <h3 className="text-lg font-semibold">{entry.title}</h3>
-                      <span className="text-sm text-muted-foreground">
-                        {format(
-                          new Date(entry.achievementDate),
-                          "MMMM d, yyyy",
-                        )}
-                      </span>
-                    </div>
-                    {entry.description && (
-                      <p className="text-muted-foreground">
-                        {entry.description}
-                      </p>
-                    )}
-                    {entry.feedback && (
-                      <p className="text-sm">
-                        <span className="font-medium">Feedback:</span>{" "}
-                        {entry.feedback}
-                      </p>
-                    )}
-                  </div>
+        <div className="space-y-8">
+          {entries
+            .sort((a, b) => new Date(b.achievementDate).getTime() - new Date(a.achievementDate).getTime())
+            .map((entry) => (
+              <div
+                key={entry.id}
+                className="flex gap-4 items-start border-l-2 border-primary/20 pl-4 pb-8 relative"
+              >
+                <div className="absolute -left-4 p-1 rounded-full bg-background border-2 border-primary">
+                  {getEntryIcon(entry.type)}
                 </div>
-              ))}
-          </div>
+                <div className="pt-1 space-y-2">
+                  <div className="flex items-baseline gap-2">
+                    <h3 className="text-lg font-semibold">{entry.title}</h3>
+                    <span className="text-sm text-muted-foreground">
+                      {format(new Date(entry.achievementDate), "MMMM d, yyyy")}
+                    </span>
+                  </div>
+                  {entry.description && (
+                    <p className="text-muted-foreground">{entry.description}</p>
+                  )}
+                  {entry.feedback && (
+                    <p className="text-sm">
+                      <span className="font-medium">Feedback:</span>{" "}
+                      {entry.feedback}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
         </div>
       )}
 
@@ -260,11 +222,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   <FormItem>
                     <FormLabel>Title</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Enter entry title"
-                        {...field}
-                        value={field.value || ""}
-                      />
+                      <Input placeholder="Enter entry title" {...field} value={field.value || ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -315,7 +273,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                             variant="outline"
                             className={cn(
                               "pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground",
+                              !field.value && "text-muted-foreground"
                             )}
                           >
                             {field.value ? (
@@ -353,7 +311,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                         placeholder="Enter description"
                         className="resize-none"
                         {...field}
-                        value={field.value || ""}
+                        value={field.value || ''}
                       />
                     </FormControl>
                     <FormMessage />
@@ -372,7 +330,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                         placeholder="Enter feedback"
                         className="resize-none"
                         {...field}
-                        value={field.value || ""}
+                        value={field.value || ''}
                       />
                     </FormControl>
                     <FormMessage />
