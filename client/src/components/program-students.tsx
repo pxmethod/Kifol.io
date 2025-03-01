@@ -221,30 +221,28 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                 <TableHead>Name</TableHead>
                 <TableHead>Parent's Email Address</TableHead>
                 <TableHead>Grade</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredStudents.map((student) => (
                 <TableRow key={student.id}>
-                  <TableCell className="font-medium">{student.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <Link href={`/programs/${programId}/students/${student.id}`}>
+                      <span className="cursor-pointer hover:underline">{student.name}</span>
+                    </Link>
+                  </TableCell>
                   <TableCell>{student.email}</TableCell>
                   <TableCell>{student.grade}</TableCell>
                   <TableCell>
-                    <div className="flex gap-2">
-                      <Link href={`/programs/${programId}/students/${student.id}`}>
-                        <Button variant="ghost" size="sm">
-                          View Details
-                        </Button>
-                      </Link>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteClick(student)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteClick(student)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -258,7 +256,11 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
               <CardContent className="pt-6">
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
-                    <h3 className="font-medium">{student.name}</h3>
+                    <h3 className="font-medium">
+                      <Link href={`/programs/${programId}/students/${student.id}`}>
+                        <span className="cursor-pointer hover:underline">{student.name}</span>
+                      </Link>
+                    </h3>
                     <p className="text-sm text-muted-foreground">
                       {student.email}
                     </p>
@@ -268,11 +270,6 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Link href={`/programs/${programId}/students/${student.id}`}>
-                      <Button variant="ghost" size="sm">
-                        View Details
-                      </Button>
-                    </Link>
                     <Button
                       variant="ghost"
                       size="sm"
