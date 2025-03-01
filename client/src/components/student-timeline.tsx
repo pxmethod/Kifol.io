@@ -38,14 +38,10 @@ import { z } from "zod";
 
 // Modified schema to handle Date object in the form
 const timelineFormSchema = z.object({
-  title: z.string().min(1, "Title is required"),
+  title: insertPortfolioEntrySchema.shape.title,
   description: insertPortfolioEntrySchema.shape.description,
-  achievementDate: z.date({
-    required_error: "Date is required",
-  }),
-  type: z.string({
-    required_error: "Type is required",
-  }).min(1, "Type is required"),
+  achievementDate: z.date(),
+  type: insertPortfolioEntrySchema.shape.type,
   grade: insertPortfolioEntrySchema.shape.grade.optional(),
   feedback: insertPortfolioEntrySchema.shape.feedback.optional(),
 });
@@ -152,23 +148,13 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
   });
 
   const onSubmit = form.handleSubmit((data) => {
-    // Validate that we have the required fields with actual content
-    if (!data.title?.trim()) {
-      form.setError('title', { message: 'Title is required' });
-      return;
-    }
-    if (!data.type?.trim()) {
-      form.setError('type', { message: 'Type is required' });
-      return;
-    }
-    
     addEntryMutation.mutate(data);
   });
 
   const getEntryIcon = (type: string) => {
     const entry = ENTRY_TYPES.find((t) => t.value === type);
     const Icon = entry?.icon || Trophy;
-    return <Icon className="h-6 w-6"/>;
+    return <Icon className="h-8 w-8" />;
   };
 
   if (isLoading) {
@@ -190,23 +176,18 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
           <StudentTimeline.AddEventButton />
         </div>
       ) : (
-        <div className="relative">
-          {/* Continuous vertical timeline line */}
-          <div className="absolute top-0 bottom-0 left-4 w-0.5 bg-primary/20"></div>
-          
-          {/* Timeline entries */}
-          <div className="space-y-8 relative">
-            {entries
-              .sort((a, b) => new Date(b.achievementDate).getTime() - new Date(a.achievementDate).getTime())
-              .map((entry) => (
-                <div
-                  key={entry.id}
-                  className="flex gap-4 items-start pl-12 pb-8 relative"
-                >
-                  <div className="absolute left-0 p-0.5 rounded-full bg-background border-2 border-primary z-10">
-                    {getEntryIcon(entry.type)}
-                  </div>
-                  <div className="pt-1 space-y-2">
+        <div className="space-y-8">
+          {entries
+            .sort((a, b) => new Date(b.achievementDate).getTime() - new Date(a.achievementDate).getTime())
+            .map((entry) => (
+              <div
+                key={entry.id}
+                className="flex gap-4 items-start border-l-2 border-primary/20 pl-4 pb-8 relative"
+              >
+                <div className="absolute -left-4 p-1 rounded-full bg-background border-2 border-primary">
+                  {getEntryIcon(entry.type)}
+                </div>
+                <div className="pt-1 space-y-2">
                   <div className="flex items-baseline gap-2">
                     <h3 className="text-lg font-semibold">{entry.title}</h3>
                     <span className="text-sm text-muted-foreground">
@@ -228,16 +209,15 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                     </p>
                   )}
                 </div>
-                </div>
-              ))}
-          </div>
+              </div>
+            ))}
         </div>
       )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Event</DialogTitle>
+            <DialogTitle>Add Timeline Entry</DialogTitle>
           </DialogHeader>
 
           <Form {...form}>
@@ -392,7 +372,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={addEntryMutation.isPending || !form.formState.isValid}
+                  disabled={addEntryMutation.isPending}
                 >
                   {addEntryMutation.isPending && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
