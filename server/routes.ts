@@ -224,48 +224,48 @@ export function registerRoutes(app: Express): Server {
     await storage.deleteStudent(studentId);
     res.sendStatus(200);
   });
-
+  
   // Portfolio Entries
   app.get("/api/students/:studentId/portfolio", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-
+    
     const studentId = parseInt(req.params.studentId);
     const student = await storage.getStudent(studentId);
-
+    
     if (!student) {
       return res.sendStatus(404);
     }
-
+    
     // Check if the user has access to any programs this student is enrolled in
     const studentPrograms = await storage.getProgramsByStudentId(studentId);
     const hasAccess = studentPrograms.some(program => program.userId === req.user.id);
-
+    
     if (!hasAccess) {
       return res.sendStatus(403);
     }
-
+    
     const entries = await storage.getPortfolioEntriesByStudentId(studentId);
     res.json(entries);
   });
-
+  
   app.post("/api/students/:studentId/portfolio", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-
+    
     const studentId = parseInt(req.params.studentId);
     const student = await storage.getStudent(studentId);
-
+    
     if (!student) {
       return res.sendStatus(404);
     }
-
+    
     // Check if the user has access to any programs this student is enrolled in
     const studentPrograms = await storage.getProgramsByStudentId(studentId);
     const hasAccess = studentPrograms.some(program => program.userId === req.user.id);
-
+    
     if (!hasAccess) {
       return res.sendStatus(403);
     }
-
+    
     try {
       // Create portfolio entry
       const entry = await storage.createPortfolioEntry(studentId, req.body);
@@ -274,28 +274,6 @@ export function registerRoutes(app: Express): Server {
       console.error("Error creating portfolio entry:", error);
       res.status(400).json({ message: error.message });
     }
-  });
-
-  app.delete("/api/portfolio/:id", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
-
-    const entryId = parseInt(req.params.id);
-    const portfolioEntry = await storage.getPortfolioEntry(entryId);
-
-    if (!portfolioEntry) {
-      return res.sendStatus(404);
-    }
-
-    // Check if the user has access to the student this entry belongs to
-    const studentPrograms = await storage.getProgramsByStudentId(portfolioEntry.studentId);
-    const hasAccess = studentPrograms.some(program => program.userId === req.user.id);
-
-    if (!hasAccess) {
-      return res.sendStatus(403);
-    }
-
-    await storage.deletePortfolioEntry(entryId);
-    res.sendStatus(200);
   });
 
   const httpServer = createServer(app);

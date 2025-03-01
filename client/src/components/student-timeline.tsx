@@ -8,19 +8,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import {
   Form,
   FormControl,
@@ -31,7 +19,15 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CalendarIcon, Loader2, Trophy, Book, Star, Award, Plus, Trash2 } from "lucide-react";
+import {
+  CalendarIcon,
+  Loader2,
+  Trophy,
+  Book,
+  Star,
+  Award,
+  Plus,
+} from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
@@ -93,165 +89,12 @@ function AddEventButton() {
   );
 }
 
-// Event Detail Dialog Component
-function EventDetailDialog({
-  event,
-  isOpen,
-  onClose
-}: {
-  event: PortfolioEntry | null;
-  isOpen: boolean;
-  onClose: () => void;
-}) {
-  const { toast } = useToast();
-  const [dialogMode, setDialogMode] = useState<'detail' | 'delete_confirmation'>('detail');
-
-  const deleteMutation = useMutation({
-    mutationFn: async (eventId: number) => {
-      const res = await apiRequest(
-        "DELETE",
-        `/api/portfolio/${eventId}`,
-      );
-      if (!res.ok) {
-        throw new Error("Failed to delete event");
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [`/api/students/${event?.studentId}/portfolio`]
-      });
-      toast({
-        title: "Success",
-        description: "Timeline event deleted successfully",
-      });
-      onClose();
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  if (!event) return null;
-
-  const handleDelete = () => {
-    setDialogMode('delete_confirmation');
-  };
-
-  const confirmDelete = () => {
-    deleteMutation.mutate(event.id);
-  };
-
-  const handleCancel = () => {
-    setDialogMode('detail');
-  };
-
-  return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-      if (!open) {
-        onClose();
-        // Reset the dialog mode when closing
-        setDialogMode('detail');
-      }
-    }}>
-      <DialogContent className="sm:max-w-[500px]">
-        {dialogMode === 'detail' ? (
-          <>
-            <DialogHeader>
-              <DialogTitle>{event.title}</DialogTitle>
-              <DialogDescription>
-                {format(new Date(event.achievementDate), "MMMM d, yyyy")}
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4 py-4">
-              {event.description && (
-                <div>
-                  <h4 className="text-sm font-medium mb-1">Description</h4>
-                  <p className="text-sm text-muted-foreground">{event.description}</p>
-                </div>
-              )}
-
-              <div>
-                <h4 className="text-sm font-medium mb-1">Type</h4>
-                <p className="text-sm text-muted-foreground capitalize">{event.type}</p>
-              </div>
-
-              {event.feedback && (
-                <div>
-                  <h4 className="text-sm font-medium mb-1">Feedback</h4>
-                  <p className="text-sm text-muted-foreground">{event.feedback}</p>
-                </div>
-              )}
-            </div>
-
-            <DialogFooter>
-              <Button
-                variant="destructive"
-                onClick={handleDelete}
-                disabled={deleteMutation.isPending}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Event
-              </Button>
-            </DialogFooter>
-          </>
-        ) : (
-          <>
-            <DialogHeader>
-              <DialogTitle>Delete Timeline Event</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to delete this event? This action cannot be undone.
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="py-4">
-              <div className="bg-muted/20 p-4 rounded-md mb-4">
-                <h3 className="font-medium">{event.title}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {format(new Date(event.achievementDate), "MMMM d, yyyy")}
-                </p>
-              </div>
-            </div>
-
-            <DialogFooter className="flex justify-between sm:justify-between">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleCancel}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={confirmDelete}
-                disabled={deleteMutation.isPending}
-              >
-                {deleteMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <Trash2 className="h-4 w-4 mr-2" />
-                )}
-                Delete Event
-              </Button>
-            </DialogFooter>
-          </>
-        )}
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 export function StudentTimeline({ studentId }: StudentTimelineProps) {
   const { toast } = useToast();
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<PortfolioEntry | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
-  // Register the dialog state setter for the Add button
-  globalDialogState.setIsOpen = setAddDialogOpen;
+  // Register the dialog state setter
+  globalDialogState.setIsOpen = setDialogOpen;
 
   const { data: entries = [], isLoading } = useQuery<PortfolioEntry[]>({
     queryKey: [`/api/students/${studentId}/portfolio`],
@@ -305,7 +148,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
         description: "Timeline entry added successfully",
       });
       form.reset();
-      setAddDialogOpen(false);
+      setDialogOpen(false);
     },
     onError: (error: Error) => {
       toast({
@@ -362,15 +205,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
               .map((entry) => (
                 <div
                   key={entry.id}
-                  className="flex gap-4 items-start pl-12 pb-8 relative cursor-pointer hover:bg-muted/5 rounded-lg p-4 transition-colors"
-                  onClick={() => setSelectedEvent(entry)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      setSelectedEvent(entry);
-                    }
-                  }}
+                  className="flex gap-4 items-start pl-12 pb-8 relative"
                 >
                   <div className="absolute left-0 p-1 rounded-full bg-background border-2 border-primary z-10">
                     {getEntryIcon(entry.type)}
@@ -403,8 +238,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
         </div>
       )}
 
-      {/* Add Event Dialog */}
-      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Timeline Entry</DialogTitle>
@@ -543,7 +377,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setAddDialogOpen(false)}
+                  onClick={() => setDialogOpen(false)}
                 >
                   Cancel
                 </Button>
@@ -558,13 +392,6 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
           </Form>
         </DialogContent>
       </Dialog>
-
-      {/* Event Detail Dialog */}
-      <EventDetailDialog
-        event={selectedEvent}
-        isOpen={!!selectedEvent}
-        onClose={() => setSelectedEvent(null)}
-      />
     </div>
   );
 }
