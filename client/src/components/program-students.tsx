@@ -221,7 +221,6 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                 <TableHead>Name</TableHead>
                 <TableHead>Parent's Email Address</TableHead>
                 <TableHead>Grade</TableHead>
-                <TableHead className="w-[200px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

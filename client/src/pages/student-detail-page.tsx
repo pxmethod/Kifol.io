@@ -10,7 +10,7 @@ import { StudentTimeline } from "@/components/student-timeline";
 
 /**
  * StudentDetailPage Component
- * 
+ *
  * Displays detailed information about a student and their portfolio timeline.
  *
  * @component
@@ -25,11 +25,11 @@ export default function StudentDetailPage({
   params: { programId: string; studentId: string };
 }) {
   // Fetch student details
-  const { 
+  const {
     data: student,
     isLoading,
     isError,
-    error
+    error,
   } = useQuery<Student, ApiError>({
     queryKey: [`/api/students/${params.studentId}`],
   });
@@ -49,7 +49,9 @@ export default function StudentDetailPage({
             </Button>
           </Link>
           <div className="mt-8 text-center">
-            <h2 className="text-xl font-semibold mb-2">Error Loading Student</h2>
+            <h2 className="text-xl font-semibold mb-2">
+              Error Loading Student
+            </h2>
             <p className="text-muted-foreground mb-4">
               {error?.message || "Unable to load student details"}
             </p>
@@ -64,7 +66,10 @@ export default function StudentDetailPage({
       <div className="min-h-screen bg-background">
         {/* Header Section */}
         <header className="bg-[#000000] text-white" role="banner">
-          <nav className="container mx-auto px-4 py-8" aria-label="Back navigation">
+          <nav
+            className="container mx-auto px-4 py-8"
+            aria-label="Back navigation"
+          >
             <Link href={`/programs/${params.programId}?tab=students`}>
               <Button
                 variant="link"
@@ -82,7 +87,15 @@ export default function StudentDetailPage({
                   <GraduationCap className="h-4 w-4" aria-hidden="true" />
                   <span>Grade {student.grade}</span>
                 </div>
-                <p className="text-gray-200 mt-2">Parent Email: {student.email}</p>
+                <p className="text-gray-200 mt-2">
+                  Parent Email:{" "}
+                  <a
+                    href={`mailto:${student.email}`}
+                    className="hover:underline font-bold"
+                  >
+                    {student.email}
+                  </a>
+                </p>
               </div>
             </div>
           </nav>
@@ -92,7 +105,9 @@ export default function StudentDetailPage({
         <main className="container mx-auto px-4 py-8">
           <section aria-labelledby="timeline-heading">
             <div className="flex justify-between items-center mb-6">
-              <h2 id="timeline-heading" className="text-2xl font-semibold">Timeline</h2>
+              <h2 id="timeline-heading" className="text-2xl font-semibold">
+                Timeline
+              </h2>
               <StudentTimeline.AddEventButton />
             </div>
 
