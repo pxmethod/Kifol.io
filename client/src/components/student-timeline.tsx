@@ -2,7 +2,6 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { PortfolioEntry, insertPortfolioEntrySchema } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -39,16 +38,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
 
-// Modified schema to handle Date object in the form
 const today = new Date();
 today.setHours(0, 0, 0, 0); // Normalize today's date to midnight
 
@@ -57,8 +51,12 @@ const timelineFormSchema = z.object({
   description: insertPortfolioEntrySchema.shape.description,
   achievementDate: z
     .date()
+    .transform((date) => {
+      // Convert to YYYY-MM-DD string to prevent timezone shifts
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    })
     .refine(
-      (date) => date.setHours(0, 0, 0, 0) <= today.getTime(),
+      (date) => date.getTime() <= today.getTime(),
       "Cannot select future dates",
     ),
   type: insertPortfolioEntrySchema.shape.type,
@@ -390,7 +388,10 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={addEntryMutation.isPending}>
+                <Button
+                  type="submit"
+                  disabled={addEntryMutation.isPending}
+                >
                   {addEntryMutation.isPending && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
