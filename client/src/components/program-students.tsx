@@ -227,25 +227,24 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
             <TableBody>
               {filteredStudents.map((student) => (
                 <TableRow key={student.id}>
-                  <TableCell className="font-medium">{student.name}</TableCell>
+                  <TableCell>
+                    <Link href={`/programs/${programId}/students/${student.id}`}>
+                      <span className="font-medium hover:underline cursor-pointer">
+                        {student.name}
+                      </span>
+                    </Link>
+                  </TableCell>
                   <TableCell>{student.email}</TableCell>
                   <TableCell>{student.grade}</TableCell>
                   <TableCell>
-                    <div className="flex gap-2">
-                      <Link href={`/programs/${programId}/students/${student.id}`}>
-                        <Button variant="ghost" size="sm">
-                          View Details
-                        </Button>
-                      </Link>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteClick(student)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteClick(student)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -259,7 +258,11 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
               <CardContent className="pt-6">
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
-                    <h3 className="font-medium">{student.name}</h3>
+                    <Link href={`/programs/${programId}/students/${student.id}`}>
+                      <h3 className="font-medium hover:underline cursor-pointer">
+                        {student.name}
+                      </h3>
+                    </Link>
                     <p className="text-sm text-muted-foreground">
                       {student.email}
                     </p>
@@ -268,21 +271,14 @@ export function ProgramStudents({ programId }: ProgramStudentsProps) {
                       <span className="text-sm">Grade {student.grade}</span>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Link href={`/programs/${programId}/students/${student.id}`}>
-                      <Button variant="ghost" size="sm">
-                        View Details
-                      </Button>
-                    </Link>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteClick(student)}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDeleteClick(student)}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
