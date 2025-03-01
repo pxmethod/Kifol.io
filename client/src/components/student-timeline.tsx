@@ -211,9 +211,9 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                     {getEntryIcon(entry.type)}
                   </div>
                   <div className="pt-1 space-y-2">
-                    <div className="flex items-baseline gap-2">
+                    <div className="space-y-1">
                       <h3 className="text-lg font-semibold">{entry.title}</h3>
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-sm text-muted-foreground block">
                         {format(
                           new Date(entry.achievementDate),
                           "MMMM d, yyyy",
