@@ -60,6 +60,12 @@ export default function ProgramDetailPage({
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.search.includes('tab=students') ? 'students' : 'sessions';
+    }
+    return 'sessions';
+  });
 
   // Fetch program details
   const {
@@ -200,6 +206,19 @@ export default function ProgramDetailPage({
     setEditDialogOpen(false); // Only close dialog on form submit
   });
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (value === 'students') {
+        url.searchParams.set('tab', 'students');
+      } else {
+        url.searchParams.delete('tab');
+      }
+      window.history.pushState({}, '', url.toString());
+    }
+  };
+
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background">
@@ -262,18 +281,9 @@ export default function ProgramDetailPage({
 
         {/* Content Section */}
         <main className="container mx-auto px-4 py-8">
-          {/* Using state for tab management */}
           <Tabs
-            value={typeof window !== "undefined" && window.location.search.includes("tab=students") ? "students" : "sessions"}
-            onValueChange={(value) => {
-              const url = new URL(window.location.href);
-              if (value === "students") {
-                url.searchParams.set("tab", "students");
-              } else {
-                url.searchParams.delete("tab");
-              }
-              window.history.pushState({}, "", url.toString());
-            }}
+            value={activeTab}
+            onValueChange={handleTabChange}
             className="w-full"
             aria-label="Program content tabs"
           >
