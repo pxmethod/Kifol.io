@@ -208,11 +208,7 @@ function EventDetailDialog({
               <Trash2 className="h-4 w-4 mr-2" />
               Delete Event
             </Button>
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="ml-auto"
-            >
+            <Button variant="outline" onClick={onClose} className="ml-auto">
               Cancel
             </Button>
           </DialogFooter>
@@ -366,7 +362,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
               .map((entry) => (
                 <div
                   key={entry.id}
-                  className="flex gap-4 items-start pl-12 pb-8 relative cursor-pointer hover:bg-muted/5 rounded-lg p-4 transition-colors"
+                  className="flex gap-4 items-start pl-12 pb-8 relative cursor-pointer hover:bg-gray-50 rounded-lg p-4 transition-colors"
                   onClick={() => setSelectedEvent(entry)}
                   role="button"
                   tabIndex={0}
@@ -421,7 +417,9 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Title<span className="text-red-500">*</span></FormLabel>
+                    <FormLabel>
+                      Title<span className="text-red-500">*</span>
+                    </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Enter entry title"
