@@ -4,7 +4,12 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Pencil, ArrowLeft, CalendarIcon, X } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -16,7 +21,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
@@ -32,10 +41,9 @@ import { programFormSchema, ProgramFormData } from "@/types/program";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ApiError } from "@/types/common";
 
-
 /**
  * ProgramDetailPage Component
- * 
+ *
  * Displays detailed information about an educational program and allows editing.
  * Shows program sessions and enrolled students in separate tabs.
  *
@@ -54,11 +62,11 @@ export default function ProgramDetailPage({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Fetch program details
-  const { 
+  const {
     data: program,
     isLoading,
     isError,
-    error
+    error,
   } = useQuery<Program, ApiError>({
     queryKey: [`/api/programs/${params.id}`],
   });
@@ -71,29 +79,29 @@ export default function ProgramDetailPage({
       if (data instanceof FormData) {
         // If it's already FormData, use it directly
         return fetch(`/api/programs/${params.id}`, {
-          method: 'PATCH',
+          method: "PATCH",
           body: data,
-        }).then(res => {
-          if (!res.ok) throw new Error('Failed to update program');
+        }).then((res) => {
+          if (!res.ok) throw new Error("Failed to update program");
           return res.json();
         });
       }
 
       // Otherwise, create FormData from ProgramFormData
-      formData.append('title', data.title);
-      formData.append('description', data.description || '');
-      formData.append('startDate', data.startDate.toISOString());
-      formData.append('endDate', data.endDate.toISOString());
+      formData.append("title", data.title);
+      formData.append("description", data.description || "");
+      formData.append("startDate", data.startDate.toISOString());
+      formData.append("endDate", data.endDate.toISOString());
 
       if (data.coverImage) {
-        formData.append('coverImage', data.coverImage);
+        formData.append("coverImage", data.coverImage);
       }
 
       return fetch(`/api/programs/${params.id}`, {
-        method: 'PATCH',
+        method: "PATCH",
         body: formData,
-      }).then(res => {
-        if (!res.ok) throw new Error('Failed to update program');
+      }).then((res) => {
+        if (!res.ok) throw new Error("Failed to update program");
         return res.json();
       });
     },
@@ -136,7 +144,7 @@ export default function ProgramDetailPage({
         setImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
-      form.setValue('coverImage', file);
+      form.setValue("coverImage", file);
     }
   };
 
@@ -146,17 +154,17 @@ export default function ProgramDetailPage({
     const formData = new FormData();
     const currentValues = form.getValues();
 
-    formData.append('title', currentValues.title);
-    formData.append('description', currentValues.description || '');
-    formData.append('startDate', currentValues.startDate.toISOString());
-    formData.append('endDate', currentValues.endDate.toISOString());
-    formData.append('removeCoverImage', 'true');
+    formData.append("title", currentValues.title);
+    formData.append("description", currentValues.description || "");
+    formData.append("startDate", currentValues.startDate.toISOString());
+    formData.append("endDate", currentValues.endDate.toISOString());
+    formData.append("removeCoverImage", "true");
 
     // Update the program but keep dialog open
     updateProgramMutation.mutate(formData);
 
     // Clear the form state and preview
-    form.setValue('coverImage', undefined);
+    form.setValue("coverImage", undefined);
     setImagePreview(null);
   };
 
@@ -175,7 +183,9 @@ export default function ProgramDetailPage({
             </Button>
           </Link>
           <div className="mt-8 text-center">
-            <h2 className="text-xl font-semibold mb-2">Error Loading Program</h2>
+            <h2 className="text-xl font-semibold mb-2">
+              Error Loading Program
+            </h2>
             <p className="text-muted-foreground mb-4">
               {error?.message || "Unable to load program details"}
             </p>
@@ -194,22 +204,22 @@ export default function ProgramDetailPage({
     <ErrorBoundary>
       <div className="min-h-screen bg-background">
         {/* Header Section */}
-        <header 
-          className="relative text-white" 
+        <header
+          className="relative text-white"
           role="banner"
           style={{
-            background: program.coverImage 
-              ? `url(${program.coverImage}) no-repeat center center` 
-              : '#000000',
-            backgroundSize: 'cover',
+            background: program.coverImage
+              ? `url(${program.coverImage}) no-repeat center center`
+              : "#000000",
+            backgroundSize: "cover",
           }}
         >
           {/* Overlay for text legibility when image is present */}
           {program.coverImage && (
-            <div 
-              className="absolute inset-0" 
-              style={{ 
-                backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundColor: "rgba(0, 0, 0, 0.6)",
               }}
             />
           )}
@@ -253,9 +263,14 @@ export default function ProgramDetailPage({
         {/* Content Section */}
         <main className="container mx-auto px-4 py-8">
           {/* Using regular state instead of defaultValue with window check */}
-          <Tabs 
-            defaultValue="sessions" 
-            value={typeof window !== 'undefined' && window.location.search.includes('tab=students') ? 'students' : 'sessions'}
+          <Tabs
+            defaultValue="sessions"
+            value={
+              typeof window !== "undefined" &&
+              window.location.search.includes("tab=students")
+                ? "students"
+                : "sessions"
+            }
             className="w-full"
             aria-label="Program content tabs"
           >
@@ -263,10 +278,20 @@ export default function ProgramDetailPage({
               <TabsTrigger value="sessions">Sessions</TabsTrigger>
               <TabsTrigger value="students">Students</TabsTrigger>
             </TabsList>
-            <TabsContent value="sessions" className="mt-8" role="tabpanel" aria-labelledby="sessions-tab">
+            <TabsContent
+              value="sessions"
+              className="mt-8"
+              role="tabpanel"
+              aria-labelledby="sessions-tab"
+            >
               <ProgramSessions programId={parseInt(params.id)} />
             </TabsContent>
-            <TabsContent value="students" className="mt-8" role="tabpanel" aria-labelledby="students-tab">
+            <TabsContent
+              value="students"
+              className="mt-8"
+              role="tabpanel"
+              aria-labelledby="students-tab"
+            >
               <ProgramStudents programId={parseInt(params.id)} />
             </TabsContent>
           </Tabs>
