@@ -397,7 +397,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                         <img
                           src={entry.mediaUrl}
                           alt={`Media for ${entry.title}`}
-                          className="w-[50px] h-[50px] object-cover rounded-md"
+                          className="w-[200px] h-[150px] object-cover rounded-md"
                         />
                       </div>
                     )}
