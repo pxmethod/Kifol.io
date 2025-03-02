@@ -80,7 +80,6 @@ export const portfolioEntries = pgTable("portfolio_entries", {
   description: text("description"),
   achievementDate: date("achievement_date").notNull(),
   type: text("type").notNull(),
-  feedback: text("feedback"),
 });
 
 // Relations

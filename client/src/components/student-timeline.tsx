@@ -67,7 +67,6 @@ const timelineFormSchema = z.object({
   description: insertPortfolioEntrySchema.shape.description,
   achievementDate: z.date().max(new Date(), "Cannot select future dates"),
   type: insertPortfolioEntrySchema.shape.type,
-  feedback: insertPortfolioEntrySchema.shape.feedback.optional(),
 });
 
 type TimelineFormData = z.infer<typeof timelineFormSchema>;
@@ -188,14 +187,7 @@ function EventDetailDialog({
               </p>
             </div>
 
-            {event.feedback && (
-              <div>
-                <h4 className="text-sm font-medium mb-1">Feedback</h4>
-                <p className="text-sm text-muted-foreground">
-                  {event.feedback}
-                </p>
-              </div>
-            )}
+            
           </div>
 
           <DialogFooter className="flex justify-between items-center">
@@ -264,7 +256,6 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
       description: "",
       achievementDate: new Date(),
       type: "achievement",
-      feedback: "",
     },
   });
 
@@ -390,12 +381,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                         {entry.description}
                       </p>
                     )}
-                    {entry.feedback && (
-                      <p className="text-sm">
-                        <span className="font-medium">Feedback:</span>{" "}
-                        {entry.feedback}
-                      </p>
-                    )}
+                    
                   </div>
                 </div>
               ))}
@@ -522,24 +508,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="feedback"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Feedback (Optional)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Enter feedback"
-                        className="resize-none"
-                        {...field}
-                        value={field.value || ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              
               <div className="flex justify-end gap-2">
                 <Button
                   type="button"
