@@ -248,7 +248,7 @@ export function registerRoutes(app: Express): Server {
     res.json(entries);
   });
 
-  app.post("/api/students/:studentId/portfolio", async (req, res) => {
+  app.post("/api/students/:studentId/portfolio", upload.single('media'), async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 
     const studentId = parseInt(req.params.studentId);
@@ -267,12 +267,27 @@ export function registerRoutes(app: Express): Server {
     }
 
     try {
-      // Create portfolio entry
-      const entry = await storage.createPortfolioEntry(studentId, req.body);
+      let mediaUrl = null;
+      let mediaType = null;
+
+      if (req.file) {
+        // Convert buffer to base64 string for storage
+        const base64Image = req.file.buffer.toString('base64');
+        mediaUrl = `data:${req.file.mimetype};base64,${base64Image}`;
+        mediaType = req.file.mimetype;
+      }
+
+      // Create portfolio entry with media data
+      const entry = await storage.createPortfolioEntry(studentId, {
+        ...req.body,
+        mediaUrl,
+        mediaType,
+      });
+
       res.status(201).json(entry);
     } catch (error) {
       console.error("Error creating portfolio entry:", error);
-      res.status(400).json({ message: error.message });
+      res.status(400).json({ message: error instanceof Error ? error.message : 'Unknown error occurred' });
     }
   });
 

@@ -40,6 +40,7 @@ import {
   Award,
   Plus,
   Trash2,
+  Upload,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -61,12 +62,13 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
 
-// Modified schema to handle Date object in the form
+// Modified schema to handle file uploads
 const timelineFormSchema = z.object({
   title: insertPortfolioEntrySchema.shape.title.min(1, "Title is required"),
   description: insertPortfolioEntrySchema.shape.description,
   achievementDate: z.date().max(new Date(), "Cannot select future dates"),
   type: insertPortfolioEntrySchema.shape.type,
+  mediaFile: z.instanceof(File).optional(),
 });
 
 type TimelineFormData = z.infer<typeof timelineFormSchema>;
@@ -82,13 +84,11 @@ type StudentTimelineProps = {
   studentId: number;
 };
 
-// Create a singleton for dialog state management
 let globalDialogState = {
   isOpen: false,
   setIsOpen: null as null | ((isOpen: boolean) => void),
 };
 
-// Add Event Button Component
 function AddEventButton() {
   return (
     <Button
@@ -101,7 +101,6 @@ function AddEventButton() {
   );
 }
 
-// Event Detail Dialog Component
 function EventDetailDialog({
   event,
   isOpen,
@@ -187,7 +186,7 @@ function EventDetailDialog({
               </p>
             </div>
 
-            
+
           </div>
 
           <DialogFooter className="flex justify-between items-center">
@@ -242,7 +241,6 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
     null,
   );
 
-  // Register the dialog state setter for the Add button
   globalDialogState.setIsOpen = setAddDialogOpen;
 
   const { data: entries = [], isLoading } = useQuery<PortfolioEntry[]>({
@@ -256,34 +254,30 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
       description: "",
       achievementDate: new Date(),
       type: "achievement",
+      mediaFile: undefined,
     },
-    mode: "onChange"
+    mode: "onChange",
   });
 
   const addEntryMutation = useMutation({
     mutationFn: async (data: TimelineFormData) => {
-      // Convert form data to API format
-      const apiData = {
-        ...data,
-        achievementDate: data.achievementDate.toISOString().split("T")[0],
-      };
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("description", data.description || "");
+      formData.append("achievementDate", data.achievementDate.toISOString().split("T")[0]);
+      formData.append("type", data.type);
 
-      const res = await apiRequest(
-        "POST",
-        `/api/students/${studentId}/portfolio`,
-        apiData,
-      );
+      if (data.mediaFile) {
+        formData.append("media", data.mediaFile);
+      }
 
-      // Check if response is valid before parsing JSON
+      const res = await fetch(`/api/students/${studentId}/portfolio`, {
+        method: "POST",
+        body: formData,
+      });
+
       if (!res.ok) {
-        const text = await res.text();
-        // If the response contains HTML, it's likely an error page
-        if (text.includes("<!DOCTYPE html>")) {
-          throw new Error(
-            "Server returned an HTML error page instead of JSON. Please check the server logs.",
-          );
-        }
-        throw new Error(`Server error: ${text}`);
+        throw new Error("Failed to create portfolio entry");
       }
 
       return res.json();
@@ -341,7 +335,6 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
         </div>
       ) : (
         <div className="relative">
-          {/* Continuous vertical timeline line */}
           <div className="absolute top-0 bottom-0 left-4 w-0.5 bg-primary/20"></div>
 
           <div className="space-y-8 relative">
@@ -382,7 +375,6 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                         {entry.description}
                       </p>
                     )}
-                    
                   </div>
                 </div>
               ))}
@@ -390,7 +382,6 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
         </div>
       )}
 
-      {/* Add Event Dialog */}
       <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -413,7 +404,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                         {...field}
                         onChange={(e) => {
                           field.onChange(e);
-                          form.trigger("title"); // Trigger validation on change
+                          form.trigger("title");
                         }}
                         value={field.value || ""}
                       />
@@ -509,7 +500,57 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   </FormItem>
                 )}
               />
-              
+
+              <FormField
+                control={form.control}
+                name="mediaFile"
+                render={({ field: { onChange, value, ...field } }) => (
+                  <FormItem>
+                    <FormLabel>Media Upload (Optional)</FormLabel>
+                    <FormControl>
+                      <div className="flex items-center gap-4">
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              onChange(file);
+                            }
+                          }}
+                          className="hidden"
+                          id="media-upload"
+                          {...field}
+                        />
+                        <label
+                          htmlFor="media-upload"
+                          className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-secondary"
+                        >
+                          <Upload className="h-4 w-4" />
+                          Choose File
+                        </label>
+                        {value && (
+                          <span className="text-sm text-muted-foreground">
+                            {(value as File).name}
+                          </span>
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {form.watch("mediaFile") && (
+                <div className="mt-4">
+                  <img
+                    src={URL.createObjectURL(form.watch("mediaFile"))}
+                    alt="Preview"
+                    className="max-w-full h-auto rounded-md"
+                  />
+                </div>
+              )}
+
               <div className="flex justify-end gap-2">
                 <Button
                   type="button"
@@ -536,7 +577,6 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Event Detail Dialog */}
       <EventDetailDialog
         event={selectedEvent}
         isOpen={!!selectedEvent}
@@ -546,5 +586,4 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
   );
 }
 
-// Export the AddEventButton as a static property
 StudentTimeline.AddEventButton = AddEventButton;
