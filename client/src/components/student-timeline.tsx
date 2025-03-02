@@ -257,6 +257,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
       achievementDate: new Date(),
       type: "achievement",
     },
+    mode: "onChange"
   });
 
   const addEntryMutation = useMutation({
@@ -521,7 +522,6 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   type="submit"
                   disabled={
                     addEntryMutation.isPending ||
-                    !form.formState.isValid ||
                     !form.getValues("title")?.trim()
                   }
                 >
