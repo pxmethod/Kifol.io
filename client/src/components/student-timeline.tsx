@@ -186,7 +186,18 @@ function EventDetailDialog({
               </p>
             </div>
 
-
+            {event.mediaUrl && (
+              <div>
+                <h4 className="text-sm font-medium mb-2">Media</h4>
+                <div className="grid grid-cols-3 gap-2">
+                  <img
+                    src={event.mediaUrl}
+                    alt="Event media"
+                    className="w-full h-auto rounded-md"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <DialogFooter className="flex justify-between items-center">
@@ -363,7 +374,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   <div className="absolute left-0 p-1 rounded-full bg-background border-2 border-primary z-10">
                     {getEntryIcon(entry.type)}
                   </div>
-                  <div className="pt-1 space-y-2">
+                  <div className="pt-1 space-y-2 w-full">
                     <div className="space-y-1">
                       <h3 className="text-lg font-semibold">{entry.title}</h3>
                       <span className="text-sm text-muted-foreground block">
@@ -377,6 +388,15 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                       <p className="text-muted-foreground">
                         {entry.description}
                       </p>
+                    )}
+                    {entry.mediaUrl && (
+                      <div className="mt-2">
+                        <img
+                          src={entry.mediaUrl}
+                          alt={`Media for ${entry.title}`}
+                          className="w-[50px] h-[50px] object-cover rounded-md"
+                        />
+                      </div>
                     )}
                   </div>
                 </div>
