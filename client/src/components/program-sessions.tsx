@@ -23,7 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { Pencil, Loader2 } from "lucide-react";
+import { Pencil, Loader2, CalendarRange } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -181,37 +181,53 @@ export function ProgramSessions({ programId }: ProgramSessionsProps) {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Sessions</h2>
+        <Button onClick={handleAdd}>Add Session</Button>
       </div>
 
-      <div className="grid gap-4">
-        {sessions.map((session) => (
-          <Card key={session.id}>
-            <CardContent className="pt-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium">{session.name}</h3>
-                  {session.description && (
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {session.description}
-                    </p>
-                  )}
+      {isLoading ? (
+        <div className="flex justify-center">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      ) : sessions.length === 0 ? (
+        <Card className="border-dashed">
+          <CardContent className="pt-6 text-center">
+            <h3 className="text-xl font-semibold mb-2">No Sessions Found</h3>
+            <p className="text-muted-foreground mb-4">
+              Add sessions to this program to get started
+            </p>
+            <Button onClick={() => setDialogOpen(true)}>
+              <CalendarRange className="mr-2 h-4 w-4" />
+              Add First Session
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4">
+          {sessions.map((session) => (
+            <Card key={session.id}>
+              <CardContent className="pt-6">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-medium">{session.name}</h3>
+                    {session.description && (
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {session.description}
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEdit(session)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleEdit(session)}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <Button onClick={handleAdd} className="w-full mt-6">
-        Add Session
-      </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       <Dialog open={dialogOpen} onOpenChange={handleCloseDialog}>
         <DialogContent>
