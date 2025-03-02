@@ -62,11 +62,14 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
 
+const now = new Date();
+now.setHours(0, 0, 0, 0);
+
 // Modified schema to handle file uploads
 const timelineFormSchema = z.object({
   title: insertPortfolioEntrySchema.shape.title.min(1, "Title is required"),
   description: insertPortfolioEntrySchema.shape.description,
-  achievementDate: z.date().max(new Date(), "Cannot select future dates"),
+  achievementDate: z.date().max(now, "Cannot select future dates"),
   type: insertPortfolioEntrySchema.shape.type,
   mediaFile: z.instanceof(File).optional(),
 });
@@ -263,7 +266,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
     defaultValues: {
       title: "",
       description: "",
-      achievementDate: new Date(),
+      achievementDate: now,
       type: "achievement",
       mediaFile: undefined,
     },
