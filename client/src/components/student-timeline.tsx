@@ -264,7 +264,10 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
       const formData = new FormData();
       formData.append("title", data.title);
       formData.append("description", data.description || "");
-      formData.append("achievementDate", data.achievementDate.toISOString().split("T")[0]);
+      formData.append(
+        "achievementDate",
+        data.achievementDate.toISOString().split("T")[0],
+      );
       formData.append("type", data.type);
 
       if (data.mediaFile) {
@@ -383,7 +386,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
       )}
 
       <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add Timeline Entry</DialogTitle>
           </DialogHeader>
@@ -546,12 +549,12 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   <img
                     src={URL.createObjectURL(form.watch("mediaFile"))}
                     alt="Preview"
-                    className="max-w-full h-auto rounded-md"
+                    className="max-h-[200px] w-auto object-contain rounded-md"
                   />
                 </div>
               )}
 
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-2 mt-6">
                 <Button
                   type="button"
                   variant="outline"
