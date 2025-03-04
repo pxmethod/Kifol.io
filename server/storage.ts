@@ -35,7 +35,7 @@ export interface IStorage {
   deleteSession(id: number): Promise<void>;
 
   // New Student methods
-  createStudent(student: InsertStudent & { parentEmail: string }): Promise<Student>;
+  createStudent(student: InsertStudent & { parentEmail: string; programId: number }): Promise<Student>;
   getStudent(id: number): Promise<Student | undefined>;
   getStudentByEmail(email: string): Promise<Student | undefined>;
   getStudentBySlug(slug: string): Promise<Student | undefined>;
@@ -60,7 +60,7 @@ export interface IStorage {
   getParentUserByEmail(email: string): Promise<ParentUser | undefined>;
 
   // New parent invitation methods
-  createParentInvitation(email: string): Promise<ParentInvitation>;
+  createParentInvitation(email: string, programId: number): Promise<ParentInvitation>;
   getParentInvitation(token: string): Promise<ParentInvitation | undefined>;
   acceptParentInvitation(token: string): Promise<void>;
   linkStudentToParent(studentId: number, parentId: number): Promise<void>;
@@ -174,8 +174,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   // New Student methods implementation
-  async createStudent(student: InsertStudent & { parentEmail: string }): Promise<Student> {
-    const { parentEmail, ...studentData } = student;
+  async createStudent(
+    student: InsertStudent & { parentEmail: string; programId: number }
+  ): Promise<Student> {
+    const { parentEmail, programId, ...studentData } = student;
 
     // Generate a unique slug for the student
     const slug = nanoid();
@@ -198,13 +200,14 @@ export class DatabaseStorage implements IStorage {
         // Create parent invitation only if we have a valid email and no existing pending invitation
         if (parentEmail) {
           try {
-            // Check for existing pending invitation
+            // Check for existing pending invitation for this program
             const existingInvitation = await tx
               .select()
               .from(parentInvitations)
               .where(
                 and(
                   eq(parentInvitations.email, parentEmail),
+                  eq(parentInvitations.programId, programId),
                   eq(parentInvitations.accepted, false),
                   sql`${parentInvitations.expiresAt} > NOW()`
                 )
@@ -213,12 +216,19 @@ export class DatabaseStorage implements IStorage {
             let invitation;
 
             if (existingInvitation.length === 0) {
-              // No valid pending invitation exists, create a new one
-              invitation = await this.createParentInvitation(parentEmail);
+              // No valid pending invitation exists for this program, create a new one
+              invitation = await this.createParentInvitation(parentEmail, programId);
+
+              // Get program details for the email
+              const program = await this.getProgram(programId);
+              if (!program) {
+                throw new Error(`Program with ID ${programId} not found`);
+              }
 
               // Generate and send the invitation email
               const emailContent = generateParentInvitationEmail(
                 newStudent.name,
+                program.title,
                 invitation.token
               );
 
@@ -230,12 +240,12 @@ export class DatabaseStorage implements IStorage {
               });
 
               if (!emailSent) {
-                console.error(`Failed to send parent invitation email to ${parentEmail} for student ${newStudent.name}`);
+                console.error(`Failed to send parent invitation email to ${parentEmail} for student ${newStudent.name} in program ${program.title}`);
               }
             } else {
               // Use existing invitation
               invitation = existingInvitation[0];
-              console.log(`Using existing invitation for parent email ${parentEmail}`);
+              console.log(`Using existing invitation for parent email ${parentEmail} in program ${programId}`);
             }
           } catch (error) {
             console.error('Error handling parent invitation:', error);
@@ -249,6 +259,9 @@ export class DatabaseStorage implements IStorage {
           .set({ parentId: existingParent.id })
           .where(eq(students.id, newStudent.id));
       }
+
+      // Add student to the program
+      await this.addStudentToProgram(programId, newStudent.id);
 
       return newStudent;
     });
@@ -422,7 +435,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // New parent invitation methods
-  async createParentInvitation(email: string): Promise<ParentInvitation> {
+  async createParentInvitation(email: string, programId: number): Promise<ParentInvitation> {
     const token = nanoid();
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiration
@@ -431,9 +444,10 @@ export class DatabaseStorage implements IStorage {
       .insert(parentInvitations)
       .values({
         email,
+        programId,
         token,
         expiresAt,
-        accepted: false, 
+        accepted: false,
       })
       .returning();
     return invitation;
@@ -446,7 +460,7 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(parentInvitations.token, token),
-          eq(parentInvitations.accepted, false), 
+          eq(parentInvitations.accepted, false),
           sql`${parentInvitations.expiresAt} > NOW()`
         )
       );
