@@ -4,6 +4,7 @@ import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertProgramSchema, insertSessionSchema, insertStudentSchema } from "@shared/schema";
 import multer from "multer";
+import { sendEmail } from "./services/mail";
 
 // Configure multer for handling file uploads
 const upload = multer({
@@ -19,6 +20,33 @@ const upload = multer({
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
+
+  // Add test route for email verification
+  app.post("/api/test-email", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    try {
+      const result = await sendEmail({
+        to: req.body.email,
+        subject: "Test Email from Student Progress App",
+        text: "This is a test email to verify the Mailgun configuration.",
+        html: "<p>This is a test email to verify the Mailgun configuration.</p>"
+      });
+
+      if (result) {
+        res.json({ success: true, message: "Test email sent successfully" });
+      } else {
+        res.status(500).json({ success: false, message: "Failed to send test email" });
+      }
+    } catch (error) {
+      console.error("Error sending test email:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Error sending test email",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
 
   // Programs
   app.get("/api/programs", async (req, res) => {

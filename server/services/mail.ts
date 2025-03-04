@@ -1,8 +1,18 @@
 import mailgun from 'mailgun-js';
 
+if (!process.env.MAILGUN_API_KEY) {
+  console.error("MAILGUN_API_KEY environment variable is not set");
+  throw new Error("MAILGUN_API_KEY environment variable must be set");
+}
+
+if (!process.env.MAILGUN_DOMAIN) {
+  console.error("MAILGUN_DOMAIN environment variable is not set");
+  throw new Error("MAILGUN_DOMAIN environment variable must be set");
+}
+
 const mg = mailgun({
-  apiKey: process.env.MAILGUN_API_KEY!,
-  domain: process.env.MAILGUN_DOMAIN!
+  apiKey: process.env.MAILGUN_API_KEY,
+  domain: process.env.MAILGUN_DOMAIN
 });
 
 interface SendEmailParams {
@@ -14,16 +24,34 @@ interface SendEmailParams {
 
 export async function sendEmail({ to, subject, text, html }: SendEmailParams): Promise<boolean> {
   try {
-    await mg.messages().send({
+    console.log('Attempting to send email via Mailgun:', {
+      to,
+      subject,
+      domain: process.env.MAILGUN_DOMAIN,
+      hasApiKey: !!process.env.MAILGUN_API_KEY,
+      from: `Student Progress <noreply@${process.env.MAILGUN_DOMAIN}>`
+    });
+
+    const result = await mg.messages().send({
       from: `Student Progress <noreply@${process.env.MAILGUN_DOMAIN}>`,
       to,
       subject,
       text,
       html
     });
+
+    console.log('Mailgun API response:', result);
+    console.log('Email sent successfully to:', to);
     return true;
   } catch (error) {
     console.error('Failed to send email:', error);
+    if (error instanceof Error) {
+      console.error('Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+    }
     return false;
   }
 }
