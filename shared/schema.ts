@@ -24,10 +24,7 @@ export const parentInvitations = pgTable("parent_invitations", {
   id: serial("id").primaryKey(),
   email: text("email").notNull(),
   token: text("token").notNull().unique(),
-  programId: integer("program_id")
-    .notNull()
-    .references(() => programs.id),
-  accepted: boolean("accepted").default(false),
+  accepted: boolean("accepted").default(false), // Changed from isAccepted to accepted
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -147,7 +144,6 @@ export const insertParentUserSchema = createInsertSchema(parentUsers).omit({
 export const insertParentInvitationSchema = createInsertSchema(parentInvitations).omit({ 
   createdAt: true,
   accepted: true,
-  programId: true,
 });
 export const insertProgramSchema = createInsertSchema(programs).omit({ userId: true });
 export const insertSessionSchema = createInsertSchema(sessions).omit({ programId: true });
@@ -181,10 +177,3 @@ export type ProgramStudent = typeof programStudents.$inferSelect;
 export type InsertProgramStudent = z.infer<typeof insertProgramStudentSchema>;
 export type PortfolioEntry = typeof portfolioEntries.$inferSelect;
 export type InsertPortfolioEntry = z.infer<typeof insertPortfolioEntrySchema>;
-
-export const parentInvitationsRelations = relations(parentInvitations, ({ one }) => ({
-  program: one(programs, {
-    fields: [parentInvitations.programId],
-    references: [programs.id],
-  }),
-}));

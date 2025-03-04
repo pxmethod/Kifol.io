@@ -1,18 +1,8 @@
 import mailgun from 'mailgun-js';
 
-if (!process.env.MAILGUN_API_KEY) {
-  console.error("MAILGUN_API_KEY environment variable is not set");
-  throw new Error("MAILGUN_API_KEY environment variable must be set");
-}
-
-if (!process.env.MAILGUN_DOMAIN) {
-  console.error("MAILGUN_DOMAIN environment variable is not set");
-  throw new Error("MAILGUN_DOMAIN environment variable must be set");
-}
-
 const mg = mailgun({
-  apiKey: process.env.MAILGUN_API_KEY,
-  domain: process.env.MAILGUN_DOMAIN
+  apiKey: process.env.MAILGUN_API_KEY!,
+  domain: process.env.MAILGUN_DOMAIN!
 });
 
 interface SendEmailParams {
@@ -24,60 +14,42 @@ interface SendEmailParams {
 
 export async function sendEmail({ to, subject, text, html }: SendEmailParams): Promise<boolean> {
   try {
-    console.log('Attempting to send email via Mailgun:', {
-      to,
-      subject,
-      domain: process.env.MAILGUN_DOMAIN,
-      hasApiKey: !!process.env.MAILGUN_API_KEY,
-      from: `Student Progress <noreply@${process.env.MAILGUN_DOMAIN}>`
-    });
-
-    const result = await mg.messages().send({
+    await mg.messages().send({
       from: `Student Progress <noreply@${process.env.MAILGUN_DOMAIN}>`,
       to,
       subject,
       text,
       html
     });
-
-    console.log('Mailgun API response:', result);
-    console.log('Email sent successfully to:', to);
     return true;
   } catch (error) {
     console.error('Failed to send email:', error);
-    if (error instanceof Error) {
-      console.error('Error details:', {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
-      });
-    }
     return false;
   }
 }
 
-export function generateParentInvitationEmail(studentName: string, programTitle: string, invitationToken: string): {
+export function generateParentInvitationEmail(studentName: string, invitationToken: string): {
   subject: string;
   text: string;
   html: string;
 } {
   const invitationLink = `${process.env.REPLIT_DOMAIN}/parent-signup/${invitationToken}`;
-
-  const subject = `Invitation to Track ${studentName}'s Progress in ${programTitle}`;
-
+  
+  const subject = `Invitation to Track ${studentName}'s Progress`;
+  
   const text = `
-    You've been invited to track ${studentName}'s educational progress in the ${programTitle} program!
-
+    You've been invited to track ${studentName}'s educational progress!
+    
     Click the following link to create your parent account:
     ${invitationLink}
-
+    
     This link will expire in 7 days.
   `;
-
+  
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2>Welcome to Student Progress Tracking!</h2>
-      <p>You've been invited to track <strong>${studentName}'s</strong> educational progress in the <strong>${programTitle}</strong> program!</p>
+      <p>You've been invited to track <strong>${studentName}'s</strong> educational progress!</p>
       <p>Click the button below to create your parent account:</p>
       <div style="text-align: center; margin: 30px 0;">
         <a href="${invitationLink}" 

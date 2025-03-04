@@ -11,7 +11,6 @@ import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 import { nanoid } from 'nanoid';
-import { sendEmail, generateParentInvitationEmail } from './services/mail';
 
 const PostgresSessionStore = connectPg(session);
 
@@ -35,7 +34,7 @@ export interface IStorage {
   deleteSession(id: number): Promise<void>;
 
   // New Student methods
-  createStudent(student: InsertStudent & { parentEmail: string; programId: number }): Promise<Student>;
+  createStudent(student: InsertStudent & { parentEmail: string }): Promise<Student>;
   getStudent(id: number): Promise<Student | undefined>;
   getStudentByEmail(email: string): Promise<Student | undefined>;
   getStudentBySlug(slug: string): Promise<Student | undefined>;
@@ -60,7 +59,7 @@ export interface IStorage {
   getParentUserByEmail(email: string): Promise<ParentUser | undefined>;
 
   // New parent invitation methods
-  createParentInvitation(email: string, programId: number): Promise<ParentInvitation>;
+  createParentInvitation(email: string): Promise<ParentInvitation>;
   getParentInvitation(token: string): Promise<ParentInvitation | undefined>;
   acceptParentInvitation(token: string): Promise<void>;
   linkStudentToParent(studentId: number, parentId: number): Promise<void>;
@@ -125,15 +124,7 @@ export class DatabaseStorage implements IStorage {
 
   async getProgram(id: number): Promise<Program | undefined> {
     const [program] = await db
-      .select({
-        id: programs.id,
-        userId: programs.userId,
-        title: programs.title,
-        description: programs.description,
-        startDate: programs.startDate,
-        endDate: programs.endDate,
-        coverImage: programs.coverImage,
-      })
+      .select()
       .from(programs)
       .where(eq(programs.id, id));
     return program;
@@ -182,10 +173,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   // New Student methods implementation
-  async createStudent(
-    student: InsertStudent & { parentEmail: string; programId: number }
-  ): Promise<Student> {
-    const { parentEmail, programId, ...studentData } = student;
+  async createStudent(student: InsertStudent & { parentEmail: string }): Promise<Student> {
+    const { parentEmail, ...studentData } = student;
 
     // Generate a unique slug for the student
     const slug = nanoid();
@@ -205,60 +194,9 @@ export class DatabaseStorage implements IStorage {
       const existingParent = await this.getParentUserByEmail(parentEmail);
 
       if (!existingParent) {
-        // Create parent invitation only if we have a valid email and no existing pending invitation
+        // Create parent invitation only if we have a valid email
         if (parentEmail) {
-          try {
-            // Check for existing pending invitation for this program
-            const existingInvitation = await tx
-              .select()
-              .from(parentInvitations)
-              .where(
-                and(
-                  eq(parentInvitations.email, parentEmail),
-                  eq(parentInvitations.programId, programId),
-                  eq(parentInvitations.accepted, false),
-                  sql`${parentInvitations.expiresAt} > NOW()`
-                )
-              );
-
-            let invitation;
-
-            if (existingInvitation.length === 0) {
-              // No valid pending invitation exists for this program, create a new one
-              invitation = await this.createParentInvitation(parentEmail, programId);
-
-              // Get program details for the email
-              const program = await this.getProgram(programId);
-              if (!program) {
-                throw new Error(`Program with ID ${programId} not found`);
-              }
-
-              // Generate and send the invitation email
-              const emailContent = generateParentInvitationEmail(
-                newStudent.name,
-                program.title,
-                invitation.token
-              );
-
-              const emailSent = await sendEmail({
-                to: parentEmail,
-                subject: emailContent.subject,
-                text: emailContent.text,
-                html: emailContent.html
-              });
-
-              if (!emailSent) {
-                console.error(`Failed to send parent invitation email to ${parentEmail} for student ${newStudent.name} in program ${program.title}`);
-              }
-            } else {
-              // Use existing invitation
-              invitation = existingInvitation[0];
-              console.log(`Using existing invitation for parent email ${parentEmail} in program ${programId}`);
-            }
-          } catch (error) {
-            console.error('Error handling parent invitation:', error);
-            // Don't throw the error - we want to continue even if email fails
-          }
+          await this.createParentInvitation(parentEmail);
         }
       } else {
         // If parent exists, link student to parent
@@ -267,9 +205,6 @@ export class DatabaseStorage implements IStorage {
           .set({ parentId: existingParent.id })
           .where(eq(students.id, newStudent.id));
       }
-
-      // Add student to the program
-      await this.addStudentToProgram(programId, newStudent.id);
 
       return newStudent;
     });
@@ -443,7 +378,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // New parent invitation methods
-  async createParentInvitation(email: string, programId: number): Promise<ParentInvitation> {
+  async createParentInvitation(email: string): Promise<ParentInvitation> {
     const token = nanoid();
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiration
@@ -452,10 +387,9 @@ export class DatabaseStorage implements IStorage {
       .insert(parentInvitations)
       .values({
         email,
-        programId,
         token,
         expiresAt,
-        accepted: false,
+        accepted: false, 
       })
       .returning();
     return invitation;
@@ -468,7 +402,7 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(parentInvitations.token, token),
-          eq(parentInvitations.accepted, false),
+          eq(parentInvitations.accepted, false), 
           sql`${parentInvitations.expiresAt} > NOW()`
         )
       );
@@ -476,52 +410,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async acceptParentInvitation(token: string): Promise<void> {
-    return await db.transaction(async (tx) => {
-      // Mark invitation as accepted
-      await tx
-        .update(parentInvitations)
-        .set({ accepted: true })
-        .where(eq(parentInvitations.token, token));
-
-      // Get the invitation to find the email
-      const [invitation] = await tx
-        .select()
-        .from(parentInvitations)
-        .where(eq(parentInvitations.token, token));
-
-      if (invitation) {
-        // Find all students with matching parent email that aren't linked to a parent
-        const unlinkedStudents = await tx
-          .select()
-          .from(students)
-          .where(
-            and(
-              eq(students.email, invitation.email),
-              sql`${students.parentId} IS NULL`
-            )
-          );
-
-        // Get the parent user
-        const [parent] = await tx
-          .select()
-          .from(parentUsers)
-          .where(eq(parentUsers.email, invitation.email));
-
-        if (parent && unlinkedStudents.length > 0) {
-          // Link all matching students to this parent
-          await Promise.all(
-            unlinkedStudents.map((student) =>
-              tx
-                .update(students)
-                .set({ parentId: parent.id })
-                .where(eq(students.id, student.id))
-            )
-          );
-        }
-      }
-    });
+    await db
+      .update(parentInvitations)
+      .set({ accepted: true }) 
+      .where(eq(parentInvitations.token, token));
   }
-
   async linkStudentToParent(studentId: number, parentId: number): Promise<void> {
     await db
       .update(students)
