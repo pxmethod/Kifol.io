@@ -11,6 +11,7 @@ import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 import { nanoid } from 'nanoid';
+import { sendEmail, generateParentInvitationEmail } from './services/mail';
 
 const PostgresSessionStore = connectPg(session);
 
@@ -196,7 +197,30 @@ export class DatabaseStorage implements IStorage {
       if (!existingParent) {
         // Create parent invitation only if we have a valid email
         if (parentEmail) {
-          await this.createParentInvitation(parentEmail);
+          try {
+            // Create the invitation
+            const invitation = await this.createParentInvitation(parentEmail);
+
+            // Generate and send the invitation email
+            const emailContent = generateParentInvitationEmail(
+              newStudent.name,
+              invitation.token
+            );
+
+            const emailSent = await sendEmail({
+              to: parentEmail,
+              subject: emailContent.subject,
+              text: emailContent.text,
+              html: emailContent.html
+            });
+
+            if (!emailSent) {
+              console.error(`Failed to send parent invitation email to ${parentEmail} for student ${newStudent.name}`);
+            }
+          } catch (error) {
+            console.error('Error sending parent invitation:', error);
+            // Don't throw the error - we want to continue even if email fails
+          }
         }
       } else {
         // If parent exists, link student to parent
