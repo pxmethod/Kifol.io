@@ -195,30 +195,50 @@ export class DatabaseStorage implements IStorage {
       const existingParent = await this.getParentUserByEmail(parentEmail);
 
       if (!existingParent) {
-        // Create parent invitation only if we have a valid email
+        // Create parent invitation only if we have a valid email and no existing pending invitation
         if (parentEmail) {
           try {
-            // Create the invitation
-            const invitation = await this.createParentInvitation(parentEmail);
+            // Check for existing pending invitation
+            const existingInvitation = await tx
+              .select()
+              .from(parentInvitations)
+              .where(
+                and(
+                  eq(parentInvitations.email, parentEmail),
+                  eq(parentInvitations.accepted, false),
+                  sql`${parentInvitations.expiresAt} > NOW()`
+                )
+              );
 
-            // Generate and send the invitation email
-            const emailContent = generateParentInvitationEmail(
-              newStudent.name,
-              invitation.token
-            );
+            let invitation;
 
-            const emailSent = await sendEmail({
-              to: parentEmail,
-              subject: emailContent.subject,
-              text: emailContent.text,
-              html: emailContent.html
-            });
+            if (existingInvitation.length === 0) {
+              // No valid pending invitation exists, create a new one
+              invitation = await this.createParentInvitation(parentEmail);
 
-            if (!emailSent) {
-              console.error(`Failed to send parent invitation email to ${parentEmail} for student ${newStudent.name}`);
+              // Generate and send the invitation email
+              const emailContent = generateParentInvitationEmail(
+                newStudent.name,
+                invitation.token
+              );
+
+              const emailSent = await sendEmail({
+                to: parentEmail,
+                subject: emailContent.subject,
+                text: emailContent.text,
+                html: emailContent.html
+              });
+
+              if (!emailSent) {
+                console.error(`Failed to send parent invitation email to ${parentEmail} for student ${newStudent.name}`);
+              }
+            } else {
+              // Use existing invitation
+              invitation = existingInvitation[0];
+              console.log(`Using existing invitation for parent email ${parentEmail}`);
             }
           } catch (error) {
-            console.error('Error sending parent invitation:', error);
+            console.error('Error handling parent invitation:', error);
             // Don't throw the error - we want to continue even if email fails
           }
         }
@@ -434,11 +454,52 @@ export class DatabaseStorage implements IStorage {
   }
 
   async acceptParentInvitation(token: string): Promise<void> {
-    await db
-      .update(parentInvitations)
-      .set({ accepted: true }) 
-      .where(eq(parentInvitations.token, token));
+    return await db.transaction(async (tx) => {
+      // Mark invitation as accepted
+      await tx
+        .update(parentInvitations)
+        .set({ accepted: true })
+        .where(eq(parentInvitations.token, token));
+
+      // Get the invitation to find the email
+      const [invitation] = await tx
+        .select()
+        .from(parentInvitations)
+        .where(eq(parentInvitations.token, token));
+
+      if (invitation) {
+        // Find all students with matching parent email that aren't linked to a parent
+        const unlinkedStudents = await tx
+          .select()
+          .from(students)
+          .where(
+            and(
+              eq(students.email, invitation.email),
+              sql`${students.parentId} IS NULL`
+            )
+          );
+
+        // Get the parent user
+        const [parent] = await tx
+          .select()
+          .from(parentUsers)
+          .where(eq(parentUsers.email, invitation.email));
+
+        if (parent && unlinkedStudents.length > 0) {
+          // Link all matching students to this parent
+          await Promise.all(
+            unlinkedStudents.map((student) =>
+              tx
+                .update(students)
+                .set({ parentId: parent.id })
+                .where(eq(students.id, student.id))
+            )
+          );
+        }
+      }
+    });
   }
+
   async linkStudentToParent(studentId: number, parentId: number): Promise<void> {
     await db
       .update(students)
