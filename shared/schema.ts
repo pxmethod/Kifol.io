@@ -80,8 +80,8 @@ export const portfolioEntries = pgTable("portfolio_entries", {
   description: text("description"),
   achievementDate: date("achievement_date").notNull(),
   type: text("type").notNull(),
-  mediaUrl: text("media_url"),
-  mediaType: text("media_type"),
+  media_url: text("media_url"),
+  media_type: text("media_type"),
 });
 
 // Relations
