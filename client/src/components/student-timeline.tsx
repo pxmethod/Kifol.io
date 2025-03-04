@@ -189,12 +189,12 @@ function EventDetailDialog({
               </p>
             </div>
 
-            {event.mediaUrl && (
+            {event.media_url && (
               <div>
                 <h4 className="text-sm font-medium mb-2">Media</h4>
                 <div className="grid grid-cols-3 gap-2">
                   <img
-                    src={event.mediaUrl}
+                    src={event.media_url}
                     alt="Event media"
                     className="w-full h-auto rounded-md"
                   />
@@ -392,10 +392,10 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                         {entry.description}
                       </p>
                     )}
-                    {entry.mediaUrl && (
+                    {entry.media_url && (
                       <div className="mt-2">
                         <img
-                          src={entry.mediaUrl}
+                          src={entry.media_url}
                           alt={`Media for ${entry.title}`}
                           className="w-[200px] h-[150px] object-cover rounded-md"
                         />
@@ -570,7 +570,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
               {form.watch("mediaFile") && (
                 <div className="mt-4">
                   <img
-                    src={URL.createObjectURL(form.watch("mediaFile"))}
+                    src={URL.createObjectURL(form.watch("mediaFile")!)}
                     alt="Preview"
                     className="max-h-[200px] w-auto object-contain rounded-md"
                   />
