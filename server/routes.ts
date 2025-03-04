@@ -267,21 +267,21 @@ export function registerRoutes(app: Express): Server {
     }
 
     try {
-      let mediaUrl = null;
-      let mediaType = null;
+      let media_url = null;
+      let media_type = null;
 
       if (req.file) {
         // Convert buffer to base64 string for storage
         const base64Image = req.file.buffer.toString('base64');
-        mediaUrl = `data:${req.file.mimetype};base64,${base64Image}`;
-        mediaType = req.file.mimetype;
+        media_url = `data:${req.file.mimetype};base64,${base64Image}`;
+        media_type = req.file.mimetype;
       }
 
       // Create portfolio entry with media data
       const entry = await storage.createPortfolioEntry(studentId, {
         ...req.body,
-        mediaUrl,
-        mediaType,
+        media_url,
+        media_type,
       });
 
       res.status(201).json(entry);
