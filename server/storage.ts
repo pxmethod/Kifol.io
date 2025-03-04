@@ -125,7 +125,15 @@ export class DatabaseStorage implements IStorage {
 
   async getProgram(id: number): Promise<Program | undefined> {
     const [program] = await db
-      .select()
+      .select({
+        id: programs.id,
+        userId: programs.userId,
+        title: programs.title,
+        description: programs.description,
+        startDate: programs.startDate,
+        endDate: programs.endDate,
+        coverImage: programs.coverImage,
+      })
       .from(programs)
       .where(eq(programs.id, id));
     return program;

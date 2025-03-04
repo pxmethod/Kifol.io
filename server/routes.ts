@@ -58,11 +58,16 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/programs/:id", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 
-    const program = await storage.getProgram(parseInt(req.params.id));
-    if (!program) return res.sendStatus(404);
-    if (program.userId !== req.user.id) return res.sendStatus(403);
+    try {
+      const program = await storage.getProgram(parseInt(req.params.id));
+      if (!program) return res.sendStatus(404);
+      if (program.userId !== req.user.id) return res.sendStatus(403);
 
-    res.json(program);
+      res.json(program);
+    } catch (error) {
+      console.error('Error fetching program:', error);
+      res.status(500).json({ message: 'Error loading program details' });
+    }
   });
 
   app.post("/api/programs", async (req, res) => {
