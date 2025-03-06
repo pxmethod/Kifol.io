@@ -859,10 +859,13 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                               className="text-red-500 hover:text-red-700"
                               onClick={() => {
                                 onChange(undefined);
-                                // Use type assertion to help TypeScript understand the ref structure
-                                const inputRef = field.ref as React.RefObject<HTMLInputElement> | null;
-                                if (inputRef && inputRef.current) {
-                                  inputRef.current.value = '';
+                                // Check if ref is an object with a current property
+                                // Convert to unknown first to avoid type errors
+                                if (field.ref && 
+                                    typeof field.ref === 'object' && 
+                                    'current' in field.ref && 
+                                    field.ref.current instanceof HTMLInputElement) {
+                                  (field.ref.current as HTMLInputElement).value = '';
                                 }
                               }}
                             >
