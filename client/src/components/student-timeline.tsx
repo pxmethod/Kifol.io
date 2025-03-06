@@ -698,7 +698,12 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
         </div>
       )}
 
-      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+      <Dialog open={addDialogOpen} onOpenChange={(isOpen) => {
+        setAddDialogOpen(isOpen);
+        if (!isOpen) {
+          form.reset();
+        }
+      }}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add Timeline Entry</DialogTitle>
@@ -871,7 +876,10 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setAddDialogOpen(false)}
+                  onClick={() => {
+                    form.reset();
+                    setAddDialogOpen(false);
+                  }}
                 >
                   Cancel
                 </Button>
