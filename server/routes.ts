@@ -313,6 +313,47 @@ export function registerRoutes(app: Express): Server {
     res.sendStatus(200);
   });
 
+  // Add the PATCH endpoint for portfolio entries
+  app.patch("/api/portfolio/:id", upload.single('media'), async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    const entryId = parseInt(req.params.id);
+    const portfolioEntry = await storage.getPortfolioEntry(entryId);
+
+    if (!portfolioEntry) {
+      return res.sendStatus(404);
+    }
+
+    // Check if the user has access to the student this entry belongs to
+    const studentPrograms = await storage.getProgramsByStudentId(portfolioEntry.studentId);
+    const hasAccess = studentPrograms.some(program => program.userId === req.user.id);
+
+    if (!hasAccess) {
+      return res.sendStatus(403);
+    }
+
+    try {
+      let updateData = { ...req.body };
+
+      if (req.file) {
+        // Convert buffer to base64 string for storage
+        const base64Image = req.file.buffer.toString('base64');
+        updateData.media_url = `data:${req.file.mimetype};base64,${base64Image}`;
+        updateData.media_type = req.file.mimetype;
+      } else if (req.body.removeMedia === 'true') {
+        // Allow removing the media
+        updateData.media_url = null;
+        updateData.media_type = null;
+      }
+
+      const updatedEntry = await storage.updatePortfolioEntry(entryId, updateData);
+      res.json(updatedEntry);
+    } catch (error) {
+      console.error("Error updating portfolio entry:", error);
+      res.status(400).json({ message: error instanceof Error ? error.message : 'Unknown error occurred' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
