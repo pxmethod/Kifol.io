@@ -698,12 +698,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
         </div>
       )}
 
-      <Dialog open={addDialogOpen} onOpenChange={(isOpen) => {
-        setAddDialogOpen(isOpen);
-        if (!isOpen) {
-          form.reset();
-        }
-      }}>
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add Timeline Entry</DialogTitle>
@@ -843,32 +838,13 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                           id="media-upload"
                           {...field}
                         />
-                        <div className="flex items-center gap-2">
-                          <label
-                            htmlFor="media-upload"
-                            className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-secondary"
-                          >
-                            <Upload className="h-4 w-4" />
-                            Choose File
-                          </label>
-                          {value && (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              className="text-red-500 hover:text-red-700"
-                              onClick={() => {
-                                onChange(undefined);
-                                if (field.ref.current) {
-                                  field.ref.current.value = '';
-                                }
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Remove file</span>
-                            </Button>
-                          )}
-                        </div>
+                        <label
+                          htmlFor="media-upload"
+                          className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-secondary"
+                        >
+                          <Upload className="h-4 w-4" />
+                          Choose File
+                        </label>
                         {value && (
                           <span className="text-sm text-muted-foreground">
                             {(value as File).name}
@@ -895,10 +871,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => {
-                    form.reset();
-                    setAddDialogOpen(false);
-                  }}
+                  onClick={() => setAddDialogOpen(false)}
                 >
                   Cancel
                 </Button>
