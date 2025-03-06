@@ -859,9 +859,10 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                               className="text-red-500 hover:text-red-700"
                               onClick={() => {
                                 onChange(undefined);
-                                // Using optional chaining to safely access current if it exists
-                                if (field.ref && typeof field.ref === 'object' && field.ref.current) {
-                                  field.ref.current.value = '';
+                                // Use type assertion to help TypeScript understand the ref structure
+                                const inputRef = field.ref as React.RefObject<HTMLInputElement> | null;
+                                if (inputRef && inputRef.current) {
+                                  inputRef.current.value = '';
                                 }
                               }}
                             >
