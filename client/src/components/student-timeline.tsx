@@ -862,10 +862,10 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                                 // Check if ref is an object with a current property
                                 // Convert to unknown first to avoid type errors
                                 if (field.ref && 
-                                    typeof field.ref === 'object' && 
-                                    'current' in field.ref && 
-                                    field.ref.current instanceof HTMLInputElement) {
-                                  (field.ref.current as HTMLInputElement).value = '';
+                                    field.ref && 
+                                    'current' in (field.ref as any) && 
+                                    (field.ref as any).current instanceof HTMLInputElement) {
+                                  (field.ref as any).current.value = '';
                                 }
                               }}
                             >
