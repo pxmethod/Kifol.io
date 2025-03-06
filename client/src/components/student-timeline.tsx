@@ -843,13 +843,32 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                           id="media-upload"
                           {...field}
                         />
-                        <label
-                          htmlFor="media-upload"
-                          className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-secondary"
-                        >
-                          <Upload className="h-4 w-4" />
-                          Choose File
-                        </label>
+                        <div className="flex items-center gap-2">
+                          <label
+                            htmlFor="media-upload"
+                            className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-secondary"
+                          >
+                            <Upload className="h-4 w-4" />
+                            Choose File
+                          </label>
+                          {value && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="text-red-500 hover:text-red-700"
+                              onClick={() => {
+                                onChange(undefined);
+                                if (field.ref.current) {
+                                  field.ref.current.value = '';
+                                }
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Remove file</span>
+                            </Button>
+                          )}
+                        </div>
                         {value && (
                           <span className="text-sm text-muted-foreground">
                             {(value as File).name}
