@@ -192,7 +192,7 @@ function EventDetailDialog({
             {event.media_url && (
               <div>
                 <h4 className="text-sm font-medium mb-2">Media</h4>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   <img
                     src={event.media_url}
                     alt="Event media"
