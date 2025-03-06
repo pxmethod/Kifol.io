@@ -698,7 +698,22 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
         </div>
       )}
 
-      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+      <Dialog 
+        open={addDialogOpen} 
+        onOpenChange={(open) => {
+          setAddDialogOpen(open);
+          if (!open) {
+            // Reset form when dialog closes
+            form.reset({
+              title: "",
+              description: "",
+              achievementDate: now,
+              type: "achievement",
+              mediaFile: undefined,
+            });
+          }
+        }}
+      >
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add Timeline Entry</DialogTitle>
