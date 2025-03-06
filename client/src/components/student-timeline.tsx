@@ -41,7 +41,6 @@ import {
   Plus,
   Trash2,
   Upload,
-  Edit2,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -66,6 +65,7 @@ import { z } from "zod";
 const now = new Date();
 now.setHours(0, 0, 0, 0);
 
+// Modified schema to handle file uploads
 const timelineFormSchema = z.object({
   title: insertPortfolioEntrySchema.shape.title.min(1, "Title is required"),
   description: insertPortfolioEntrySchema.shape.description,
@@ -104,275 +104,6 @@ function AddEventButton() {
   );
 }
 
-function EditEventDialog({
-  event,
-  isOpen,
-  onClose,
-}: {
-  event: PortfolioEntry;
-  isOpen: boolean;
-  onClose: () => void;
-}) {
-  const { toast } = useToast();
-  const form = useForm<TimelineFormData>({
-    resolver: zodResolver(timelineFormSchema),
-    defaultValues: {
-      title: event.title,
-      description: event.description || "",
-      achievementDate: new Date(event.achievementDate),
-      type: event.type,
-      mediaFile: undefined,
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async (data: TimelineFormData) => {
-      const formData = new FormData();
-      formData.append("title", data.title);
-      formData.append("description", data.description || "");
-      formData.append(
-        "achievementDate",
-        data.achievementDate.toISOString().split("T")[0],
-      );
-      formData.append("type", data.type);
-
-      if (data.mediaFile) {
-        formData.append("media", data.mediaFile);
-      }
-
-      const res = await fetch(`/api/portfolio/${event.id}`, {
-        method: "PATCH",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to update portfolio entry");
-      }
-
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [`/api/students/${event.studentId}/portfolio`],
-      });
-      toast({
-        title: "Success",
-        description: "Timeline entry updated successfully",
-      });
-      form.reset();
-      onClose();
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const onSubmit = form.handleSubmit((data) => {
-    updateMutation.mutate(data);
-  });
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Edit Timeline Entry</DialogTitle>
-        </DialogHeader>
-
-        <Form {...form}>
-          <form onSubmit={onSubmit} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Title<span className="text-red-500">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter entry title"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        form.trigger("title");
-                      }}
-                      value={field.value || ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Type</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select entry type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {ENTRY_TYPES.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          <div className="flex items-center gap-2">
-                            <type.icon className="h-4 w-4" />
-                            {type.label}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="achievementDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Date</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground",
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "MMMM dd, yyyy")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) => date > new Date()}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description (Optional)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Enter description"
-                      className="resize-none"
-                      {...field}
-                      value={field.value || ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="mediaFile"
-              render={({ field: { onChange, value, ...field } }) => (
-                <FormItem>
-                  <FormLabel>Media Upload (Optional)</FormLabel>
-                  <FormControl>
-                    <div className="flex items-center gap-4">
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            onChange(file);
-                          }
-                        }}
-                        className="hidden"
-                        id="media-upload"
-                        {...field}
-                      />
-                      <label
-                        htmlFor="media-upload"
-                        className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-secondary"
-                      >
-                        <Upload className="h-4 w-4" />
-                        Choose File
-                      </label>
-                      {value && (
-                        <span className="text-sm text-muted-foreground">
-                          {(value as File).name}
-                        </span>
-                      )}
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {form.watch("mediaFile") && (
-              <div className="mt-4">
-                <img
-                  src={URL.createObjectURL(form.watch("mediaFile")!)}
-                  alt="Preview"
-                  className="max-h-[200px] w-auto object-contain rounded-md"
-                />
-              </div>
-            )}
-
-            <div className="flex justify-end gap-2 mt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={
-                  updateMutation.isPending ||
-                  !form.getValues("title")?.trim()
-                }
-              >
-                {updateMutation.isPending && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Update Entry
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 function EventDetailDialog({
   event,
   isOpen,
@@ -384,7 +115,6 @@ function EventDetailDialog({
 }) {
   const { toast } = useToast();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const deleteMutation = useMutation({
     mutationFn: async (eventId: number) => {
@@ -433,7 +163,7 @@ function EventDetailDialog({
 
   return (
     <>
-      <Dialog open={isOpen && !deleteDialogOpen && !editDialogOpen} onOpenChange={handleClose}>
+      <Dialog open={isOpen && !deleteDialogOpen} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>{event.title}</DialogTitle>
@@ -474,26 +204,17 @@ function EventDetailDialog({
           </div>
 
           <DialogFooter className="flex justify-between items-center">
-            <div className="flex gap-2">
-              <Button
-                variant="destructive"
-                onClick={handleDelete}
-                className="bg-red-600 text-white hover:bg-red-700"
-                disabled={deleteMutation.isPending}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Event
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setEditDialogOpen(true)}
-              >
-                <Edit2 className="h-4 w-4 mr-2" />
-                Edit Event
-              </Button>
-            </div>
-            <Button variant="outline" onClick={onClose}>
-              Close
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              className="bg-red-600 text-white hover:bg-red-700"
+              disabled={deleteMutation.isPending}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Event
+            </Button>
+            <Button variant="outline" onClick={onClose} className="ml-auto">
+              Cancel
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -523,17 +244,6 @@ function EventDetailDialog({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {editDialogOpen && (
-        <EditEventDialog
-          event={event}
-          isOpen={editDialogOpen}
-          onClose={() => {
-            setEditDialogOpen(false);
-            onClose();
-          }}
-        />
-      )}
     </>
   );
 }
@@ -698,12 +408,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
         </div>
       )}
 
-      <Dialog open={addDialogOpen} onOpenChange={(isOpen) => {
-        setAddDialogOpen(isOpen);
-        if (!isOpen) {
-          form.reset();
-        }
-      }}>
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add Timeline Entry</DialogTitle>
@@ -843,32 +548,13 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                           id="media-upload"
                           {...field}
                         />
-                        <div className="flex items-center gap-2">
-                          <label
-                            htmlFor="media-upload"
-                            className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-secondary"
-                          >
-                            <Upload className="h-4 w-4" />
-                            Choose File
-                          </label>
-                          {value && (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              className="text-red-500 hover:text-red-700"
-                              onClick={() => {
-                                onChange(undefined);
-                                if (field.ref.current) {
-                                  field.ref.current.value = '';
-                                }
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Remove file</span>
-                            </Button>
-                          )}
-                        </div>
+                        <label
+                          htmlFor="media-upload"
+                          className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-secondary"
+                        >
+                          <Upload className="h-4 w-4" />
+                          Choose File
+                        </label>
                         {value && (
                           <span className="text-sm text-muted-foreground">
                             {(value as File).name}
@@ -886,7 +572,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   <img
                     src={URL.createObjectURL(form.watch("mediaFile")!)}
                     alt="Preview"
-                    className="max-h-[200px] w-auto object-contain rounded-md"
+                    className="max-h-[100px] w-auto object-contain rounded-md"
                   />
                 </div>
               )}
@@ -895,10 +581,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => {
-                    form.reset();
-                    setAddDialogOpen(false);
-                  }}
+                  onClick={() => setAddDialogOpen(false)}
                 >
                   Cancel
                 </Button>
