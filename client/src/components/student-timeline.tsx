@@ -63,38 +63,6 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
 
-function ImagePreview({
-  file,
-  onRemove,
-  className,
-}: {
-  file: File;
-  onRemove: () => void;
-  className?: string;
-}) {
-  return (
-    <div className={cn("relative group", className)}>
-      <img
-        src={URL.createObjectURL(file)}
-        alt="Preview"
-        className="max-h-[200px] w-auto object-contain rounded-md"
-      />
-      <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="text-white hover:text-red-500"
-          onClick={onRemove}
-        >
-          <Trash2 className="h-5 w-5" />
-          <span className="sr-only">Remove image</span>
-        </Button>
-      </div>
-    </div>
-  );
-}
-
 const now = new Date();
 now.setHours(0, 0, 0, 0);
 
@@ -334,41 +302,31 @@ function EditEventDialog({
                 <FormItem>
                   <FormLabel>Media Upload (Optional)</FormLabel>
                   <FormControl>
-                    <div className="space-y-4">
-                      <div>
-                        <Input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              onChange(file);
-                            }
-                          }}
-                          className="hidden"
-                          id="media-upload-edit"
-                          {...field}
-                        />
-                        <label
-                          htmlFor="media-upload-edit"
-                          className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-secondary w-fit"
-                        >
-                          <Upload className="h-4 w-4" />
-                          Choose File
-                        </label>
-                      </div>
+                    <div className="flex items-center gap-4">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            onChange(file);
+                          }
+                        }}
+                        className="hidden"
+                        id="media-upload"
+                        {...field}
+                      />
+                      <label
+                        htmlFor="media-upload"
+                        className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-secondary"
+                      >
+                        <Upload className="h-4 w-4" />
+                        Choose File
+                      </label>
                       {value && (
-                        <div className="mt-2">
-                          <ImagePreview
-                            file={value}
-                            onRemove={() => {
-                              onChange(undefined);
-                              if (field.ref && 'current' in field.ref) {
-                                (field.ref as any).current.value = '';
-                              }
-                            }}
-                          />
-                        </div>
+                        <span className="text-sm text-muted-foreground">
+                          {(value as File).name}
+                        </span>
                       )}
                     </div>
                   </FormControl>
@@ -376,6 +334,16 @@ function EditEventDialog({
                 </FormItem>
               )}
             />
+
+            {form.watch("mediaFile") && (
+              <div className="mt-4">
+                <img
+                  src={URL.createObjectURL(form.watch("mediaFile")!)}
+                  alt="Preview"
+                  className="max-h-[200px] w-auto object-contain rounded-md"
+                />
+              </div>
+            )}
 
             <div className="flex justify-end gap-2 mt-6">
               <Button
@@ -861,41 +829,50 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   <FormItem>
                     <FormLabel>Media Upload (Optional)</FormLabel>
                     <FormControl>
-                      <div className="space-y-4">
-                        <div>
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                onChange(file);
-                              }
-                            }}
-                            className="hidden"
-                            id="media-upload"
-                            {...field}
-                          />
+                      <div className="flex items-center gap-4">
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              onChange(file);
+                            }
+                          }}
+                          className="hidden"
+                          id="media-upload"
+                          {...field}
+                        />
+                        <div className="flex items-center gap-2">
                           <label
                             htmlFor="media-upload"
-                            className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-secondary w-fit"
+                            className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-secondary"
                           >
                             <Upload className="h-4 w-4" />
                             Choose File
                           </label>
-                        </div>
-                        {value && (
-                          <div className="mt-2">
-                            <ImagePreview
-                              file={value}
-                              onRemove={() => {
+                          {value && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="text-red-500 hover:text-red-700"
+                              onClick={() => {
                                 onChange(undefined);
-                                if (field.ref && 'current' in field.ref) {
-                                  (field.ref as any).current.value = '';
+                                if (field.ref.current) {
+                                  field.ref.current.value = '';
                                 }
                               }}
-                            />
-                          </div>
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Remove file</span>
+                            </Button>
+                          )}
+                        </div>
+                        {value && (
+                          <span className="text-sm text-muted-foreground">
+                            {(value as File).name}
+                          </span>
                         )}
                       </div>
                     </FormControl>
@@ -903,6 +880,16 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   </FormItem>
                 )}
               />
+
+              {form.watch("mediaFile") && (
+                <div className="mt-4">
+                  <img
+                    src={URL.createObjectURL(form.watch("mediaFile")!)}
+                    alt="Preview"
+                    className="max-h-[200px] w-auto object-contain rounded-md"
+                  />
+                </div>
+              )}
 
               <div className="flex justify-end gap-2 mt-6">
                 <Button
