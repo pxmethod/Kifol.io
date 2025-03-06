@@ -711,6 +711,17 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
               type: "achievement",
               mediaFile: undefined,
             });
+            
+            // Clear any file input that might be cached in the DOM
+            const fileInput = document.getElementById('media-upload') as HTMLInputElement;
+            if (fileInput) {
+              fileInput.value = '';
+            }
+            
+            // Revoke any existing image preview URLs to prevent memory leaks
+            if (form.watch("mediaFile")) {
+              URL.revokeObjectURL(URL.createObjectURL(form.watch("mediaFile")!));
+            }
           }
         }}
       >
