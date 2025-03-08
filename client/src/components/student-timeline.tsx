@@ -654,33 +654,32 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
               .map((entry) => (
                 <div
                   key={entry.id}
-                  className="flex gap-4 items-start pl-12 pb-8 relative cursor-pointer hover:bg-gray-50 rounded-lg p-4 transition-colors"
-                  onClick={() => setSelectedEvent(entry)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      setSelectedEvent(entry);
-                    }
-                  }}
+                  className="flex gap-4 items-start pl-12 pb-8 relative cursor-default hover:bg-gray-50 rounded-lg p-4 transition-colors"
                 >
                   <div className="absolute left-0 p-1 rounded-full bg-background border-2 border-primary z-10">
                     {getEntryIcon(entry.type)}
                   </div>
                   <div className="pt-1 space-y-2 w-full">
                     <div className="space-y-1">
-                      <h3 className="text-lg font-semibold">{entry.title}</h3>
+                      <button
+                        className="text-lg font-semibold text-left hover:underline focus:outline-none"
+                        onClick={() => setSelectedEvent(entry)}
+                        onKeyPress={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            setSelectedEvent(entry);
+                          }
+                        }}
+                        role="button"
+                        tabIndex={0}
+                      >
+                        {entry.title}
+                      </button>
                       <span className="text-sm text-muted-foreground block">
-                        {format(
-                          new Date(entry.achievementDate),
-                          "MMMM d, yyyy",
-                        )}
+                        {format(new Date(entry.achievementDate), "MMMM d, yyyy")}
                       </span>
                     </div>
                     {entry.description && (
-                      <p className="text-muted-foreground">
-                        {entry.description}
-                      </p>
+                      <p className="text-muted-foreground">{entry.description}</p>
                     )}
                     {entry.media_url && (
                       <div className="mt-2">
@@ -862,10 +861,10 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                                 // Check if ref is an object with a current property
                                 // Convert to unknown first to avoid type errors
                                 if (field.ref && 
-                                    typeof field.ref === 'object' && 
-                                    'current' in field.ref && 
-                                    field.ref.current instanceof HTMLInputElement) {
-                                  (field.ref.current as HTMLInputElement).value = '';
+                                    typeof field.ref === 'object' &&
+                                    'current' in field.ref &&
+                                    (field.ref as { current: HTMLInputElement }).current instanceof HTMLInputElement) {
+                                  (field.ref as { current: HTMLInputElement }).current.value = '';
                                 }
                               }}
                             >

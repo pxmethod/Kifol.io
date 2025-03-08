@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { SiApple, SiGoogle, SiFacebook } from "react-icons/si";
+import { SiGoogle, SiFacebook } from "react-icons/si";
 
 const loginSchema = insertUserSchema.extend({
   password: z.string().min(1, "Password is required"),
@@ -57,7 +57,7 @@ export default function AuthPage() {
     registerMutation.mutate(data);
   });
 
-  const SocialButton = ({ icon: Icon, label }: { icon: React.ComponentType; label: string }) => (
+  const SocialButton = ({ icon: Icon, label }: { icon: React.ComponentType<{ className: string }>; label: string }) => (
     <Button variant="outline" className="w-full flex gap-2 items-center justify-center" type="button">
       <Icon className="w-5 h-5" />
       <span>Continue with {label}</span>
@@ -169,13 +169,12 @@ export default function AuthPage() {
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
                     <span className="bg-background px-2 text-muted-foreground">
-                      Or continue with
+                      Or
                     </span>
                   </div>
                 </div>
                 <div className="grid gap-2">
                   <SocialButton icon={SiGoogle} label="Google" />
-                  <SocialButton icon={SiApple} label="Apple" />
                   <SocialButton icon={SiFacebook} label="Facebook" />
                 </div>
               </div>
