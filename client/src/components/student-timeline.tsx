@@ -62,6 +62,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
+import { Lightbox } from "@/components/ui/lightbox"; // Added import
 
 const now = new Date();
 now.setHours(0, 0, 0, 0);
@@ -385,6 +386,7 @@ function EventDetailDialog({
   const { toast } = useToast();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false); // Added lightbox state
 
   const deleteMutation = useMutation({
     mutationFn: async (eventId: number) => {
@@ -463,11 +465,13 @@ function EventDetailDialog({
               <div>
                 <h4 className="text-sm font-medium mb-2">Media</h4>
                 <div className="grid grid-cols-2 gap-2">
-                  <img
-                    src={event.media_url}
-                    alt="Event media"
-                    className="w-full h-auto rounded-md"
-                  />
+                  <button onClick={() => setLightboxOpen(true)}> {/* Added button to open lightbox */}
+                    <img
+                      src={event.media_url}
+                      alt="Event media"
+                      className="w-full h-auto rounded-md cursor-pointer"
+                    />
+                  </button>
                 </div>
               </div>
             )}
@@ -534,6 +538,8 @@ function EventDetailDialog({
           }}
         />
       )}
+
+      <Lightbox open={lightboxOpen} onClose={() => setLightboxOpen(false)} src={event?.media_url || ''} /> {/* Lightbox implementation */}
     </>
   );
 }
@@ -541,9 +547,9 @@ function EventDetailDialog({
 export function StudentTimeline({ studentId }: StudentTimelineProps) {
   const { toast } = useToast();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<PortfolioEntry | null>(
+  const [selectedEvent, setSelectedEvent] = useState<EnhancedPortfolioEntry | null>(
     null,
-  );
+  ); // Changed type to EnhancedPortfolioEntry
 
   globalDialogState.setIsOpen = setAddDialogOpen;
 
