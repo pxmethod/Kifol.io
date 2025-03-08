@@ -686,7 +686,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                         <img
                           src={entry.media_url}
                           alt={`Media for ${entry.title}`}
-                          className="w-[200px] h-[150px] object-cover rounded-md"
+                          className="w-[160px] h-[120px] object-cover rounded-md"
                         />
                       </div>
                     )}
@@ -715,7 +715,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
 }}>
   <DialogContent className="max-h-[90vh] overflow-y-auto">
     <DialogHeader>
-      <DialogTitle>Add Timeline Entry</DialogTitle>
+      <DialogTitle>Add Event to Timeline</DialogTitle>
     </DialogHeader>
 
     <Form {...form}>
