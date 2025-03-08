@@ -654,7 +654,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
               .map((entry) => (
                 <div
                   key={entry.id}
-                  className="flex gap-4 items-start pl-12 pb-8 relative cursor-default hover:bg-gray-50 rounded-lg p-4 transition-colors"
+                  className="flex gap-4 items-start pl-12 pb-8 relative cursor-default rounded-lg p-4 transition-colors"
                 >
                   <div className="absolute left-0 p-1 rounded-full bg-background border-2 border-primary z-10">
                     {getEntryIcon(entry.type)}
@@ -890,7 +890,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                   <img
                     src={URL.createObjectURL(form.watch("mediaFile")!)}
                     alt="Preview"
-                    className="max-h-[200px] w-auto object-contain rounded-md"
+                    className="max-h-[60px] w-auto object-contain rounded-md"
                   />
                 </div>
               )}
