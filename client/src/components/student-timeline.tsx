@@ -547,9 +547,10 @@ function EventDetailDialog({
 export function StudentTimeline({ studentId }: StudentTimelineProps) {
   const { toast } = useToast();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<EnhancedPortfolioEntry | null>(
+  const [selectedEvent, setSelectedEvent] = useState<PortfolioEntry | null>(
     null,
-  ); // Changed type to EnhancedPortfolioEntry
+  );
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   globalDialogState.setIsOpen = setAddDialogOpen;
 
@@ -689,11 +690,20 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                     )}
                     {entry.media_url && (
                       <div className="mt-2">
-                        <img
-                          src={entry.media_url}
-                          alt={`Media for ${entry.title}`}
-                          className="w-[160px] h-[120px] object-cover rounded-md"
-                        />
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedEvent(entry);
+                            setLightboxOpen(true);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <img
+                            src={entry.media_url}
+                            alt={`Media for ${entry.title}`}
+                            className="w-[160px] h-[120px] object-cover rounded-md hover:opacity-90 transition-opacity"
+                          />
+                        </button>
                       </div>
                     )}
                   </div>
@@ -921,9 +931,17 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
 
       <EventDetailDialog
         event={selectedEvent}
-        isOpen={!!selectedEvent}
+        isOpen={!!selectedEvent && !lightboxOpen}
         onClose={() => setSelectedEvent(null)}
       />
+      
+      {selectedEvent && selectedEvent.media_url && (
+        <Lightbox 
+          src={selectedEvent.media_url}
+          open={lightboxOpen}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
     </div>
   );
 }
