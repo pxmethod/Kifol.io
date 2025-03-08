@@ -697,232 +697,221 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
         </div>
       )}
 
-      <Dialog open={addDialogOpen} onOpenChange={(isOpen) => {
-        setAddDialogOpen(isOpen);
-        if (!isOpen) {
-          form.reset();
-        }
-      }}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Add Timeline Entry</DialogTitle>
-          </DialogHeader>
+<Dialog open={addDialogOpen} onOpenChange={(isOpen) => {
+  setAddDialogOpen(isOpen);
+  if (!isOpen) {
+    const mediaFile = form.getValues("mediaFile"); // Preserve mediaFile
+    form.reset({
+      title: "",  
+      type: "",  
+      achievementDate: new Date(),  
+      description: "",  
+      mediaFile: mediaFile, // Keep media file while resetting everything else
+    }, {
+      keepDirtyValues: false, // Ensures fields are reset
+      keepValues: false, // Forces reset of all other values
+    });
+  }
+}}>
+  <DialogContent className="max-h-[90vh] overflow-y-auto">
+    <DialogHeader>
+      <DialogTitle>Add Timeline Entry</DialogTitle>
+    </DialogHeader>
 
-          <Form {...form}>
-            <form onSubmit={onSubmit} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Title<span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter entry title"
-                        {...field}
-                        onChange={(e) => {
-                          field.onChange(e);
-                          form.trigger("title");
-                        }}
-                        value={field.value || ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Type</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select entry type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {ENTRY_TYPES.map((type) => (
-                          <SelectItem key={type.value} value={type.value}>
-                            <div className="flex items-center gap-2">
-                              <type.icon className="h-4 w-4" />
-                              {type.label}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="achievementDate"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Date</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground",
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "MMMM dd, yyyy")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) => date > new Date()}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description (Optional)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Enter description"
-                        className="resize-none"
-                        {...field}
-                        value={field.value || ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="mediaFile"
-                render={({ field: { onChange, value, ...field } }) => (
-                  <FormItem>
-                    <FormLabel>Media Upload (Optional)</FormLabel>
-                    <FormControl>
-                      <div className="flex items-center gap-4">
-                        <Input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              onChange(file);
-                            }
-                          }}
-                          className="hidden"
-                          id="media-upload"
-                          {...field}
-                        />
-                        <div className="flex items-center gap-2">
-                          <label
-                            htmlFor="media-upload"
-                            className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-secondary"
-                          >
-                            <Upload className="h-4 w-4" />
-                            Choose File
-                          </label>
-                          {value && (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              className="text-red-500 hover:text-red-700"
-                              onClick={() => {
-                                onChange(undefined);
-                                // Check if ref is an object with a current property
-                                // Convert to unknown first to avoid type errors
-                                if (field.ref && 
-                                    typeof field.ref === 'object' &&
-                                    'current' in field.ref &&
-                                    (field.ref as { current: HTMLInputElement }).current instanceof HTMLInputElement) {
-                                  (field.ref as { current: HTMLInputElement }).current.value = '';
-                                }
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Remove file</span>
-                            </Button>
-                          )}
-                        </div>
-                        {value && (
-                          <span className="text-sm text-muted-foreground">
-                            {(value as File).name}
-                          </span>
-                        )}
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {form.watch("mediaFile") && (
-                <div className="mt-4">
-                  <img
-                    src={URL.createObjectURL(form.watch("mediaFile")!)}
-                    alt="Preview"
-                    className="max-h-[60px] w-auto object-contain rounded-md"
-                  />
-                </div>
-              )}
-
-              <div className="flex justify-end gap-2 mt-6">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    form.reset();
-                    setAddDialogOpen(false);
+    <Form {...form}>
+      <form onSubmit={onSubmit} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Title<span className="text-red-500">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Enter entry title"
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    form.trigger("title");
                   }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={
-                    addEntryMutation.isPending ||
-                    !form.getValues("title")?.trim()
-                  }
-                >
-                  {addEntryMutation.isPending && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  value={field.value || ""}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Type</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select entry type" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {ENTRY_TYPES.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      <div className="flex items-center gap-2">
+                        <type.icon className="h-4 w-4" />
+                        {type.label}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="achievementDate"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Date</FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "pl-3 text-left font-normal",
+                        !field.value && "text-muted-foreground",
+                      )}
+                    >
+                      {field.value ? (
+                        format(field.value, "MMMM dd, yyyy")
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    disabled={(date) => date > new Date()}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description (Optional)</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Enter description"
+                  className="resize-none"
+                  {...field}
+                  value={field.value || ""}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="mediaFile"
+          render={({ field: { onChange, value, ...field } }) => (
+            <FormItem>
+              <FormLabel>Media Upload (Optional)</FormLabel>
+              <FormControl>
+                <div className="flex items-center gap-4">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        onChange(file);
+                      }
+                    }}
+                    className="hidden"
+                    id="media-upload"
+                    {...field}
+                  />
+                  <label
+                    htmlFor="media-upload"
+                    className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-secondary"
+                  >
+                    <Upload className="h-4 w-4" />
+                    Choose File
+                  </label>
+                  {value && (
+                    <span className="text-sm text-muted-foreground">
+                      {(value as File).name}
+                    </span>
                   )}
-                  Add Entry
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {form.watch("mediaFile") && (
+          <div className="mt-4">
+            <img
+              src={URL.createObjectURL(form.watch("mediaFile")!)}
+              alt="Preview"
+              className="max-h-[60px] w-auto object-contain rounded-md"
+            />
+          </div>
+        )}
+
+        <div className="flex justify-end gap-2 mt-6">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              form.reset({
+                ...form.getValues(),
+                mediaFile: form.getValues("mediaFile"),
+              });
+              setAddDialogOpen(false);
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            disabled={
+              addEntryMutation.isPending ||
+              !form.getValues("title")?.trim()
+            }
+          >
+            {addEntryMutation.isPending && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Add Entry
+          </Button>
+        </div>
+      </form>
+    </Form>
+  </DialogContent>
+</Dialog>
 
       <EventDetailDialog
         event={selectedEvent}
