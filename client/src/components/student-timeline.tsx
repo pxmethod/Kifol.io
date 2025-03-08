@@ -939,7 +939,11 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
         <Lightbox 
           src={selectedEvent.media_url}
           open={lightboxOpen}
-          onClose={() => setLightboxOpen(false)}
+          onClose={() => {
+            setLightboxOpen(false);
+            // Clear the selected event when closing the lightbox to prevent detail dialog from showing
+            setSelectedEvent(null);
+          }}
         />
       )}
     </div>
