@@ -301,7 +301,7 @@ function EditEventDialog({
               name="mediaFile"
               render={({ field: { onChange, value, ...field } }) => (
                 <FormItem>
-                  <FormLabel>Media Upload (Optional)</FormLabel>
+                  <FormLabel>Update Media (Optional)</FormLabel>
                   <FormControl>
                     <div className="flex items-center gap-4">
                       <Input
@@ -322,7 +322,7 @@ function EditEventDialog({
                         className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-secondary"
                       >
                         <Upload className="h-4 w-4" />
-                        Choose File
+                        Change
                       </label>
                       {value && (
                         <span className="text-sm text-muted-foreground">
@@ -465,11 +465,11 @@ function EventDetailDialog({
               <div>
                 <h4 className="text-sm font-medium mb-2">Media</h4>
                 <div className="grid grid-cols-2 gap-2">
-                  <button onClick={() => setLightboxOpen(true)}> {/* Added button to open lightbox */}
+                  <button>
                     <img
                       src={event.media_url}
                       alt="Event media"
-                      className="w-full h-auto rounded-md cursor-pointer"
+                      className="w-full h-auto rounded-md"
                     />
                   </button>
                 </div>
