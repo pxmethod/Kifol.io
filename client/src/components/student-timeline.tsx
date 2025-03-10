@@ -72,7 +72,7 @@ const timelineFormSchema = z.object({
   description: insertPortfolioEntrySchema.shape.description,
   achievementDate: z.date().max(now, "Cannot select future dates"),
   type: insertPortfolioEntrySchema.shape.type,
-  mediaFile: z.instanceof(File).optional(),
+  mediaFiles: z.array(z.instanceof(File)).optional(),
 });
 
 type TimelineFormData = z.infer<typeof timelineFormSchema>;
@@ -122,7 +122,7 @@ function EditEventDialog({
       description: event.description || "",
       achievementDate: new Date(event.achievementDate),
       type: event.type,
-      mediaFile: undefined,
+      mediaFiles: undefined,
     },
   });
 
@@ -137,8 +137,12 @@ function EditEventDialog({
       );
       formData.append("type", data.type);
 
-      if (data.mediaFile) {
-        formData.append("media", data.mediaFile);
+      if (data.mediaFiles && data.mediaFiles.length > 0) {
+        // By default, replace all media when updating
+        formData.append("replaceAllMedia", "true");
+        data.mediaFiles.forEach((file) => {
+          formData.append("media", file);
+        });
       }
 
       const res = await fetch(`/api/portfolio/${event.id}`, {
@@ -298,7 +302,7 @@ function EditEventDialog({
 
             <FormField
               control={form.control}
-              name="mediaFile"
+              name="mediaFiles"
               render={({ field: { onChange, value, ...field } }) => (
                 <FormItem>
                   <FormLabel>Update Media (Optional)</FormLabel>
@@ -308,13 +312,14 @@ function EditEventDialog({
                         type="file"
                         accept="image/*"
                         onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            onChange(file);
+                          const files = Array.from(e.target.files || []);
+                          if (files.length > 0) {
+                            onChange(files);
                           }
                         }}
                         className="hidden"
                         id="media-upload"
+                        multiple
                         {...field}
                       />
                       <label
@@ -326,7 +331,7 @@ function EditEventDialog({
                       </label>
                       {value && (
                         <span className="text-sm text-muted-foreground">
-                          {(value as File).name}
+                          {value.length} files selected
                         </span>
                       )}
                     </div>
@@ -336,13 +341,34 @@ function EditEventDialog({
               )}
             />
 
-            {form.watch("mediaFile") && (
+            {form.watch("mediaFiles") && (
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                {Array.from(form.watch("mediaFiles") || []).map((file, index) => (
+                  <div key={index} className="relative">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={`Preview ${index + 1}`}
+                      className="h-[120px] w-auto object-contain rounded-md"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {event.media && event.media.length > 0 && !form.watch("mediaFiles") && (
               <div className="mt-4">
-                <img
-                  src={URL.createObjectURL(form.watch("mediaFile")!)}
-                  alt="Preview"
-                  className="max-h-[200px] w-auto object-contain rounded-md"
-                />
+                <p className="text-sm text-muted-foreground mb-2">Current media:</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {event.media.map((item, index) => (
+                    <div key={index} className="relative">
+                      <img 
+                        src={item.mediaUrl} 
+                        alt={`Media ${index + 1}`}
+                        className="h-[120px] w-auto object-contain rounded-md" 
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -461,11 +487,34 @@ function EventDetailDialog({
               </p>
             </div>
 
-            {event.media_url && (
+            {event.media && event.media.length > 0 && (
               <div>
                 <h4 className="text-sm font-medium mb-2">Media</h4>
                 <div className="grid grid-cols-2 gap-2">
-                  <button>
+                  {event.media.map((item, index) => (
+                    <button 
+                      key={index}
+                      onClick={() => {
+                        setLightboxOpen(true);
+                      }}
+                    >
+                      <img
+                        src={item.mediaUrl}
+                        alt={`Event media ${index + 1}`}
+                        className="w-full h-auto rounded-md"
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* For backward compatibility with existing entries that have media_url */}
+            {!event.media && event.media_url && (
+              <div>
+                <h4 className="text-sm font-medium mb-2">Media</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <button onClick={() => setLightboxOpen(true)}>
                     <img
                       src={event.media_url}
                       alt="Event media"
@@ -581,8 +630,10 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
       );
       formData.append("type", data.type);
 
-      if (data.mediaFile) {
-        formData.append("media", data.mediaFile);
+      if (data.mediaFiles && data.mediaFiles.length > 0) {
+        data.mediaFiles.forEach((file) => {
+          formData.append("media", file);
+        });
       }
 
       const res = await fetch(`/api/students/${studentId}/portfolio`, {
@@ -688,7 +739,39 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                     {entry.description && (
                       <p className="text-muted-foreground">{entry.description}</p>
                     )}
-                    {entry.media_url && (
+                    {entry.media && entry.media.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {entry.media.slice(0, 3).map((item, index) => (
+                          <button 
+                            key={index}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedEvent(entry);
+                              setLightboxOpen(true);
+                            }}
+                            className="cursor-pointer relative group"
+                          >
+                            <img
+                              src={item.mediaUrl}
+                              alt={`Media ${index + 1} for ${entry.title}`}
+                              className="w-[160px] h-[120px] object-cover rounded-md hover:opacity-90 transition-opacity"
+                            />
+                            {/* Trashcan icon on hover (not functional yet) */}
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity flex items-center justify-center opacity-0 group-hover:opacity-100">
+                              <Trash2 className="h-6 w-6 text-white drop-shadow-lg" />
+                            </div>
+                          </button>
+                        ))}
+                        {entry.media.length > 3 && (
+                          <div className="w-[160px] h-[120px] flex items-center justify-center bg-gray-100 rounded-md text-gray-500">
+                            +{entry.media.length - 3} more
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* For backward compatibility with existing entries */}
+                    {!entry.media && entry.media_url && (
                       <div className="mt-2">
                         <button 
                           onClick={(e) => {
@@ -696,13 +779,17 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                             setSelectedEvent(entry);
                             setLightboxOpen(true);
                           }}
-                          className="cursor-pointer"
+                          className="cursor-pointer relative group"
                         >
                           <img
                             src={entry.media_url}
                             alt={`Media for ${entry.title}`}
                             className="w-[160px] h-[120px] object-cover rounded-md hover:opacity-90 transition-opacity"
                           />
+                          {/* Trashcan icon on hover (not functional yet) */}
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity flex items-center justify-center opacity-0 group-hover:opacity-100">
+                            <Trash2 className="h-6 w-6 text-white drop-shadow-lg" />
+                          </div>
                         </button>
                       </div>
                     )}
@@ -716,13 +803,13 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
 <Dialog open={addDialogOpen} onOpenChange={(isOpen) => {
   setAddDialogOpen(isOpen);
   if (!isOpen) {
-    const mediaFile = form.getValues("mediaFile"); // Preserve mediaFile
+    const mediaFiles = form.getValues("mediaFiles"); // Preserve mediaFiles
     form.reset({
       title: "",  
       type: "",  
       achievementDate: new Date(),  
       description: "",  
-      mediaFile: mediaFile, // Keep media file while resetting everything else
+      mediaFiles: mediaFiles, // Keep media files while resetting everything else
     }, {
       keepDirtyValues: false, // Ensures fields are reset
       keepValues: false, // Forces reset of all other values
@@ -849,7 +936,7 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
 
         <FormField
           control={form.control}
-          name="mediaFile"
+          name="mediaFiles"
           render={({ field: { onChange, value, ...field } }) => (
             <FormItem>
               <FormLabel>Media Upload (Optional)</FormLabel>
@@ -859,13 +946,14 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                     type="file"
                     accept="image/*"
                     onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        onChange(file);
+                      const files = Array.from(e.target.files || []);
+                      if (files.length > 0) {
+                        onChange(files);
                       }
                     }}
                     className="hidden"
                     id="media-upload"
+                    multiple
                     {...field}
                   />
                   <label
@@ -873,11 +961,11 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
                     className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-secondary"
                   >
                     <Upload className="h-4 w-4" />
-                    Choose File
+                    Choose Files
                   </label>
                   {value && (
                     <span className="text-sm text-muted-foreground">
-                      {(value as File).name}
+                      {value.length} files selected
                     </span>
                   )}
                 </div>
@@ -887,13 +975,17 @@ export function StudentTimeline({ studentId }: StudentTimelineProps) {
           )}
         />
 
-        {form.watch("mediaFile") && (
-          <div className="mt-4">
-            <img
-              src={URL.createObjectURL(form.watch("mediaFile")!)}
-              alt="Preview"
-              className="max-h-[60px] w-auto object-contain rounded-md"
-            />
+        {form.watch("mediaFiles") && (
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            {Array.from(form.watch("mediaFiles") || []).map((file, index) => (
+              <div key={index} className="relative group">
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt={`Preview ${index + 1}`}
+                  className="h-[60px] w-auto object-contain rounded-md"
+                />
+              </div>
+            ))}
           </div>
         )}
 
