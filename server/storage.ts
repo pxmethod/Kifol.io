@@ -53,11 +53,6 @@ export interface IStorage {
   updatePortfolioEntry(id: number, entry: Partial<InsertPortfolioEntry>): Promise<PortfolioEntry>;
   deletePortfolioEntry(id: number): Promise<void>;
 
-  // Portfolio Media methods
-  createPortfolioMedia(portfolioEntryId: number, mediaUrl: string, mediaType: string): Promise<any>;
-  getMediaByPortfolioEntryId(portfolioEntryId: number): Promise<any[]>;
-  deleteMediaByPortfolioEntryId(portfolioEntryId: number): Promise<void>;
-
   // New parent user methods
   createParentUser(user: InsertParentUser): Promise<ParentUser>;
   getParentUser(id: number): Promise<ParentUser | undefined>;
@@ -436,24 +431,3 @@ export class DatabaseStorage implements IStorage {
 }
 
 export const storage = new DatabaseStorage();
-
-  // Portfolio Media methods implementation
-  async createPortfolioMedia(portfolioEntryId: number, mediaUrl: string, mediaType: string): Promise<any> {
-    const [newMedia] = await db
-      .insert(portfolioMedia)
-      .values({ portfolioEntryId, mediaUrl, mediaType })
-      .returning();
-    return newMedia;
-  }
-
-  async getMediaByPortfolioEntryId(portfolioEntryId: number): Promise<any[]> {
-    return await db
-      .select()
-      .from(portfolioMedia)
-      .where(eq(portfolioMedia.portfolioEntryId, portfolioEntryId));
-  }
-
-  async deleteMediaByPortfolioEntryId(portfolioEntryId: number): Promise<void> {
-    await db.delete(portfolioMedia)
-      .where(eq(portfolioMedia.portfolioEntryId, portfolioEntryId));
-  }

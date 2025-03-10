@@ -64,24 +64,6 @@ export const students = pgTable("students", {
 export const programStudents = pgTable("program_students", {
   id: serial("id").primaryKey(),
   programId: integer("program_id")
-
-export const portfolioMedia = pgTable("portfolio_media", {
-  id: serial("id").primaryKey(),
-  portfolioEntryId: integer("portfolio_entry_id")
-    .notNull()
-    .references(() => portfolioEntries.id),
-  mediaUrl: text("media_url").notNull(),
-  mediaType: text("media_type").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const portfolioMediaRelations = relations(portfolioMedia, ({ one }) => ({
-  entry: one(portfolioEntries, {
-    fields: [portfolioMedia.portfolioEntryId],
-    references: [portfolioEntries.id],
-  }),
-}));
-
     .notNull()
     .references(() => programs.id),
   studentId: integer("student_id")
@@ -147,12 +129,11 @@ export const programStudentsRelations = relations(programStudents, ({ one }) => 
   }),
 }));
 
-export const portfolioEntriesRelations = relations(portfolioEntries, ({ one, many }) => ({
+export const portfolioEntriesRelations = relations(portfolioEntries, ({ one }) => ({
   student: one(students, {
     fields: [portfolioEntries.studentId],
     references: [students.id],
   }),
-  media: many(portfolioMedia),
 }));
 
 // Schemas
