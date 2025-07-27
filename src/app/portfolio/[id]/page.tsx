@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Header from '@/components/Header';
+import EditPortfolioModal from '@/components/EditPortfolioModal';
 
 interface PortfolioData {
   id: string;
@@ -17,6 +18,8 @@ export default function PortfolioPage() {
   const params = useParams();
   const [portfolio, setPortfolio] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showCopyNotification, setShowCopyNotification] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     const portfolioId = params.id as string;
@@ -31,6 +34,31 @@ export default function PortfolioPage() {
     
     setLoading(false);
   }, [params.id]);
+
+  const copyToClipboard = async () => {
+    if (portfolio) {
+      const url = `my.kifol.io/${portfolio.id}`;
+      try {
+        await navigator.clipboard.writeText(url);
+        setShowCopyNotification(true);
+        setTimeout(() => setShowCopyNotification(false), 3000);
+      } catch (err) {
+        console.error('Failed to copy URL:', err);
+      }
+    }
+  };
+
+  const handleSavePortfolio = (updatedPortfolio: PortfolioData) => {
+    // Update local storage
+    const portfolios = JSON.parse(localStorage.getItem('portfolios') || '[]');
+    const updatedPortfolios = portfolios.map((p: PortfolioData) => 
+      p.id === updatedPortfolio.id ? updatedPortfolio : p
+    );
+    localStorage.setItem('portfolios', JSON.stringify(updatedPortfolios));
+    
+    // Update state
+    setPortfolio(updatedPortfolio);
+  };
 
   if (loading) {
     return (
@@ -64,12 +92,23 @@ export default function PortfolioPage() {
     <div className="min-h-screen bg-kifolio-bg">
       <Header />
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Portfolio Header */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <div className="flex items-center space-x-6">
-              {/* Child Photo */}
-              <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-kifolio-cta to-kifolio-header flex items-center justify-center">
+        <div className="max-w-2xl mx-auto">
+          {/* Portfolio Header Card */}
+          <div className="bg-white rounded-lg shadow-md p-6 mb-8 relative">
+            {/* Edit Button */}
+            <button 
+              onClick={() => setShowEditModal(true)}
+              className="absolute top-4 right-4 p-2 text-gray-500 hover:text-kifolio-cta transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+
+            {/* Centered Content */}
+            <div className="text-center space-y-6">
+              {/* Avatar */}
+              <div className="w-32 h-32 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-kifolio-cta to-kifolio-header flex items-center justify-center">
                 {portfolio.photoUrl ? (
                   <img 
                     src={portfolio.photoUrl} 
@@ -77,34 +116,37 @@ export default function PortfolioPage() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span className="text-white text-2xl font-bold">
+                  <span className="text-white text-4xl font-bold">
                     {portfolio.childName.charAt(0).toUpperCase()}
                   </span>
                 )}
               </div>
               
-              {/* Portfolio Info */}
-              <div className="flex-1">
-                <h1 className="text-3xl font-bold text-kifolio-text mb-2">
+              {/* Name and Title */}
+              <div className="space-y-2">
+                <h1 className="text-3xl font-bold text-kifolio-text">
                   {portfolio.childName}
                 </h1>
-                <p className="text-xl text-gray-600 mb-2">
+                <p className="text-xl text-gray-600">
                   {portfolio.portfolioTitle}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Template: {portfolio.template.charAt(0).toUpperCase() + portfolio.template.slice(1)}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Created: {new Date(portfolio.createdAt).toLocaleDateString()}
                 </p>
               </div>
 
-              {/* Portfolio URL */}
-              <div className="text-right">
-                <p className="text-sm text-gray-500 mb-1">Portfolio URL:</p>
-                <p className="text-sm font-mono text-kifolio-cta">
+              {/* Portfolio URL with Copy Button */}
+              <div className="flex items-center justify-center space-x-2">
+                <span className="text-sm text-gray-500">Portfolio URL:</span>
+                <span className="text-sm font-mono text-kifolio-cta">
                   my.kifol.io/{portfolio.id}
-                </p>
+                </span>
+                <button
+                  onClick={copyToClipboard}
+                  className="p-1 text-gray-400 hover:text-kifolio-cta transition-colors"
+                  title="Copy URL"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
@@ -136,6 +178,21 @@ export default function PortfolioPage() {
           </div>
         </div>
       </main>
+
+      {/* Copy Notification */}
+      {showCopyNotification && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
+          URL copied to clipboard!
+        </div>
+      )}
+
+      {/* Edit Portfolio Modal */}
+      <EditPortfolioModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        onSave={handleSavePortfolio}
+        portfolio={portfolio}
+      />
     </div>
   );
 } 
