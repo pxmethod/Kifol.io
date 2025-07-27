@@ -1,4 +1,10 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+
 export default function EmptyState() {
+  const router = useRouter();
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 text-center">
       {/* Empty State Message */}
@@ -12,7 +18,10 @@ export default function EmptyState() {
       </div>
 
       {/* Call to Action Button */}
-      <button className="bg-kifolio-cta text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-kifolio-cta/90 transition-colors shadow-md">
+      <button 
+        onClick={() => router.push('/create')}
+        className="bg-kifolio-cta text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-kifolio-cta/90 transition-colors shadow-md"
+      >
         Create New Portfolio
       </button>
     </div>
