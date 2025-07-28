@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import EditPortfolioModal from '@/components/EditPortfolioModal';
 
@@ -12,13 +12,18 @@ interface PortfolioData {
   photoUrl: string;
   template: string;
   createdAt: string;
+  isPrivate?: boolean;
+  password?: string;
+  hasUnsavedChanges?: boolean;
 }
 
 export default function PortfolioPage() {
   const params = useParams();
+  const router = useRouter();
   const [portfolio, setPortfolio] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showCopyNotification, setShowCopyNotification] = useState(false);
+  const [showPublishNotification, setShowPublishNotification] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
@@ -60,6 +65,24 @@ export default function PortfolioPage() {
     setPortfolio(updatedPortfolio);
   };
 
+  const handlePreview = () => {
+    if (portfolio) {
+      window.open(`/preview/${portfolio.id}`, '_blank');
+    }
+  };
+
+  const handlePublish = () => {
+    if (portfolio) {
+      // Mark portfolio as published (no unsaved changes)
+      const updatedPortfolio = { ...portfolio, hasUnsavedChanges: false };
+      handleSavePortfolio(updatedPortfolio);
+      
+      // Show success notification
+      setShowPublishNotification(true);
+      setTimeout(() => setShowPublishNotification(false), 3000);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-kifolio-bg">
@@ -91,6 +114,38 @@ export default function PortfolioPage() {
   return (
     <div className="min-h-screen bg-kifolio-bg">
       <Header />
+      
+      {/* Action Bar */}
+      <div className="bg-white border-b border-gray-200 px-4 py-3">
+        <div className="max-w-2xl mx-auto flex items-center justify-between">
+          <button
+            onClick={() => router.push('/')}
+            className="flex items-center text-gray-600 hover:text-kifolio-text transition-colors"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to dashboard
+          </button>
+          
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={handlePreview}
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Preview
+            </button>
+            <button
+              onClick={handlePublish}
+              disabled={!portfolio.hasUnsavedChanges}
+              className="px-4 py-2 bg-kifolio-cta text-white rounded-lg hover:bg-kifolio-cta/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Publish
+            </button>
+          </div>
+        </div>
+      </div>
+
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
           {/* Portfolio Header Card */}
@@ -183,6 +238,13 @@ export default function PortfolioPage() {
       {showCopyNotification && (
         <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
           URL copied to clipboard!
+        </div>
+      )}
+
+      {/* Publish Notification */}
+      {showPublishNotification && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
+          Portfolio successfully published!
         </div>
       )}
 
