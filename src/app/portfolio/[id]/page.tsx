@@ -4,6 +4,10 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import EditPortfolioModal from '@/components/EditPortfolioModal';
+import AchievementModal from '@/components/AchievementModal';
+import AchievementDetailModal from '@/components/AchievementDetailModal';
+import AchievementsTimeline from '@/components/AchievementsTimeline';
+import { Achievement } from '@/types/achievement';
 
 interface PortfolioData {
   id: string;
@@ -15,6 +19,7 @@ interface PortfolioData {
   isPrivate?: boolean;
   password?: string;
   hasUnsavedChanges?: boolean;
+  achievements?: Achievement[];
 }
 
 export default function PortfolioPage() {
@@ -25,6 +30,10 @@ export default function PortfolioPage() {
   const [showCopyNotification, setShowCopyNotification] = useState(false);
   const [showPublishNotification, setShowPublishNotification] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showAchievementModal, setShowAchievementModal] = useState(false);
+  const [showAchievementDetailModal, setShowAchievementDetailModal] = useState(false);
+  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+  const [editingAchievement, setEditingAchievement] = useState<Achievement | null>(null);
 
   useEffect(() => {
     const portfolioId = params.id as string;
@@ -63,6 +72,61 @@ export default function PortfolioPage() {
     
     // Update state
     setPortfolio(updatedPortfolio);
+  };
+
+  const handleSaveAchievement = (achievement: Achievement) => {
+    if (!portfolio) return;
+
+    const updatedPortfolio = { ...portfolio };
+    const existingAchievements = updatedPortfolio.achievements || [];
+    
+    if (editingAchievement) {
+      // Update existing achievement
+      const achievementIndex = existingAchievements.findIndex(a => a.id === achievement.id);
+      if (achievementIndex !== -1) {
+        existingAchievements[achievementIndex] = achievement;
+      }
+    } else {
+      // Add new achievement
+      existingAchievements.push(achievement);
+    }
+    
+    updatedPortfolio.achievements = existingAchievements;
+    updatedPortfolio.hasUnsavedChanges = true;
+    
+    handleSavePortfolio(updatedPortfolio);
+    setEditingAchievement(null);
+  };
+
+  const handleDeleteAchievement = (achievementId: string) => {
+    if (!portfolio) return;
+
+    const updatedPortfolio = { ...portfolio };
+    const existingAchievements = updatedPortfolio.achievements || [];
+    
+    // Remove the achievement
+    const filteredAchievements = existingAchievements.filter(a => a.id !== achievementId);
+    
+    updatedPortfolio.achievements = filteredAchievements;
+    updatedPortfolio.hasUnsavedChanges = true;
+    
+    handleSavePortfolio(updatedPortfolio);
+    setEditingAchievement(null);
+  };
+
+  const handleEditAchievement = (achievement: Achievement) => {
+    setEditingAchievement(achievement);
+    setShowAchievementModal(true);
+  };
+
+  const handleViewAchievement = (achievement: Achievement) => {
+    setSelectedAchievement(achievement);
+    setShowAchievementDetailModal(true);
+  };
+
+  const handleAddAchievement = () => {
+    setEditingAchievement(null);
+    setShowAchievementModal(true);
   };
 
   const handlePreview = () => {
@@ -206,30 +270,32 @@ export default function PortfolioPage() {
             </div>
           </div>
 
-          {/* Portfolio Content - Empty State */}
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {/* Portfolio Content */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            {/* Header with Add Button */}
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-bold text-kifolio-text">Achievements</h2>
+                <p className="text-gray-600 text-sm">
+                  Track {portfolio.childName}&apos;s growth and accomplishments
+                </p>
+              </div>
+              <button
+                onClick={handleAddAchievement}
+                className="bg-kifolio-cta text-white px-4 py-2 rounded-lg font-semibold hover:bg-kifolio-cta/90 transition-colors flex items-center space-x-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-              </div>
-              <h2 className="text-2xl font-bold text-kifolio-text mb-4">
-                Start Building {portfolio.childName}&apos;s Portfolio
-              </h2>
-              <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                Add achievements, milestones, photos, and more to showcase {portfolio.childName}&apos;s growth and accomplishments.
-              </p>
-              
-              <div className="space-y-4">
-                <button className="w-full max-w-xs bg-kifolio-cta text-white py-3 px-6 rounded-lg font-semibold hover:bg-kifolio-cta/90">
-                  Add First Achievement
-                </button>
-                <button className="w-full max-w-xs bg-gray-100 text-kifolio-text py-3 px-6 rounded-lg font-semibold hover:bg-gray-200">
-                  Upload Photos
-                </button>
-              </div>
+                <span>Add Achievement</span>
+              </button>
             </div>
+
+            {/* Achievements Timeline */}
+            <AchievementsTimeline
+              achievements={portfolio.achievements || []}
+              onView={handleViewAchievement}
+            />
           </div>
         </div>
       </main>
@@ -254,6 +320,33 @@ export default function PortfolioPage() {
         onClose={() => setShowEditModal(false)}
         onSave={handleSavePortfolio}
         portfolio={portfolio}
+      />
+
+      {/* Achievement Modal */}
+      <AchievementModal
+        isOpen={showAchievementModal}
+        onClose={() => {
+          setShowAchievementModal(false);
+          setEditingAchievement(null);
+        }}
+        onSave={handleSaveAchievement}
+        onDelete={handleDeleteAchievement}
+        achievement={editingAchievement}
+      />
+
+      {/* Achievement Detail Modal */}
+      <AchievementDetailModal
+        isOpen={showAchievementDetailModal}
+        onClose={() => {
+          setShowAchievementDetailModal(false);
+          setSelectedAchievement(null);
+        }}
+        onEdit={(achievement) => {
+          setEditingAchievement(achievement);
+          setShowAchievementDetailModal(false);
+          setShowAchievementModal(true);
+        }}
+        achievement={selectedAchievement}
       />
     </div>
   );
