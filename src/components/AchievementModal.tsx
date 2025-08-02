@@ -33,10 +33,42 @@ export default function AchievementModal({
 
   const isEditing = !!achievement;
 
+  // Reset form when modal opens/closes
+  useEffect(() => {
+    if (!isOpen) {
+      // Clear form when modal closes
+      setFormData({
+        title: '',
+        date: new Date().toISOString().split('T')[0],
+        description: '',
+        isMilestone: false,
+        media: []
+      });
+      setOriginalData({
+        title: '',
+        date: new Date().toISOString().split('T')[0],
+        description: '',
+        isMilestone: false,
+        media: []
+      });
+      setMediaPreview([]);
+      setExistingMedia([]);
+      setErrors({});
+      setModalMode('form');
+    }
+  }, [isOpen]);
+
   // Populate form data when achievement changes
   useEffect(() => {
     setModalMode('form'); // Reset to form mode when achievement changes
+    
+    // Clear all form state first
+    setMediaPreview([]);
+    setExistingMedia([]);
+    setErrors({});
+    
     if (achievement) {
+      // Editing existing achievement - populate with achievement data
       const data: AchievementFormData = {
         title: achievement.title,
         date: achievement.date.split('T')[0],
@@ -48,7 +80,7 @@ export default function AchievementModal({
       setOriginalData(data);
       setExistingMedia(achievement.media);
     } else {
-      // Reset form for new achievement
+      // Adding new achievement - reset to blank form
       const defaultData: AchievementFormData = {
         title: '',
         date: new Date().toISOString().split('T')[0],
@@ -58,8 +90,6 @@ export default function AchievementModal({
       };
       setFormData(defaultData);
       setOriginalData(defaultData);
-      setMediaPreview([]);
-      setExistingMedia([]);
     }
   }, [achievement]);
 

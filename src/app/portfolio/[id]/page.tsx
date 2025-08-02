@@ -324,6 +324,7 @@ export default function PortfolioPage() {
 
       {/* Achievement Modal */}
       <AchievementModal
+        key={editingAchievement?.id || 'new-achievement'}
         isOpen={showAchievementModal}
         onClose={() => {
           setShowAchievementModal(false);
