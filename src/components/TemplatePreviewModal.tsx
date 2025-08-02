@@ -1,5 +1,8 @@
 'use client';
 
+import { getTemplateConfig } from '@/config/templates';
+import TemplateFactory from './templates/TemplateFactory';
+
 interface TemplatePreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -23,6 +26,38 @@ export default function TemplatePreviewModal({
   ];
 
   const currentTemplate = templates.find(t => t.id === selectedTemplate);
+  
+  // Sample portfolio data for preview
+  const samplePortfolio = {
+    id: 'preview',
+    childName: 'Alex Johnson',
+    portfolioTitle: 'My Learning Journey',
+    photoUrl: '',
+    template: selectedTemplate || 'ren',
+    createdAt: new Date().toISOString(),
+    achievements: [
+      {
+        id: '1',
+        title: 'First Steps',
+        date: '2024-01-15',
+        description: 'Took my first steps independently',
+        media: [],
+        isMilestone: true,
+        createdAt: '2024-01-15T10:00:00Z',
+        updatedAt: '2024-01-15T10:00:00Z'
+      },
+      {
+        id: '2',
+        title: 'First Words',
+        date: '2024-02-20',
+        description: 'Said my first words clearly',
+        media: [],
+        isMilestone: false,
+        createdAt: '2024-02-20T14:30:00Z',
+        updatedAt: '2024-02-20T14:30:00Z'
+      }
+    ]
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -55,26 +90,9 @@ export default function TemplatePreviewModal({
               </div>
 
               {/* Template Preview */}
-              <div className="border-2 border-gray-200 rounded-lg p-8 bg-gray-50">
-                <div className="text-center space-y-4">
-                  {/* Placeholder for template preview */}
-                  <div className="w-32 h-32 mx-auto bg-gradient-to-br from-kifolio-cta to-kifolio-header rounded-full flex items-center justify-center">
-                    <span className="text-white text-2xl font-bold">
-                      {currentTemplate.name.charAt(0)}
-                    </span>
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-semibold text-kifolio-text">Sample Child Name</h4>
-                    <p className="text-gray-600">Portfolio Title</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4 max-w-xs mx-auto">
-                    <div className="bg-white rounded p-3 text-center">
-                      <div className="text-sm font-medium text-kifolio-text">Achievements</div>
-                    </div>
-                    <div className="bg-white rounded p-3 text-center">
-                      <div className="text-sm font-medium text-kifolio-text">Milestones</div>
-                    </div>
-                  </div>
+              <div className="border-2 border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+                <div className="h-96 overflow-y-auto">
+                  <TemplateFactory portfolio={samplePortfolio} />
                 </div>
               </div>
 
