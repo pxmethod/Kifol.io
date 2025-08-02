@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import TemplatePreviewModal from '@/components/TemplatePreviewModal';
+import ConfirmNavigationModal from '@/components/ConfirmNavigationModal';
 
 interface PortfolioData {
   id: string;
@@ -32,6 +33,7 @@ export default function CreatePortfolio() {
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [selectedTemplateForPreview, setSelectedTemplateForPreview] = useState<string>('');
   const [showPassword, setShowPassword] = useState(true);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const templates = [
     { id: 'ren', name: 'Ren', description: 'Clean and modern design' },
@@ -71,6 +73,34 @@ export default function CreatePortfolio() {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const hasChanges = () => {
+    return (
+      formData.childName.trim() !== '' ||
+      formData.portfolioTitle.trim() !== '' ||
+      formData.photoUrl !== '' ||
+      formData.template !== '' ||
+      formData.isPrivate ||
+      formData.password.trim() !== ''
+    );
+  };
+
+  const handleBackClick = () => {
+    if (hasChanges()) {
+      setShowConfirmModal(true);
+    } else {
+      router.push('/');
+    }
+  };
+
+  const handleConfirmNavigation = () => {
+    setShowConfirmModal(false);
+    router.push('/');
+  };
+
+  const handleCancelNavigation = () => {
+    setShowConfirmModal(false);
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -144,6 +174,22 @@ export default function CreatePortfolio() {
   return (
     <div className="min-h-screen bg-kifolio-bg">
       <Header />
+      
+      {/* Action Bar */}
+      <div className="bg-white border-b border-gray-200 px-4 py-3">
+        <div className="max-w-2xl mx-auto flex items-center justify-between">
+          <button
+            onClick={handleBackClick}
+            className="flex items-center text-gray-600 hover:text-kifolio-text transition-colors"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to dashboard
+          </button>
+        </div>
+      </div>
+
       <main className="container mx-auto px-4 py-8 max-w-2xl">
         <div className="bg-white rounded-lg shadow-md p-6">
           <h1 className="text-2xl font-bold text-kifolio-text mb-6">Create New Portfolio</h1>
@@ -360,6 +406,15 @@ export default function CreatePortfolio() {
         onClose={() => setShowTemplateModal(false)}
         onSelect={(templateId) => handleInputChange('template', templateId)}
         selectedTemplate={selectedTemplateForPreview}
+      />
+
+      {/* Confirm Navigation Modal */}
+      <ConfirmNavigationModal
+        isOpen={showConfirmModal}
+        onConfirm={handleConfirmNavigation}
+        onCancel={handleCancelNavigation}
+        title="Discard Changes?"
+        message="You will lose any changes you've made if you go back."
       />
     </div>
   );
