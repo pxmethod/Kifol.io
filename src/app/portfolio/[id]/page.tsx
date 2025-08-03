@@ -238,7 +238,7 @@ export default function PortfolioPage() {
             <button
               onClick={handlePublish}
               disabled={!portfolio.hasUnsavedChanges}
-              className="px-4 py-2 bg-kifolio-cta text-white rounded-lg hover:bg-kifolio-cta/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 bg-kifolio-cta text-white rounded-lg hover:bg-kifolio-cta/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md"
             >
               Publish
             </button>
@@ -318,7 +318,7 @@ export default function PortfolioPage() {
               </div>
               <button
                 onClick={handleAddAchievement}
-                className="bg-kifolio-cta text-white px-4 py-2 rounded-lg font-semibold hover:bg-kifolio-cta/90 transition-colors flex items-center space-x-2"
+                className="bg-kifolio-cta text-white px-4 py-2 rounded-lg font-semibold hover:bg-kifolio-cta/90 transition-colors flex items-center space-x-2 transition-colors shadow-md"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
