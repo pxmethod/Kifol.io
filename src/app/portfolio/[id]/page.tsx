@@ -265,11 +265,21 @@ export default function PortfolioPage() {
               {/* Avatar */}
               <div className="w-32 h-32 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-kifolio-cta to-kifolio-header flex items-center justify-center">
                 {portfolio.photoUrl ? (
-                  <img 
-                    src={portfolio.photoUrl} 
-                    alt={portfolio.childName}
-                    className="w-full h-full object-cover"
-                  />
+                  portfolio.photoUrl.startsWith('/placeholders/') ? (
+                    <div className="w-full h-full rounded-full overflow-hidden">
+                      <img 
+                        src={portfolio.photoUrl} 
+                        alt={portfolio.childName}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <img 
+                      src={portfolio.photoUrl} 
+                      alt={portfolio.childName}
+                      className="w-full h-full object-cover"
+                    />
+                  )
                 ) : (
                   <span className="text-white text-4xl font-bold">
                     {portfolio.childName.charAt(0).toUpperCase()}

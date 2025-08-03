@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import TemplatePreviewModal from '@/components/TemplatePreviewModal';
 import ConfirmNavigationModal from '@/components/ConfirmNavigationModal';
+import { getRandomPlaceholder } from '@/utils/placeholders';
 
 interface PortfolioData {
   id: string;
@@ -148,7 +149,7 @@ export default function CreatePortfolio() {
         id: portfolioId,
         childName: formData.childName,
         portfolioTitle: formData.portfolioTitle,
-        photoUrl: formData.photoUrl,
+        photoUrl: formData.photoUrl || getRandomPlaceholder(formData.childName),
         template: formData.template,
         isPrivate: formData.isPrivate,
         password: formData.password,

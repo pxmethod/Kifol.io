@@ -112,11 +112,21 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove }: Portfolio
         {/* Avatar */}
         <div className="w-24 h-24 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-kifolio-cta to-kifolio-header flex items-center justify-center">
           {portfolio.photoUrl ? (
-            <img
-              src={portfolio.photoUrl}
-              alt={portfolio.childName}
-              className="w-full h-full object-cover"
-            />
+            portfolio.photoUrl.startsWith('/placeholders/') ? (
+              <div className="w-full h-full rounded-full overflow-hidden">
+                <img
+                  src={portfolio.photoUrl}
+                  alt={portfolio.childName}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <img
+                src={portfolio.photoUrl}
+                alt={portfolio.childName}
+                className="w-full h-full object-cover"
+              />
+            )
           ) : (
             <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />

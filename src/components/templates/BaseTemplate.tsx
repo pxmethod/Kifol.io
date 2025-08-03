@@ -49,11 +49,21 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
               style={{ borderColor: config.colors.primary }}
             >
               {portfolio.photoUrl ? (
-                <img 
-                  src={portfolio.photoUrl} 
-                  alt={portfolio.childName}
-                  className="w-full h-full object-cover"
-                />
+                portfolio.photoUrl.startsWith('/placeholders/') ? (
+                  <div className="w-full h-full rounded-full overflow-hidden">
+                    <img 
+                      src={portfolio.photoUrl} 
+                      alt={portfolio.childName}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <img 
+                    src={portfolio.photoUrl} 
+                    alt={portfolio.childName}
+                    className="w-full h-full object-cover"
+                  />
+                )
               ) : (
                 <div 
                   className="w-full h-full flex items-center justify-center text-white text-4xl font-bold"
