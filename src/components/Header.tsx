@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -9,9 +10,13 @@ export default function Header() {
     <header className="bg-kifolio-header text-white px-4 py-3 shadow-sm">
       <div className="flex items-center justify-between max-w-6xl mx-auto">
         {/* Logo */}
-        <div className="text-xl font-semibold">
-          Kifolio
-        </div>
+        <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
+          <img 
+            src="/kifolio_logo.svg" 
+            alt="Kifolio Logo" 
+            className="h-8 w-auto"
+          />
+        </Link>
 
         {/* User Profile Section */}
         <div className="flex items-center space-x-3 relative">
