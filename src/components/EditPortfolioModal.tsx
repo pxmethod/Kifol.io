@@ -18,6 +18,7 @@ interface EditPortfolioModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (updatedPortfolio: PortfolioData) => void;
+  onDelete?: (portfolioId: string) => void;
   portfolio: PortfolioData | null;
 }
 
@@ -25,6 +26,7 @@ export default function EditPortfolioModal({
   isOpen,
   onClose,
   onSave,
+  onDelete,
   portfolio
 }: EditPortfolioModalProps) {
   const [formData, setFormData] = useState({
@@ -46,6 +48,8 @@ export default function EditPortfolioModal({
   const [showPassword, setShowPassword] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [modalMode, setModalMode] = useState<'form' | 'delete-confirmation'>('form');
 
   const templates = [
     { id: 'ren', name: 'Ren', description: 'Clean and modern design' },
@@ -140,6 +144,22 @@ export default function EditPortfolioModal({
     }
   };
 
+  const handleDeletePortfolio = () => {
+    if (portfolio && onDelete) {
+      onDelete(portfolio.id);
+      setModalMode('form');
+      onClose();
+    }
+  };
+
+  const handleShowDeleteConfirmation = () => {
+    setModalMode('delete-confirmation');
+  };
+
+  const handleCancelDelete = () => {
+    setModalMode('form');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -177,10 +197,10 @@ export default function EditPortfolioModal({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-semibold text-kifolio-text">
-            Edit Portfolio
+            {modalMode === 'delete-confirmation' ? 'Delete Portfolio?' : 'Edit Portfolio'}
           </h2>
           <button
-            onClick={onClose}
+            onClick={modalMode === 'delete-confirmation' ? handleCancelDelete : onClose}
             className="text-gray-500 hover:text-gray-700"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -189,9 +209,42 @@ export default function EditPortfolioModal({
           </button>
         </div>
 
-        {/* Form */}
+        {/* Content */}
         <div className="p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          {modalMode === 'delete-confirmation' ? (
+            /* Delete Confirmation Content */
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-kifolio-text mb-2">
+                Delete Portfolio?
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to delete this portfolio? This action cannot be undone and will remove all achievements.
+              </p>
+              <div className="flex space-x-3">
+                <button
+                  type="button"
+                  onClick={handleCancelDelete}
+                  className="flex-1 bg-gray-100 text-kifolio-text py-2 px-4 rounded-lg font-semibold hover:bg-gray-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDeletePortfolio}
+                  className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700"
+                >
+                  Delete Portfolio
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* Form Content */
+            <form onSubmit={handleSubmit} className="space-y-6">
             {/* Child's Name */}
             <div>
               <label htmlFor="editChildName" className="block text-sm font-medium text-kifolio-text mb-2">
@@ -370,8 +423,22 @@ export default function EditPortfolioModal({
                 <p className="text-red-500 text-sm mt-2 text-center">{errors.submit}</p>
               )}
             </div>
+
+            {/* Delete Button */}
+            {onDelete && (
+              <div className="pt-4 border-t border-gray-200">
+                <button
+                  type="button"
+                  onClick={handleShowDeleteConfirmation}
+                  className="w-full bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                >
+                  Delete Portfolio
+                </button>
+              </div>
+            )}
           </form>
-        </div>
+        )}
+      </div>
       </div>
     </div>
   );

@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import EditPortfolioModal from '@/components/EditPortfolioModal';
 import AchievementModal from '@/components/AchievementModal';
 import AchievementDetailModal from '@/components/AchievementDetailModal';
 import AchievementsTimeline from '@/components/AchievementsTimeline';
+import Toast from '@/components/Toast';
 import { Achievement } from '@/types/achievement';
 
 interface PortfolioData {
@@ -25,6 +26,7 @@ interface PortfolioData {
 export default function PortfolioPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [portfolio, setPortfolio] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showCopyNotification, setShowCopyNotification] = useState(false);
@@ -34,6 +36,8 @@ export default function PortfolioPage() {
   const [showAchievementDetailModal, setShowAchievementDetailModal] = useState(false);
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
   const [editingAchievement, setEditingAchievement] = useState<Achievement | null>(null);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   useEffect(() => {
     const portfolioId = params.id as string;
@@ -48,6 +52,17 @@ export default function PortfolioPage() {
     
     setLoading(false);
   }, [params.id]);
+
+  // Check if portfolio was just created
+  useEffect(() => {
+    const wasCreated = searchParams.get('created') === 'true';
+    if (wasCreated) {
+      setToastMessage('Portfolio created successfully!');
+      setShowToast(true);
+      // Remove the query parameter from URL
+      router.replace(`/portfolio/${params.id}`);
+    }
+  }, [searchParams, params.id, router]);
 
   const copyToClipboard = async () => {
     if (portfolio) {
@@ -89,6 +104,9 @@ export default function PortfolioPage() {
     } else {
       // Add new achievement
       existingAchievements.push(achievement);
+      // Show success toast for new achievement
+      setToastMessage('Achievement added successfully!');
+      setShowToast(true);
     }
     
     updatedPortfolio.achievements = existingAchievements;
@@ -109,6 +127,10 @@ export default function PortfolioPage() {
     
     updatedPortfolio.achievements = filteredAchievements;
     updatedPortfolio.hasUnsavedChanges = true;
+    
+    // Show success toast for achievement removal
+    setToastMessage('Achievement removed successfully!');
+    setShowToast(true);
     
     handleSavePortfolio(updatedPortfolio);
     setEditingAchievement(null);
@@ -133,6 +155,20 @@ export default function PortfolioPage() {
     if (portfolio) {
       window.open(`/preview/${portfolio.id}`, '_blank');
     }
+  };
+
+  const handleDeletePortfolio = (portfolioId: string) => {
+    // Remove from local storage
+    const portfolios = JSON.parse(localStorage.getItem('portfolios') || '[]');
+    const updatedPortfolios = portfolios.filter((p: PortfolioData) => p.id !== portfolioId);
+    localStorage.setItem('portfolios', JSON.stringify(updatedPortfolios));
+    
+    // Show success toast for portfolio removal
+    setToastMessage('Portfolio removed successfully!');
+    setShowToast(true);
+    
+    // Redirect to dashboard
+    router.push('/');
   };
 
   const handlePublish = () => {
@@ -319,6 +355,7 @@ export default function PortfolioPage() {
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         onSave={handleSavePortfolio}
+        onDelete={handleDeletePortfolio}
         portfolio={portfolio}
       />
 
@@ -348,6 +385,14 @@ export default function PortfolioPage() {
           setShowAchievementModal(true);
         }}
         achievement={selectedAchievement}
+      />
+
+      {/* Toast Notification */}
+      <Toast
+        message={toastMessage}
+        variant="success"
+        isVisible={showToast}
+        onDismiss={() => setShowToast(false)}
       />
     </div>
   );

@@ -6,6 +6,7 @@ import EmptyState from '@/components/EmptyState';
 import PortfolioGrid from '@/components/PortfolioGrid';
 import EditPortfolioModal from '@/components/EditPortfolioModal';
 import DeletePortfolioModal from '@/components/DeletePortfolioModal';
+import Toast from '@/components/Toast';
 import { Achievement } from '@/types/achievement';
 
 interface PortfolioData {
@@ -28,6 +29,8 @@ export default function Dashboard() {
   const [deletingPortfolio, setDeletingPortfolio] = useState<PortfolioData | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   useEffect(() => {
     // Load portfolios from local storage
@@ -70,6 +73,10 @@ export default function Dashboard() {
     setPortfolios(updatedPortfolios);
     setShowDeleteModal(false);
     setDeletingPortfolio(null);
+    
+    // Show success toast for portfolio removal
+    setToastMessage('Portfolio removed successfully!');
+    setShowToast(true);
   };
 
   const handleCancelDelete = () => {
@@ -124,6 +131,14 @@ export default function Dashboard() {
         portfolio={deletingPortfolio}
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
+      />
+
+      {/* Toast Notification */}
+      <Toast
+        message={toastMessage}
+        variant="success"
+        isVisible={showToast}
+        onDismiss={() => setShowToast(false)}
       />
     </div>
   );

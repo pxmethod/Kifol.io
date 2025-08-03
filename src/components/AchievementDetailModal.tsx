@@ -95,11 +95,11 @@ export default function AchievementDetailModal({
               
               {/* Main Image */}
               <div className="mb-4">
-                <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                <div className="bg-gray-100 rounded-lg overflow-hidden">
                   <img
                     src={imageMedia[selectedImageIndex]?.url}
                     alt=""
-                    className="w-full h-full object-cover"
+                    className="w-full h-auto max-h-96 object-contain"
                   />
                 </div>
               </div>

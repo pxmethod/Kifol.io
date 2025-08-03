@@ -161,8 +161,8 @@ export default function CreatePortfolio() {
       existingPortfolios.push(portfolioData);
       localStorage.setItem('portfolios', JSON.stringify(existingPortfolios));
 
-      // Redirect to the new portfolio
-      router.push(`/portfolio/${portfolioId}`);
+      // Redirect to the new portfolio with success parameter
+      router.push(`/portfolio/${portfolioId}?created=true`);
     } catch (error) {
       console.error('Error creating portfolio:', error);
       setErrors({ submit: 'Failed to create portfolio. Please try again.' });
