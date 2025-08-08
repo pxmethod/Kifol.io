@@ -1,10 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 
 export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   return (
     <header className="bg-kifolio-header text-white px-4 py-3 shadow-sm">
@@ -19,7 +37,7 @@ export default function Header() {
         </Link>
 
         {/* User Profile Section */}
-        <div className="flex items-center space-x-3 relative">
+        <div className="flex items-center space-x-3 relative" ref={dropdownRef}>
           {/* Avatar */}
           <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
             <svg 

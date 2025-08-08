@@ -392,6 +392,7 @@ export default function PortfolioPage() {
           setShowAchievementModal(true);
         }}
         achievement={selectedAchievement}
+        showEditButton={true}
       />
 
       {/* Toast Notification */}

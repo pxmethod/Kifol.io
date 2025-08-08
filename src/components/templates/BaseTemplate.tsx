@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { TemplateConfig, PortfolioTemplateProps } from '@/types/template';
 import { Achievement } from '@/types/achievement';
+import AchievementDetailModal from '@/components/AchievementDetailModal';
 
 interface BaseTemplateProps extends PortfolioTemplateProps {
   config: TemplateConfig;
@@ -11,6 +13,10 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
   const achievements = portfolio.achievements || [];
   const milestones = achievements.filter((a: Achievement) => a.isMilestone);
   const regularAchievements = achievements.filter((a: Achievement) => !a.isMilestone);
+  
+  // Modal state
+  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -18,6 +24,16 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const handleViewAchievement = (achievement: Achievement) => {
+    setSelectedAchievement(achievement);
+    setShowDetailModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowDetailModal(false);
+    setSelectedAchievement(null);
   };
 
   return (
@@ -141,11 +157,12 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                 {milestones.map((achievement: Achievement) => (
                   <div 
                     key={achievement.id}
-                    className="p-6 rounded-lg border"
+                    className="p-6 rounded-lg border cursor-pointer hover:shadow-lg transition-shadow"
                     style={{ 
                       backgroundColor: config.colors.background,
                       borderColor: config.colors.border
                     }}
+                    onClick={() => handleViewAchievement(achievement)}
                   >
                     <div className="flex items-start space-x-4">
                       <div 
@@ -225,11 +242,12 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
 
                     {/* Content */}
                     <div 
-                      className="flex-1 p-6 rounded-lg border"
+                      className="flex-1 p-6 rounded-lg border cursor-pointer hover:shadow-lg transition-shadow"
                       style={{ 
                         backgroundColor: config.colors.background,
                         borderColor: config.colors.border
                       }}
+                      onClick={() => handleViewAchievement(achievement)}
                     >
                       <h3 
                         className="text-lg font-semibold mb-2"
@@ -340,6 +358,15 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
           Created with Kifolio • {new Date().getFullYear()}
         </p>
       </footer>
+
+      {/* Achievement Detail Modal */}
+      <AchievementDetailModal
+        isOpen={showDetailModal}
+        onClose={handleCloseModal}
+        onEdit={() => {}} // No edit functionality in public view
+        achievement={selectedAchievement}
+        showEditButton={false}
+      />
     </div>
   );
 } 
