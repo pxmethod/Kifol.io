@@ -30,7 +30,7 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove }: Portfolio
 
   const achievementCount = portfolio.achievements?.length || 0;
 
-  // Close menu when mouse leaves the menu area
+  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -48,6 +48,11 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove }: Portfolio
   }, [showMenu]);
 
   const handleMenuMouseLeave = () => {
+    // Only close when leaving the button area, not the dropdown
+    // The dropdown will handle its own mouse leave
+  };
+
+  const handleDropdownMouseLeave = () => {
     setShowMenu(false);
   };
 
@@ -94,7 +99,11 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove }: Portfolio
 
         {/* Dropdown Menu */}
         {showMenu && (
-          <div className="profile-menu__dropdown" style={{ right: 0, top: '2.5rem' }}>
+          <div 
+            className="profile-menu__dropdown" 
+            style={{ right: 0, top: '2.5rem' }}
+            onMouseLeave={handleDropdownMouseLeave}
+          >
             <button
               onClick={handleEdit}
               className="profile-menu__item"
