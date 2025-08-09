@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import PortfolioCard from './PortfolioCard';
 import { Achievement } from '@/types/achievement';
 
@@ -25,11 +26,27 @@ interface PortfolioGridProps {
 
 export default function PortfolioGrid({ portfolios, onEdit, onRemove }: PortfolioGridProps) {
   const router = useRouter();
+  const [animatedCards, setAnimatedCards] = useState<Set<string>>(new Set());
+
+  // Trigger animations when portfolios change
+  useEffect(() => {
+    if (portfolios.length > 0) {
+      // Reset animations first
+      setAnimatedCards(new Set());
+      
+      // Animate each card with a staggered delay
+      portfolios.forEach((portfolio, index) => {
+        setTimeout(() => {
+          setAnimatedCards(prev => new Set(prev).add(portfolio.id));
+        }, index * 100); // 100ms delay between each card
+      });
+    }
+  }, [portfolios]);
 
   return (
     <div className="space-y-8">
       {/* Header with Create Button */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center animate-fade-in">
         <h1 className="text-2xl font-bold text-kifolio-text">
           My Portfolios
         </h1>
@@ -49,6 +66,7 @@ export default function PortfolioGrid({ portfolios, onEdit, onRemove }: Portfoli
             portfolio={portfolio}
             onEdit={onEdit}
             onRemove={onRemove}
+            isAnimated={animatedCards.has(portfolio.id)}
           />
         ))}
       </div>
