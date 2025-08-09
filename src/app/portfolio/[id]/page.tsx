@@ -224,29 +224,31 @@ export default function PortfolioPage() {
       <Header />
       
       {/* Action Bar */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <button
-            onClick={() => router.push('/')}
-            className="flex items-center text-gray-600 hover:text-kifolio-text transition-colors"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to dashboard
-          </button>
+      <div className="action-bar">
+        <div className="action-bar__container">
+          <div className="action-bar__left">
+            <button
+              onClick={() => router.push('/')}
+              className="btn--back"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to dashboard
+            </button>
+          </div>
           
-          <div className="flex items-center space-x-3">
+          <div className="action-bar__right">
             <button
               onClick={handlePreview}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              className="btn btn--secondary"
             >
               Preview
             </button>
             <button
               onClick={handlePublish}
               disabled={!portfolio.hasUnsavedChanges}
-              className="px-4 py-2 bg-kifolio-cta text-white rounded-lg hover:bg-kifolio-cta/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md"
+              className="btn btn--primary"
             >
               Publish
             </button>
@@ -257,21 +259,22 @@ export default function PortfolioPage() {
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
           {/* Portfolio Header Card */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8 relative">
+          <div className="card card--profile">
             {/* Edit Button */}
-            <button 
-              onClick={() => setShowEditModal(true)}
-              className="absolute top-4 right-4 p-2 text-gray-500 hover:text-kifolio-cta transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-            </button>
+            <div className="card__actions">
+              <button 
+                onClick={() => setShowEditModal(true)}
+                className="btn btn--ghost btn--icon-only"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+            </div>
 
-            {/* Centered Content */}
-            <div className="text-center space-y-6">
+            <div className="card__body">
               {/* Avatar */}
-              <div className="w-32 h-32 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-kifolio-cta to-kifolio-header flex items-center justify-center">
+              <div className="card__avatar">
                 {portfolio.photoUrl ? (
                   portfolio.photoUrl.startsWith('/placeholders/') ? (
                     <div className="w-full h-full rounded-full overflow-hidden">
@@ -289,34 +292,32 @@ export default function PortfolioPage() {
                     />
                   )
                 ) : (
-                  <span className="text-white text-4xl font-bold">
+                  <span className="card__avatar--placeholder">
                     {portfolio.childName.charAt(0).toUpperCase()}
                   </span>
                 )}
               </div>
               
               {/* Name and Title */}
-              <div className="space-y-2">
-                <h1 className="text-3xl font-bold text-kifolio-text">
-                  {portfolio.childName}
-                </h1>
-                <p className="text-xl text-gray-600">
-                  {portfolio.portfolioTitle}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Member since {formatMemberSince(portfolio.createdAt)}
-                </p>
-              </div>
+              <h1 className="card__title">
+                {portfolio.childName}
+              </h1>
+              <p className="card__subtitle">
+                {portfolio.portfolioTitle}
+              </p>
+              <p className="text-sm text-gray-500">
+                Member since {formatMemberSince(portfolio.createdAt)}
+              </p>
 
               {/* Portfolio URL with Copy Button */}
-              <div className="flex items-center justify-center space-x-2">
+              <div className="card__meta">
                 <span className="text-sm text-gray-500">Portfolio URL:</span>
                 <span className="text-sm font-mono text-kifolio-cta">
                   my.kifol.io/{portfolio.id}
                 </span>
                 <button
                   onClick={copyToClipboard}
-                  className="p-1 text-gray-400 hover:text-kifolio-cta transition-colors"
+                  className="btn btn--ghost btn--icon-only btn--sm"
                   title="Copy URL"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -328,15 +329,12 @@ export default function PortfolioPage() {
           </div>
 
           {/* Portfolio Content */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            {/* Header with Add Button */}
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-xl font-bold text-kifolio-text">Achievements</h2>
-              </div>
+          <div className="card" style={{ marginTop: '2rem' }}>
+            <div className="card__header">
+              <h2 className="card__title">Achievements</h2>
               <button
                 onClick={handleAddAchievement}
-                className="bg-kifolio-cta text-white px-4 py-2 rounded-lg font-semibold hover:bg-kifolio-cta/90 transition-colors flex items-center space-x-2 transition-colors shadow-md"
+                className="btn btn--primary"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -345,11 +343,13 @@ export default function PortfolioPage() {
               </button>
             </div>
 
-            {/* Achievements Timeline */}
-            <AchievementsTimeline
-              achievements={portfolio.achievements || []}
-              onView={handleViewAchievement}
-            />
+            <div className="card__body">
+              {/* Achievements Timeline */}
+              <AchievementsTimeline
+                achievements={portfolio.achievements || []}
+                onView={handleViewAchievement}
+              />
+            </div>
           </div>
         </div>
       </main>

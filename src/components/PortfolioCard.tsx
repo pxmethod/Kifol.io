@@ -30,7 +30,7 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove }: Portfolio
 
   const achievementCount = portfolio.achievements?.length || 0;
 
-  // Close menu when clicking outside
+  // Close menu when mouse leaves the menu area
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -46,6 +46,10 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove }: Portfolio
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showMenu]);
+
+  const handleMenuMouseLeave = () => {
+    setShowMenu(false);
+  };
 
   const handleCardClick = (e: React.MouseEvent) => {
     // Don't navigate if clicking on the menu button
@@ -74,13 +78,13 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove }: Portfolio
 
   return (
     <div 
-      className="bg-white rounded-lg shadow-md p-6 cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 relative group"
+      className="card card--portfolio card--interactive"
       onClick={handleCardClick}
     >
       {/* 3-Dot Menu */}
-      <div className="absolute top-4 right-4" ref={menuRef}>
+      <div className="card__actions" ref={menuRef} onMouseLeave={handleMenuMouseLeave}>
         <button
-          className="menu-button p-2 text-gray-400 hover:text-kifolio-cta transition-colors rounded-full hover:bg-gray-100"
+          className="menu-button btn btn--ghost btn--icon-only btn--sm"
           onClick={handleMenuToggle}
         >
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -90,16 +94,17 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove }: Portfolio
 
         {/* Dropdown Menu */}
         {showMenu && (
-          <div className="absolute right-0 top-10 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-[120px] z-10">
+          <div className="profile-menu__dropdown" style={{ right: 0, top: '2.5rem' }}>
             <button
               onClick={handleEdit}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+              className="profile-menu__item"
             >
               Edit
             </button>
             <button
               onClick={handleRemove}
-              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+              className="profile-menu__item profile-menu__item--danger"
+              style={{ color: 'var(--color-danger)' }}
             >
               Remove
             </button>
@@ -108,9 +113,9 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove }: Portfolio
       </div>
 
       {/* Card Content */}
-      <div className="text-center space-y-4">
+      <div className="card__body">
         {/* Avatar */}
-        <div className="w-24 h-24 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-kifolio-cta to-kifolio-header flex items-center justify-center">
+        <div className="card__avatar card__avatar--xl">
           {portfolio.photoUrl ? (
             portfolio.photoUrl.startsWith('/placeholders/') ? (
               <div className="w-full h-full rounded-full overflow-hidden">
@@ -128,26 +133,28 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove }: Portfolio
               />
             )
           ) : (
-            <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-            </svg>
+            <span className="card__avatar--placeholder text-2xl">
+              {portfolio.childName.charAt(0).toUpperCase()}
+            </span>
           )}
         </div>
 
         {/* Child's Name */}
-        <h3 className="text-2xl font-bold text-kifolio-text truncate">
+        <h3 className="card__title">
           {portfolio.childName}
         </h3>
 
         {/* Portfolio Title */}
-        <p className="text-gray-600 font-medium">
+        <p className="card__subtitle">
           {portfolio.portfolioTitle}
         </p>
 
         {/* Achievement Count */}
-        <p className="text-sm text-gray-500">
-          {achievementCount} Achievement{achievementCount !== 1 ? 's' : ''}
-        </p>
+        <div className="card__meta">
+          <span className="card__meta-item">
+            {achievementCount} Achievement{achievementCount !== 1 ? 's' : ''}
+          </span>
+        </div>
       </div>
     </div>
   );

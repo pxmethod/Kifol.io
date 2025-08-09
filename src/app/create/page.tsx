@@ -177,11 +177,11 @@ export default function CreatePortfolio() {
       <Header />
       
       {/* Action Bar */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
+      <div className="action-bar">
+        <div className="action-bar__container">
           <button
             onClick={handleBackClick}
-            className="flex items-center text-gray-600 hover:text-kifolio-text transition-colors"
+            className="btn--back"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -192,61 +192,59 @@ export default function CreatePortfolio() {
       </div>
 
       <main className="container mx-auto px-4 py-8 max-w-2xl">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h1 className="text-2xl font-bold text-kifolio-text mb-6">Create New Portfolio</h1>
-          
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="card">
+          <div className="card__header">
+            <h1 className="card__title">Create New Portfolio</h1>
+          </div>
+          <div className="card__body">
+            <form id="portfolioForm" onSubmit={handleSubmit} className="form">
             {/* Child's Name */}
-            <div>
-              <label htmlFor="childName" className="block text-sm font-medium text-kifolio-text mb-2">
-                Child&apos;s Name *
+            <div className="form-field">
+              <label htmlFor="childName" className="form-field__label form-field__label--required">
+                Child&apos;s Name
               </label>
               <input
                 type="text"
                 id="childName"
                 value={formData.childName}
                 onChange={(e) => handleInputChange('childName', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-kifolio-cta ${
-                  errors.childName ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`input ${errors.childName ? 'input--error' : ''}`}
                 placeholder="Enter your child's name"
                 maxLength={100}
               />
               {errors.childName && (
-                <p className="text-red-500 text-sm mt-1">{errors.childName}</p>
+                <p className="form-field__error">{errors.childName}</p>
               )}
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="form-field__help">
                 {formData.childName.length}/100 characters
               </p>
             </div>
 
             {/* Portfolio Title */}
-            <div>
-              <label htmlFor="portfolioTitle" className="block text-sm font-medium text-kifolio-text mb-2">
-                Portfolio Title *
+            <div className="form-field">
+              <label htmlFor="portfolioTitle" className="form-field__label form-field__label--required">
+                Portfolio Title
               </label>
               <input
                 type="text"
                 id="portfolioTitle"
                 value={formData.portfolioTitle}
                 onChange={(e) => handleInputChange('portfolioTitle', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-kifolio-cta ${
-                  errors.portfolioTitle ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`input ${errors.portfolioTitle ? 'input--error' : ''}`}
                 placeholder="Enter portfolio title"
                 maxLength={100}
               />
               {errors.portfolioTitle && (
-                <p className="text-red-500 text-sm mt-1">{errors.portfolioTitle}</p>
+                <p className="form-field__error">{errors.portfolioTitle}</p>
               )}
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="form-field__help">
                 {formData.portfolioTitle.length}/100 characters
               </p>
             </div>
 
             {/* Photo Upload */}
-            <div>
-              <label htmlFor="photo" className="block text-sm font-medium text-kifolio-text mb-2">
+            <div className="form-field">
+              <label htmlFor="photo" className="form-field__label">
                 Child&apos;s Photo (Optional)
               </label>
               <input
@@ -254,12 +252,12 @@ export default function CreatePortfolio() {
                 id="photo"
                 onChange={handlePhotoUpload}
                 accept="image/jpeg,image/png,image/gif,image/svg+xml"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-kifolio-cta"
+                className="input"
               />
               {errors.photo && (
-                <p className="text-red-500 text-sm mt-1">{errors.photo}</p>
+                <p className="form-field__error">{errors.photo}</p>
               )}
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="form-field__help">
                 JPEG, PNG, GIF, or SVG up to 2MB
               </p>
             </div>
@@ -383,21 +381,23 @@ export default function CreatePortfolio() {
                 )}
               </div>
             </div>
-
-            {/* Submit Button */}
-            <div className="pt-4">
+          </form>
+          </div>
+          <div className="card__footer">
+            <div className="form-actions form-actions--center">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-kifolio-cta text-white py-3 px-6 rounded-lg font-semibold hover:bg-kifolio-cta/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                className={`btn btn--primary btn--wide ${isSubmitting ? 'btn--loading' : ''}`}
+                form="portfolioForm"
               >
                 {isSubmitting ? 'Creating Portfolio...' : 'Create Portfolio'}
               </button>
-              {errors.submit && (
-                <p className="text-red-500 text-sm mt-2 text-center">{errors.submit}</p>
-              )}
             </div>
-          </form>
+            {errors.submit && (
+              <p className="form-field__error text-center mt-4">{errors.submit}</p>
+            )}
+          </div>
         </div>
       </main>
 

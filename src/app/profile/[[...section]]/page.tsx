@@ -90,7 +90,7 @@ export default function ProfilePage() {
             <div>
               <button
                 onClick={() => router.push('/')}
-                className="flex items-center text-kifolio-cta hover:text-kifolio-cta/80 transition-colors mb-6"
+                className="btn--back mb-6"
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -102,20 +102,18 @@ export default function ProfilePage() {
             </div>
 
             {/* Account Email Section */}
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-kifolio-text mb-2">
-                  Account Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kifolio-cta focus:border-transparent transition-colors"
-                  placeholder="Enter your email address"
-                />
-              </div>
+            <div className="form-field">
+              <label htmlFor="email" className="form-field__label">
+                Account Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={formData.email}
+                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                className="input"
+                placeholder="Enter your email address"
+              />
             </div>
 
             {/* Google Sign-In Section */}
@@ -146,10 +144,10 @@ export default function ProfilePage() {
 
             {/* Save Button */}
             {hasChanges && (
-              <div className="flex justify-end pt-6 border-t border-gray-200">
+              <div className="form-actions">
                 <button
                   onClick={handleSaveChanges}
-                  className="bg-kifolio-cta text-white px-6 py-3 rounded-lg font-semibold hover:bg-kifolio-cta/90 transition-colors shadow-md"
+                  className="btn btn--primary"
                 >
                   Save Changes
                 </button>
@@ -216,63 +214,59 @@ export default function ProfilePage() {
       <Header />
       
       {/* Mobile Navigation Dropdown */}
-      <div className="lg:hidden bg-white border-b border-gray-200">
-        <div className="px-4 py-3">
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="w-full flex items-center justify-between px-4 py-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+      <div className="mobile-nav lg:hidden">
+        <div className="mobile-nav__dropdown" ref={dropdownRef}>
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="mobile-nav__trigger"
+          >
+            <span>{getCurrentSectionLabel()}</span>
+            <svg 
+              className={`mobile-nav__chevron ${isMobileMenuOpen ? 'mobile-nav__chevron--open' : ''}`}
+              fill="currentColor" 
+              viewBox="0 0 20 20"
             >
-              <span className="text-gray-700 font-medium">{getCurrentSectionLabel()}</span>
-              <svg 
-                className={`w-5 h-5 text-gray-500 transition-transform ${isMobileMenuOpen ? 'rotate-180' : ''}`}
-                fill="currentColor" 
-                viewBox="0 0 20 20"
-              >
-                <path 
-                  fillRule="evenodd" 
-                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
-                  clipRule="evenodd" 
-                />
-              </svg>
-            </button>
+              <path 
+                fillRule="evenodd" 
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
+                clipRule="evenodd" 
+              />
+            </svg>
+          </button>
 
-            {/* Mobile Dropdown Menu */}
-            {isMobileMenuOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
-                <div className="py-1">
-                  {navigationItems.map((item) => {
-                    const isActive = (item.id === 'general' && currentSection === 'general') || 
-                                    item.id === currentSection;
-                    
-                    return (
-                      <button
-                        key={item.id}
-                        onClick={() => handleNavigation(item.path)}
-                        className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors ${
-                          isActive
-                            ? 'bg-kifolio-cta/10 text-kifolio-cta font-medium'
-                            : item.id === 'delete-account'
-                            ? 'text-red-600'
-                            : 'text-gray-700'
-                        }`}
-                      >
-                        {item.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
+          {/* Mobile Dropdown Menu */}
+          {isMobileMenuOpen && (
+            <div className="mobile-nav__menu">
+              {navigationItems.map((item) => {
+                const isActive = (item.id === 'general' && currentSection === 'general') || 
+                                item.id === currentSection;
+                
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleNavigation(item.path)}
+                    className={`mobile-nav__item ${
+                      isActive
+                        ? 'mobile-nav__item--active'
+                        : item.id === 'delete-account'
+                        ? 'mobile-nav__item--danger'
+                        : ''
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
       <div className="flex">
         {/* Desktop Sidebar Navigation */}
-        <div className="hidden lg:block w-64 bg-white border-r border-gray-200 min-h-screen">
-          <nav className="p-6">
-            <ul className="space-y-2">
+        <div className="sidebar hidden lg:block">
+          <nav className="sidebar__nav">
+            <ul className="sidebar__list">
               {navigationItems.map((item) => {
                 const isActive = (item.id === 'general' && currentSection === 'general') || 
                                 item.id === currentSection;
@@ -281,12 +275,12 @@ export default function ProfilePage() {
                   <li key={item.id}>
                     <button
                       onClick={() => handleNavigation(item.path)}
-                      className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
+                      className={`sidebar__item ${
                         isActive
-                          ? 'bg-kifolio-cta/10 text-kifolio-cta font-medium'
+                          ? 'sidebar__item--active'
                           : item.id === 'delete-account'
-                          ? 'text-red-600 hover:bg-red-50'
-                          : 'text-gray-700 hover:bg-gray-100'
+                          ? 'sidebar__item--danger'
+                          : ''
                       }`}
                     >
                       {item.label}

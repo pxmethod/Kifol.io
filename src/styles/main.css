@@ -1,0 +1,280 @@
+/* Kifolio Main Stylesheet */
+
+/* Import Tailwind base styles */
+@tailwind base;
+
+/* Import our base styles and design tokens */
+@import url('./base/index.css');
+
+/* Import component styles */
+@import url('./components/buttons.css');
+@import url('./components/forms.css');
+@import url('./components/cards.css');
+@import url('./components/navigation.css');
+@import url('./components/modals.css');
+
+/* Import utility classes */
+@import url('./utilities/index.css');
+
+/* Import Tailwind components and utilities */
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Tailwind component classes */
+@layer components {
+  /* Button Components using Tailwind */
+  .btn-primary {
+    @apply bg-kifolio-cta text-white px-4 py-3 rounded-lg font-semibold hover:bg-kifolio-cta/90 transition-colors shadow-md flex items-center gap-2;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-gray-700 border border-gray-300 px-4 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors flex items-center gap-2;
+  }
+  
+  .btn-danger {
+    @apply bg-red-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors flex items-center gap-2;
+  }
+  
+  .btn-ghost {
+    @apply bg-transparent text-gray-600 px-4 py-3 rounded-lg font-semibold hover:bg-gray-100 hover:text-kifolio-text transition-colors flex items-center gap-2;
+  }
+  
+  .btn-link {
+    @apply text-kifolio-cta hover:text-kifolio-cta/80 transition-colors flex items-center gap-2;
+  }
+  
+  /* Form Components using Tailwind */
+  .form-input {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kifolio-cta focus:border-transparent transition-colors;
+  }
+  
+  .form-textarea {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kifolio-cta focus:border-transparent transition-colors resize-vertical min-h-24;
+  }
+  
+  .form-select {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kifolio-cta focus:border-transparent transition-colors appearance-none bg-white;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+  
+  .form-label {
+    @apply block text-sm font-medium text-kifolio-text mb-2;
+  }
+  
+  .form-error {
+    @apply text-sm text-red-600 mt-1;
+  }
+  
+  .form-help {
+    @apply text-sm text-gray-600 mt-1;
+  }
+  
+  /* Card Components using Tailwind */
+  .card-base {
+    @apply bg-white rounded-lg shadow-md overflow-hidden;
+  }
+  
+  .card-portfolio {
+    @apply card-base relative hover:shadow-lg transition-shadow;
+  }
+  
+  .card-achievement {
+    @apply card-base border-l-4 border-kifolio-cta;
+  }
+  
+  .card-modal {
+    @apply card-base max-w-2xl mx-auto shadow-xl;
+  }
+  
+  /* Avatar Components using Tailwind */
+  .avatar-base {
+    @apply rounded-full overflow-hidden flex items-center justify-content bg-gradient-to-br from-kifolio-cta to-kifolio-header;
+  }
+  
+  .avatar-sm {
+    @apply avatar-base w-8 h-8;
+  }
+  
+  .avatar-md {
+    @apply avatar-base w-12 h-12;
+  }
+  
+  .avatar-lg {
+    @apply avatar-base w-16 h-16;
+  }
+  
+  .avatar-xl {
+    @apply avatar-base w-24 h-24;
+  }
+  
+  .avatar-2xl {
+    @apply avatar-base w-32 h-32;
+  }
+  
+  /* Navigation Components using Tailwind */
+  .nav-item {
+    @apply px-4 py-3 rounded-lg transition-colors font-medium;
+  }
+  
+  .nav-item-active {
+    @apply nav-item bg-kifolio-cta/10 text-kifolio-cta;
+  }
+  
+  .nav-item-inactive {
+    @apply nav-item text-gray-700 hover:bg-gray-100;
+  }
+  
+  .nav-item-danger {
+    @apply nav-item text-red-600 hover:bg-red-50;
+  }
+  
+  /* Layout Components using Tailwind */
+  .container-app {
+    @apply max-w-6xl mx-auto px-4;
+  }
+  
+  .container-narrow {
+    @apply max-w-2xl mx-auto px-4;
+  }
+  
+  .section-spacing {
+    @apply py-8;
+  }
+  
+  /* Text Components using Tailwind */
+  .heading-1 {
+    @apply text-4xl font-bold text-kifolio-text;
+  }
+  
+  .heading-2 {
+    @apply text-3xl font-bold text-kifolio-text;
+  }
+  
+  .heading-3 {
+    @apply text-2xl font-bold text-kifolio-text;
+  }
+  
+  .heading-4 {
+    @apply text-xl font-semibold text-kifolio-text;
+  }
+  
+  .text-muted {
+    @apply text-gray-600;
+  }
+  
+  .text-subtle {
+    @apply text-gray-500;
+  }
+  
+  .text-primary {
+    @apply text-kifolio-cta;
+  }
+  
+  /* Animation Components using Tailwind */
+  .fade-in {
+    @apply animate-in fade-in duration-200;
+  }
+  
+  .slide-up {
+    @apply animate-in slide-in-from-bottom-4 duration-200;
+  }
+  
+  .scale-in {
+    @apply animate-in zoom-in-95 duration-200;
+  }
+}
+
+/* Custom utility classes using Tailwind */
+@layer utilities {
+  /* Focus utilities */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kifolio-cta focus-visible:ring-offset-2;
+  }
+  
+  .focus-ring-danger {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2;
+  }
+  
+  /* Interaction utilities */
+  .hover-lift {
+    @apply transition-transform hover:-translate-y-1;
+  }
+  
+  .hover-scale {
+    @apply transition-transform hover:scale-105 active:scale-95;
+  }
+  
+  /* Text utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Scroll utilities */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+  
+  /* Custom shadows */
+  .shadow-kifolio {
+    box-shadow: 0 4px 6px -1px rgba(255, 107, 53, 0.1), 0 2px 4px -1px rgba(255, 107, 53, 0.06);
+  }
+}
+
+/* Global styles that need to override Tailwind */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-inter), Inter, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-gray-100);
+  border-radius: var(--radius-md);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: var(--radius-md);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-400);
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}

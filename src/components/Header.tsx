@@ -40,10 +40,10 @@ export default function Header() {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+            className="profile-menu__trigger"
           >
             {/* Avatar */}
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+            <div className="profile-menu__avatar">
               <svg 
                 className="w-5 h-5 text-white" 
                 fill="currentColor" 
@@ -58,16 +58,15 @@ export default function Header() {
             </div>
 
             {/* Email */}
-            <span className="text-sm hidden sm:block text-white">
+            <span className="profile-menu__email hidden sm:block">
               email@domain.com
             </span>
 
             {/* Dropdown Arrow */}
             <svg 
-              className="w-4 h-4 text-white transition-transform duration-200"
+              className={`profile-menu__chevron ${isDropdownOpen ? 'profile-menu__chevron--open' : ''}`}
               fill="currentColor" 
               viewBox="0 0 20 20"
-              style={{ transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
             >
               <path 
                 fillRule="evenodd" 
@@ -79,15 +78,15 @@ export default function Header() {
 
           {/* Dropdown Menu */}
           {isDropdownOpen && (
-            <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+            <div className="profile-menu__dropdown">
               <Link 
                 href="/profile"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors border-b border-gray-100"
+                className="profile-menu__item"
                 onClick={() => setIsDropdownOpen(false)}
               >
                 Profile
               </Link>
-              <div className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer">
+              <div className="profile-menu__item">
                 Logout
               </div>
             </div>

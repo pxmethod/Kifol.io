@@ -1,22 +1,2 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  --background: #f0f8f6;
-  --foreground: #2d5a5a;
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-inter), Inter, sans-serif;
-}
-
-/* Custom utilities */
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
+/* Import our organized CSS system */
+@import url('../styles/main.css');
