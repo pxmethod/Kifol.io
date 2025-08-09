@@ -89,10 +89,10 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove }: Portfolio
       {/* 3-Dot Menu */}
       <div className="card__actions" ref={menuRef} onMouseLeave={handleMenuMouseLeave}>
         <button
-          className="menu-button btn btn--ghost btn--icon-only btn--sm"
+          className="menu-button btn btn--ghost btn--icon-only"
           onClick={handleMenuToggle}
         >
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
           </svg>
         </button>

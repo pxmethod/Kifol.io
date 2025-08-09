@@ -35,7 +35,7 @@ export default function PortfolioGrid({ portfolios, onEdit, onRemove }: Portfoli
         </h1>
         <button
           onClick={() => router.push('/create')}
-          className="bg-kifolio-cta text-white px-6 py-3 rounded-lg font-semibold hover:bg-kifolio-cta/90 transition-colors shadow-md"
+          className="btn btn--primary"
         >
           Create New Portfolio
         </button>
