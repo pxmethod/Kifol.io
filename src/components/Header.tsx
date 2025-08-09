@@ -37,36 +37,37 @@ export default function Header() {
         </Link>
 
         {/* User Profile Section */}
-        <div className="flex items-center space-x-3 relative" ref={dropdownRef}>
-          {/* Avatar */}
-          <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-            <svg 
-              className="w-5 h-5 text-white" 
-              fill="currentColor" 
-              viewBox="0 0 20 20"
-            >
-              <path 
-                fillRule="evenodd" 
-                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" 
-                clipRule="evenodd" 
-              />
-            </svg>
-          </div>
-
-          {/* Email */}
-          <span className="text-sm hidden sm:block">
-            email@domain.com
-          </span>
-
-          {/* Dropdown Toggle */}
+        <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="text-white hover:text-white/80 transition-colors"
+            className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
           >
+            {/* Avatar */}
+            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+              <svg 
+                className="w-5 h-5 text-white" 
+                fill="currentColor" 
+                viewBox="0 0 20 20"
+              >
+                <path 
+                  fillRule="evenodd" 
+                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" 
+                  clipRule="evenodd" 
+                />
+              </svg>
+            </div>
+
+            {/* Email */}
+            <span className="text-sm hidden sm:block text-white">
+              email@domain.com
+            </span>
+
+            {/* Dropdown Arrow */}
             <svg 
-              className="w-4 h-4" 
+              className="w-4 h-4 text-white transition-transform duration-200"
               fill="currentColor" 
               viewBox="0 0 20 20"
+              style={{ transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
             >
               <path 
                 fillRule="evenodd" 

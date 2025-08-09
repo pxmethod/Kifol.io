@@ -88,6 +88,15 @@ export default function ProfilePage() {
         return (
           <div className="space-y-8">
             <div>
+              <button
+                onClick={() => router.push('/')}
+                className="flex items-center text-kifolio-cta hover:text-kifolio-cta/80 transition-colors mb-6"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to my dashboard
+              </button>
               <h2 className="text-2xl font-bold text-kifolio-text mb-2">My Profile</h2>
               <p className="text-gray-600">Update your username and manage your account</p>
             </div>
