@@ -64,6 +64,14 @@ export default function PortfolioPage() {
     }
   }, [searchParams, params.id, router]);
 
+  const formatMemberSince = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long'
+    });
+  };
+
   const copyToClipboard = async () => {
     if (portfolio) {
       const url = `my.kifol.io/${portfolio.id}`;
@@ -294,6 +302,9 @@ export default function PortfolioPage() {
                 </h1>
                 <p className="text-xl text-gray-600">
                   {portfolio.portfolioTitle}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Member since {formatMemberSince(portfolio.createdAt)}
                 </p>
               </div>
 
