@@ -16,6 +16,10 @@ interface NotificationPreferences {
   accountActivity: boolean;
 }
 
+interface InvitationData {
+  email: string;
+}
+
 const navigationItems = [
   { id: 'general', label: 'General', path: '/profile' },
   { id: 'password', label: 'Password', path: '/profile/password' },
@@ -46,6 +50,8 @@ export default function ProfilePage() {
   const [hasChanges, setHasChanges] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [passwordError, setPasswordError] = useState('');
+  const [invitationData, setInvitationData] = useState<InvitationData>({ email: '' });
+  const [isSendingInvite, setIsSendingInvite] = useState(false);
 
   // Determine current section from URL
   const currentSection = Array.isArray(params.section) && params.section.length > 0 
@@ -118,6 +124,34 @@ export default function ProfilePage() {
       notificationPreferences.kifolioCommunications !== originalNotificationPreferences.kifolioCommunications ||
       notificationPreferences.accountActivity !== originalNotificationPreferences.accountActivity
     );
+  };
+
+  const handleSendInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!invitationData.email.trim()) {
+      return;
+    }
+
+    setIsSendingInvite(true);
+    
+    try {
+      // Simulate API call for sending invitation
+      // In a real app, this would connect to email services
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+      
+      // Show success message
+      setToastMessage(`Invitation sent successfully to ${invitationData.email}!`);
+      setShowToast(true);
+      
+      // Reset form
+      setInvitationData({ email: '' });
+    } catch (error) {
+      setToastMessage('Failed to send invitation. Please try again.');
+      setShowToast(true);
+    } finally {
+      setIsSendingInvite(false);
+    }
   };
 
   const handleNavigation = (path: string) => {
@@ -256,9 +290,7 @@ export default function ProfilePage() {
             <form onSubmit={handleSaveNotificationPreferences} className="space-y-8">
               {/* Alerts & Notifications Section */}
               <div>
-                <h3 className="text-lg font-semibold text-kifolio-text mb-4">Alerts & Notifications</h3>
-                <p className="text-gray-600 mb-4">Send me:</p>
-                
+                <h3 className="text-lg font-semibold text-kifolio-text mb-4">Send me:</h3>
                 <div className="space-y-4">
                   <label className="checkbox">
                     <input
@@ -307,9 +339,37 @@ export default function ProfilePage() {
           <div className="space-y-8">
             <div>
               <h2 className="text-2xl font-bold text-kifolio-text mb-2">Invitations</h2>
-              <p className="text-gray-600">Manage your invitations and referrals</p>
+              <p className="text-gray-600">Know someone else who'd like to use Kifolio? Send them an invite.</p>
             </div>
-            <div className="text-gray-500">Invitations section coming soon...</div>
+
+            {/* Invitation Form */}
+            <form onSubmit={handleSendInvite} className="space-y-6">
+              <div className="form-field">
+                <label htmlFor="invite-email" className="form-field__label">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  id="invite-email"
+                  value={invitationData.email}
+                  onChange={(e) => setInvitationData(prev => ({ ...prev, email: e.target.value }))}
+                  className="input"
+                  placeholder="Enter email address to invite"
+                  required
+                />
+              </div>
+
+              {/* Send Invite Button */}
+              <div className="form-actions">
+                <button
+                  type="submit"
+                  className="btn btn--primary"
+                  disabled={!invitationData.email.trim() || isSendingInvite}
+                >
+                  {isSendingInvite ? 'Sending...' : 'Send Invite'}
+                </button>
+              </div>
+            </form>
           </div>
         );
 
@@ -318,9 +378,41 @@ export default function ProfilePage() {
           <div className="space-y-8">
             <div>
               <h2 className="text-2xl font-bold text-kifolio-text mb-2">Delete Account</h2>
-              <p className="text-gray-600">Permanently delete your account and data</p>
+              <p className="text-gray-600">This action cannot be undone</p>
             </div>
-            <div className="text-gray-500">Delete account section coming soon...</div>
+
+            {/* Subtext with Links */}
+            <div className="space-y-4">
+              <p className="text-gray-600">
+                Before you go, consider{' '}
+                <a href="#" className="text-primary hover:underline">submitting feedback</a>
+                {' '}or{' '}
+                <a href="#" className="text-primary hover:underline">contacting support</a>
+                {' '}if you're experiencing issues.
+              </p>
+              <p className="text-gray-600">
+                Need help?{' '}
+                <a href="#" className="text-primary hover:underline">Visit our help center</a>
+                {' '}or{' '}
+                <a href="#" className="text-primary hover:underline">contact our team</a>.
+              </p>
+            </div>
+
+            {/* Delete Button */}
+            <div className="form-actions">
+              <button
+                onClick={() => {
+                  // TODO: Implement account deletion logic
+                  // - Sign out user
+                  // - Redirect to marketing website
+                  // - Send deletion confirmation email
+                  console.log('Delete account clicked - services not yet connected');
+                }}
+                className="btn btn--danger"
+              >
+                Delete my account
+              </button>
+            </div>
           </div>
         );
 

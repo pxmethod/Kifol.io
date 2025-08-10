@@ -233,10 +233,11 @@
 }
 
 .checkbox__label {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   color: var(--color-text);
   line-height: var(--line-height-normal);
   cursor: pointer;
+  padding-top: 0.3rem;
 }
 
 .checkbox__description {
