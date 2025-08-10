@@ -8,6 +8,12 @@ import Toast from '@/components/Toast';
 interface ProfileData {
   email: string;
   googleConnected: boolean;
+  password?: string;
+}
+
+interface NotificationPreferences {
+  kifolioCommunications: boolean;
+  accountActivity: boolean;
 }
 
 const navigationItems = [
@@ -26,11 +32,20 @@ export default function ProfilePage() {
     email: 'jn.amenard@gmail.com',
     googleConnected: true
   });
-  const [formData, setFormData] = useState({ email: '' });
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [notificationPreferences, setNotificationPreferences] = useState<NotificationPreferences>({
+    kifolioCommunications: true,
+    accountActivity: true
+  });
+  const [originalNotificationPreferences, setOriginalNotificationPreferences] = useState<NotificationPreferences>({
+    kifolioCommunications: true,
+    accountActivity: true
+  });
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [hasChanges, setHasChanges] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
 
   // Determine current section from URL
   const currentSection = Array.isArray(params.section) && params.section.length > 0 
@@ -38,11 +53,11 @@ export default function ProfilePage() {
     : 'general';
 
   useEffect(() => {
-    setFormData({ email: profileData.email });
+    setFormData({ email: profileData.email, password: '' });
   }, [profileData]);
 
   useEffect(() => {
-    setHasChanges(formData.email !== profileData.email);
+    setHasChanges(formData.email !== profileData.email || formData.password !== '');
   }, [formData, profileData]);
 
   // Close mobile menu when clicking outside
@@ -70,7 +85,47 @@ export default function ProfilePage() {
     setShowToast(true);
   };
 
+  const handlePasswordChange = async () => {
+    // Validate password
+    if (formData.password.length < 6) {
+      setPasswordError('Password must be at least 6 characters long');
+      return;
+    }
+    
+    setPasswordError('');
+    
+    // Simulate API call for password change
+    setProfileData(prev => ({ ...prev, password: formData.password }));
+    setFormData(prev => ({ ...prev, password: '' }));
+    setHasChanges(false);
+    setToastMessage('Password has successfully been changed!');
+    setShowToast(true);
+  };
+
+  const handleSaveNotificationPreferences = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Simulate API call for saving notification preferences
+    // In a real app, this would save to the backend
+    
+    setOriginalNotificationPreferences(notificationPreferences);
+    setToastMessage('Notification preferences updated successfully!');
+    setShowToast(true);
+  };
+
+  const hasNotificationChanges = () => {
+    return (
+      notificationPreferences.kifolioCommunications !== originalNotificationPreferences.kifolioCommunications ||
+      notificationPreferences.accountActivity !== originalNotificationPreferences.accountActivity
+    );
+  };
+
   const handleNavigation = (path: string) => {
+    // Clear password field when navigating away from password section
+    if (currentSection === 'password') {
+      setFormData(prev => ({ ...prev, password: '' }));
+      setPasswordError('');
+    }
     router.push(path);
     setIsMobileMenuOpen(false); // Close mobile menu on navigation
   };
@@ -88,17 +143,8 @@ export default function ProfilePage() {
         return (
           <div className="space-y-8">
             <div>
-              <button
-                onClick={() => router.push('/')}
-                className="btn--back mb-6"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                Back to my dashboard
-              </button>
               <h2 className="text-2xl font-bold text-kifolio-text mb-2">My Profile</h2>
-              <p className="text-gray-600">Update your username and manage your account</p>
+              <p className="text-gray-600">Update your email and manage your account</p>
             </div>
 
             {/* Account Email Section */}
@@ -161,9 +207,42 @@ export default function ProfilePage() {
           <div className="space-y-8">
             <div>
               <h2 className="text-2xl font-bold text-kifolio-text mb-2">Password</h2>
-              <p className="text-gray-600">Update your password settings</p>
+              <p className="text-gray-600">Manage your password</p>
             </div>
-            <div className="text-gray-500">Password section coming soon...</div>
+
+            {/* Password Section */}
+            <div className="form-field">
+              <label htmlFor="password" className="form-field__label">
+                New Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={formData.password}
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, password: e.target.value }));
+                  if (passwordError) setPasswordError('');
+                }}
+                className={`input ${passwordError ? 'input--error' : ''}`}
+                placeholder="Enter new password"
+              />
+              {passwordError && (
+                <p className="form-field__error">{passwordError}</p>
+              )}
+              <p className="form-field__help">Minimum 6 characters required</p>
+            </div>
+
+            {/* Change Password Button */}
+            {formData.password && (
+              <div className="form-actions">
+                <button
+                  onClick={handlePasswordChange}
+                  className="btn btn--primary"
+                >
+                  Change Password
+                </button>
+              </div>
+            )}
           </div>
         );
 
@@ -174,7 +253,54 @@ export default function ProfilePage() {
               <h2 className="text-2xl font-bold text-kifolio-text mb-2">Email Notifications</h2>
               <p className="text-gray-600">Manage your email notification preferences</p>
             </div>
-            <div className="text-gray-500">Email notifications section coming soon...</div>
+
+            {/* Email Notifications Form */}
+            <form onSubmit={handleSaveNotificationPreferences} className="space-y-8">
+              {/* Alerts & Notifications Section */}
+              <div>
+                <h3 className="text-lg font-semibold text-kifolio-text mb-4">Alerts & Notifications</h3>
+                <p className="text-gray-600 mb-4">Send me:</p>
+                
+                <div className="space-y-4">
+                  <label className="checkbox">
+                    <input
+                      type="checkbox"
+                      className="checkbox__input"
+                      checked={notificationPreferences.kifolioCommunications}
+                      onChange={(e) => setNotificationPreferences(prev => ({
+                        ...prev,
+                        kifolioCommunications: e.target.checked
+                      }))}
+                    />
+                    <span className="checkbox__label">Kifolio communications</span>
+                  </label>
+                  
+                  <label className="checkbox">
+                    <input
+                      type="checkbox"
+                      className="checkbox__input"
+                      checked={notificationPreferences.accountActivity}
+                      onChange={(e) => setNotificationPreferences(prev => ({
+                        ...prev,
+                        accountActivity: e.target.checked
+                      }))}
+                    />
+                    <span className="checkbox__label">Account activity</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="form-actions">
+                <button
+                  type="submit"
+                  className="btn btn--primary"
+                  disabled={!hasNotificationChanges()}
+                >
+                  Save Preferences
+                </button>
+              </div>
+            </form>
           </div>
         );
 
@@ -293,9 +419,28 @@ export default function ProfilePage() {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 p-4 lg:p-8">
-          <div className="max-w-2xl mx-auto lg:mx-0">
-            {renderContent()}
+        <div className="flex-1 main-content-with-sidebar">
+          {/* Action Bar */}
+          <div className="action-bar">
+            <div className="action-bar__container">
+              <div className="action-bar__left">
+                <button
+                  onClick={() => router.push('/')}
+                  className="btn--back"
+                >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  Back to my dashboard
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 lg:p-8">
+            <div className="max-w-2xl mx-auto lg:mx-0">
+              {renderContent()}
+            </div>
           </div>
         </div>
       </div>
