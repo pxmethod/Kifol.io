@@ -217,8 +217,8 @@
 .checkbox__input:checked::after {
   content: '';
   position: absolute;
-  top: 2px;
-  left: 5px;
+  top: 4px;
+  left: 9px;
   width: 7px;
   height: 12px;
   border: 2px solid white;

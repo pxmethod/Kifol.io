@@ -189,16 +189,15 @@ export default function ProfilePage() {
             </div>
 
             {/* Save Button */}
-            {hasChanges && (
-              <div className="form-actions">
-                <button
-                  onClick={handleSaveChanges}
-                  className="btn btn--primary"
-                >
-                  Save Changes
-                </button>
-              </div>
-            )}
+            <div className="form-actions">
+              <button
+                onClick={handleSaveChanges}
+                className="btn btn--primary"
+                disabled={!hasChanges}
+              >
+                Save Changes
+              </button>
+            </div>
           </div>
         );
 
@@ -233,16 +232,15 @@ export default function ProfilePage() {
             </div>
 
             {/* Change Password Button */}
-            {formData.password && (
-              <div className="form-actions">
-                <button
-                  onClick={handlePasswordChange}
-                  className="btn btn--primary"
-                >
-                  Change Password
-                </button>
-              </div>
-            )}
+            <div className="form-actions">
+              <button
+                onClick={handlePasswordChange}
+                className="btn btn--primary"
+                disabled={!formData.password}
+              >
+                Change Password
+              </button>
+            </div>
           </div>
         );
 
