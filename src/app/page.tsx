@@ -87,7 +87,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="min-h-screen bg-kifolio-bg">
-        <Header />
+        <Header animateLogo={true} />
         <main className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[60vh]">
             <div className="text-kifolio-text">Loading...</div>
@@ -99,8 +99,8 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-kifolio-bg">
-      <Header />
-      <main className="container mx-auto px-4 py-8">
+      <Header animateLogo={true} />
+      <main className="container mx-auto px-4 py-8 main-content">
         {portfolios.length === 0 ? (
           <EmptyState />
         ) : (

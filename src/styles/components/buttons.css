@@ -17,6 +17,7 @@
   text-decoration: none;
   white-space: nowrap;
   position: relative;
+  z-index: 1;
   min-height: 2.75rem; /* 44px for good touch targets */
 }
 

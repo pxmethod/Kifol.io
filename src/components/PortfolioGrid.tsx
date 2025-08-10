@@ -44,7 +44,7 @@ export default function PortfolioGrid({ portfolios, onEdit, onRemove }: Portfoli
   }, [portfolios]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 portfolio-grid-container">
       {/* Header with Create Button */}
       <div className="flex justify-between items-center animate-fade-in">
         <h1 className="text-2xl font-bold text-kifolio-text">

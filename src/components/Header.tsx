@@ -3,9 +3,26 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 
-export default function Header() {
+interface HeaderProps {
+  animateLogo?: boolean;
+}
+
+export default function Header({ animateLogo = false }: HeaderProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isLogoAnimated, setIsLogoAnimated] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Trigger logo animation on page load (only when animateLogo is true)
+  useEffect(() => {
+    if (animateLogo) {
+      // Small delay to ensure smooth animation
+      const timer = setTimeout(() => {
+        setIsLogoAnimated(true);
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [animateLogo]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -28,7 +45,12 @@ export default function Header() {
     <header className="bg-kifolio-header text-white px-4 py-3 shadow-sm">
       <div className="flex items-center justify-between max-w-6xl mx-auto">
         {/* Logo */}
-        <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
+        <Link 
+          href="/" 
+          className={`flex items-center hover:opacity-80 transition-opacity ${
+            animateLogo && isLogoAnimated ? 'animate-logo-enter' : animateLogo ? 'animate-logo-initial' : ''
+          }`}
+        >
           <img 
             src="/kifolio_logo.svg" 
             alt="Kifolio Logo" 

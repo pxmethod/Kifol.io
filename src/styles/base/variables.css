@@ -87,9 +87,9 @@
   --transition-slow: 300ms ease-in-out;
   
   /* Z-Index Scale */
-  --z-dropdown: 10;
-  --z-modal: 20;
-  --z-popover: 30;
-  --z-tooltip: 40;
-  --z-toast: 50;
+  --z-dropdown: 99999;
+  --z-modal: 100000;
+  --z-popover: 100001;
+  --z-tooltip: 100002;
+  --z-toast: 100003;
 }
