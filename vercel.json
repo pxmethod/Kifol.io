@@ -8,13 +8,6 @@
       "maxDuration": 30
     }
   },
-  "redirects": [
-    {
-      "source": "/portfolio/(.*)",
-      "destination": "/preview/$1",
-      "permanent": false
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
