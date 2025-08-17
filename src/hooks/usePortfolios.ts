@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { portfolioService, achievementService } from '@/lib/database'
 import { createClient } from '@/lib/supabase/client'
 import { dbPortfolioToLegacy, legacyPortfolioToDb, LegacyPortfolioData } from '@/lib/adapters/portfolio'
+import { storageService } from '@/lib/storage'
 
 export function usePortfolios() {
   const [portfolios, setPortfolios] = useState<LegacyPortfolioData[]>([])
@@ -78,8 +79,16 @@ export function usePortfolios() {
         throw new Error('User not authenticated')
       }
 
+      // Get portfolio data before deletion to clean up photo
+      const portfolio = portfolios.find(p => p.id === portfolioId)
+      
       // Delete from database
       await portfolioService.deletePortfolio(portfolioId)
+      
+      // Clean up associated photo if it exists and is not a placeholder
+      if (portfolio?.photoUrl && !portfolio.photoUrl.includes('placeholders')) {
+        await storageService.deleteFile(portfolio.photoUrl)
+      }
       
       // Reload portfolios
       await loadPortfolios()

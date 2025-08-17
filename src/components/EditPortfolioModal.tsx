@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import { storageService } from '@/lib/storage';
 
 interface PortfolioData {
   id: string;
@@ -48,6 +50,7 @@ export default function EditPortfolioModal({
   const [showPassword, setShowPassword] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [modalMode, setModalMode] = useState<'form' | 'delete-confirmation'>('form');
 
@@ -121,26 +124,37 @@ export default function EditPortfolioModal({
     }
   };
 
-  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      // Check file size (2MB limit)
-      if (file.size > 2 * 1024 * 1024) {
-        setErrors(prev => ({ ...prev, photo: 'File size must be 2MB or less' }));
-        return;
+    if (!file) return;
+
+    // Validate file
+    const validation = storageService.validateFile(file);
+    if (!validation.valid) {
+      setErrors(prev => ({ ...prev, photo: validation.error || 'Invalid file' }));
+      return;
+    }
+
+    setUploadingPhoto(true);
+    setErrors(prev => ({ ...prev, photo: '' }));
+
+    try {
+      // Delete old photo if it exists and is not a placeholder
+      if (originalData.photoUrl && !originalData.photoUrl.includes('placeholders')) {
+        await storageService.deleteFile(originalData.photoUrl);
       }
 
-      // Check file type
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
-      if (!allowedTypes.includes(file.type)) {
-        setErrors(prev => ({ ...prev, photo: 'Please upload a JPEG, PNG, GIF, or SVG file' }));
-        return;
-      }
-
-      // Create a local URL for preview (in real app, this would upload to server)
-      const photoUrl = URL.createObjectURL(file);
+      // Upload new file to storage
+      const photoUrl = await storageService.uploadFile(file, formData.childName || 'photo');
       setFormData(prev => ({ ...prev, photoUrl }));
-      setErrors(prev => ({ ...prev, photo: '' }));
+    } catch (error) {
+      console.error('Photo upload error:', error);
+      setErrors(prev => ({ 
+        ...prev, 
+        photo: 'Failed to upload photo. Please try again.' 
+      }));
+    } finally {
+      setUploadingPhoto(false);
     }
   };
 
@@ -304,7 +318,14 @@ export default function EditPortfolioModal({
                 onChange={handlePhotoUpload}
                 accept="image/jpeg,image/png,image/gif,image/svg+xml"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-kifolio-cta"
+                disabled={uploadingPhoto}
               />
+              {uploadingPhoto && (
+                <div className="flex items-center mt-2">
+                  <LoadingSpinner size="sm" className="mr-2" label="" />
+                  <span className="text-sm text-kifolio-text">Uploading photo...</span>
+                </div>
+              )}
               {errors.photo && (
                 <p className="text-red-500 text-sm mt-1">{errors.photo}</p>
               )}

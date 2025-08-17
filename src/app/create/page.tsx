@@ -9,6 +9,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { getRandomPlaceholder } from '@/utils/placeholders';
 import { usePortfolios } from '@/hooks/usePortfolios';
 import { useAuth } from '@/contexts/AuthContext';
+import { storageService } from '@/lib/storage';
 
 
 export default function CreatePortfolio() {
@@ -29,6 +30,7 @@ export default function CreatePortfolio() {
   const [selectedTemplateForPreview, setSelectedTemplateForPreview] = useState<string>('');
   const [showPassword, setShowPassword] = useState(true);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -109,26 +111,32 @@ export default function CreatePortfolio() {
     }
   };
 
-  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      // Check file size (2MB limit)
-      if (file.size > 2 * 1024 * 1024) {
-        setErrors(prev => ({ ...prev, photo: 'File size must be 2MB or less' }));
-        return;
-      }
+    if (!file) return;
 
-      // Check file type
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
-      if (!allowedTypes.includes(file.type)) {
-        setErrors(prev => ({ ...prev, photo: 'Please upload a JPEG, PNG, GIF, or SVG file' }));
-        return;
-      }
+    // Validate file
+    const validation = storageService.validateFile(file);
+    if (!validation.valid) {
+      setErrors(prev => ({ ...prev, photo: validation.error || 'Invalid file' }));
+      return;
+    }
 
-      // Create a local URL for preview (in real app, this would upload to server)
-      const photoUrl = URL.createObjectURL(file);
+    setUploadingPhoto(true);
+    setErrors(prev => ({ ...prev, photo: '' }));
+
+    try {
+      // Upload file to storage
+      const photoUrl = await storageService.uploadFile(file, formData.childName || 'photo');
       setFormData(prev => ({ ...prev, photoUrl }));
-      setErrors(prev => ({ ...prev, photo: '' }));
+    } catch (error) {
+      console.error('Photo upload error:', error);
+      setErrors(prev => ({ 
+        ...prev, 
+        photo: 'Failed to upload photo. Please try again.' 
+      }));
+    } finally {
+      setUploadingPhoto(false);
     }
   };
 
@@ -269,7 +277,14 @@ export default function CreatePortfolio() {
                 onChange={handlePhotoUpload}
                 accept="image/jpeg,image/png,image/gif,image/svg+xml"
                 className="input"
+                disabled={uploadingPhoto}
               />
+              {uploadingPhoto && (
+                <div className="flex items-center mt-2">
+                  <LoadingSpinner size="sm" className="mr-2" label="" />
+                  <span className="text-sm text-kifolio-text">Uploading photo...</span>
+                </div>
+              )}
               {errors.photo && (
                 <p className="form-field__error">{errors.photo}</p>
               )}
