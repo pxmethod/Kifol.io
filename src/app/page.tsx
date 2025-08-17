@@ -1,82 +1,67 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Header from '@/components/Header';
 import EmptyState from '@/components/EmptyState';
 import PortfolioGrid from '@/components/PortfolioGrid';
 import EditPortfolioModal from '@/components/EditPortfolioModal';
 import DeletePortfolioModal from '@/components/DeletePortfolioModal';
 import Toast from '@/components/Toast';
-import { Achievement } from '@/types/achievement';
-
-interface PortfolioData {
-  id: string;
-  childName: string;
-  portfolioTitle: string;
-  photoUrl: string;
-  template: string;
-  createdAt: string;
-  isPrivate?: boolean;
-  password?: string;
-  hasUnsavedChanges?: boolean;
-  achievements?: Achievement[];
-}
+import { usePortfolios } from '@/hooks/usePortfolios';
+import { LegacyPortfolioData } from '@/lib/adapters/portfolio';
 
 export default function Dashboard() {
-  const [portfolios, setPortfolios] = useState<PortfolioData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [editingPortfolio, setEditingPortfolio] = useState<PortfolioData | null>(null);
-  const [deletingPortfolio, setDeletingPortfolio] = useState<PortfolioData | null>(null);
+  const { 
+    portfolios, 
+    loading, 
+    error, 
+    savePortfolio, 
+    deletePortfolio: removePortfolio 
+  } = usePortfolios();
+  
+  const [editingPortfolio, setEditingPortfolio] = useState<LegacyPortfolioData | null>(null);
+  const [deletingPortfolio, setDeletingPortfolio] = useState<LegacyPortfolioData | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
-  useEffect(() => {
-    // Load portfolios from local storage
-    const storedPortfolios = JSON.parse(localStorage.getItem('portfolios') || '[]');
-    setPortfolios(storedPortfolios);
-    setLoading(false);
-  }, []);
-
-  const handleEditPortfolio = (portfolio: PortfolioData) => {
+  const handleEditPortfolio = (portfolio: LegacyPortfolioData) => {
     setEditingPortfolio(portfolio);
     setShowEditModal(true);
   };
 
-  const handleRemovePortfolio = (portfolio: PortfolioData) => {
+  const handleRemovePortfolio = (portfolio: LegacyPortfolioData) => {
     setDeletingPortfolio(portfolio);
     setShowDeleteModal(true);
   };
 
-  const handleSavePortfolio = (updatedPortfolio: PortfolioData) => {
-    // Update local storage
-    const updatedPortfolios = portfolios.map(p => 
-      p.id === updatedPortfolio.id ? updatedPortfolio : p
-    );
-    localStorage.setItem('portfolios', JSON.stringify(updatedPortfolios));
-    
-    // Update state
-    setPortfolios(updatedPortfolios);
-    setShowEditModal(false);
-    setEditingPortfolio(null);
+  const handleSavePortfolio = async (updatedPortfolio: LegacyPortfolioData) => {
+    try {
+      await savePortfolio(updatedPortfolio);
+      setShowEditModal(false);
+      setEditingPortfolio(null);
+      setToastMessage('Portfolio updated successfully!');
+      setShowToast(true);
+    } catch (err) {
+      setToastMessage('Failed to update portfolio');
+      setShowToast(true);
+    }
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (!deletingPortfolio) return;
 
-    // Remove from local storage
-    const updatedPortfolios = portfolios.filter(p => p.id !== deletingPortfolio.id);
-    localStorage.setItem('portfolios', JSON.stringify(updatedPortfolios));
-    
-    // Update state
-    setPortfolios(updatedPortfolios);
-    setShowDeleteModal(false);
-    setDeletingPortfolio(null);
-    
-    // Show success toast for portfolio removal
-    setToastMessage('Portfolio removed successfully!');
-    setShowToast(true);
+    try {
+      await removePortfolio(deletingPortfolio.id);
+      setShowDeleteModal(false);
+      setDeletingPortfolio(null);
+      setToastMessage('Portfolio removed successfully!');
+      setShowToast(true);
+    } catch (err) {
+      setToastMessage('Failed to remove portfolio');
+      setShowToast(true);
+    }
   };
 
   const handleCancelDelete = () => {
@@ -90,7 +75,20 @@ export default function Dashboard() {
         <Header animateLogo={true} />
         <main className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[60vh]">
-            <div className="text-kifolio-text">Loading...</div>
+            <div className="text-kifolio-text">Loading portfolios...</div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-kifolio-bg">
+        <Header animateLogo={true} />
+        <main className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-red-500">Error: {error}</div>
           </div>
         </main>
       </div>

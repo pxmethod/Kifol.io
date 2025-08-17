@@ -136,17 +136,38 @@ export default function ProfilePage() {
     setIsSendingInvite(true);
     
     try {
-      // Simulate API call for sending invitation
-      // In a real app, this would connect to email services
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
-      
-      // Show success message
-      setToastMessage(`Invitation sent successfully to ${invitationData.email}!`);
-      setShowToast(true);
-      
-      // Reset form
-      setInvitationData({ email: '' });
+      // Send invitation email using our email service
+      const emailResponse = await fetch('/api/email/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'invitation',
+          data: {
+            to: invitationData.email,
+            inviterName: formData.email.split('@')[0] || 'A Kifolio user', // Use current user's name
+            inviteeEmail: invitationData.email,
+            inviteUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/signup?invited=true`,
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+            personalMessage: 'I think you\'d love using Kifolio to showcase your achievements!',
+            subject: 'You\'re invited to join Kifolio!'
+          }
+        }),
+      });
+
+      if (emailResponse.ok) {
+        // Show success message
+        setToastMessage(`Invitation sent successfully to ${invitationData.email}!`);
+        setShowToast(true);
+        
+        // Reset form
+        setInvitationData({ email: '' });
+      } else {
+        throw new Error('Failed to send invitation email');
+      }
     } catch (error) {
+      console.error('Error sending invitation:', error);
       setToastMessage('Failed to send invitation. Please try again.');
       setShowToast(true);
     } finally {
@@ -339,7 +360,7 @@ export default function ProfilePage() {
           <div className="space-y-8">
             <div>
               <h2 className="text-2xl font-bold text-kifolio-text mb-2">Invitations</h2>
-              <p className="text-gray-600">Know someone else who'd like to use Kifolio? Send them an invite.</p>
+              <p className="text-gray-600">Know someone else who&apos;d like to use Kifolio? Send them an invite.</p>
             </div>
 
             {/* Invitation Form */}
@@ -388,7 +409,7 @@ export default function ProfilePage() {
                 <a href="#" className="text-primary hover:underline">submitting feedback</a>
                 {' '}or{' '}
                 <a href="#" className="text-primary hover:underline">contacting support</a>
-                {' '}if you're experiencing issues.
+                {' '}if you&apos;re experiencing issues.
               </p>
               <p className="text-gray-600">
                 Need help?{' '}

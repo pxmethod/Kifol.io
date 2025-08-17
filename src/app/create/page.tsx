@@ -6,6 +6,7 @@ import Header from '@/components/Header';
 import TemplatePreviewModal from '@/components/TemplatePreviewModal';
 import ConfirmNavigationModal from '@/components/ConfirmNavigationModal';
 import { getRandomPlaceholder } from '@/utils/placeholders';
+import { usePortfolios } from '@/hooks/usePortfolios';
 
 interface PortfolioData {
   id: string;
@@ -21,6 +22,7 @@ interface PortfolioData {
 
 export default function CreatePortfolio() {
   const router = useRouter();
+  const { createPortfolio } = usePortfolios();
   const [formData, setFormData] = useState({
     childName: '',
     portfolioTitle: '',
@@ -157,13 +159,18 @@ export default function CreatePortfolio() {
         createdAt: new Date().toISOString()
       };
 
-      // Save to local storage
-      const existingPortfolios = JSON.parse(localStorage.getItem('portfolios') || '[]');
-      existingPortfolios.push(portfolioData);
-      localStorage.setItem('portfolios', JSON.stringify(existingPortfolios));
+      // Create portfolio using the hook
+      const newPortfolio = await createPortfolio({
+        childName: portfolioData.childName,
+        portfolioTitle: portfolioData.portfolioTitle,
+        photoUrl: portfolioData.photoUrl,
+        template: portfolioData.template,
+        isPrivate: portfolioData.isPrivate,
+        password: portfolioData.password
+      });
 
       // Redirect to the new portfolio with success parameter
-      router.push(`/portfolio/${portfolioId}?created=true`);
+      router.push(`/portfolio/${newPortfolio.id}?created=true`);
     } catch (error) {
       console.error('Error creating portfolio:', error);
       setErrors({ submit: 'Failed to create portfolio. Please try again.' });

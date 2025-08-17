@@ -1,3 +1,5 @@
+import { Achievement } from './achievement';
+
 export interface TemplateConfig {
   id: string;
   name: string;
@@ -24,6 +26,6 @@ export interface PortfolioTemplateProps {
     createdAt: string;
     isPrivate?: boolean;
     password?: string;
-    achievements?: any[];
+    achievements?: Achievement[];
   };
 } 

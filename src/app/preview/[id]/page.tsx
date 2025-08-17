@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import TemplateFactory from '@/components/templates/TemplateFactory';
+import { Achievement } from '@/types/achievement';
 
 interface PortfolioData {
   id: string;
@@ -13,7 +14,7 @@ interface PortfolioData {
   createdAt: string;
   isPrivate?: boolean;
   password?: string;
-  achievements?: any[];
+  achievements?: Achievement[];
 }
 
 export default function PreviewPage() {
@@ -51,7 +52,7 @@ export default function PreviewPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-kifolio-text mb-4">Portfolio Not Found</h1>
-          <p className="text-kifolio-text">The portfolio you're looking for doesn't exist.</p>
+          <p className="text-kifolio-text">The portfolio you&apos;re looking for doesn&apos;t exist.</p>
         </div>
       </div>
     );

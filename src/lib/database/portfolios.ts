@@ -1,0 +1,147 @@
+import { createClient } from '@/lib/supabase/client'
+import { Database } from '@/types/database'
+
+type Portfolio = Database['public']['Tables']['portfolios']['Row']
+type NewPortfolio = Database['public']['Tables']['portfolios']['Insert']
+type UpdatePortfolio = Database['public']['Tables']['portfolios']['Update']
+
+export class PortfolioService {
+  private supabase = createClient()
+
+  /**
+   * Get all portfolios for the current user
+   */
+  async getUserPortfolios(): Promise<Portfolio[]> {
+    const { data, error } = await this.supabase
+      .from('portfolios')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching portfolios:', error)
+      throw new Error('Failed to fetch portfolios')
+    }
+
+    return data || []
+  }
+
+  /**
+   * Get a specific portfolio by ID
+   */
+  async getPortfolio(id: string): Promise<Portfolio | null> {
+    const { data, error } = await this.supabase
+      .from('portfolios')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return null // Portfolio not found
+      }
+      console.error('Error fetching portfolio:', error)
+      throw new Error('Failed to fetch portfolio')
+    }
+
+    return data
+  }
+
+  /**
+   * Get a public portfolio by ID (for preview functionality)
+   */
+  async getPublicPortfolio(id: string): Promise<Portfolio | null> {
+    const { data, error } = await this.supabase
+      .from('portfolios')
+      .select('*')
+      .eq('id', id)
+      .eq('is_private', false)
+      .single()
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return null // Portfolio not found or not public
+      }
+      console.error('Error fetching public portfolio:', error)
+      throw new Error('Failed to fetch portfolio')
+    }
+
+    return data
+  }
+
+  /**
+   * Create a new portfolio
+   */
+  async createPortfolio(portfolio: Omit<NewPortfolio, 'user_id'>): Promise<Portfolio> {
+    const { data, error } = await this.supabase
+      .from('portfolios')
+      .insert([portfolio])
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error creating portfolio:', error)
+      throw new Error('Failed to create portfolio')
+    }
+
+    return data
+  }
+
+  /**
+   * Update an existing portfolio
+   */
+  async updatePortfolio(id: string, updates: UpdatePortfolio): Promise<Portfolio> {
+    const { data, error } = await this.supabase
+      .from('portfolios')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error updating portfolio:', error)
+      throw new Error('Failed to update portfolio')
+    }
+
+    return data
+  }
+
+  /**
+   * Delete a portfolio
+   */
+  async deletePortfolio(id: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('portfolios')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      console.error('Error deleting portfolio:', error)
+      throw new Error('Failed to delete portfolio')
+    }
+  }
+
+  /**
+   * Check if portfolio is accessible (either public or owned by user)
+   */
+  async isPortfolioAccessible(id: string): Promise<boolean> {
+    const { data, error } = await this.supabase
+      .from('portfolios')
+      .select('is_private, user_id')
+      .eq('id', id)
+      .single()
+
+    if (error) {
+      return false
+    }
+
+    // If it's public, it's accessible
+    if (!data.is_private) {
+      return true
+    }
+
+    // If it's private, check if user owns it
+    const { data: { user } } = await this.supabase.auth.getUser()
+    return user?.id === data.user_id
+  }
+}
+
