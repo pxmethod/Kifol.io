@@ -35,15 +35,18 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/auth') &&
-    !request.nextUrl.pathname.startsWith('/api') &&
-    request.nextUrl.pathname !== '/'
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
+  // Allow public access to preview pages and home page
+  const isPublicPath = 
+    request.nextUrl.pathname === '/' ||
+    request.nextUrl.pathname.startsWith('/auth') ||
+    request.nextUrl.pathname.startsWith('/api') ||
+    request.nextUrl.pathname.startsWith('/preview/')
+
+  // Redirect unauthenticated users trying to access protected pages
+  if (!user && !isPublicPath) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
+    url.searchParams.set('message', 'Please log in to access this page')
     return NextResponse.redirect(url)
   }
 
