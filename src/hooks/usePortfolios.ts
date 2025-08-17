@@ -15,22 +15,12 @@ export function usePortfolios() {
       setLoading(true)
       setError(null)
       
-      // Check if Supabase is configured
-      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        // Fall back to localStorage if Supabase is not configured
-        const storedPortfolios = JSON.parse(localStorage.getItem('portfolios') || '[]')
-        setPortfolios(storedPortfolios)
-        setLoading(false)
-        return
-      }
-      
       // Check if user is authenticated
       const { data: { user } } = await supabase.auth.getUser()
       
       if (!user) {
-        // If not authenticated, fall back to localStorage for backwards compatibility
-        const storedPortfolios = JSON.parse(localStorage.getItem('portfolios') || '[]')
-        setPortfolios(storedPortfolios)
+        // If not authenticated, show empty portfolios
+        setPortfolios([])
         setLoading(false)
         return
       }
@@ -51,10 +41,7 @@ export function usePortfolios() {
     } catch (err) {
       console.error('Error loading portfolios:', err)
       setError('Failed to load portfolios')
-      
-      // Fall back to localStorage on error
-      const storedPortfolios = JSON.parse(localStorage.getItem('portfolios') || '[]')
-      setPortfolios(storedPortfolios)
+      setPortfolios([])
     } finally {
       setLoading(false)
     }
@@ -63,27 +50,10 @@ export function usePortfolios() {
   // Save portfolio to database
   const savePortfolio = async (portfolio: LegacyPortfolioData) => {
     try {
-      // Check if Supabase is configured
-      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        // Fall back to localStorage if Supabase is not configured
-        const updatedPortfolios = portfolios.map(p => 
-          p.id === portfolio.id ? portfolio : p
-        )
-        localStorage.setItem('portfolios', JSON.stringify(updatedPortfolios))
-        setPortfolios(updatedPortfolios)
-        return
-      }
-
       const { data: { user } } = await supabase.auth.getUser()
       
       if (!user) {
-        // Fall back to localStorage if not authenticated
-        const updatedPortfolios = portfolios.map(p => 
-          p.id === portfolio.id ? portfolio : p
-        )
-        localStorage.setItem('portfolios', JSON.stringify(updatedPortfolios))
-        setPortfolios(updatedPortfolios)
-        return
+        throw new Error('User not authenticated')
       }
 
       // Update in database
@@ -102,23 +72,10 @@ export function usePortfolios() {
   // Delete portfolio from database
   const deletePortfolio = async (portfolioId: string) => {
     try {
-      // Check if Supabase is configured
-      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        // Fall back to localStorage if Supabase is not configured
-        const updatedPortfolios = portfolios.filter(p => p.id !== portfolioId)
-        localStorage.setItem('portfolios', JSON.stringify(updatedPortfolios))
-        setPortfolios(updatedPortfolios)
-        return
-      }
-
       const { data: { user } } = await supabase.auth.getUser()
       
       if (!user) {
-        // Fall back to localStorage if not authenticated
-        const updatedPortfolios = portfolios.filter(p => p.id !== portfolioId)
-        localStorage.setItem('portfolios', JSON.stringify(updatedPortfolios))
-        setPortfolios(updatedPortfolios)
-        return
+        throw new Error('User not authenticated')
       }
 
       // Delete from database
@@ -136,37 +93,10 @@ export function usePortfolios() {
   // Create new portfolio
   const createPortfolio = async (portfolioData: Omit<LegacyPortfolioData, 'id' | 'createdAt' | 'hasUnsavedChanges' | 'achievements'>) => {
     try {
-      // Check if Supabase is configured
-      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        // Fall back to localStorage if Supabase is not configured
-        const newPortfolio: LegacyPortfolioData = {
-          ...portfolioData,
-          id: Date.now().toString(),
-          createdAt: new Date().toISOString(),
-          hasUnsavedChanges: false,
-          achievements: []
-        }
-        const updatedPortfolios = [...portfolios, newPortfolio]
-        localStorage.setItem('portfolios', JSON.stringify(updatedPortfolios))
-        setPortfolios(updatedPortfolios)
-        return newPortfolio
-      }
-
       const { data: { user } } = await supabase.auth.getUser()
       
       if (!user) {
-        // Fall back to localStorage if not authenticated
-        const newPortfolio: LegacyPortfolioData = {
-          ...portfolioData,
-          id: Date.now().toString(),
-          createdAt: new Date().toISOString(),
-          hasUnsavedChanges: false,
-          achievements: []
-        }
-        const updatedPortfolios = [...portfolios, newPortfolio]
-        localStorage.setItem('portfolios', JSON.stringify(updatedPortfolios))
-        setPortfolios(updatedPortfolios)
-        return newPortfolio
+        throw new Error('User not authenticated')
       }
 
       // Create in database

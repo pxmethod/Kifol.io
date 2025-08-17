@@ -156,63 +156,151 @@ export default function PortfolioPage() {
     }
   };
 
-  const handleSavePortfolio = (updatedPortfolio: PortfolioData) => {
-    // Update local storage
-    const portfolios = JSON.parse(localStorage.getItem('portfolios') || '[]');
-    const updatedPortfolios = portfolios.map((p: PortfolioData) => 
-      p.id === updatedPortfolio.id ? updatedPortfolio : p
-    );
-    localStorage.setItem('portfolios', JSON.stringify(updatedPortfolios));
-    
-    // Update state
-    setPortfolio(updatedPortfolio);
-  };
-
-  const handleSaveAchievement = (achievement: Achievement) => {
-    if (!portfolio) return;
-
-    const updatedPortfolio = { ...portfolio };
-    const existingAchievements = updatedPortfolio.achievements || [];
-    
-    if (editingAchievement) {
-      // Update existing achievement
-      const achievementIndex = existingAchievements.findIndex(a => a.id === achievement.id);
-      if (achievementIndex !== -1) {
-        existingAchievements[achievementIndex] = achievement;
-      }
-    } else {
-      // Add new achievement
-      existingAchievements.push(achievement);
-      // Show success toast for new achievement
-      setToastMessage('Achievement added successfully!');
+  const handleSavePortfolio = async (updatedPortfolio: PortfolioData) => {
+    try {
+      // Update portfolio in database using the database service
+      await portfolioService.updatePortfolio(updatedPortfolio.id, {
+        child_name: updatedPortfolio.childName,
+        portfolio_title: updatedPortfolio.portfolioTitle,
+        photo_url: updatedPortfolio.photoUrl || null,
+        template: updatedPortfolio.template,
+        is_private: updatedPortfolio.isPrivate || false,
+        password: updatedPortfolio.password || null
+      });
+      
+      // Update state
+      setPortfolio(updatedPortfolio);
+    } catch (error) {
+      console.error('Error saving portfolio:', error);
+      setToastMessage('Failed to save portfolio. Please try again.');
       setShowToast(true);
     }
-    
-    updatedPortfolio.achievements = existingAchievements;
-    updatedPortfolio.hasUnsavedChanges = true;
-    
-    handleSavePortfolio(updatedPortfolio);
-    setEditingAchievement(null);
   };
 
-  const handleDeleteAchievement = (achievementId: string) => {
+  const handleSaveAchievement = async (achievement: Achievement) => {
     if (!portfolio) return;
 
-    const updatedPortfolio = { ...portfolio };
-    const existingAchievements = updatedPortfolio.achievements || [];
-    
-    // Remove the achievement
-    const filteredAchievements = existingAchievements.filter(a => a.id !== achievementId);
-    
-    updatedPortfolio.achievements = filteredAchievements;
-    updatedPortfolio.hasUnsavedChanges = true;
-    
-    // Show success toast for achievement removal
-    setToastMessage('Achievement removed successfully!');
-    setShowToast(true);
-    
-    handleSavePortfolio(updatedPortfolio);
-    setEditingAchievement(null);
+    try {
+      if (editingAchievement) {
+        // Update existing achievement in database
+        await achievementService.updateAchievement(achievement.id, {
+          title: achievement.title,
+          description: achievement.description || null,
+          date_achieved: achievement.date,
+          media_urls: achievement.media.map(m => m.url),
+          category: achievement.isMilestone ? 'milestone' : null
+        });
+        setToastMessage('Achievement updated successfully!');
+      } else {
+        // Create new achievement in database
+        await achievementService.createAchievement({
+          portfolio_id: portfolio.id,
+          title: achievement.title,
+          description: achievement.description || null,
+          date_achieved: achievement.date,
+          media_urls: achievement.media.map(m => m.url),
+          category: achievement.isMilestone ? 'milestone' : null
+        });
+        setToastMessage('Achievement added successfully!');
+      }
+      
+      setShowToast(true);
+      
+      // Reload the portfolio to get updated achievements from database
+      const portfolioId = portfolio.id;
+      const dbPortfolio = await portfolioService.getPortfolio(portfolioId);
+      if (dbPortfolio) {
+        const achievements = await achievementService.getPortfolioAchievements(portfolioId);
+        const portfolioData: PortfolioData = {
+          id: dbPortfolio.id,
+          childName: dbPortfolio.child_name,
+          portfolioTitle: dbPortfolio.portfolio_title,
+          photoUrl: dbPortfolio.photo_url || '',
+          template: dbPortfolio.template,
+          createdAt: dbPortfolio.created_at,
+          isPrivate: dbPortfolio.is_private,
+          password: dbPortfolio.password || undefined,
+          hasUnsavedChanges: false,
+          achievements: achievements.map(achievement => ({
+            id: achievement.id,
+            title: achievement.title,
+            date: achievement.date_achieved,
+            description: achievement.description || undefined,
+            media: achievement.media_urls.map((url, index) => ({
+              id: `media-${index}`,
+              url,
+              type: url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
+              fileName: url.split('/').pop() || 'file',
+              fileSize: 0
+            })),
+            isMilestone: achievement.category === 'milestone',
+            createdAt: achievement.created_at,
+            updatedAt: achievement.updated_at
+          }))
+        };
+        setPortfolio(portfolioData);
+      }
+      
+      setEditingAchievement(null);
+    } catch (error) {
+      console.error('Error saving achievement:', error);
+      setToastMessage('Failed to save achievement. Please try again.');
+      setShowToast(true);
+    }
+  };
+
+  const handleDeleteAchievement = async (achievementId: string) => {
+    if (!portfolio) return;
+
+    try {
+      // Delete achievement from database
+      await achievementService.deleteAchievement(achievementId);
+      
+      // Show success toast for achievement removal
+      setToastMessage('Achievement removed successfully!');
+      setShowToast(true);
+      
+      // Reload the portfolio to get updated achievements from database
+      const portfolioId = portfolio.id;
+      const dbPortfolio = await portfolioService.getPortfolio(portfolioId);
+      if (dbPortfolio) {
+        const achievements = await achievementService.getPortfolioAchievements(portfolioId);
+        const portfolioData: PortfolioData = {
+          id: dbPortfolio.id,
+          childName: dbPortfolio.child_name,
+          portfolioTitle: dbPortfolio.portfolio_title,
+          photoUrl: dbPortfolio.photo_url || '',
+          template: dbPortfolio.template,
+          createdAt: dbPortfolio.created_at,
+          isPrivate: dbPortfolio.is_private,
+          password: dbPortfolio.password || undefined,
+          hasUnsavedChanges: false,
+          achievements: achievements.map(achievement => ({
+            id: achievement.id,
+            title: achievement.title,
+            date: achievement.date_achieved,
+            description: achievement.description || undefined,
+            media: achievement.media_urls.map((url, index) => ({
+              id: `media-${index}`,
+              url,
+              type: url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
+              fileName: url.split('/').pop() || 'file',
+              fileSize: 0
+            })),
+            isMilestone: achievement.category === 'milestone',
+            createdAt: achievement.created_at,
+            updatedAt: achievement.updated_at
+          }))
+        };
+        setPortfolio(portfolioData);
+      }
+      
+      setEditingAchievement(null);
+    } catch (error) {
+      console.error('Error deleting achievement:', error);
+      setToastMessage('Failed to delete achievement. Please try again.');
+      setShowToast(true);
+    }
   };
 
   const handleEditAchievement = (achievement: Achievement) => {
@@ -236,18 +324,22 @@ export default function PortfolioPage() {
     }
   };
 
-  const handleDeletePortfolio = (portfolioId: string) => {
-    // Remove from local storage
-    const portfolios = JSON.parse(localStorage.getItem('portfolios') || '[]');
-    const updatedPortfolios = portfolios.filter((p: PortfolioData) => p.id !== portfolioId);
-    localStorage.setItem('portfolios', JSON.stringify(updatedPortfolios));
-    
-    // Show success toast for portfolio removal
-    setToastMessage('Portfolio removed successfully!');
-    setShowToast(true);
-    
-    // Redirect to dashboard
-    router.push('/');
+  const handleDeletePortfolio = async (portfolioId: string) => {
+    try {
+      // Delete portfolio from database
+      await portfolioService.deletePortfolio(portfolioId);
+      
+      // Show success toast for portfolio removal
+      setToastMessage('Portfolio removed successfully!');
+      setShowToast(true);
+      
+      // Redirect to dashboard
+      router.push('/');
+    } catch (error) {
+      console.error('Error deleting portfolio:', error);
+      setToastMessage('Failed to delete portfolio. Please try again.');
+      setShowToast(true);
+    }
   };
 
   const handlePublish = () => {
