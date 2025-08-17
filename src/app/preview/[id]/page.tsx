@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import TemplateFactory from '@/components/templates/TemplateFactory';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import ErrorDisplay from '@/components/ErrorDisplay';
 import { Achievement } from '@/types/achievement';
 import { portfolioService, achievementService } from '@/lib/database';
 
@@ -116,12 +117,13 @@ export default function PreviewPage() {
   if (!portfolio || error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-kifolio-text mb-4">Portfolio Not Found</h1>
-          <p className="text-kifolio-text">
-            {error || "The portfolio you're looking for doesn't exist."}
-          </p>
-        </div>
+        <ErrorDisplay
+          title="Portfolio Not Found"
+          message={error || "This portfolio is either private, doesn't exist, or has been removed."}
+          type="error"
+          showRetry={true}
+          onRetry={() => window.location.reload()}
+        />
       </div>
     );
   }

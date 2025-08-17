@@ -8,6 +8,7 @@ import EditPortfolioModal from '@/components/EditPortfolioModal';
 import DeletePortfolioModal from '@/components/DeletePortfolioModal';
 import Toast from '@/components/Toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import ErrorDisplay from '@/components/ErrorDisplay';
 import { usePortfolios } from '@/hooks/usePortfolios';
 import { LegacyPortfolioData } from '@/lib/adapters/portfolio';
 
@@ -88,9 +89,14 @@ export default function Dashboard() {
       <div className="min-h-screen bg-kifolio-bg">
         <Header animateLogo={true} />
         <main className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center min-h-[60vh]">
-            <div className="text-red-500">Error: {error}</div>
-          </div>
+          <ErrorDisplay
+            title="Unable to Load Portfolios"
+            message={`We're having trouble loading your portfolios. ${error}`}
+            type="error"
+            showRetry={true}
+            onRetry={() => window.location.reload()}
+            className="min-h-[50vh]"
+          />
         </main>
       </div>
     );

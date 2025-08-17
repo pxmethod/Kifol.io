@@ -9,6 +9,7 @@ import AchievementDetailModal from '@/components/AchievementDetailModal';
 import AchievementsTimeline from '@/components/AchievementsTimeline';
 import Toast from '@/components/Toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import ErrorDisplay from '@/components/ErrorDisplay';
 import { Achievement } from '@/types/achievement';
 import { useAuth } from '@/contexts/AuthContext';
 import { portfolioService, achievementService } from '@/lib/database';
@@ -381,18 +382,16 @@ export default function PortfolioPage() {
       <div className="min-h-screen bg-kifolio-bg">
         <Header />
         <main className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-kifolio-text mb-4">Portfolio Not Found</h1>
-            <p className="text-kifolio-text">
-              {error || "The portfolio you're looking for doesn't exist."}
-            </p>
-            <button
-              onClick={() => router.push('/')}
-              className="mt-4 btn btn--primary"
-            >
-              Back to Dashboard
-            </button>
-          </div>
+          <ErrorDisplay
+            title="Portfolio Not Found"
+            message={error || "The portfolio you're looking for doesn't exist or you don't have permission to view it."}
+            type="error"
+            showRetry={true}
+            showHome={true}
+            onRetry={() => window.location.reload()}
+            onHome={() => router.push('/')}
+            className="min-h-[50vh]"
+          />
         </main>
       </div>
     );
