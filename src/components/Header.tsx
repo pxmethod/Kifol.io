@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface HeaderProps {
@@ -62,10 +63,13 @@ export default function Header({ animateLogo = false }: HeaderProps) {
             animateLogo && isLogoAnimated ? 'animate-logo-enter' : animateLogo ? 'animate-logo-initial' : ''
           }`}
         >
-          <img 
+          <Image 
             src="/kifolio_logo.svg" 
             alt="Kifolio Logo" 
+            width={120}
+            height={32}
             className="h-8 w-auto"
+            priority
           />
         </Link>
 

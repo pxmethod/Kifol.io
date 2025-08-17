@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Achievement } from '@/types/achievement';
 
 interface AchievementCardProps {
@@ -37,9 +38,11 @@ export default function AchievementCard({
             key={media.id}
             className="w-8 h-8 rounded overflow-hidden bg-gray-100 flex-shrink-0"
           >
-            <img
+            <Image
               src={media.url}
               alt=""
+              width={32}
+              height={32}
               className="w-full h-full object-cover"
             />
           </div>

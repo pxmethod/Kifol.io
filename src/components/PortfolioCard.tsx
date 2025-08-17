@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Achievement } from '@/types/achievement';
 
 interface PortfolioData {
@@ -129,16 +130,20 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove, isAnimated 
           {portfolio.photoUrl ? (
             portfolio.photoUrl.startsWith('/placeholders/') ? (
               <div className="w-full h-full rounded-full overflow-hidden">
-                <img
+                <Image
                   src={portfolio.photoUrl}
                   alt={portfolio.childName}
+                  width={80}
+                  height={80}
                   className="w-full h-full object-cover"
                 />
               </div>
             ) : (
-              <img
+              <Image
                 src={portfolio.photoUrl}
                 alt={portfolio.childName}
+                width={80}
+                height={80}
                 className="w-full h-full object-cover"
               />
             )

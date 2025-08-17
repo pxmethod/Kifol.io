@@ -11,16 +11,16 @@ export default function LoadingSpinner({
   className = '',
   label = 'Loading...'
 }: LoadingSpinnerProps) {
-  const sizeClasses = {
-    sm: 'w-10 h-8',
-    md: 'w-20 h-16', 
-    lg: 'w-24 h-20'
+  const scaleClasses = {
+    sm: 'scale-50',
+    md: 'scale-75', 
+    lg: 'scale-100'
   };
 
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>
       <div 
-        className={`${sizeClasses[size]} loader`}
+        className={`loader ${scaleClasses[size]} transform-gpu`}
         role="status"
         aria-label={label}
       />

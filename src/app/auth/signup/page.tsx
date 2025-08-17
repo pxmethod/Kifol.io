@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface SignUpFormData {
@@ -150,9 +151,11 @@ export default function SignUpPage() {
       {/* Logo - Top Left */}
       <div className="absolute top-6 left-6 z-10">
         <Link href="/" className="flex items-center">
-          <img 
+          <Image 
             src="/kifolio_logo_dark.svg" 
             alt="Kifolio Logo" 
+            width={120}
+            height={32}
             className="h-8 w-auto"
           />
         </Link>

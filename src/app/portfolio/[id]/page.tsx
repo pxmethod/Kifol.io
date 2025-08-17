@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import Header from '@/components/Header';
 import EditPortfolioModal from '@/components/EditPortfolioModal';
 import AchievementModal from '@/components/AchievementModal';
@@ -489,16 +490,20 @@ export default function PortfolioPage() {
                 {portfolio.photoUrl ? (
                   portfolio.photoUrl.startsWith('/placeholders/') ? (
                     <div className="w-full h-full rounded-full overflow-hidden">
-                      <img 
+                      <Image 
                         src={portfolio.photoUrl} 
                         alt={portfolio.childName}
+                        width={120}
+                        height={120}
                         className="w-full h-full object-cover"
                       />
                     </div>
                   ) : (
-                    <img 
+                    <Image 
                       src={portfolio.photoUrl} 
                       alt={portfolio.childName}
+                      width={120}
+                      height={120}
                       className="w-full h-full object-cover"
                     />
                   )

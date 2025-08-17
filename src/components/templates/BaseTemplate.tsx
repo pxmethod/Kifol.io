@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { TemplateConfig, PortfolioTemplateProps } from '@/types/template';
 import { Achievement } from '@/types/achievement';
 import AchievementDetailModal from '@/components/AchievementDetailModal';
@@ -67,16 +68,20 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
               {portfolio.photoUrl ? (
                 portfolio.photoUrl.startsWith('/placeholders/') ? (
                   <div className="w-full h-full rounded-full overflow-hidden">
-                    <img 
+                    <Image 
                       src={portfolio.photoUrl} 
                       alt={portfolio.childName}
+                      width={200}
+                      height={200}
                       className="w-full h-full object-cover"
                     />
                   </div>
                 ) : (
-                  <img 
+                  <Image 
                     src={portfolio.photoUrl} 
                     alt={portfolio.childName}
+                    width={200}
+                    height={200}
                     className="w-full h-full object-cover"
                   />
                 )
@@ -274,9 +279,11 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                               style={{ borderColor: config.colors.border }}
                             >
                               {media.type === 'image' ? (
-                                <img 
+                                <Image 
                                   src={media.url} 
                                   alt={media.fileName}
+                                  width={64}
+                                  height={64}
                                   className="w-full h-full object-cover"
                                 />
                               ) : (

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Achievement } from '@/types/achievement';
 
 interface AchievementDetailModalProps {
@@ -98,9 +99,11 @@ export default function AchievementDetailModal({
               {/* Main Image */}
               <div className="mb-4">
                 <div className="bg-gray-100 rounded-lg overflow-hidden">
-                  <img
+                  <Image
                     src={imageMedia[selectedImageIndex]?.url}
                     alt=""
+                    width={800}
+                    height={384}
                     className="w-full h-auto max-h-96 object-contain"
                   />
                 </div>
@@ -119,9 +122,11 @@ export default function AchievementDetailModal({
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
-                      <img
+                      <Image
                         src={media.url}
                         alt=""
+                        width={64}
+                        height={64}
                         className="w-full h-full object-cover"
                       />
                     </button>

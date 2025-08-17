@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function ForgotPasswordPage() {
   return (
@@ -8,9 +9,11 @@ export default function ForgotPasswordPage() {
       {/* Logo - Top Left */}
       <div className="absolute top-6 left-6 z-10">
         <Link href="/" className="flex items-center">
-          <img 
+          <Image 
             src="/kifolio_logo.svg" 
             alt="Kifolio Logo" 
+            width={120}
+            height={32}
             className="h-8 w-auto"
           />
         </Link>
