@@ -176,7 +176,10 @@ export function usePortfolios() {
       // Reload portfolios
       await loadPortfolios()
       
-      return dbPortfolioToLegacy(createdPortfolio)
+      const legacyPortfolio = dbPortfolioToLegacy(createdPortfolio, [])
+      console.log('Created portfolio in database:', createdPortfolio)
+      console.log('Transformed to legacy format:', legacyPortfolio)
+      return legacyPortfolio
     } catch (err) {
       console.error('Error creating portfolio:', err)
       setError('Failed to create portfolio')

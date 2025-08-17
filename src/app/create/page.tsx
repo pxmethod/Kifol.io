@@ -152,10 +152,13 @@ export default function CreatePortfolio() {
       // Redirect to the portfolio edit page with success parameter
       const redirectUrl = `/portfolio/${newPortfolio.id}?created=true`;
       console.log('Created portfolio:', newPortfolio);
-      console.log('Redirecting to portfolio edit page:', redirectUrl);
+      console.log('About to redirect to:', redirectUrl);
       
-      // Use window.location instead of router.push to ensure redirect
-      window.location.href = redirectUrl;
+      // Add a delay to see if this helps with timing issues
+      setTimeout(() => {
+        console.log('Executing redirect to:', redirectUrl);
+        router.push(redirectUrl);
+      }, 500);
     } catch (error) {
       console.error('Error creating portfolio:', error);
       setErrors({ submit: 'Failed to create portfolio. Please try again.' });
