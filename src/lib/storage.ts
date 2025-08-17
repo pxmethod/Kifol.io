@@ -78,7 +78,7 @@ export class StorageService {
     try {
       // Check if bucket exists
       const { data: buckets } = await supabase.storage.listBuckets()
-      const bucketExists = buckets?.some((bucket: any) => bucket.name === this.BUCKET_NAME)
+      const bucketExists = buckets?.some((bucket: { name: string }) => bucket.name === this.BUCKET_NAME)
 
       if (!bucketExists) {
         // Create bucket if it doesn't exist
