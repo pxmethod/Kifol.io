@@ -9,17 +9,6 @@ import { getRandomPlaceholder } from '@/utils/placeholders';
 import { usePortfolios } from '@/hooks/usePortfolios';
 import { useAuth } from '@/contexts/AuthContext';
 
-interface PortfolioData {
-  id: string;
-  childName: string;
-  portfolioTitle: string;
-  photoUrl: string;
-  template: string;
-  createdAt: string;
-  isPrivate?: boolean;
-  password?: string;
-  hasUnsavedChanges?: boolean;
-}
 
 export default function CreatePortfolio() {
   const router = useRouter();
@@ -54,11 +43,6 @@ export default function CreatePortfolio() {
     { id: 'adler', name: 'Adler', description: 'Classic and timeless' }
   ];
 
-  const generatePortfolioId = (childName: string) => {
-    const cleanName = childName.toLowerCase().replace(/[^a-z0-9]/g, '');
-    const randomSuffix = Math.floor(Math.random() * 9000) + 1000; // 4-digit number
-    return `${cleanName}${randomSuffix}`;
-  };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -155,30 +139,18 @@ export default function CreatePortfolio() {
     setIsSubmitting(true);
 
     try {
-      const portfolioId = generatePortfolioId(formData.childName);
-      const portfolioData: PortfolioData = {
-        id: portfolioId,
+      // Create portfolio using the hook
+      const newPortfolio = await createPortfolio({
         childName: formData.childName,
         portfolioTitle: formData.portfolioTitle,
         photoUrl: formData.photoUrl || getRandomPlaceholder(formData.childName),
         template: formData.template,
         isPrivate: formData.isPrivate,
-        password: formData.password,
-        hasUnsavedChanges: false,
-        createdAt: new Date().toISOString()
-      };
-
-      // Create portfolio using the hook
-      const newPortfolio = await createPortfolio({
-        childName: portfolioData.childName,
-        portfolioTitle: portfolioData.portfolioTitle,
-        photoUrl: portfolioData.photoUrl,
-        template: portfolioData.template,
-        isPrivate: portfolioData.isPrivate,
-        password: portfolioData.password
+        password: formData.password
       });
 
-      // Redirect to the new portfolio with success parameter
+      // Redirect to the portfolio edit page with success parameter
+      console.log('Redirecting to portfolio edit page:', `/portfolio/${newPortfolio.id}?created=true`);
       router.push(`/portfolio/${newPortfolio.id}?created=true`);
     } catch (error) {
       console.error('Error creating portfolio:', error);
