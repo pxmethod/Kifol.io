@@ -30,6 +30,9 @@ export default function PortfolioPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
+  
+  console.log('Portfolio page loaded with params:', params);
+  console.log('Current pathname:', window.location.pathname);
   const [portfolio, setPortfolio] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,6 +52,7 @@ export default function PortfolioPage() {
         setLoading(true);
         setError(null);
         const portfolioId = params.id as string;
+        console.log('Loading portfolio with ID:', portfolioId);
         
         // Check if Supabase is configured
         if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
