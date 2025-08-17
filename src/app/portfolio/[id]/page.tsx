@@ -8,6 +8,7 @@ import AchievementModal from '@/components/AchievementModal';
 import AchievementDetailModal from '@/components/AchievementDetailModal';
 import AchievementsTimeline from '@/components/AchievementsTimeline';
 import Toast from '@/components/Toast';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import { Achievement } from '@/types/achievement';
 import { useAuth } from '@/contexts/AuthContext';
 import { portfolioService, achievementService } from '@/lib/database';
@@ -42,6 +43,8 @@ export default function PortfolioPage() {
   const [editingAchievement, setEditingAchievement] = useState<Achievement | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [savingAchievement, setSavingAchievement] = useState(false);
+  const [deletingAchievement, setDeletingAchievement] = useState<string | null>(null);
 
   useEffect(() => {
     const loadPortfolio = async () => {
@@ -180,6 +183,7 @@ export default function PortfolioPage() {
   const handleSaveAchievement = async (achievement: Achievement) => {
     if (!portfolio) return;
 
+    setSavingAchievement(true);
     try {
       if (editingAchievement) {
         // Update existing achievement in database
@@ -246,12 +250,15 @@ export default function PortfolioPage() {
       console.error('Error saving achievement:', error);
       setToastMessage('Failed to save achievement. Please try again.');
       setShowToast(true);
+    } finally {
+      setSavingAchievement(false);
     }
   };
 
   const handleDeleteAchievement = async (achievementId: string) => {
     if (!portfolio) return;
 
+    setDeletingAchievement(achievementId);
     try {
       // Delete achievement from database
       await achievementService.deleteAchievement(achievementId);
@@ -300,6 +307,8 @@ export default function PortfolioPage() {
       console.error('Error deleting achievement:', error);
       setToastMessage('Failed to delete achievement. Please try again.');
       setShowToast(true);
+    } finally {
+      setDeletingAchievement(null);
     }
   };
 
@@ -359,9 +368,8 @@ export default function PortfolioPage() {
       <div className="min-h-screen bg-kifolio-bg">
         <Header />
         <main className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kifolio-cta mx-auto"></div>
-            <p className="mt-4 text-kifolio-text">Loading portfolio...</p>
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <LoadingSpinner size="lg" label="Loading portfolio..." />
           </div>
         </main>
       </div>
@@ -538,12 +546,17 @@ export default function PortfolioPage() {
               <h2 className="card__title">Achievements</h2>
               <button
                 onClick={handleAddAchievement}
-                className="btn btn--primary"
+                disabled={savingAchievement}
+                className={`btn btn--primary ${savingAchievement ? 'opacity-75 cursor-not-allowed' : ''}`}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                <span>Add</span>
+                {savingAchievement ? (
+                  <LoadingSpinner size="sm" className="mr-2" label="" />
+                ) : (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                )}
+                <span>{savingAchievement ? 'Adding...' : 'Add'}</span>
               </button>
             </div>
 

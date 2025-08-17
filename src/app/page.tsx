@@ -7,6 +7,7 @@ import PortfolioGrid from '@/components/PortfolioGrid';
 import EditPortfolioModal from '@/components/EditPortfolioModal';
 import DeletePortfolioModal from '@/components/DeletePortfolioModal';
 import Toast from '@/components/Toast';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import { usePortfolios } from '@/hooks/usePortfolios';
 import { LegacyPortfolioData } from '@/lib/adapters/portfolio';
 
@@ -75,7 +76,7 @@ export default function Dashboard() {
         <Header animateLogo={true} />
         <main className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[60vh]">
-            <div className="text-kifolio-text">Loading portfolios...</div>
+            <LoadingSpinner size="lg" label="Loading portfolios..." />
           </div>
         </main>
       </div>

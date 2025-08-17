@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import TemplateFactory from '@/components/templates/TemplateFactory';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import { Achievement } from '@/types/achievement';
 import { portfolioService, achievementService } from '@/lib/database';
 
@@ -107,10 +108,7 @@ export default function PreviewPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kifolio-cta mx-auto"></div>
-          <p className="mt-4 text-kifolio-text">Loading portfolio...</p>
-        </div>
+        <LoadingSpinner size="lg" label="Loading portfolio..." />
       </div>
     );
   }

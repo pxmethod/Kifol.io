@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import TemplatePreviewModal from '@/components/TemplatePreviewModal';
 import ConfirmNavigationModal from '@/components/ConfirmNavigationModal';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import { getRandomPlaceholder } from '@/utils/placeholders';
 import { usePortfolios } from '@/hooks/usePortfolios';
 import { useAuth } from '@/contexts/AuthContext';
@@ -165,9 +166,8 @@ export default function CreatePortfolio() {
       <div className="min-h-screen bg-kifolio-bg">
         <Header />
         <main className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kifolio-cta mx-auto"></div>
-            <p className="mt-4 text-kifolio-text">Loading...</p>
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <LoadingSpinner size="lg" label="Loading..." />
           </div>
         </main>
       </div>
