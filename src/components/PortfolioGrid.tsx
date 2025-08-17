@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import PortfolioCard from './PortfolioCard';
 import { Achievement } from '@/types/achievement';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface PortfolioData {
   id: string;
@@ -26,6 +27,7 @@ interface PortfolioGridProps {
 
 export default function PortfolioGrid({ portfolios, onEdit, onRemove }: PortfolioGridProps) {
   const router = useRouter();
+  const { user } = useAuth();
   const [animatedCards, setAnimatedCards] = useState<Set<string>>(new Set());
 
   // Trigger animations when portfolios change
@@ -50,12 +52,14 @@ export default function PortfolioGrid({ portfolios, onEdit, onRemove }: Portfoli
         <h1 className="text-2xl font-bold text-kifolio-text">
           My Portfolios
         </h1>
-        <button
-          onClick={() => router.push('/create')}
-          className="btn btn--primary"
-        >
-          Create New Portfolio
-        </button>
+        {user && (
+          <button
+            onClick={() => router.push('/create')}
+            className="btn btn--primary"
+          >
+            Create New Portfolio
+          </button>
+        )}
       </div>
 
       {/* Portfolio Grid */}

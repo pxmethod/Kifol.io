@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import TemplatePreviewModal from '@/components/TemplatePreviewModal';
 import ConfirmNavigationModal from '@/components/ConfirmNavigationModal';
 import { getRandomPlaceholder } from '@/utils/placeholders';
 import { usePortfolios } from '@/hooks/usePortfolios';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface PortfolioData {
   id: string;
@@ -22,6 +23,7 @@ interface PortfolioData {
 
 export default function CreatePortfolio() {
   const router = useRouter();
+  const { user, loading } = useAuth();
   const { createPortfolio } = usePortfolios();
   const [formData, setFormData] = useState({
     childName: '',
@@ -37,6 +39,13 @@ export default function CreatePortfolio() {
   const [selectedTemplateForPreview, setSelectedTemplateForPreview] = useState<string>('');
   const [showPassword, setShowPassword] = useState(true);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/auth/login?message=Please log in to create a portfolio');
+    }
+  }, [user, loading, router]);
 
   const templates = [
     { id: 'ren', name: 'Ren', description: 'Clean and modern design' },
@@ -178,6 +187,35 @@ export default function CreatePortfolio() {
       setIsSubmitting(false);
     }
   };
+
+  // Show loading while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-kifolio-bg">
+        <Header />
+        <main className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kifolio-cta mx-auto"></div>
+            <p className="mt-4 text-kifolio-text">Loading...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // If not authenticated, show nothing (will redirect)
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-kifolio-bg">
+        <Header />
+        <main className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <p className="text-kifolio-text">Redirecting to login...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-kifolio-bg">
