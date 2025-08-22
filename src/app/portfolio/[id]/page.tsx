@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Header from '@/components/Header';
@@ -32,7 +32,7 @@ export default function PortfolioPage() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [portfolio, setPortfolio] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,87 +48,6 @@ export default function PortfolioPage() {
   const [savingAchievement, setSavingAchievement] = useState(false);
   const [deletingAchievement, setDeletingAchievement] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadPortfolio = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const portfolioId = params.id as string;
-        
-        // Check if Supabase is configured
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-          // Fall back to localStorage if Supabase is not configured
-          const portfolios = JSON.parse(localStorage.getItem('portfolios') || '[]');
-          const foundPortfolio = portfolios.find((p: PortfolioData) => p.id === portfolioId);
-          
-          if (foundPortfolio) {
-            setPortfolio(foundPortfolio);
-          } else {
-            setError('Portfolio not found');
-          }
-          setLoading(false);
-          return;
-        }
-
-        // Try to get portfolio from database first
-        const dbPortfolio = await portfolioService.getPortfolio(portfolioId);
-        
-        if (dbPortfolio) {
-          // Get achievements for this portfolio
-          const achievements = await achievementService.getPortfolioAchievements(portfolioId);
-          
-          // Transform to legacy format
-          const portfolioData: PortfolioData = {
-            id: dbPortfolio.id,
-            childName: dbPortfolio.child_name,
-            portfolioTitle: dbPortfolio.portfolio_title,
-            photoUrl: dbPortfolio.photo_url || '',
-            template: dbPortfolio.template,
-            createdAt: dbPortfolio.created_at,
-            isPrivate: dbPortfolio.is_private,
-            password: dbPortfolio.password || undefined,
-            hasUnsavedChanges: false,
-            achievements: achievements.map(achievement => ({
-              id: achievement.id,
-              title: achievement.title,
-              date: achievement.date_achieved,
-              description: achievement.description || undefined,
-              media: achievement.media_urls.map((url, index) => ({
-                id: `media-${index}`,
-                url,
-                type: url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
-                fileName: url.split('/').pop() || 'file',
-                fileSize: 0
-              })),
-              isMilestone: achievement.category === 'milestone',
-              createdAt: achievement.created_at,
-              updatedAt: achievement.updated_at
-            }))
-          };
-          
-          setPortfolio(portfolioData);
-        } else {
-          // Fall back to localStorage
-          const portfolios = JSON.parse(localStorage.getItem('portfolios') || '[]');
-          const foundPortfolio = portfolios.find((p: PortfolioData) => p.id === portfolioId);
-          
-          if (foundPortfolio) {
-            setPortfolio(foundPortfolio);
-          } else {
-            setError('Portfolio not found');
-          }
-        }
-      } catch (err) {
-        console.error('Error loading portfolio:', err);
-        setError('Failed to load portfolio');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPortfolio();
-  }, [params.id]);
-
   // Check if portfolio was just created
   useEffect(() => {
     const wasCreated = searchParams.get('created') === 'true';
@@ -139,6 +58,87 @@ export default function PortfolioPage() {
       router.replace(`/portfolio/${params.id}`);
     }
   }, [searchParams, params.id, router]);
+
+  const loadPortfolio = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const portfolioId = params.id as string;
+      
+      // Get portfolio from database
+      const dbPortfolio = await portfolioService.getPortfolio(portfolioId);
+      
+      if (dbPortfolio) {
+        // Get achievements for this portfolio
+        const achievements = await achievementService.getPortfolioAchievements(portfolioId);
+        
+        // Transform to legacy format
+        const portfolioData: PortfolioData = {
+          id: dbPortfolio.id,
+          childName: dbPortfolio.child_name,
+          portfolioTitle: dbPortfolio.portfolio_title,
+          photoUrl: dbPortfolio.photo_url || '',
+          template: dbPortfolio.template,
+          createdAt: dbPortfolio.created_at,
+          isPrivate: dbPortfolio.is_private,
+          password: dbPortfolio.password || undefined,
+          hasUnsavedChanges: false,
+          achievements: achievements.map(achievement => ({
+            id: achievement.id,
+            title: achievement.title,
+            date: achievement.date_achieved,
+            description: achievement.description || undefined,
+            media: achievement.media_urls.map((url, index) => ({
+              id: `media-${index}`,
+              url,
+              type: url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
+              fileName: url.split('/').pop() || 'file',
+              fileSize: 0
+            })),
+            isMilestone: achievement.category === 'milestone',
+            createdAt: achievement.created_at,
+            updatedAt: achievement.updated_at
+          }))
+        };
+        
+        setPortfolio(portfolioData);
+      } else {
+        setError('Portfolio not found');
+      }
+    } catch (err) {
+      console.error('Error loading portfolio:', err);
+      setError('Failed to load portfolio');
+    } finally {
+      setLoading(false);
+    }
+  }, [params.id]);
+
+  // Load portfolio data
+  useEffect(() => {
+    if (user && params.id) {
+      loadPortfolio();
+    }
+  }, [user, params.id, loadPortfolio]);
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-kifolio-bg">
+        <Header />
+        <main className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <LoadingSpinner size="lg" label="Loading..." />
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Redirect unauthenticated users to welcome page
+  if (!user) {
+    router.push('/welcome');
+    return null;
+  }
 
   const formatMemberSince = (dateString: string) => {
     const date = new Date(dateString);

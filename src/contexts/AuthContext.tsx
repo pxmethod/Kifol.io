@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { User, AuthChangeEvent, Session } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
+import { userService } from '@/lib/database'
 
 interface AuthContextType {
   user: User | null
@@ -48,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password,
         options: {
           data: {
-            name: name || ''
+            name: name || email.split('@')[0]
           }
         }
       })
@@ -57,6 +58,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: error.message }
       }
 
+      // Note: User profile and email preferences will be automatically created
+      // by the database trigger when the user confirms their email
       return {}
     } catch (error) {
       return { error: 'An unexpected error occurred' }
@@ -81,7 +84,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
+    try {
+      await supabase.auth.signOut()
+    } catch (error) {
+      console.error('Error signing out:', error)
+    }
   }
 
   const resetPassword = async (email: string) => {

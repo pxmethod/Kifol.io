@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import EmptyState from '@/components/EmptyState';
 import PortfolioGrid from '@/components/PortfolioGrid';
@@ -10,9 +11,12 @@ import Toast from '@/components/Toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import { usePortfolios } from '@/hooks/usePortfolios';
+import { useAuth } from '@/contexts/AuthContext';
 import { LegacyPortfolioData } from '@/lib/adapters/portfolio';
 
 export default function Dashboard() {
+  const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
   const { 
     portfolios, 
     loading, 
@@ -27,6 +31,32 @@ export default function Dashboard() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+
+  // Redirect unauthenticated users to welcome page
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/welcome');
+    }
+  }, [user, authLoading, router]);
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-kifolio-bg">
+        <Header animateLogo={true} />
+        <main className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <LoadingSpinner size="lg" label="Loading..." />
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Show welcome page for unauthenticated users
+  if (!user) {
+    return null; // Will redirect to /welcome
+  }
 
   const handleEditPortfolio = (portfolio: LegacyPortfolioData) => {
     setEditingPortfolio(portfolio);

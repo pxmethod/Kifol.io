@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Toast from '@/components/Toast';
+import { useAuth } from '@/contexts/AuthContext';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface ProfileData {
   email: string;
@@ -31,6 +33,7 @@ const navigationItems = [
 export default function ProfilePage() {
   const params = useParams();
   const router = useRouter();
+  const { user, loading } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [profileData, setProfileData] = useState<ProfileData>({
     email: 'jn.amenard@gmail.com',
@@ -82,6 +85,27 @@ export default function ProfilePage() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isMobileMenuOpen]);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/auth/login?message=Please log in to access your profile');
+    }
+  }, [user, loading, router]);
+
+  // Show loading while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-kifolio-bg flex items-center justify-center">
+        <LoadingSpinner size="lg" label="Loading..." />
+      </div>
+    );
+  }
+
+  // Don't render if user is not authenticated (will redirect)
+  if (!user) {
+    return null;
+  }
 
   const handleSaveChanges = async () => {
     // Simulate API call

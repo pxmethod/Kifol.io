@@ -33,22 +33,7 @@ export default function PreviewPage() {
         setError(null);
         const portfolioId = params.id as string;
         
-        // Check if Supabase is configured
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-          // Fall back to localStorage if Supabase is not configured
-          const portfolios = JSON.parse(localStorage.getItem('portfolios') || '[]');
-          const foundPortfolio = portfolios.find((p: PortfolioData) => p.id === portfolioId);
-          
-          if (foundPortfolio) {
-            setPortfolio(foundPortfolio);
-          } else {
-            setError('Portfolio not found');
-          }
-          setLoading(false);
-          return;
-        }
-
-        // Try to get portfolio from database first
+        // Get portfolio from database
         const dbPortfolio = await portfolioService.getPortfolio(portfolioId);
         
         if (dbPortfolio) {
@@ -85,15 +70,7 @@ export default function PreviewPage() {
           
           setPortfolio(portfolioData);
         } else {
-          // Fall back to localStorage
-          const portfolios = JSON.parse(localStorage.getItem('portfolios') || '[]');
-          const foundPortfolio = portfolios.find((p: PortfolioData) => p.id === portfolioId);
-          
-          if (foundPortfolio) {
-            setPortfolio(foundPortfolio);
-          } else {
-            setError('Portfolio not found');
-          }
+          setError('Portfolio not found');
         }
       } catch (err) {
         console.error('Error loading portfolio:', err);

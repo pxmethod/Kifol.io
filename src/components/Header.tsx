@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface HeaderProps {
@@ -10,6 +11,7 @@ interface HeaderProps {
 }
 
 export default function Header({ animateLogo = false }: HeaderProps) {
+  const router = useRouter();
   const { user, signOut } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLogoAnimated, setIsLogoAnimated] = useState(false);
@@ -48,6 +50,8 @@ export default function Header({ animateLogo = false }: HeaderProps) {
     try {
       await signOut();
       setIsDropdownOpen(false);
+      // Redirect to welcome page after logout
+      router.push('/welcome');
     } catch (error) {
       console.error('Logout error:', error);
     }
