@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface HeaderProps {
@@ -12,6 +12,7 @@ interface HeaderProps {
 
 export default function Header({ animateLogo = false }: HeaderProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, signOut } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLogoAnimated, setIsLogoAnimated] = useState(false);
@@ -63,9 +64,7 @@ export default function Header({ animateLogo = false }: HeaderProps) {
         {/* Logo */}
         <Link 
           href="/" 
-          className={`flex items-center hover:opacity-80 transition-opacity ${
-            animateLogo && isLogoAnimated ? 'animate-logo-enter' : animateLogo ? 'animate-logo-initial' : ''
-          }`}
+          className={`flex items-center ${animateLogo ? 'animate-fade-in' : ''}`}
         >
           <Image 
             src="/kifolio_logo.svg" 
@@ -82,13 +81,17 @@ export default function Header({ animateLogo = false }: HeaderProps) {
           <nav className="hidden md:flex items-center space-x-8">
             <Link 
               href="/" 
-              className="text-white hover:text-gray-200 transition-colors font-medium"
+              className={`text-white hover:text-gray-200 transition-colors font-medium ${
+                pathname === '/' ? 'border-b-[3px] border-kifolio-primary' : ''
+              }`}
             >
               My Portfolios
             </Link>
             <Link 
               href="/whats-happening" 
-              className="text-white hover:text-gray-200 transition-colors font-medium"
+              className={`text-white hover:text-gray-200 transition-colors font-medium ${
+                pathname === '/whats-happening' ? 'border-b-[3px] border-kifolio-primary' : ''
+              }`}
             >
               What&apos;s Happening
             </Link>

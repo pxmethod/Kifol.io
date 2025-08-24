@@ -291,7 +291,7 @@ export default function WhatsHappeningPage() {
           <h1 className="text-2xl font-bold text-kifolio-text">
             What&apos;s Happening
           </h1>
-          <p className="text-xl text-gray-600">
+          <p className="text-md text-gray-600">
             Discover amazing activities for kids and teens in your area
           </p>
         </div>

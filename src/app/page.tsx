@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import EmptyState from '@/components/EmptyState';
-import PortfolioGrid from '@/components/PortfolioGrid';
+import PortfolioCard from '@/components/PortfolioCard';
 import EditPortfolioModal from '@/components/EditPortfolioModal';
 import DeletePortfolioModal from '@/components/DeletePortfolioModal';
 import Toast from '@/components/Toast';
@@ -31,6 +31,7 @@ export default function Dashboard() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [animatedCards, setAnimatedCards] = useState<Set<string>>(new Set());
 
   // Redirect unauthenticated users to welcome page
   useEffect(() => {
@@ -38,6 +39,21 @@ export default function Dashboard() {
       router.push('/welcome');
     }
   }, [user, authLoading, router]);
+
+  // Trigger animations when portfolios change
+  useEffect(() => {
+    if (portfolios.length > 0) {
+      // Reset animations first
+      setAnimatedCards(new Set());
+      
+      // Animate each card with a staggered delay
+      portfolios.forEach((portfolio, index) => {
+        setTimeout(() => {
+          setAnimatedCards(prev => new Set(prev).add(portfolio.id));
+        }, index * 100); // 100ms delay between each card
+      });
+    }
+  }, [portfolios]);
 
   // Show loading while checking authentication
   if (authLoading) {
@@ -139,11 +155,40 @@ export default function Dashboard() {
         {portfolios.length === 0 ? (
           <EmptyState />
         ) : (
-          <PortfolioGrid
-            portfolios={portfolios}
-            onEdit={handleEditPortfolio}
-            onRemove={handleRemovePortfolio}
-          />
+          <div className="space-y-8 portfolio-grid-container">
+            {/* Header with Create Button */}
+            <div className="flex justify-between items-center animate-fade-in">
+              <div>
+                <h1 className="text-2xl font-bold text-kifolio-text">
+                  My Portfolios
+                </h1>
+                <p className="text-md text-gray-600">
+                  Support and manage your child&apos;s portfolio
+                </p>
+              </div>
+              {user && (
+                <button
+                  onClick={() => router.push('/create')}
+                  className="btn btn--primary"
+                >
+                  Create New Portfolio
+                </button>
+              )}
+            </div>
+
+            {/* Portfolio Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {portfolios.map((portfolio) => (
+                <PortfolioCard
+                  key={portfolio.id}
+                  portfolio={portfolio}
+                  onEdit={handleEditPortfolio}
+                  onRemove={handleRemovePortfolio}
+                  isAnimated={animatedCards.has(portfolio.id)}
+                />
+              ))}
+            </div>
+          </div>
         )}
       </main>
 
