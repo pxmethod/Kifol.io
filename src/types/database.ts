@@ -14,6 +14,8 @@ export interface Database {
           id: string
           email: string
           name: string | null
+          city: string | null
+          state: string | null
           created_at: string
           updated_at: string
         }
@@ -21,6 +23,8 @@ export interface Database {
           id?: string
           email: string
           name?: string | null
+          city?: string | null
+          state?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -28,6 +32,8 @@ export interface Database {
           id?: string
           email?: string
           name?: string | null
+          city?: string | null
+          state?: string | null
           updated_at?: string
         }
       }

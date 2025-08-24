@@ -9,6 +9,8 @@ CREATE TABLE public.users (
   id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
   name TEXT,
+  city TEXT,
+  state TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
 );
@@ -59,6 +61,19 @@ CREATE TABLE public.invitations (
   expires_at TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
+-- Event reminders table for tracking which events users want followups for
+CREATE TABLE public.event_reminders (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
+  event_id TEXT NOT NULL,
+  event_title TEXT NOT NULL,
+  event_date DATE NOT NULL,
+  event_location TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+  UNIQUE(user_id, event_id)
+);
+
 -- Enable Row Level Security
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.portfolios ENABLE ROW LEVEL SECURITY;
@@ -69,6 +84,7 @@ ALTER TABLE public.invitations ENABLE ROW LEVEL SECURITY;
 -- Users can only see/edit their own data
 CREATE POLICY "Users can view own data" ON public.users FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update own data" ON public.users FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users can create own data" ON public.users FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- Portfolio policies
 CREATE POLICY "Users can view own portfolios" ON public.portfolios FOR SELECT USING (auth.uid() = user_id);
@@ -127,6 +143,11 @@ CREATE POLICY "Users can create own email preferences" ON public.email_preferenc
 CREATE POLICY "Users can view sent invitations" ON public.invitations FOR SELECT USING (auth.uid() = inviter_id);
 CREATE POLICY "Users can create invitations" ON public.invitations FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+-- Event reminder policies
+CREATE POLICY "Users can view own reminders" ON public.event_reminders FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own reminders" ON public.event_reminders FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can delete own reminders" ON public.event_reminders FOR DELETE USING (auth.uid() = user_id);
+
 -- Functions for automatic timestamps
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
 RETURNS TRIGGER AS $$
@@ -141,6 +162,7 @@ CREATE TRIGGER handle_updated_at BEFORE UPDATE ON public.users FOR EACH ROW EXEC
 CREATE TRIGGER handle_updated_at BEFORE UPDATE ON public.portfolios FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 CREATE TRIGGER handle_updated_at BEFORE UPDATE ON public.achievements FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 CREATE TRIGGER handle_updated_at BEFORE UPDATE ON public.email_preferences FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+CREATE TRIGGER handle_updated_at BEFORE UPDATE ON public.event_reminders FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 
 -- Function to automatically create user profile and email preferences
 CREATE OR REPLACE FUNCTION public.handle_new_user()

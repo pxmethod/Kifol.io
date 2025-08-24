@@ -77,6 +77,24 @@ export default function Header({ animateLogo = false }: HeaderProps) {
           />
         </Link>
 
+        {/* Navigation Menu */}
+        {user && (
+          <nav className="hidden md:flex items-center space-x-8">
+            <Link 
+              href="/" 
+              className="text-white hover:text-gray-200 transition-colors font-medium"
+            >
+              My Portfolios
+            </Link>
+            <Link 
+              href="/whats-happening" 
+              className="text-white hover:text-gray-200 transition-colors font-medium"
+            >
+              What&apos;s Happening
+            </Link>
+          </nav>
+        )}
+
         {/* User Profile Section */}
         {user ? (
           <div className="relative" ref={dropdownRef}>

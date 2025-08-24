@@ -22,6 +22,18 @@
 
 /* Custom Tailwind component classes */
 @layer components {
+  /* Animation keyframes */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   /* Button Components using Tailwind */
   .btn-primary {
     @apply bg-kifolio-cta text-white px-4 py-3 rounded-lg font-semibold hover:bg-kifolio-cta/90 transition-colors shadow-md flex items-center gap-2;

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Event Followup - Kifolio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f8fafc; line-height: 1.6; color: #334155;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 40px 30px; text-align: center;">
+            <div style="background-color: #ffffff; border-radius: 16px; padding: 20px; display: inline-block; margin-bottom: 20px;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="#f97316"/>
+                    <path d="M19 15L19.74 17.74L22.5 18.5L19.74 19.26L19 22L18.26 19.26L15.5 18.5L18.26 17.74L19 15Z" fill="#f97316"/>
+                    <path d="M5 6L5.64 7.64L7.28 8.28L5.64 8.92L5 10.56L4.36 8.92L2.72 8.28L4.36 7.64L5 6Z" fill="#f97316"/>
+                </svg>
+            </div>
+            <h1 style="color: #ffffff; font-size: 28px; font-weight: 700; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                Event Followup - Kifolio
+            </h1>
+        </div>
+
+        <!-- Content -->
+        <div style="padding: 40px 30px;">
+            <p style="font-size: 18px; color: #334155; margin-bottom: 24px;">
+                Hi there! 👋
+            </p>
+            
+            <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 12px; padding: 24px; margin: 24px 0; border-left: 4px solid #f59e0b;">
+                <p style="font-size: 16px; color: #92400e; margin: 0; font-weight: 500;">
+                    We hope you and your child enjoyed <strong>{{EVENT_TITLE}}</strong> on {{EVENT_DATE}} at {{EVENT_LOCATION}}!
+                </p>
+            </div>
+            
+            <p style="font-size: 16px; color: #475569; margin-bottom: 20px;">
+                This is a friendly reminder that if you documented anything from the event, feel free to add it to your child's portfolio. It's a great way to track their growth and achievements!
+            </p>
+            
+            <p style="font-size: 16px; color: #475569; margin-bottom: 32px;">
+                Whether it's a new skill learned, a project completed, or a memorable experience, every achievement counts in building their portfolio.
+            </p>
+            
+            <!-- CTA Button -->
+            <div style="text-align: center; margin: 32px 0;">
+                <a href="{{PORTFOLIO_URL}}" 
+                   style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 12px; display: inline-block; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); transition: all 0.3s ease;">
+                    ✨ Add Achievements
+                </a>
+            </div>
+            
+            <div style="background-color: #f1f5f9; border-radius: 8px; padding: 20px; margin: 24px 0;">
+                <p style="font-size: 14px; color: #64748b; margin: 0; text-align: center;">
+                    💡 <strong>Tip:</strong> Take a few minutes to reflect on what your child accomplished during the event. Even small wins are worth celebrating!
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="color: #64748b; margin: 0 0 16px 0; font-size: 14px;">
+                Happy portfolio building! 🎉
+            </p>
+            <p style="color: #94a3b8; margin: 0; font-size: 12px;">
+                The Kifolio Team
+            </p>
+            <div style="margin-top: 20px;">
+                <a href="{{PORTFOLIO_URL}}" style="color: #f97316; text-decoration: none; font-size: 12px;">
+                    Visit Kifolio
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

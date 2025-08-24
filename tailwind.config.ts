@@ -17,6 +17,8 @@ const config: Config = {
           header: "#1a5f5f",
           cta: "#ff6b35",
           text: "#2d5a5a",
+          primary: "#ff6b35", // Add this to match kifolio-primary usage
+          "primary-dark": "#e55a2b", // Add this to match kifolio-primary-dark usage
         },
       },
       spacing: {

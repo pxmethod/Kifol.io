@@ -52,7 +52,37 @@ export class UserService {
 
     if (error) {
       console.error('Error updating user profile:', error)
-      throw new Error('Failed to update user profile')
+      throw new Error(`Failed to update user profile: ${error.message}`)
+    }
+
+    return data
+  }
+
+  /**
+   * Create user profile
+   */
+  async createUser(profileData: Partial<User>): Promise<User> {
+    const { data: { user: authUser } } = await this.supabase.auth.getUser()
+    
+    if (!authUser) {
+      throw new Error('User not authenticated')
+    }
+
+    const { data, error } = await this.supabase
+      .from('users')
+      .insert([{
+        id: authUser.id,
+        email: authUser.email || '',
+        name: authUser.user_metadata?.name || null,
+        city: profileData.city || null,
+        state: profileData.state || null
+      }])
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error creating user profile:', error)
+      throw new Error(`Failed to create user profile: ${error.message}`)
     }
 
     return data
