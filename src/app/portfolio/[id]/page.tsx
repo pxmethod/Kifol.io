@@ -1,19 +1,22 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import Image from 'next/image';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
 import Header from '@/components/Header';
-import EditPortfolioModal from '@/components/EditPortfolioModal';
-import AchievementModal from '@/components/AchievementModal';
-import AchievementDetailModal from '@/components/AchievementDetailModal';
-import AchievementsTimeline from '@/components/AchievementsTimeline';
-import Toast from '@/components/Toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorDisplay from '@/components/ErrorDisplay';
-import { Achievement } from '@/types/achievement';
+import AchievementCard from '@/components/AchievementCard';
+import AchievementModal from '@/components/AchievementModal';
+import AchievementDetailModal from '@/components/AchievementDetailModal';
+import EditPortfolioModal from '@/components/EditPortfolioModal';
+import DeletePortfolioModal from '@/components/DeletePortfolioModal';
+import Toast from '@/components/Toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { portfolioService, achievementService } from '@/lib/database';
+import { DOMAIN_CONFIG } from '@/config/domains';
+import { Achievement } from '@/types/achievement';
+import Image from 'next/image';
+import AchievementsTimeline from '@/components/AchievementsTimeline';
 
 interface PortfolioData {
   id: string;
@@ -150,7 +153,7 @@ export default function PortfolioPage() {
 
   const copyToClipboard = async () => {
     if (portfolio) {
-      const url = `my.kifol.io/${portfolio.id}`;
+              const url = `${DOMAIN_CONFIG.PORTFOLIO_DOMAIN}/${portfolio.id}`;
       try {
         await navigator.clipboard.writeText(url);
         setShowCopyNotification(true);
@@ -528,18 +531,33 @@ export default function PortfolioPage() {
               {/* Portfolio URL with Copy Button */}
               <div className="card__meta">
                 <span className="text-sm text-gray-500">Portfolio URL:</span>
-                <span className="text-sm font-mono text-kifolio-cta">
-                  my.kifol.io/{portfolio.id}
-                </span>
-                <button
-                  onClick={copyToClipboard}
-                  className="btn btn--ghost btn--icon-only btn--sm"
-                  title="Copy URL"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                </button>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-mono text-kifolio-cta">
+                    {DOMAIN_CONFIG.PORTFOLIO_DOMAIN}/{portfolio.id}
+                  </span>
+                  {portfolio.isPrivate && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      Private
+                    </span>
+                  )}
+                  <button
+                    onClick={copyToClipboard}
+                    className="btn btn--ghost btn--icon-only btn--sm"
+                    title="Copy URL"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                  </button>
+                </div>
+                {portfolio.isPrivate && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    This portfolio is private. Recipients will need the password to view it.
+                  </p>
+                )}
               </div>
             </div>
           </div>

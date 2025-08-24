@@ -1,9 +1,9 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
-import { User, AuthChangeEvent, Session } from '@supabase/supabase-js'
-import { createClient } from '@/lib/supabase/client'
-import { userService } from '@/lib/database'
+import { createContext, useContext, useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
+import { portfolioAccessService } from '@/lib/services/portfolio-access';
 
 interface AuthContextType {
   user: User | null
@@ -105,11 +105,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut()
+      // Clear password access before signing out
+      portfolioAccessService.clearAllPasswordAccess();
+      
+      await supabase.auth.signOut();
     } catch (error) {
-      console.error('Error signing out:', error)
+      console.error('Error signing out:', error);
     }
-  }
+  };
 
   const resetPassword = async (email: string) => {
     try {

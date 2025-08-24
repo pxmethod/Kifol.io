@@ -1,0 +1,91 @@
+# Environment Variables Setup for Portfolio Domain System
+
+## Required Environment Variables
+
+Create these environment variables in your deployment platform (Vercel) or local `.env.local` file:
+
+### 1. Supabase Configuration
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+### 2. Email Configuration (Resend)
+```bash
+RESEND_API_KEY=your_resend_api_key
+EMAIL_FROM=Kifolio <noreply@kifol.io>
+EMAIL_DOMAIN=kifol.io
+SUPPORT_EMAIL=support@kifol.io
+```
+
+### 3. App URLs and Domains (NEW!)
+```bash
+NEXT_PUBLIC_APP_URL=https://kifol.io
+NEXT_PUBLIC_PORTFOLIO_DOMAIN=my.kifol.io
+```
+
+### 4. Database Configuration
+```bash
+DATABASE_URL=your_database_connection_string
+```
+
+### 5. Authentication
+```bash
+NEXTAUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=https://kifol.io
+```
+
+## Portfolio Domain System
+
+The new portfolio domain system allows users to share portfolios at:
+- `my.kifol.io/{portfolio-id}`
+
+### How It Works:
+1. **Portfolio Creation**: Generates unique UUID
+2. **URL Generation**: Uses `NEXT_PUBLIC_PORTFOLIO_DOMAIN` environment variable
+3. **Public Access**: Routes to `/preview/[id]` page
+4. **Sharing**: Users can copy and share the generated URL
+
+### Next.js Configuration:
+- **Rewrites**: `my.kifol.io/:id` → `/preview/:id`
+- **Redirects**: `my.kifol.io/` → `https://kifol.io`
+
+## Setup Steps
+
+### 1. Local Development
+```bash
+# Copy environment variables
+cp .env.example .env.local
+
+# Edit with your values
+nano .env.local
+```
+
+### 2. Vercel Deployment
+1. Go to your Vercel project settings
+2. Add all environment variables
+3. Redeploy the project
+
+### 3. Domain Configuration
+1. Ensure `kifol.io` points to Vercel
+2. Ensure `my.kifol.io` points to Vercel
+3. Verify SSL certificates are active
+
+## Testing the Portfolio Domain System
+
+1. **Create a portfolio** in the app
+2. **Copy the generated URL** (should show `my.kifol.io/{id}`)
+3. **Test the URL** in an incognito browser
+4. **Verify it loads** the portfolio preview page
+
+## Troubleshooting
+
+### Portfolio URLs not working?
+- Check `NEXT_PUBLIC_PORTFOLIO_DOMAIN` is set
+- Verify DNS records for `my.kifol.io`
+- Check Vercel domain configuration
+
+### Build errors?
+- Ensure all required environment variables are set
+- Check Next.js configuration syntax
+- Verify TypeScript types are correct

@@ -26,9 +26,9 @@ export class PortfolioService {
   }
 
   /**
-   * Get a specific portfolio by ID
+   * Get a portfolio by ID with access control
    */
-  async getPortfolio(id: string): Promise<Portfolio | null> {
+  async getPortfolioWithAccess(id: string): Promise<Portfolio | null> {
     const { data, error } = await this.supabase
       .from('portfolios')
       .select('*')
@@ -44,6 +44,13 @@ export class PortfolioService {
     }
 
     return data
+  }
+
+  /**
+   * Get a specific portfolio by ID (legacy method for existing code)
+   */
+  async getPortfolio(id: string): Promise<Portfolio | null> {
+    return this.getPortfolioWithAccess(id);
   }
 
   /**
@@ -66,6 +73,31 @@ export class PortfolioService {
     }
 
     return data
+  }
+
+  /**
+   * Get portfolio access information
+   */
+  async getPortfolioAccessInfo(id: string): Promise<{
+    isPrivate: boolean;
+    hasPassword: boolean;
+    ownerId: string;
+  } | null> {
+    const { data, error } = await this.supabase
+      .from('portfolios')
+      .select('is_private, password, user_id')
+      .eq('id', id)
+      .single()
+
+    if (error || !data) {
+      return null
+    }
+
+    return {
+      isPrivate: data.is_private,
+      hasPassword: !!data.password,
+      ownerId: data.user_id
+    }
   }
 
   /**

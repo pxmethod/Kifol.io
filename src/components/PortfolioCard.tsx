@@ -85,90 +85,103 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove, isAnimated 
 
   return (
     <div 
-      className={`card card--portfolio card--interactive ${isAnimated ? 'animate-card-enter' : 'animate-card-initial'}`}
+      className={`bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 cursor-pointer ${isAnimated ? 'animate-card-enter' : 'animate-card-initial'}`}
       onClick={handleCardClick}
     >
-      {/* 3-Dot Menu */}
-      <div className="card__actions" ref={menuRef} onMouseLeave={handleMenuMouseLeave}>
-        <button
-          className="menu-button btn btn--ghost btn--icon-only"
-          onClick={handleMenuToggle}
-        >
-          <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-          </svg>
-        </button>
-
-        {/* Dropdown Menu */}
-        {showMenu && (
-          <div 
-            className="profile-menu__dropdown" 
-            style={{ right: 0, top: '2.5rem' }}
-            onMouseLeave={handleDropdownMouseLeave}
+      {/* Portfolio Image */}
+      <div className="h-48 bg-gray-100 flex items-center justify-center relative">
+        {/* 3-Dot Menu - positioned absolutely over the image */}
+        <div className="absolute top-3 right-3 z-10" ref={menuRef} onMouseLeave={handleMenuMouseLeave}>
+          <button
+            className="menu-button bg-white/90 hover:bg-white rounded-lg p-2 shadow-sm transition-colors"
+            onClick={handleMenuToggle}
           >
-            <button
-              onClick={handleEdit}
-              className="profile-menu__item"
+            <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+            </svg>
+          </button>
+
+          {/* Dropdown Menu */}
+          {showMenu && (
+            <div 
+              className="absolute right-0 top-12 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-20"
+              onMouseLeave={handleDropdownMouseLeave}
             >
-              Edit
-            </button>
-            <button
-              onClick={handleRemove}
-              className="profile-menu__item profile-menu__item--danger"
-              style={{ color: 'var(--color-danger)' }}
-            >
-              Remove
-            </button>
+              <button
+                onClick={handleEdit}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Edit
+              </button>
+              <button
+                onClick={handleRemove}
+                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+              >
+                Remove
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Status Tag - positioned absolutely over the image */}
+        {portfolio.isPrivate && (
+          <div className="absolute top-3 left-3">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              Private
+            </span>
+          </div>
+        )}
+
+        {/* Portfolio Photo or Placeholder */}
+        {portfolio.photoUrl ? (
+          portfolio.photoUrl.startsWith('/placeholders/') ? (
+            <Image
+              src={portfolio.photoUrl}
+              alt={portfolio.childName}
+              width={192}
+              height={192}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <Image
+              src={portfolio.photoUrl}
+              alt={portfolio.childName}
+              width={192}
+              height={192}
+              className="w-full h-full object-cover"
+            />
+          )
+        ) : (
+          <div className="text-gray-400 text-center">
+            <svg className="w-16 h-16 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <p>No Photo</p>
           </div>
         )}
       </div>
 
-      {/* Card Content */}
-      <div className="card__body">
-        {/* Avatar */}
-        <div className="card__avatar card__avatar--xl">
-          {portfolio.photoUrl ? (
-            portfolio.photoUrl.startsWith('/placeholders/') ? (
-              <div className="w-full h-full rounded-full overflow-hidden">
-                <Image
-                  src={portfolio.photoUrl}
-                  alt={portfolio.childName}
-                  width={80}
-                  height={80}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ) : (
-              <Image
-                src={portfolio.photoUrl}
-                alt={portfolio.childName}
-                width={80}
-                height={80}
-                className="w-full h-full object-cover"
-              />
-            )
-          ) : (
-            <span className="card__avatar--placeholder text-2xl">
-              {portfolio.childName.charAt(0).toUpperCase()}
-            </span>
-          )}
-        </div>
-
+      {/* Portfolio Details */}
+      <div className="p-6">
         {/* Child's Name */}
-        <h3 className="card__title">
+        <h3 className="text-xl font-semibold text-kifolio-text mb-2">
           {portfolio.childName}
         </h3>
 
         {/* Portfolio Title */}
-        <p className="card__subtitle">
+        <p className="text-gray-600 text-sm mb-4">
           {portfolio.portfolioTitle}
         </p>
 
         {/* Achievement Count */}
-        <div className="card__meta">
-          <span className="card__meta-item">
-            {achievementCount} Achievement{achievementCount !== 1 ? 's' : ''}
-          </span>
+        <div className="flex items-center text-sm text-gray-600">
+          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+          </svg>
+          {achievementCount} Achievement{achievementCount !== 1 ? 's' : ''}
         </div>
       </div>
     </div>
