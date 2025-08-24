@@ -415,3 +415,57 @@
     padding: 0 var(--space-3);
   }
 }
+
+/* Mobile Menu Styles */
+.mobile-menu-overlay {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.mobile-menu-slide {
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Mobile menu item hover effects */
+.mobile-menu-item {
+  transition: all 0.2s ease-in-out;
+}
+
+.mobile-menu-item:hover {
+  transform: translateX(4px);
+}
+
+/* Active state for mobile menu items */
+.mobile-menu-item.active {
+  background: linear-gradient(135deg, #ff6b35 0%, #ea580c 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+}
+
+/* Mobile menu close button hover */
+.mobile-menu-close:hover {
+  background-color: #f3f4f6;
+  transform: scale(1.05);
+}
+
+/* Ensure mobile menu is above all other content */
+.mobile-menu-z {
+  z-index: 9999;
+}
