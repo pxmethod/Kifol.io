@@ -82,7 +82,7 @@ export default function Header({ animateLogo = false }: HeaderProps) {
       <div className="flex items-center justify-between max-w-6xl mx-auto">
         {/* Logo */}
         <Link 
-          href="/" 
+          href={user ? "/dashboard" : "/"} 
           className={`flex items-center ${animateLogo ? 'animate-fade-in' : ''}`}
         >
           <Image 
@@ -99,9 +99,9 @@ export default function Header({ animateLogo = false }: HeaderProps) {
         {user && (
           <nav className="hidden md:flex items-center space-x-8">
             <Link 
-              href="/" 
+              href="/dashboard" 
               className={`text-white hover:text-gray-200 transition-colors font-medium ${
-                pathname === '/' ? 'border-b-[3px] border-kifolio-primary' : ''
+                pathname === '/dashboard' ? 'border-b-[3px] border-kifolio-primary' : ''
               }`}
             >
               My Portfolios
@@ -253,9 +253,9 @@ export default function Header({ animateLogo = false }: HeaderProps) {
             {/* Mobile Menu Items */}
             <nav className="p-6 space-y-4">
               <Link
-                href="/"
+                href="/dashboard"
                 className={`flex items-center px-4 py-3 rounded-lg text-lg font-medium transition-colors mobile-menu-item ${
-                  pathname === '/' 
+                  pathname === '/dashboard' 
                     ? 'active' 
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}

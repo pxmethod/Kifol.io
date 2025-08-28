@@ -89,13 +89,13 @@ export default function CreatePortfolio() {
     if (hasChanges()) {
       setShowConfirmModal(true);
     } else {
-      router.push('/');
+      router.push('/dashboard');
     }
   };
 
   const handleConfirmNavigation = () => {
     setShowConfirmModal(false);
-    router.push('/');
+    router.push('/dashboard');
   };
 
   const handleCancelNavigation = () => {

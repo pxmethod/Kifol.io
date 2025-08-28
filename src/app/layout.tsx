@@ -19,8 +19,41 @@ const googleFonts = [
 const googleFontsUrl = `https://fonts.googleapis.com/css2?family=${googleFonts}:wght@300;400;500;600;700&display=swap`;
 
 export const metadata: Metadata = {
-  title: "Kifolio - Showcase Your Child's Achievements",
-  description: "Create beautiful portfolios to showcase your children's work, milestones and achievements",
+  title: "Kifolio - Digital Portfolio Platform for Children | Capture Every Milestone",
+  description: "Create beautiful digital portfolios for your children. Showcase achievements, creativity, and milestones from first drawing to graduation. Start free, no credit card required.",
+  keywords: "digital portfolio, children portfolio, achievement tracking, milestone capture, parent tools, child development, creative portfolio, educational portfolio",
+  authors: [{ name: "Kifolio Team" }],
+  creator: "Kifolio",
+  publisher: "Kifolio",
+  robots: "index, follow",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://kifol.io",
+    siteName: "Kifolio",
+    title: "Kifolio - Digital Portfolio Platform for Children",
+    description: "Capture every milestone in beautiful digital portfolios. Free to start, no credit card required.",
+    images: [
+      {
+        url: "https://kifol.io/kifolio_logo_dark.svg",
+        width: 144,
+        height: 38,
+        alt: "Kifolio Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kifolio - Digital Portfolio Platform for Children",
+    description: "Capture every milestone in beautiful digital portfolios. Free to start, no credit card required.",
+    images: ["https://kifol.io/kifolio_logo_dark.svg"],
+  },
+  alternates: {
+    canonical: "https://kifol.io",
+  },
+  verification: {
+    google: "your-google-verification-code", // Add when you have Google Search Console
+  },
 };
 
 export default function RootLayout({

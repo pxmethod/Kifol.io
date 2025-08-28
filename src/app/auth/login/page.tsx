@@ -50,7 +50,7 @@ export default function LoginPage() {
   // Redirect if already logged in (but allow them to stay if they just arrived)
   useEffect(() => {
     if (user && !successMessage) {
-      router.push('/');
+      router.push('/dashboard');
     }
   }, [user, router, successMessage]);
 
@@ -101,7 +101,7 @@ export default function LoginPage() {
       }
 
       // Success - redirect to dashboard
-      router.push('/');
+      router.push('/dashboard');
     } catch (error) {
       setErrors({ ...errors, submit: 'An unexpected error occurred. Please try again.' });
     } finally {
@@ -131,7 +131,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-kifolio-bg">
       {/* Logo - Top Left */}
       <div className="absolute top-6 left-6 z-10">
-        <Link href="/" className="flex items-center">
+        <Link href={user ? "/dashboard" : "/"} className="flex items-center">
           <Image 
             src="/kifolio_logo_dark.svg" 
             alt="Kifolio Logo" 

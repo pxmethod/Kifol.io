@@ -26,10 +26,10 @@ export default function WhatsHappeningPage() {
   const [showToast, setShowToast] = useState(false);
   const [userReminders, setUserReminders] = useState<Set<string>>(new Set());
 
-  // Redirect unauthenticated users to welcome page
+  // Redirect unauthenticated users to marketing site
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/welcome');
+      router.push('/');
     }
   }, [user, authLoading, router]);
 

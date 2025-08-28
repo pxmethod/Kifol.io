@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://kifol.io/sitemap.xml
+
+# Disallow admin and private areas
+Disallow: /dashboard/
+Disallow: /profile/
+Disallow: /create/
+Disallow: /portfolio/
+Disallow: /api/
+
+# Allow public pages
+Allow: /
+Allow: /auth/login
+Allow: /auth/signup
+Allow: /whats-happening
+Allow: /preview/

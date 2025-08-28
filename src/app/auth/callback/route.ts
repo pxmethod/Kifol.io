@@ -12,7 +12,8 @@ export async function GET(request: Request) {
     
     if (!error) {
       // Successful authentication, redirect to dashboard
-      return NextResponse.redirect(`${origin}${next}`)
+      const redirectUrl = next === '/' ? '/dashboard' : next
+      return NextResponse.redirect(`${origin}${redirectUrl}`)
     }
   }
 
