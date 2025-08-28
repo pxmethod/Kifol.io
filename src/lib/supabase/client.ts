@@ -16,7 +16,8 @@ export const createClient = () => {
         signInWithOAuth: () => Promise.resolve({ data: { user: null, session: null }, error: { message: 'Supabase not configured' } }),
         signOut: () => Promise.resolve({ error: null }),
         onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-        exchangeCodeForSession: () => Promise.resolve({ data: { session: null }, error: { message: 'Supabase not configured' } })
+        exchangeCodeForSession: () => Promise.resolve({ data: { session: null }, error: { message: 'Supabase not configured' } }),
+        resetPasswordForEmail: (email: string, options?: any) => Promise.resolve({ error: null })
       }
     } as any
   }

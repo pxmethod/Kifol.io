@@ -70,20 +70,115 @@ export default function MarketingPage() {
         <section className="py-20 px-4 text-center bg-gradient-to-br from-kifolio-bg to-white">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Capture your child&apos;s journey, from first drawing to graduation
+              Every milestone matters. Capture them all with Kifolio.
             </h1>
             <p className="text-xl text-gray-600 mb-12 leading-relaxed">
-            Kifolio makes it simple for parents to build a digital portfolio that celebrates their child&apos;s achievements, creativity, and progress—year after year. 
+              Build beautiful portfolios for your children that showcase their work, 
+              milestones, and achievements. Whether it&apos;s artwork, school projects, 
+              sports accomplishments, or personal growth, Kifolio has you covered. 
+              Simple, responsive, and totally free.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/auth/signup"
                 className="bg-kifolio-primary hover:bg-kifolio-primary-dark text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors shadow-lg hover:shadow-xl"
               >
-                Start for Free
+                Get Started
               </Link>
             </div>
-            <p className="py-4 text-gray-500 text-sm">Set up in minutes. No credit card required. 30-day free trial.</p>
+            <p className="py-4 text-gray-500 text-sm">Totally free. Set up in minutes.</p>
+          </div>
+        </section>
+
+        {/* Benefits Section */}
+        <section className="py-20 px-4 bg-white" aria-labelledby="benefits-heading">
+          <div className="max-w-6xl mx-auto text-center">
+            <h2 id="benefits-heading" className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Why Parents Choose Kifolio
+            </h2>
+            <p className="text-lg text-gray-600 mb-16 leading-relaxed">
+              Everything you need to showcase your child&apos;s growth and achievements in one beautiful platform
+            </p>
+            
+            <div className="grid md:grid-cols-2 gap-8 md:gap-16">
+              {/* Left Column */}
+              <div className="space-y-6 text-left">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-kifolio-primary rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-700">Beautiful, customizable templates that grow with your child</p>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-kifolio-primary rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-700">Organize achievements by date, category, or milestone</p>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-kifolio-primary rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-700">Share with family and friends on any device</p>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-kifolio-primary rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-700">Privacy controls to keep portfolios secure</p>
+                </div>
+              </div>
+              
+              {/* Right Column */}
+              <div className="space-y-6 text-left">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-kifolio-primary rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-700">Track progress over time with visual timelines</p>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-kifolio-primary rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-700">Add photos, videos, and documents easily</p>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-kifolio-primary rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-700">Export and print for physical keepsakes</p>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-kifolio-primary rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-700">Perfect for school applications and memories</p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -91,14 +186,54 @@ export default function MarketingPage() {
         <section className="py-20 px-4 bg-white">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">
-            Every Milestone Deserves to Be Remembered
+            From first drawing to graduation
             </h2>
             <p className="text-lg text-gray-600 mb-12 leading-relaxed">
-              Build beautiful portfolios for your children that showcase their work, 
-              milestones, and achievements. Whether it&apos;s artwork, school projects, 
-              sports accomplishments, or personal growth, Kifolio has you covered. 
-              Simple, responsive, and yes — totally free.
+            Kifolio isn&apos;t only about preserving memories—it&apos;s about setting your child up for success. By curating their achievements and progress over the years, you&apos;ll have a ready-made portfolio that supports important milestones like:
             </p>
+          </div>
+          {/* Features Section */}
+          <div className="max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-12">
+              <div className="text-center">
+                <div className="bg-kifolio-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-10 h-10 text-kifolio-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-4">Beautiful Templates</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Start with one of our beautiful templates and make it your own. 
+                  Customize colors, layouts, and content to match your child&apos;s personality.
+                </p>
+              </div>
+              
+              <div className="text-center">
+                <div className="bg-kifolio-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-10 h-10 text-kifolio-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-4">Fully Responsive</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Look great at every screen size right out of the box, from phones 
+                  to tablets to desktops. Share with family and friends on any device.
+                </p>
+              </div>
+              
+              <div className="text-center">
+                <div className="bg-kifolio-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-10 h-10 text-kifolio-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-4">Completely Free</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Build unlimited portfolios and use all of Kifolio&apos;s core features 
+                  – for free! No hidden fees, no credit card required.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -162,53 +297,45 @@ export default function MarketingPage() {
             </div>
           </div>
         </section>
-
-        {/* Features Section */}
-        <section className="py-20 px-4 bg-white">
+        {/* Testimonials Section */}
+        <section className="py-20 px-4 bg-white" aria-labelledby="testimonials-heading">
           <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-3 gap-12">
-              <div className="text-center">
-                <div className="bg-kifolio-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-10 h-10 text-kifolio-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+            <h2 id="testimonials-heading" className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
+              What Parents Are Saying
+            </h2>
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="bg-gray-50 rounded-lg p-6">
+                <div className="flex items-center mb-4">
+                  <div className="w-12 h-12 bg-kifolio-primary rounded-full flex items-center justify-center mr-4">
+                    <span className="text-white font-semibold">S</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900">Sarah M.</h4>
+                    <p className="text-sm text-gray-600">Parent of Emma, age 8</p>
+                  </div>
                 </div>
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">Beautiful Templates</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Start with one of our beautiful templates and make it your own. 
-                  Customize colors, layouts, and content to match your child&apos;s personality.
+                <p className="text-gray-700 italic">
+                  &ldquo;Kifolio has made it so easy to document Emma&apos;s artistic journey. Her grandparents love being able to see her progress, and it&apos;s become a beautiful digital keepsake.&rdquo;
                 </p>
               </div>
-              
-              <div className="text-center">
-                <div className="bg-kifolio-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-10 h-10 text-kifolio-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                  </svg>
+
+              <div className="bg-gray-50 rounded-lg p-6">
+                <div className="flex items-center mb-4">
+                  <div className="w-12 h-12 bg-kifolio-primary rounded-full flex items-center justify-center mr-4">
+                    <span className="text-white font-semibold">M</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900">Michael T.</h4>
+                    <p className="text-sm text-gray-600">Parent of Lucas, age 12</p>
+                  </div>
                 </div>
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">Fully Responsive</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Look great at every screen size right out of the box, from phones 
-                  to tablets to desktops. Share with family and friends on any device.
-                </p>
-              </div>
-              
-              <div className="text-center">
-                <div className="bg-kifolio-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-10 h-10 text-kifolio-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">Completely Free</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Build unlimited portfolios and use all of Kifolio&apos;s core features 
-                  – for free! No hidden fees, no credit card required.
+                <p className="text-gray-700 italic">
+                  &ldquo;The templates are beautiful and easy to customize. Lucas loves seeing his sports achievements documented, and it motivates him to keep improving.&rdquo;
                 </p>
               </div>
             </div>
           </div>
         </section>
-
         {/* CTA Section */}
         <section className="py-20 px-4 bg-gradient-to-br from-kifolio-primary to-kifolio-primary-dark">
           <div className="max-w-4xl mx-auto text-center text-white">
@@ -280,46 +407,6 @@ export default function MarketingPage() {
             </div>
           </div>
         </section>
-
-        {/* Testimonials Section */}
-        <section className="py-20 px-4 bg-white" aria-labelledby="testimonials-heading">
-          <div className="max-w-6xl mx-auto">
-            <h2 id="testimonials-heading" className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
-              What Parents Are Saying
-            </h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-gray-50 rounded-lg p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-kifolio-primary rounded-full flex items-center justify-center mr-4">
-                    <span className="text-white font-semibold">S</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Sarah M.</h4>
-                    <p className="text-sm text-gray-600">Parent of Emma, age 8</p>
-                  </div>
-                </div>
-                <p className="text-gray-700 italic">
-                  "Kifolio has made it so easy to document Emma&apos;s artistic journey. Her grandparents love being able to see her progress, and it&apos;s become a beautiful digital keepsake."
-                </p>
-              </div>
-
-              <div className="bg-gray-50 rounded-lg p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-kifolio-primary rounded-full flex items-center justify-center mr-4">
-                    <span className="text-white font-semibold">M</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Michael T.</h4>
-                    <p className="text-sm text-gray-600">Parent of Lucas, age 12</p>
-                  </div>
-                </div>
-                <p className="text-gray-700 italic">
-                  "The templates are beautiful and easy to customize. Lucas loves seeing his sports achievements documented, and it motivates him to keep improving."
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       {/* Footer */}
@@ -358,7 +445,7 @@ export default function MarketingPage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Kifolio. All rights reserved.</p>
+            <p>&copy; 2025 Kifolio. All rights reserved.</p>
           </div>
         </div>
       </footer>
