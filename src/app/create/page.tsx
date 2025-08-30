@@ -289,7 +289,7 @@ export default function CreatePortfolio() {
                 <p className="form-field__error">{errors.photo}</p>
               )}
               <p className="form-field__help">
-                JPEG, PNG, GIF, or SVG up to 2MB
+                JPEG, PNG, GIF, or SVG. Max size of 5MB
               </p>
             </div>
 

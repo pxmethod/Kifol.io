@@ -62,6 +62,13 @@ export default function AchievementModal({
   useEffect(() => {
     setModalMode('form'); // Reset to form mode when achievement changes
     
+    // Cleanup existing blob URLs before changing achievement
+    mediaPreview.forEach(preview => {
+      if (preview.url.startsWith('blob:')) {
+        URL.revokeObjectURL(preview.url);
+      }
+    });
+    
     // Clear all form state first
     setMediaPreview([]);
     setExistingMedia([]);

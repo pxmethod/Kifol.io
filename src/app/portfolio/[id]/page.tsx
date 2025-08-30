@@ -50,6 +50,7 @@ export default function PortfolioPage() {
   const [toastMessage, setToastMessage] = useState('');
   const [savingAchievement, setSavingAchievement] = useState(false);
   const [deletingAchievement, setDeletingAchievement] = useState<string | null>(null);
+  const [showPrivateTooltip, setShowPrivateTooltip] = useState(false);
 
   // Check if portfolio was just created
   useEffect(() => {
@@ -347,8 +348,8 @@ export default function PortfolioPage() {
       setToastMessage('Portfolio removed successfully!');
       setShowToast(true);
       
-      // Redirect to dashboard
-      router.push('/');
+      // Redirect to dashboard (My Portfolios page)
+      router.push('/dashboard');
     } catch (error) {
       console.error('Error deleting portfolio:', error);
       setToastMessage('Failed to delete portfolio. Please try again.');
@@ -393,7 +394,7 @@ export default function PortfolioPage() {
             showRetry={true}
             showHome={true}
             onRetry={() => window.location.reload()}
-            onHome={() => router.push('/')}
+            onHome={() => router.push('/dashboard')}
             className="min-h-[50vh]"
           />
         </main>
@@ -411,7 +412,7 @@ export default function PortfolioPage() {
           {/* Mobile: All elements in single row */}
           <div className="flex lg:hidden items-center justify-between w-full">
             <button
-              onClick={() => router.push('/')}
+              onClick={() => router.push('/dashboard')}
               className="btn btn--ghost btn--icon-only"
               title="Back to dashboard"
             >
@@ -441,7 +442,7 @@ export default function PortfolioPage() {
           <div className="hidden lg:flex items-center justify-between w-full">
             <div className="action-bar__left">
               <button
-                onClick={() => router.push('/')}
+                onClick={() => router.push('/dashboard')}
                 className="btn--back"
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -521,6 +522,39 @@ export default function PortfolioPage() {
               <h1 className="card__title">
                 {portfolio.childName}
               </h1>
+              
+              {/* Status Badge - Center aligned underneath the name */}
+              <div className="flex justify-center mb-4 relative">
+                {portfolio.isPrivate ? (
+                  <div 
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 cursor-help"
+                    onMouseEnter={() => setShowPrivateTooltip(true)}
+                    onMouseLeave={() => setShowPrivateTooltip(false)}
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    Private
+                    
+                    {/* Custom Tooltip */}
+                    {showPrivateTooltip && (
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap z-10">
+                        This portfolio is private. Recipients will need the password to view it.
+                        {/* Tooltip arrow */}
+                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Public
+                  </div>
+                )}
+              </div>
+              
               <p className="card__subtitle">
                 {portfolio.portfolioTitle}
               </p>
@@ -528,24 +562,20 @@ export default function PortfolioPage() {
                 Member since {formatMemberSince(portfolio.createdAt)}
               </p>
 
-              {/* Portfolio URL with Copy Button */}
-              <div className="card__meta">
-                <span className="text-sm text-gray-500">Portfolio URL:</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-mono text-kifolio-cta">
-                    {DOMAIN_CONFIG.PORTFOLIO_DOMAIN}/{portfolio.id}
-                  </span>
-                  {portfolio.isPrivate && (
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                      Private
-                    </span>
-                  )}
+              {/* Portfolio URL - On its own row */}
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div className="flex-1">
+                    <span className="text-sm font-medium text-gray-700">Portfolio URL:</span>
+                    <div className="mt-1">
+                      <span className="text-sm font-mono text-kifolio-cta break-all">
+                        {DOMAIN_CONFIG.PORTFOLIO_DOMAIN}/{portfolio.id}
+                      </span>
+                    </div>
+                  </div>
                   <button
                     onClick={copyToClipboard}
-                    className="btn btn--ghost btn--icon-only btn--sm"
+                    className="btn btn--ghost btn--icon-only btn--sm flex-shrink-0"
                     title="Copy URL"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -553,11 +583,6 @@ export default function PortfolioPage() {
                     </svg>
                   </button>
                 </div>
-                {portfolio.isPrivate && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    This portfolio is private. Recipients will need the password to view it.
-                  </p>
-                )}
               </div>
             </div>
           </div>
