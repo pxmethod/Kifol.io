@@ -1,7 +1,30 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import { 
+  useFadeUpOnLoad, 
+  useFadeUpOnScroll, 
+  useScaleInOnScroll,
+  useStaggeredLoadAnimation 
+} from '@/hooks/useSimpleAnimations';
 
 export default function MarketingPage() {
+  // Load animations for above-the-fold content
+  const heroAnimation = useFadeUpOnLoad(200);
+  const portfolioShowcase = useFadeUpOnLoad(600);
+
+  // Scroll animations for below-the-fold content
+  const whatSection = useFadeUpOnScroll(0.3);
+  const benefitsSection = useFadeUpOnScroll(0.3);
+  const demoSection = useFadeUpOnScroll(0.3);
+  const testimonialsSection = useFadeUpOnScroll(0.3);
+  const ctaSection = useScaleInOnScroll(0.3);
+  const faqSection = useFadeUpOnScroll(0.3);
+
+  // Staggered animations
+  const benefitItems = useStaggeredLoadAnimation(8, 1000, 100);
+  const featureCards = useStaggeredLoadAnimation(4, 800, 150);
   return (
     <div className="min-h-screen bg-white">
       {/* Structured Data for SEO */}
@@ -68,7 +91,8 @@ export default function MarketingPage() {
       <main>
         {/* Hero Section */}
         <section className="py-20 px-4 text-center bg-kifolio-header">
-          <div className="max-w-4xl mx-auto">
+          <div className={`max-w-4xl mx-auto ${heroAnimation.className}`}>
+
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
               Every milestone matters. Capture them all with Kifolio.
             </h1>
@@ -89,8 +113,23 @@ export default function MarketingPage() {
           </div>
         </section>
 
+        {/* Portfolio Showcase Section */}
+        <section 
+          className={`relative bg-contain bg-center bg-no-repeat bg-kifolio-bg h-64 md:h-96 lg:h-[800px] ${portfolioShowcase.className}`}
+          style={{
+            backgroundImage: "url('/marketing/portfolio-ren-web.png')"
+          }}
+        >     
+          <div className="relative z-10 h-full flex items-center justify-center">
+            {/* Portfolio showcase content can go here */}
+          </div>
+        </section>
+
         {/* The What Section */}
-        <section className="py-20 px-4 bg-white">
+        <section 
+          ref={whatSection.ref}
+          className={`py-20 px-4 bg-kifolio-bg ${whatSection.className}`}
+        >
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold .text-kifolio-text mb-8">
             From first drawing to graduation
@@ -102,7 +141,7 @@ export default function MarketingPage() {
           {/* Features Section */}
           <div className="max-w-6xl mx-auto">
             <div className="grid md:grid-cols-2 gap-12">
-              <div className="text-center">
+              <div className={`text-center ${featureCards.getItemClassName(0)}`}>
                 <div className="bg-kifolio-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
                   <svg className="w-10 h-10 text-kifolio-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -114,7 +153,7 @@ export default function MarketingPage() {
                 </p>
               </div>
               
-              <div className="text-center">
+              <div className={`text-center ${featureCards.getItemClassName(1)}`}>
                 <div className="bg-kifolio-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
                   <svg className="w-10 h-10 text-kifolio-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -126,7 +165,7 @@ export default function MarketingPage() {
                 </p>
               </div>
               
-              <div className="text-center">
+              <div className={`text-center ${featureCards.getItemClassName(2)}`}>
                 <div className="bg-kifolio-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
                   <svg className="w-10 h-10 text-kifolio-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
@@ -138,7 +177,7 @@ export default function MarketingPage() {
                 </p>
               </div>
 
-              <div className="text-center">
+              <div className={`text-center ${featureCards.getItemClassName(3)}`}>
                 <div className="bg-kifolio-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
                   <svg className="w-10 h-10 text-kifolio-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
@@ -146,7 +185,7 @@ export default function MarketingPage() {
                 </div>
                 <h3 className="text-2xl font-semibold .text-kifolio-text mb-4">Personal Growth Tracking</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Beyond academics, Kifolio gives your child a narrative of progress that builds confidence and shows them how far they’ve come.
+                  Beyond academics, Kifolio gives your child a narrative of progress that builds confidence and shows them how far they've come.
                 </p>
               </div>
             </div>
@@ -154,7 +193,11 @@ export default function MarketingPage() {
         </section>
 
         {/* Benefits Section */}
-        <section className="py-20 px-4 bg-white" aria-labelledby="benefits-heading">
+        <section 
+          ref={benefitsSection.ref}
+          className={`py-20 px-4 bg-white ${benefitsSection.className}`} 
+          aria-labelledby="benefits-heading"
+        >
           <div className="max-w-6xl mx-auto text-center">
             <h2 id="benefits-heading" className="text-3xl md:text-4xl font-bold .text-kifolio-text mb-4">
               Why Parents Choose Kifolio
@@ -245,68 +288,12 @@ export default function MarketingPage() {
           </div>
         </section>
 
-        {/* Demo Sites Preview */}
-        <section className="py-20 px-4 bg-kifolio-bg">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold .text-kifolio-text mb-12 text-center">
-              See Kifolio in Action
-            </h2>
-                         <p className="text-lg text-gray-600 mb-12 leading-relaxed text-center">
-             Digital scrapbook meets academic resume—built by parents to showcase their children&apos;s academic progress, personal achievements, and creative work in one organized, shareable portfolio.
-             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {/* Demo Site 1 */}
-              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div className="h-48 bg-gray-200 flex items-center justify-center">
-                  <div className="text-gray-400 text-center">
-                    <svg className="w-16 h-16 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    <p>Portfolio Preview</p>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold .text-kifolio-text mb-2">Emma&apos;s Art Portfolio</h3>
-                  <p className="text-gray-600 text-sm">Showcasing creative projects and artistic growth</p>
-                </div>
-              </div>
-
-              {/* Demo Site 2 */}
-              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div className="h-48 bg-gray-200 flex items-center justify-center">
-                  <div className="text-gray-400 text-center">
-                    <svg className="w-16 h-16 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <p>Portfolio Preview</p>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold .text-kifolio-text mb-2">Lucas&apos;s Sports Journey</h3>
-                  <p className="text-gray-600 text-sm">Tracking athletic achievements and progress</p>
-                </div>
-              </div>
-
-              {/* Demo Site 3 */}
-              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div className="h-48 bg-gray-200 flex items-center justify-center">
-                  <div className="text-gray-400 text-center">
-                    <svg className="w-16 h-16 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 5.477 5.754 5 7.5 5s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 19 16.5 19c-1.746 0-3.332-.523-4.5-1.253" />
-                    </svg>
-                    <p>Portfolio Preview</p>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold .text-kifolio-text mb-2">Sophia&apos;s Learning Path</h3>
-                  <p className="text-gray-600 text-sm">Documenting educational milestones and projects</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
         {/* Testimonials Section */}
-        <section className="py-20 px-4 bg-white" aria-labelledby="testimonials-heading">
+        <section 
+          ref={testimonialsSection.ref}
+          className={`py-20 px-4 bg-white ${testimonialsSection.className}`} 
+          aria-labelledby="testimonials-heading"
+        >
           <div className="max-w-6xl mx-auto">
             <h2 id="testimonials-heading" className="text-3xl md:text-4xl font-bold .text-kifolio-text mb-12 text-center">
               What Parents Are Saying
@@ -376,7 +363,10 @@ export default function MarketingPage() {
           </div>
         </section>
         {/* CTA Section */}
-        <section className="py-20 px-4 bg-gradient-to-br bg-gradient-to-br from-orange-500 to-pink-500">
+        <section 
+          ref={ctaSection.ref}
+          className={`py-20 px-4 bg-gradient-to-br bg-gradient-to-br from-orange-500 to-pink-500 ${ctaSection.className}`}
+        >
           <div className="max-w-4xl mx-auto text-center text-white">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
               Ready to Get Started?
@@ -394,7 +384,11 @@ export default function MarketingPage() {
         </section>
 
         {/* FAQ Section for Featured Snippets */}
-        <section className="py-20 px-4 bg-kifolio-bg" aria-labelledby="faq-heading">
+        <section 
+          ref={faqSection.ref}
+          className={`py-20 px-4 bg-kifolio-bg ${faqSection.className}`} 
+          aria-labelledby="faq-heading"
+        >
           <div className="max-w-4xl mx-auto">
             <h2 id="faq-heading" className="text-3xl md:text-4xl font-bold .text-kifolio-text mb-12 text-center">
               Frequently Asked Questions
@@ -420,7 +414,7 @@ export default function MarketingPage() {
                     You can include artwork, school projects, sports achievements, academic milestones, creative writing, photos, videos, and any other accomplishments that showcase your child&apos;s growth and development.
                   </div>
                 </div>
-              </div>
+      </div>
 
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
                 <h3 className="text-xl font-semibold .text-kifolio-text mb-3" itemProp="name">
@@ -431,7 +425,7 @@ export default function MarketingPage() {
                     Yes! Kifolio portfolios are fully responsive and can be shared with anyone. You can control privacy settings and choose whether to make portfolios public or password-protected.
                   </div>
                 </div>
-              </div>
+      </div>
 
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
                 <h3 className="text-xl font-semibold .text-kifolio-text mb-3" itemProp="name">

@@ -198,6 +198,31 @@
   .scale-in {
     @apply animate-in zoom-in-95 duration-200;
   }
+
+  /* Marketing Page Animations */
+  .animate-fade-up-hidden {
+    opacity: 0;
+    transform: translateY(2rem);
+    transition: all 1000ms ease-out;
+  }
+  
+  .animate-fade-up-visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 1000ms ease-out;
+  }
+  
+  .animate-scale-hidden {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: all 1000ms ease-out;
+  }
+  
+  .animate-scale-visible {
+    opacity: 1;
+    transform: scale(1);
+    transition: all 1000ms ease-out;
+  }
 }
 
 /* Custom utility classes using Tailwind */
