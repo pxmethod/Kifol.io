@@ -173,28 +173,61 @@ export default function TermsOfUsePage() {
             <section>
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. Contact Information</h2>
               <p className="text-gray-700 leading-relaxed">
-                If you have any questions about these Terms of Use, please contact us at{' '}
-                <a href="mailto:support@kifol.io" className="text-kifolio-cta hover:underline">
-                  support@kifol.io
+                If you have any questions about these Terms of Use, please contact {' '}
+                <a href="mailto:john@kifol.io" className="text-kifolio-cta hover:underline">
+                  john@kifol.io
                 </a>
               </p>
             </section>
           </div>
 
           {/* Back to Home */}
-          <div className="mt-12 pt-8 border-t border-gray-200">
-            <Link
-              href="/"
-              className="inline-flex items-center text-kifolio-cta hover:text-kifolio-cta/80 font-medium transition-colors"
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+          <div className="mt-12 text-center">
+            <Link href="/" className="bg-kifolio-primary text-white px-8 py-3 rounded-lg hover:bg-kifolio-primary-dark transition-colors font-medium">
               Back to Home
             </Link>
           </div>
         </div>
       </main>
+      {/* Footer */}
+      <footer className="bg-kifolio-header text-white py-12 px-4 mt-12">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div className="md:col-span-2">
+              <Image 
+                src="/kifolio_logo.svg" 
+                alt="Kifolio Logo" 
+                width={144}
+                height={38}
+                className="h-10 w-auto mb-4"
+              />
+              <p className="text-white mb-4">
+                Create beautiful portfolios to showcase your children's work, 
+                milestones, and achievements.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Product</h4>
+              <ul className="space-y-2 text-white">
+                <li><Link href="/auth/signup" className="hover:text-white transition-colors">Sign Up</Link></li>
+                <li><Link href="/auth/login" className="hover:text-white transition-colors">Log In</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Company</h4>
+              <ul className="space-y-2 text-white">
+                <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
+                <li><a href="mailto:john@kifol.io" className="hover:text-white transition-colors">Contact</a></li>
+                <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link></li>
+                <li><Link href="/terms" className="hover:text-white transition-colors">Terms</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-white mt-8 pt-8 text-center text-white">
+            <p>&copy; 2025 Kifolio. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

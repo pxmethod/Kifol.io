@@ -470,14 +470,13 @@ export default function MarketingPage() {
               <ul className="space-y-2 text-white">
                 <li><Link href="/auth/signup" className="hover:text-white transition-colors">Sign Up</Link></li>
                 <li><Link href="/auth/login" className="hover:text-white transition-colors">Log In</Link></li>
-                <li><Link href="/whats-happening" className="hover:text-white transition-colors">What&apos;s Happening</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Company</h4>
               <ul className="space-y-2 text-white">
                 <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
-                <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
+                <li><a href="mailto:john@kifol.io" className="hover:text-white transition-colors">Contact</a></li>
                 <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link></li>
                 <li><Link href="/terms" className="hover:text-white transition-colors">Terms</Link></li>
               </ul>
