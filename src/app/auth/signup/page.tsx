@@ -318,11 +318,11 @@ export default function SignUpPage() {
 
               {/* Right Column - Social Sign Up */}
               <div className="border-t lg:border-t-0 lg:border-l lg:border-gray-200 pt-8 lg:pt-0 lg:pl-8">
-                <h2 className="text-xl font-semibold text-kifolio-text mb-6">Or continue with</h2>
+                <h2 className="text-xl font-semibold text-kifolio-text mb-6">Or continue with:</h2>
                 
                 <div className="space-y-4">
                   <p className="text-gray-600 text-sm">
-                    To create an account with your Google credentials:
+                    Creating an account with your Google credentials:
                   </p>
                   
                   <button

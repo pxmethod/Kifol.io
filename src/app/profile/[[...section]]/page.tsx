@@ -6,6 +6,8 @@ import Header from '@/components/Header';
 import Toast from '@/components/Toast';
 import { useAuth } from '@/contexts/AuthContext';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { createClient } from '@/lib/supabase/client';
+import { userService } from '@/lib/database';
 
 interface ProfileData {
   email: string;
@@ -33,7 +35,8 @@ const navigationItems = [
 export default function ProfilePage() {
   const params = useParams();
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, loading, signInWithGoogle } = useAuth();
+  const supabase = createClient();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [profileData, setProfileData] = useState<ProfileData>({
     email: user?.email || '',
@@ -55,6 +58,8 @@ export default function ProfilePage() {
   const [passwordError, setPasswordError] = useState('');
   const [invitationData, setInvitationData] = useState<InvitationData>({ email: '' });
   const [isSendingInvite, setIsSendingInvite] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Determine current section from URL
   const currentSection = Array.isArray(params.section) && params.section.length > 0 
@@ -64,6 +69,18 @@ export default function ProfilePage() {
   useEffect(() => {
     setFormData({ email: profileData.email, password: '' });
   }, [profileData]);
+
+  // Update Google connection status when user changes
+  useEffect(() => {
+    if (user) {
+      const hasGoogleIdentity = user.identities?.some(identity => identity.provider === 'google') || false;
+      setProfileData(prev => ({
+        ...prev,
+        email: user.email || '',
+        googleConnected: hasGoogleIdentity
+      }));
+    }
+  }, [user]);
 
   useEffect(() => {
     setHasChanges(formData.email !== profileData.email || formData.password !== '');
@@ -209,6 +226,72 @@ export default function ProfilePage() {
     setIsMobileMenuOpen(false); // Close mobile menu on navigation
   };
 
+  const handleGoogleConnect = async () => {
+    try {
+      const { error } = await signInWithGoogle();
+      
+      if (error) {
+        setToastMessage('Failed to connect Google account. Please try again.');
+        setShowToast(true);
+      } else {
+        // The OAuth flow will redirect, so we don't need to handle success here
+        // The user will be redirected back after OAuth completion
+      }
+    } catch (error) {
+      console.error('Error connecting Google account:', error);
+      setToastMessage('Failed to connect Google account. Please try again.');
+      setShowToast(true);
+    }
+  };
+
+  const handleGoogleDisconnect = async () => {
+    try {
+      // Unlink the Google provider
+      const { error } = await supabase.auth.unlinkIdentity({
+        identity_id: user?.identities?.find(identity => identity.provider === 'google')?.id || ''
+      });
+
+      if (error) {
+        setToastMessage('Failed to disconnect Google account. Please try again.');
+        setShowToast(true);
+      } else {
+        // Update local state
+        setProfileData(prev => ({ ...prev, googleConnected: false }));
+        setToastMessage('Google account disconnected successfully!');
+        setShowToast(true);
+      }
+    } catch (error) {
+      console.error('Error disconnecting Google account:', error);
+      setToastMessage('Failed to disconnect Google account. Please try again.');
+      setShowToast(true);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    
+    try {
+      await userService.deleteAccount();
+      
+      // Show success message and redirect to marketing site
+      setToastMessage('Account deleted successfully. You have been signed out.');
+      setShowToast(true);
+      
+      // Redirect to marketing site after a brief delay
+      setTimeout(() => {
+        router.push('/');
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      setToastMessage('Failed to delete account. Please try again.');
+      setShowToast(true);
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirmation(false);
+    }
+  };
+
   const getCurrentSectionLabel = () => {
     const currentItem = navigationItems.find(item => 
       (item.id === 'general' && currentSection === 'general') || item.id === currentSection
@@ -269,11 +352,7 @@ export default function ProfilePage() {
                   {profileData.googleConnected ? (
                     <button
                       type="button"
-                      onClick={() => {
-                        // TODO: Implement Google disconnect
-                        setToastMessage('Google disconnect not yet implemented');
-                        setShowToast(true);
-                      }}
+                      onClick={handleGoogleDisconnect}
                       className="px-3 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
                     >
                       Disconnect
@@ -281,11 +360,7 @@ export default function ProfilePage() {
                   ) : (
                     <button
                       type="button"
-                      onClick={() => {
-                        // TODO: Implement Google connect
-                        setToastMessage('Google connect not yet implemented');
-                        setShowToast(true);
-                      }}
+                      onClick={handleGoogleConnect}
                       className="px-3 py-2 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
                     >
                       Connect
@@ -480,16 +555,11 @@ export default function ProfilePage() {
             {/* Delete Button */}
             <div className="form-actions">
               <button
-                onClick={() => {
-                  // TODO: Implement account deletion logic
-                  // - Sign out user
-                  // - Redirect to marketing website
-                  // - Send deletion confirmation email
-                  console.log('Delete account clicked - services not yet connected');
-                }}
+                onClick={() => setShowDeleteConfirmation(true)}
                 className="btn btn--danger"
+                disabled={isDeleting}
               >
-                Delete my account
+                {isDeleting ? 'Deleting...' : 'Delete my account'}
               </button>
             </div>
           </div>
@@ -621,6 +691,73 @@ export default function ProfilePage() {
         isVisible={showToast}
         onDismiss={() => setShowToast(false)}
       />
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-red-600">Delete Account</h2>
+              <button
+                onClick={() => setShowDeleteConfirmation(false)}
+                className="text-gray-500 hover:text-gray-700"
+                disabled={isDeleting}
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="mb-6">
+              <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-center text-kifolio-text mb-2">
+                Are you absolutely sure?
+              </h3>
+              <p className="text-gray-600 text-center mb-4">
+                This action cannot be undone. This will permanently delete your account and remove all your portfolios, achievements, and data from our servers.
+              </p>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-sm text-red-700 font-medium">
+                  ⚠️ This will delete:
+                </p>
+                <ul className="text-sm text-red-700 mt-1 ml-4 list-disc">
+                  <li>All your portfolios</li>
+                  <li>All achievements and photos</li>
+                  <li>Your account settings</li>
+                  <li>All associated data</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex space-x-3">
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirmation(false)}
+                className="flex-1 bg-gray-100 text-kifolio-text py-2 px-4 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Yes, delete my account'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

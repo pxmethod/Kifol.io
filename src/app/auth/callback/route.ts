@@ -8,9 +8,37 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     
-    if (!error) {
+    if (!error && data.user) {
+      // Check if this is a new user (created within the last minute)
+      const userCreated = new Date(data.user.created_at)
+      const oneMinuteAgo = new Date(Date.now() - 60 * 1000)
+      const isNewUser = userCreated > oneMinuteAgo
+
+      // Send welcome email for new users
+      if (isNewUser && data.user.email) {
+        try {
+          await fetch(`${origin}/api/email/send`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              type: 'welcome',
+              data: {
+                to: data.user.email,
+                userName: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'there',
+                loginUrl: `${origin}/auth/login`
+              }
+            }),
+          })
+        } catch (emailError) {
+          console.error('Failed to send welcome email:', emailError)
+          // Don't block the auth flow if email fails
+        }
+      }
+
       // Successful authentication, redirect to dashboard
       const redirectUrl = next === '/' ? '/dashboard' : next
       return NextResponse.redirect(`${origin}${redirectUrl}`)
