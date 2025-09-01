@@ -664,7 +664,7 @@ export default function ProfilePage() {
             <div className="action-bar__container">
               <div className="action-bar__left">
                 <button
-                  onClick={() => router.push('/')}
+                  onClick={() => router.push('/dashboard')}
                   className="btn--back"
                 >
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

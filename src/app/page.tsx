@@ -90,7 +90,7 @@ export default function MarketingPage() {
       {/* Main Content */}
       <main>
         {/* Hero Section */}
-        <section className="py-20 px-4 text-center bg-kifolio-header">
+        <section className="py-20 pb-40 px-4 text-center bg-kifolio-header">
           <div className={`max-w-4xl mx-auto ${heroAnimation.className}`}>
 
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
@@ -113,9 +113,9 @@ export default function MarketingPage() {
           </div>
         </section>
 
-        {/* Portfolio Showcase Section */}
+        {/* Portfolio Showcase Section with Overlap */}
         <section 
-          className={`relative bg-contain bg-center bg-no-repeat bg-kifolio-bg h-64 md:h-96 lg:h-[800px] ${portfolioShowcase.className}`}
+          className={`relative bg-contain bg-center bg-no-repeat h-64 md:h-96 lg:h-[800px] -mt-40 ${portfolioShowcase.className}`}
           style={{
             backgroundImage: "url('/marketing/portfolio-ren-web.png')"
           }}
