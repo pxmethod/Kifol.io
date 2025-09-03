@@ -161,45 +161,38 @@ class EventService {
   async searchEvents(params: EventSearchParams): Promise<Event[]> {
     try {
       console.log('=== TICKETMASTER DEBUG ===');
-      console.log('API Key available:', this.apiKey ? 'YES' : 'NO');
-      console.log('API Key length:', this.apiKey?.length || 0);
-      console.log('Environment:', typeof window !== 'undefined' ? 'client' : 'server');
+      console.log('Using server-side API route to avoid CORS');
       console.log('========================');
       
-      // Build search parameters for Ticketmaster Discovery API
-      const searchParams: Record<string, string> = {
-        'size': (params.limit || 20).toString(),
-        'sort': 'date,asc',
-        'startDateTime': params.startDate || new Date().toISOString(),
-      };
-
-      // Add location-based search
-      if (params.city) {
-        const [city, state] = params.city.split(',').map(s => s.trim());
-        if (city) searchParams['city'] = city;
-        if (state) searchParams['stateCode'] = state;
-      }
-
-      if (params.radius) {
-        searchParams['radius'] = params.radius.toString();
-        searchParams['unit'] = 'miles';
-      }
-
-      // Add category filtering for family-friendly events
-      if (params.category && params.category !== 'all') {
-        const classificationId = this.getClassificationId(params.category);
-        if (classificationId) {
-          searchParams['classificationId'] = classificationId;
-        }
-      } else {
-        // Default to family-friendly events
-        searchParams['classificationId'] = 'KZFzniwnSyZfZ7v7nE'; // Family
-      }
-
-      const response = await this.makeRequest('/events.json', searchParams);
+      // Parse city and state
+      const [city, state] = params.city ? params.city.split(',').map(s => s.trim()) : ['', ''];
       
-      if (response._embedded && response._embedded.events) {
-        return response._embedded.events.map((event: TicketmasterEvent) => this.transformEvent(event));
+      if (!city || !state) {
+        console.log('No city/state provided, returning mock data');
+        return this.getEnhancedMockEvents(params.city, params.category);
+      }
+
+      // Build query parameters for our server-side API
+      const queryParams = new URLSearchParams({
+        'city': city,
+        'state': state,
+        'radius': (params.radius || 20).toString(),
+        'limit': (params.limit || 20).toString(),
+        'category': params.category || 'all'
+      });
+
+      // Call our server-side API route
+      const response = await fetch(`/api/events/search?${queryParams.toString()}`);
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.events && Array.isArray(data.events)) {
+        console.log(`Found ${data.events.length} events from Ticketmaster`);
+        return data.events;
       }
       
       return [];
@@ -495,23 +488,10 @@ class EventService {
   // Get nearby events based on coordinates
   async getNearbyEvents(lat: number, lng: number, radius: number = 20): Promise<Event[]> {
     try {
-      const searchParams: Record<string, string> = {
-        'size': '20',
-        'sort': 'date,asc',
-        'startDateTime': new Date().toISOString(),
-        'latlong': `${lat},${lng}`,
-        'radius': radius.toString(),
-        'unit': 'miles',
-        'classificationId': 'KZFzniwnSyZfZ7v7nE', // Family events
-      };
-
-      const response = await this.makeRequest('/events.json', searchParams);
-      
-      if (response._embedded && response._embedded.events) {
-        return response._embedded.events.map((event: TicketmasterEvent) => this.transformEvent(event));
-      }
-      
-      return [];
+      // For now, we'll use the enhanced mock data for nearby events
+      // You can extend the server-side API later to support lat/lng coordinates
+      console.log('Using mock data for nearby events (lat/lng not yet implemented)');
+      return this.getEnhancedMockEvents('Nearby');
     } catch (error) {
       console.error('Failed to get nearby events:', error);
       return this.getEnhancedMockEvents('Nearby');
