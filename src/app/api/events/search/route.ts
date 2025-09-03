@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       'stateCode': state,
       'radius': radius,
       'unit': 'miles',
-      'classificationId': 'KZFzniwnSyZfZ7v7nE', // Family events
+      // Removed classificationId to get all event types
     });
 
     // Add category filtering if specified
@@ -78,11 +78,46 @@ export async function GET(request: NextRequest) {
     console.log('Ticketmaster response data keys:', Object.keys(data));
     console.log('Events found:', data._embedded?.events?.length || 0);
     
+    // Log event categories for debugging
+    if (data._embedded?.events) {
+      const categories = data._embedded.events.map((event: any) => {
+        const classification = event.classifications?.find((c: any) => c.primary);
+        return {
+          name: event.name,
+          segment: classification?.segment?.name,
+          genre: classification?.genre?.name,
+          subGenre: classification?.subGenre?.name
+        };
+      });
+      console.log('Event categories:', categories);
+    }
+    
     // Transform the data to match our Event interface
     const events = data._embedded?.events?.map((event: any) => {
       try {
         const venue = event._embedded?.venues?.[0];
         const primaryClassification = event.classifications?.find((c: any) => c.primary);
+        
+        // Determine if this is a family-friendly event
+        const segment = primaryClassification?.segment?.name?.toLowerCase() || '';
+        const genre = primaryClassification?.genre?.name?.toLowerCase() || '';
+        const subGenre = primaryClassification?.subGenre?.name?.toLowerCase() || '';
+        
+        // Family-friendly categories
+        const familyFriendlyCategories = [
+          'arts & theatre', 'music', 'family', 'kids', 'children', 'educational',
+          'comedy', 'festival', 'fair', 'exhibition', 'museum', 'zoo', 'aquarium'
+        ];
+        
+        const isFamilyFriendly = familyFriendlyCategories.some(cat => 
+          segment.includes(cat) || genre.includes(cat) || subGenre.includes(cat) ||
+          event.name.toLowerCase().includes(cat)
+        );
+        
+        // Skip events that are clearly not family-friendly
+        if (!isFamilyFriendly && (segment.includes('sports') || segment.includes('nightlife'))) {
+          return null;
+        }
         
         return {
           id: event.id,
@@ -107,6 +142,9 @@ export async function GET(request: NextRequest) {
         return null;
       }
     }).filter(Boolean) || [];
+
+    console.log('Filtered events returned:', events.length);
+    console.log('Event types:', events.map(e => e.category));
 
     return NextResponse.json({ events });
     
