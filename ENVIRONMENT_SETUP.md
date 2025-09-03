@@ -18,18 +18,23 @@ EMAIL_DOMAIN=kifol.io
 SUPPORT_EMAIL=support@kifol.io
 ```
 
-### 3. App URLs and Domains (NEW!)
+### 3. Events API Configuration (Ticketmaster)
+```bash
+NEXT_PUBLIC_TICKETMASTER_API_KEY=your_ticketmaster_api_key
+```
+
+### 4. App URLs and Domains (NEW!)
 ```bash
 NEXT_PUBLIC_APP_URL=https://kifol.io
 NEXT_PUBLIC_PORTFOLIO_DOMAIN=my.kifol.io
 ```
 
-### 4. Database Configuration
+### 5. Database Configuration
 ```bash
 DATABASE_URL=your_database_connection_string
 ```
 
-### 5. Authentication
+### 6. Authentication
 ```bash
 NEXTAUTH_SECRET=your_nextauth_secret
 NEXTAUTH_URL=https://kifol.io

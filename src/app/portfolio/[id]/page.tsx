@@ -568,7 +568,7 @@ export default function PortfolioPage() {
                   <div className="flex-1">
                     <span className="text-sm font-medium text-gray-700">Portfolio URL:</span>
                     <div className="mt-1">
-                      <span className="text-sm font-mono text-kifolio-cta break-all">
+                      <span className="text-xs font-mono text-kifolio-cta break-all">
                         {DOMAIN_CONFIG.PORTFOLIO_DOMAIN}/{portfolio.id}
                       </span>
                     </div>

@@ -9,40 +9,101 @@ export interface Event {
   ageRange: string;
   cost: string;
   imageUrl?: string;
-  eventbriteUrl?: string;
+  ticketmasterUrl?: string;
   latitude?: number;
   longitude?: number;
 }
 
-export interface EventbriteEvent {
+export interface TicketmasterEvent {
   id: string;
-  name: { text: string };
-  description: { text: string };
-  start: { local: string };
-  end: { local: string };
-  venue: {
-    name: string;
-    address: {
-      city: string;
-      state: string;
-      country: string;
-    };
-    latitude: string;
-    longitude: string;
-  };
-  category: {
-    name: string;
-  };
-  ticket_availability: {
-    is_free: boolean;
-    minimum_ticket_price?: {
-      display: string;
-    };
-  };
-  logo?: {
-    url: string;
-  };
+  name: string;
+  type: string;
   url: string;
+  locale: string;
+  images: Array<{
+    ratio: string;
+    url: string;
+    width: number;
+    height: number;
+    fallback: boolean;
+  }>;
+  sales: {
+    public: {
+      startDateTime: string;
+      endDateTime: string;
+    };
+  };
+  dates: {
+    start: {
+      localDate: string;
+      localTime: string;
+      dateTime: string;
+    };
+    timezone: string;
+    status: {
+      code: string;
+    };
+  };
+  classifications: Array<{
+    primary: boolean;
+    segment: {
+      id: string;
+      name: string;
+    };
+    genre: {
+      id: string;
+      name: string;
+    };
+    subGenre: {
+      id: string;
+      name: string;
+    };
+  }>;
+  priceRanges?: Array<{
+    type: string;
+    currency: string;
+    min: number;
+    max: number;
+  }>;
+  _embedded: {
+    venues: Array<{
+      id: string;
+      name: string;
+      type: string;
+      url: string;
+      locale: string;
+      images: Array<{
+        ratio: string;
+        url: string;
+        width: number;
+        height: number;
+        fallback: boolean;
+      }>;
+      distance: number;
+      units: string;
+      address: {
+        line1: string;
+        line2?: string;
+      };
+      city: {
+        name: string;
+      };
+      state: {
+        name: string;
+        stateCode: string;
+      };
+      country: {
+        name: string;
+        countryCode: string;
+      };
+      postalCode: string;
+      location: {
+        longitude: string;
+        latitude: string;
+      };
+      timezone: string;
+    }>;
+  };
 }
 
 export interface EventSearchParams {
@@ -57,19 +118,24 @@ export interface EventSearchParams {
 
 class EventService {
   private apiKey: string;
-  private baseUrl = 'https://www.eventbriteapi.com/v3';
+  private baseUrl = 'https://app.ticketmaster.com/discovery/v2';
+  private version = '2.0'; // Force rebuild
 
   constructor() {
-    this.apiKey = process.env.NEXT_PUBLIC_EVENTBRITE_API_KEY || '';
+    this.apiKey = process.env.NEXT_PUBLIC_TICKETMASTER_API_KEY || '';
+    console.log('Ticketmaster API Key loaded:', this.apiKey ? 'Yes' : 'No');
   }
 
   private async makeRequest(endpoint: string, params: Record<string, string> = {}) {
+    console.log('Making Ticketmaster API request to:', endpoint);
+    console.log('API Key available:', this.apiKey ? 'Yes' : 'No');
+    
     if (!this.apiKey) {
-      throw new Error('Eventbrite API key not configured');
+      throw new Error('Ticketmaster API key not configured');
     }
 
     const url = new URL(`${this.baseUrl}${endpoint}`);
-    url.searchParams.append('token', this.apiKey);
+    url.searchParams.append('apikey', this.apiKey);
     
     // Add additional parameters
     Object.entries(params).forEach(([key, value]) => {
@@ -82,95 +148,275 @@ class EventService {
       const response = await fetch(url.toString());
       
       if (!response.ok) {
-        throw new Error(`Eventbrite API error: ${response.status} ${response.statusText}`);
+        throw new Error(`Ticketmaster API error: ${response.status} ${response.statusText}`);
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Eventbrite API request failed:', error);
+      console.error('Ticketmaster API request failed:', error);
       throw error;
     }
   }
 
   async searchEvents(params: EventSearchParams): Promise<Event[]> {
     try {
-      // Build search parameters
+      console.log('=== TICKETMASTER DEBUG ===');
+      console.log('API Key available:', this.apiKey ? 'YES' : 'NO');
+      console.log('API Key length:', this.apiKey?.length || 0);
+      console.log('Environment:', typeof window !== 'undefined' ? 'client' : 'server');
+      console.log('========================');
+      
+      // Build search parameters for Ticketmaster Discovery API
       const searchParams: Record<string, string> = {
-        'location.address': params.city,
-        'expand': 'venue,category',
-        'status': 'live',
-        'start_date.range_start': params.startDate || new Date().toISOString(),
-        'limit': (params.limit || 20).toString(),
+        'size': (params.limit || 20).toString(),
+        'sort': 'date,asc',
+        'startDateTime': params.startDate || new Date().toISOString(),
       };
 
+      // Add location-based search
+      if (params.city) {
+        const [city, state] = params.city.split(',').map(s => s.trim());
+        if (city) searchParams['city'] = city;
+        if (state) searchParams['stateCode'] = state;
+      }
+
       if (params.radius) {
-        searchParams['location.within'] = `${params.radius}mi`;
+        searchParams['radius'] = params.radius.toString();
+        searchParams['unit'] = 'miles';
       }
 
+      // Add category filtering for family-friendly events
       if (params.category && params.category !== 'all') {
-        searchParams['category_id'] = this.getCategoryId(params.category);
+        const classificationId = this.getClassificationId(params.category);
+        if (classificationId) {
+          searchParams['classificationId'] = classificationId;
+        }
+      } else {
+        // Default to family-friendly events
+        searchParams['classificationId'] = 'KZFzniwnSyZfZ7v7nE'; // Family
       }
 
-      const response = await this.makeRequest('/events/search/', searchParams);
+      const response = await this.makeRequest('/events.json', searchParams);
       
-      return response.events.map((event: EventbriteEvent) => this.transformEvent(event));
+      if (response._embedded && response._embedded.events) {
+        return response._embedded.events.map((event: TicketmasterEvent) => this.transformEvent(event));
+      }
+      
+      return [];
     } catch (error) {
       console.error('Failed to search events:', error);
       // Return mock data as fallback
-      return this.getMockEvents(params.city);
+      return this.getEnhancedMockEvents(params.city, params.category);
     }
   }
 
-  private transformEvent(eventbriteEvent: EventbriteEvent): Event {
+  private transformEvent(ticketmasterEvent: TicketmasterEvent): Event {
+    const venue = ticketmasterEvent._embedded?.venues?.[0];
+    const primaryClassification = ticketmasterEvent.classifications?.find(c => c.primary);
+    
     return {
-      id: eventbriteEvent.id,
-      title: eventbriteEvent.name.text,
-      description: eventbriteEvent.description.text,
-      startDate: eventbriteEvent.start.local,
-      endDate: eventbriteEvent.end.local,
-      location: eventbriteEvent.venue.name,
-      category: eventbriteEvent.category.name,
-      ageRange: this.estimateAgeRange(eventbriteEvent.description.text),
-      cost: eventbriteEvent.ticket_availability.is_free 
-        ? 'Free' 
-        : eventbriteEvent.ticket_availability.minimum_ticket_price?.display || 'Varies',
-      imageUrl: eventbriteEvent.logo?.url,
-      eventbriteUrl: eventbriteEvent.url,
-      latitude: parseFloat(eventbriteEvent.venue.latitude),
-      longitude: parseFloat(eventbriteEvent.venue.longitude),
+      id: ticketmasterEvent.id,
+      title: ticketmasterEvent.name,
+      description: this.generateEventDescription(ticketmasterEvent),
+      startDate: ticketmasterEvent.dates.start.dateTime,
+      endDate: ticketmasterEvent.dates.start.dateTime, // Ticketmaster doesn't provide end time in basic response
+      location: venue ? `${venue.name}, ${venue.city.name}, ${venue.state.stateCode}` : 'Location TBD',
+      category: primaryClassification?.segment?.name || 'Entertainment',
+      ageRange: this.estimateAgeRange(ticketmasterEvent.name, primaryClassification?.segment?.name),
+      cost: this.formatPrice(ticketmasterEvent.priceRanges),
+      imageUrl: this.getBestImage(ticketmasterEvent.images),
+      ticketmasterUrl: ticketmasterEvent.url,
+      latitude: venue ? parseFloat(venue.location.latitude) : undefined,
+      longitude: venue ? parseFloat(venue.location.longitude) : undefined,
     };
   }
 
-  private estimateAgeRange(description: string): string {
-    const text = description.toLowerCase();
+  private estimateAgeRange(title: string, category?: string): string {
+    const text = (title + ' ' + (category || '')).toLowerCase();
     
-    if (text.includes('teen') || text.includes('adolescent') || text.includes('13-18')) {
+    if (text.includes('teen') || text.includes('adolescent') || text.includes('13-18') || text.includes('high school')) {
       return '13-18';
-    } else if (text.includes('kid') || text.includes('child') || text.includes('6-12')) {
+    } else if (text.includes('kid') || text.includes('child') || text.includes('6-12') || text.includes('elementary')) {
       return '6-12';
-    } else if (text.includes('toddler') || text.includes('preschool') || text.includes('3-5')) {
+    } else if (text.includes('toddler') || text.includes('preschool') || text.includes('3-5') || text.includes('baby')) {
       return '3-5';
-    } else if (text.includes('all ages') || text.includes('family')) {
+    } else if (text.includes('all ages') || text.includes('family') || text.includes('children')) {
       return '4-18';
     }
     
-    return '4-18'; // Default age range
+    return '4-18'; // Default age range for family events
   }
 
-  private getCategoryId(category: string): string {
-    // Eventbrite category IDs - these are examples, you'll need to get the actual IDs
-    const categoryMap: Record<string, string> = {
-      'Arts & Crafts': '110',
-      'Education': '108',
-      'Sports': '113',
-      'Entertainment': '105',
-      'Technology': '102',
-      'Music': '103',
-      'Food & Drink': '110',
-      'Health & Wellness': '107',
+  private generateEventDescription(event: TicketmasterEvent): string {
+    const venue = event._embedded?.venues?.[0];
+    const primaryClassification = event.classifications?.find(c => c.primary);
+    
+    let description = `Join us for ${event.name}`;
+    
+    if (venue) {
+      description += ` at ${venue.name}`;
+    }
+    
+    if (primaryClassification?.segment?.name) {
+      description += `. A ${primaryClassification.segment.name.toLowerCase()} event`;
+    }
+    
+    description += ' perfect for families and children.';
+    
+    return description;
+  }
+
+  private formatPrice(priceRanges?: Array<{min: number, max: number, currency: string}>): string {
+    if (!priceRanges || priceRanges.length === 0) {
+      return 'Varies';
+    }
+    
+    const priceRange = priceRanges[0];
+    const currency = priceRange.currency === 'USD' ? '$' : priceRange.currency;
+    
+    if (priceRange.min === priceRange.max) {
+      return `${currency}${priceRange.min}`;
+    } else {
+      return `${currency}${priceRange.min} - ${currency}${priceRange.max}`;
+    }
+  }
+
+  private getBestImage(images: Array<{url: string, width: number, height: number}>): string | undefined {
+    if (!images || images.length === 0) {
+      return undefined;
+    }
+    
+    // Find the best image (prefer 16:9 ratio, then largest)
+    const bestImage = images.find(img => img.width / img.height === 16/9) || 
+                     images.reduce((best, current) => 
+                       current.width > best.width ? current : best
+                     );
+    
+    return bestImage?.url;
+  }
+
+  private getClassificationId(category: string): string | null {
+    // Ticketmaster classification IDs for family-friendly events
+    const classificationMap: Record<string, string> = {
+      'Arts & Crafts': 'KZFzniwnSyZfZ7v7nE', // Family
+      'Education': 'KZFzniwnSyZfZ7v7nE', // Family
+      'Sports': 'KZFzniwnSyZfZ7v7nE', // Family
+      'Entertainment': 'KZFzniwnSyZfZ7v7nE', // Family
+      'Technology': 'KZFzniwnSyZfZ7v7nE', // Family
+      'Music': 'KZFzniwnSyZfZ7v7nE', // Family
+      'Food & Drink': 'KZFzniwnSyZfZ7v7nE', // Family
+      'Health & Wellness': 'KZFzniwnSyZfZ7v7nE', // Family
     };
     
-    return categoryMap[category] || '108'; // Default to Education
+    return classificationMap[category] || null;
+  }
+
+  private getEnhancedMockEvents(city: string, category?: string): Event[] {
+    const allEvents = [
+      {
+        id: '1',
+        title: 'Kids Art Workshop',
+        description: 'Creative painting and drawing workshop for children ages 6-12. Perfect for budding artists!',
+        startDate: this.getFutureDate(1, 10, 0),
+        endDate: this.getFutureDate(1, 12, 0),
+        location: `${city} Art Center`,
+        category: 'Arts & Crafts',
+        ageRange: '6-12',
+        cost: 'Free',
+        imageUrl: '/placeholders/placeholder-1.svg'
+      },
+      {
+        id: '2',
+        title: 'Science Fair for Teens',
+        description: 'Interactive science experiments and demonstrations. Learn about physics, chemistry, and biology!',
+        startDate: this.getFutureDate(2, 14, 0),
+        endDate: this.getFutureDate(2, 16, 0),
+        location: `${city} Science Center`,
+        category: 'Education',
+        ageRange: '13-18',
+        cost: '$15',
+        imageUrl: '/placeholders/placeholder-2.svg'
+      },
+      {
+        id: '3',
+        title: 'Youth Soccer Tournament',
+        description: 'Friendly soccer competition for kids and teens. Teams welcome!',
+        startDate: this.getFutureDate(3, 9, 0),
+        endDate: this.getFutureDate(3, 17, 0),
+        location: `${city} Sports Complex`,
+        category: 'Sports',
+        ageRange: '8-16',
+        cost: '$25',
+        imageUrl: '/placeholders/placeholder-3.svg'
+      },
+      {
+        id: '4',
+        title: 'Coding Camp for Kids',
+        description: 'Learn programming basics with fun projects and games. No experience needed!',
+        startDate: this.getFutureDate(4, 9, 0),
+        endDate: this.getFutureDate(4, 15, 0),
+        location: `${city} Tech Hub`,
+        category: 'Technology',
+        ageRange: '10-14',
+        cost: '$45',
+        imageUrl: '/placeholders/placeholder-4.svg'
+      },
+      {
+        id: '5',
+        title: 'Music & Movement for Toddlers',
+        description: 'Interactive music and dance session for little ones ages 2-5. Parents welcome!',
+        startDate: this.getFutureDate(5, 10, 30),
+        endDate: this.getFutureDate(5, 11, 30),
+        location: `${city} Community Center`,
+        category: 'Entertainment',
+        ageRange: '2-5',
+        cost: 'Free',
+        imageUrl: '/placeholders/placeholder-1.svg'
+      },
+      {
+        id: '6',
+        title: 'Robotics Workshop',
+        description: 'Build and program your own robot! Perfect for kids interested in engineering.',
+        startDate: this.getFutureDate(6, 13, 0),
+        endDate: this.getFutureDate(6, 16, 0),
+        location: `${city} Maker Space`,
+        category: 'Technology',
+        ageRange: '8-14',
+        cost: '$35',
+        imageUrl: '/placeholders/placeholder-2.svg'
+      },
+      {
+        id: '7',
+        title: 'Basketball Skills Clinic',
+        description: 'Learn fundamental basketball skills with professional coaches.',
+        startDate: this.getFutureDate(7, 9, 0),
+        endDate: this.getFutureDate(7, 11, 0),
+        location: `${city} Recreation Center`,
+        category: 'Sports',
+        ageRange: '10-16',
+        cost: '$20',
+        imageUrl: '/placeholders/placeholder-3.svg'
+      },
+      {
+        id: '8',
+        title: 'Creative Writing Workshop',
+        description: 'Express your imagination through storytelling and creative writing exercises.',
+        startDate: this.getFutureDate(8, 15, 0),
+        endDate: this.getFutureDate(8, 17, 0),
+        location: `${city} Public Library`,
+        category: 'Education',
+        ageRange: '12-18',
+        cost: 'Free',
+        imageUrl: '/placeholders/placeholder-4.svg'
+      }
+    ];
+
+    // Filter by category if specified
+    if (category && category !== 'all') {
+      return allEvents.filter(event => event.category === category);
+    }
+
+    return allEvents;
   }
 
   private getMockEvents(city: string): Event[] {
@@ -226,10 +472,17 @@ class EventService {
     ];
   }
 
+  private getFutureDate(daysFromNow: number, hour: number, minute: number): string {
+    const date = new Date();
+    date.setDate(date.getDate() + daysFromNow);
+    date.setHours(hour, minute, 0, 0);
+    return date.toISOString();
+  }
+
   async getEventById(eventId: string): Promise<Event | null> {
     try {
-      const response = await this.makeRequest(`/events/${eventId}/`, {
-        'expand': 'venue,category'
+      const response = await this.makeRequest(`/events/${eventId}.json`, {
+        'include': 'venue'
       });
       
       return this.transformEvent(response);
@@ -243,21 +496,25 @@ class EventService {
   async getNearbyEvents(lat: number, lng: number, radius: number = 20): Promise<Event[]> {
     try {
       const searchParams: Record<string, string> = {
-        'location.latitude': lat.toString(),
-        'location.longitude': lng.toString(),
-        'location.within': `${radius}mi`,
-        'expand': 'venue,category',
-        'status': 'live',
-        'start_date.range_start': new Date().toISOString(),
-        'limit': '20',
+        'size': '20',
+        'sort': 'date,asc',
+        'startDateTime': new Date().toISOString(),
+        'latlong': `${lat},${lng}`,
+        'radius': radius.toString(),
+        'unit': 'miles',
+        'classificationId': 'KZFzniwnSyZfZ7v7nE', // Family events
       };
 
-      const response = await this.makeRequest('/events/search/', searchParams);
+      const response = await this.makeRequest('/events.json', searchParams);
       
-      return response.events.map((event: EventbriteEvent) => this.transformEvent(event));
+      if (response._embedded && response._embedded.events) {
+        return response._embedded.events.map((event: TicketmasterEvent) => this.transformEvent(event));
+      }
+      
+      return [];
     } catch (error) {
       console.error('Failed to get nearby events:', error);
-      return this.getMockEvents('Nearby');
+      return this.getEnhancedMockEvents('Nearby');
     }
   }
 }

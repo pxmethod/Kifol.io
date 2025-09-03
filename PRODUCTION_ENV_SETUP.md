@@ -18,7 +18,12 @@ EMAIL_DOMAIN=yourdomain.com
 SUPPORT_EMAIL=support@yourdomain.com
 ```
 
-### 3. App URLs
+### 3. Events API Configuration (Ticketmaster)
+```bash
+NEXT_PUBLIC_TICKETMASTER_API_KEY=your_production_ticketmaster_api_key
+```
+
+### 4. App URLs
 ```bash
 NEXT_PUBLIC_APP_URL=https://yourdomain.com
 ```

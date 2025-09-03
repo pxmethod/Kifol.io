@@ -11,14 +11,17 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-inter)", "Inter", "sans-serif"],
       },
+      fontSize: {
+        'sm': '1rem',
+      },
       colors: {
         kifolio: {
           bg: "#f0f8f6",
           header: "#1a5f5f",
           cta: "#ff6b35",
           text: "#2d5a5a",
-          primary: "#ff6b35", // Add this to match kifolio-primary usage
-          "primary-dark": "#e55a2b", // Add this to match kifolio-primary-dark usage
+          primary: "#ff6b35",
+          "primary-dark": "#e55a2b", 
         },
       },
       spacing: {

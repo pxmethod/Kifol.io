@@ -41,6 +41,11 @@ export default function WhatsHappeningPage() {
           setLoading(true);
           setError('');
           
+          // Debug: Check environment variable
+          console.log('=== ENVIRONMENT DEBUG ===');
+          console.log('NEXT_PUBLIC_TICKETMASTER_API_KEY exists:', !!process.env.NEXT_PUBLIC_TICKETMASTER_API_KEY);
+          console.log('========================');
+          
           // Load user's city and state from profile
           const userProfile = await userService.getCurrentUser();
           const city = userProfile?.city || '';
@@ -546,9 +551,9 @@ export default function WhatsHappeningPage() {
                             "I'm Going"
                           )}
                         </button>
-                        {event.eventbriteUrl && (
+                        {event.ticketmasterUrl && (
                           <a
-                            href={event.eventbriteUrl}
+                            href={event.ticketmasterUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="px-4 py-2 border border-kifolio-primary text-kifolio-primary hover:bg-kifolio-primary hover:text-white rounded-lg font-medium transition-colors"

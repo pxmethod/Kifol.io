@@ -214,7 +214,7 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                 className="text-3xl font-bold mb-8 text-center"
                 style={{ color: config.colors.text }}
               >
-                Achievements
+                Timeline
               </h2>
               <div className="space-y-8">
                 {regularAchievements.map((achievement: Achievement) => (
