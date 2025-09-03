@@ -144,7 +144,7 @@ export async function GET(request: NextRequest) {
     }).filter(Boolean) || [];
 
     console.log('Filtered events returned:', events.length);
-    console.log('Event types:', events.map(e => e.category));
+    console.log('Event types:', events.map((e: any) => e.category));
 
     return NextResponse.json({ events });
     
