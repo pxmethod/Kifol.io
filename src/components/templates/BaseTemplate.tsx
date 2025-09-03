@@ -13,7 +13,21 @@ interface BaseTemplateProps extends PortfolioTemplateProps {
 export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
   const achievements = portfolio.achievements || [];
   const milestones = achievements.filter((a: Achievement) => a.isMilestone);
-  const regularAchievements = achievements.filter((a: Achievement) => !a.isMilestone);
+  
+  // Sort all achievements by date (newest first) and group by date
+  const sortedAchievements = [...achievements].sort((a, b) => 
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+  
+  // Group achievements by date
+  const achievementsByDate = sortedAchievements.reduce((groups: { [key: string]: Achievement[] }, achievement) => {
+    const date = achievement.date;
+    if (!groups[date]) {
+      groups[date] = [];
+    }
+    groups[date].push(achievement);
+    return groups;
+  }, {});
   
   // Modal state
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
@@ -149,66 +163,8 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
       {/* Content Section */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
-          {/* Milestones Section */}
-          {milestones.length > 0 && (
-            <div className="mb-16">
-              <h2 
-                className="text-3xl font-bold mb-8 text-center"
-                style={{ color: config.colors.text }}
-              >
-                Milestones
-              </h2>
-              <div className="grid gap-8 md:grid-cols-2">
-                {milestones.map((achievement: Achievement) => (
-                  <div 
-                    key={achievement.id}
-                    className="p-6 rounded-lg border cursor-pointer hover:shadow-lg transition-shadow"
-                    style={{ 
-                      backgroundColor: config.colors.background,
-                      borderColor: config.colors.border
-                    }}
-                    onClick={() => handleViewAchievement(achievement)}
-                  >
-                    <div className="flex items-start space-x-4">
-                      <div 
-                        className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: config.colors.primary }}
-                      >
-                        <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <h3 
-                          className="text-lg font-semibold mb-2"
-                          style={{ color: config.colors.text }}
-                        >
-                          {achievement.title}
-                        </h3>
-                        <p 
-                          className="text-sm mb-2"
-                          style={{ color: config.colors.textSecondary }}
-                        >
-                          {formatDate(achievement.date)}
-                        </p>
-                        {achievement.description && (
-                          <p 
-                            className="text-sm"
-                            style={{ color: config.colors.textSecondary }}
-                          >
-                            {achievement.description}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Achievements Timeline */}
-          {regularAchievements.length > 0 && (
+          {/* Achievements by Date */}
+          {Object.keys(achievementsByDate).length > 0 && (
             <div>
               <h2 
                 className="text-3xl font-bold mb-8 text-center"
@@ -216,102 +172,106 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
               >
                 Timeline
               </h2>
-              <div className="space-y-8">
-                {regularAchievements.map((achievement: Achievement) => (
-                  <div 
-                    key={achievement.id}
-                    className="flex items-start space-x-6"
-                  >
-                    {/* Date */}
+              <div className="space-y-12">
+                {Object.entries(achievementsByDate).map(([date, dateAchievements]) => (
+                  <div key={date} className="space-y-6">
+                    {/* Date Header */}
                     <div 
-                      className="w-24 text-sm font-medium flex-shrink-0 pt-2"
-                      style={{ color: config.colors.textSecondary }}
-                    >
-                      {formatDate(achievement.date)}
-                    </div>
-
-                    {/* Timeline Line */}
-                    <div className="relative flex-shrink-0">
-                      <div 
-                        className="w-4 h-4 rounded-full border-2"
-                        style={{ 
-                          backgroundColor: config.colors.background,
-                          borderColor: config.colors.primary
-                        }}
-                      ></div>
-                      <div 
-                        className="absolute top-4 left-2 w-px h-full"
-                        style={{ backgroundColor: config.colors.border }}
-                      ></div>
-                    </div>
-
-                    {/* Content */}
-                    <div 
-                      className="flex-1 p-6 rounded-lg border cursor-pointer hover:shadow-lg transition-shadow"
+                      className="text-lg font-semibold text-center pb-2 border-b"
                       style={{ 
-                        backgroundColor: config.colors.background,
+                        color: config.colors.text,
                         borderColor: config.colors.border
                       }}
-                      onClick={() => handleViewAchievement(achievement)}
                     >
-                      <h3 
-                        className="text-lg font-semibold mb-2"
-                        style={{ color: config.colors.text }}
-                      >
-                        {achievement.title}
-                      </h3>
-                      {achievement.description && (
-                        <p 
-                          className="text-sm"
-                          style={{ color: config.colors.textSecondary }}
+                      {formatDate(date)}
+                    </div>
+                    
+                    {/* Achievements for this date */}
+                    <div className="space-y-4">
+                      {dateAchievements.map((achievement: Achievement) => (
+                        <div 
+                          key={achievement.id}
+                          className="p-6 rounded-lg border cursor-pointer hover:shadow-lg transition-shadow"
+                          style={{ 
+                            backgroundColor: config.colors.background,
+                            borderColor: config.colors.border
+                          }}
+                          onClick={() => handleViewAchievement(achievement)}
                         >
-                          {achievement.description}
-                        </p>
-                      )}
-                      
-                      {/* Media Preview */}
-                      {achievement.media && achievement.media.length > 0 && (
-                        <div className="mt-4 flex space-x-2">
-                          {achievement.media.slice(0, 3).map((media) => (
-                            <div 
-                              key={media.id}
-                              className="w-16 h-16 rounded border overflow-hidden"
-                              style={{ borderColor: config.colors.border }}
+                          <div className="flex items-start justify-between mb-2">
+                            <h3 
+                              className="text-lg font-semibold"
+                              style={{ color: config.colors.text }}
                             >
-                              {media.type === 'image' ? (
-                                <Image 
-                                  src={media.url} 
-                                  alt={media.fileName}
-                                  width={64}
-                                  height={64}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
+                              {achievement.title}
+                            </h3>
+                            {achievement.isMilestone && (
+                              <span 
+                                className="px-2 py-1 text-xs font-medium rounded-full"
+                                style={{ 
+                                  backgroundColor: config.colors.primary,
+                                  color: 'white'
+                                }}
+                              >
+                                Milestone
+                              </span>
+                            )}
+                          </div>
+                          
+                          {achievement.description && (
+                            <p 
+                              className="text-sm mb-4"
+                              style={{ color: config.colors.textSecondary }}
+                            >
+                              {achievement.description}
+                            </p>
+                          )}
+                          
+                          {/* Media Preview */}
+                          {achievement.media && achievement.media.length > 0 && (
+                            <div className="mt-4 flex space-x-2">
+                              {achievement.media.slice(0, 3).map((media) => (
                                 <div 
-                                  className="w-full h-full flex items-center justify-center"
-                                  style={{ backgroundColor: config.colors.primary }}
+                                  key={media.id}
+                                  className="w-16 h-16 rounded border overflow-hidden"
+                                  style={{ borderColor: config.colors.border }}
                                 >
-                                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-                                  </svg>
+                                  {media.type === 'image' ? (
+                                    <Image 
+                                      src={media.url} 
+                                      alt={media.fileName}
+                                      width={64}
+                                      height={64}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <div 
+                                      className="w-full h-full flex items-center justify-center"
+                                      style={{ backgroundColor: config.colors.primary }}
+                                    >
+                                      <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                                      </svg>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                              {achievement.media.length > 3 && (
+                                <div 
+                                  className="w-16 h-16 rounded border flex items-center justify-center text-sm font-medium"
+                                  style={{ 
+                                    backgroundColor: config.colors.background,
+                                    borderColor: config.colors.border,
+                                    color: config.colors.textSecondary
+                                  }}
+                                >
+                                  +{achievement.media.length - 3}
                                 </div>
                               )}
                             </div>
-                          ))}
-                          {achievement.media.length > 3 && (
-                            <div 
-                              className="w-16 h-16 rounded border flex items-center justify-center text-sm font-medium"
-                              style={{ 
-                                backgroundColor: config.colors.background,
-                                borderColor: config.colors.border,
-                                color: config.colors.textSecondary
-                              }}
-                            >
-                              +{achievement.media.length - 3}
-                            </div>
                           )}
                         </div>
-                      )}
+                      ))}
                     </div>
                   </div>
                 ))}

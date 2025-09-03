@@ -225,7 +225,7 @@ export default function CreatePortfolio() {
             {/* Child's Name */}
             <div className="form-field">
               <label htmlFor="childName" className="form-field__label form-field__label--required">
-                Child&apos;s Name
+                Child&apos;s name
               </label>
               <input
                 type="text"
@@ -247,7 +247,7 @@ export default function CreatePortfolio() {
             {/* Portfolio Title */}
             <div className="form-field">
               <label htmlFor="portfolioTitle" className="form-field__label form-field__label--required">
-                Portfolio Title
+                Portfolio title
               </label>
               <input
                 type="text"
@@ -269,7 +269,7 @@ export default function CreatePortfolio() {
             {/* Photo Upload */}
             <div className="form-field">
               <label htmlFor="photo" className="form-field__label">
-                Child&apos;s Photo (Optional)
+                Child&apos;s photo (totally optional)
               </label>
               <input
                 type="file"
@@ -296,7 +296,7 @@ export default function CreatePortfolio() {
             {/* Template Selection */}
             <div>
               <label className="block text-sm font-medium text-kifolio-text mb-2">
-                Portfolio Template *
+                Choose a template *
               </label>
               <div className="grid grid-cols-2 gap-4">
                 {templates.map((template) => (
@@ -347,7 +347,7 @@ export default function CreatePortfolio() {
             {/* Privacy Settings */}
             <div>
               <label className="block text-sm font-medium text-kifolio-text mb-2">
-                Privacy Settings
+                Privacy settings
               </label>
               <div className="space-y-4">
                 {/* Privacy Toggle */}
@@ -375,7 +375,7 @@ export default function CreatePortfolio() {
                 {formData.isPrivate && (
                   <div>
                     <label htmlFor="password" className="block text-sm font-medium text-kifolio-text mb-2">
-                      Portfolio Password *
+                      Portfolio password *
                     </label>
                     <div className="relative">
                       <input
