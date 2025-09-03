@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Version 2.0 - Fixed date format for Ticketmaster API
 export async function GET(request: NextRequest) {
   try {
     console.log('=== SERVER-SIDE API ROUTE DEBUG ===');
@@ -31,11 +32,20 @@ export async function GET(request: NextRequest) {
     }
 
     // Build search parameters for Ticketmaster Discovery API
+    // Format date to match Ticketmaster's expected format: YYYY-MM-DDTHH:mm:ssZ
+    const now = new Date();
+    const originalDate = now.toISOString();
+    const formattedDate = originalDate.replace(/\.\d{3}Z$/, 'Z');
+    
+    console.log('Original date:', originalDate);
+    console.log('Formatted date:', formattedDate);
+    console.log('Date format check:', /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(formattedDate));
+    
     const ticketmasterParams = new URLSearchParams({
       'apikey': apiKey,
       'size': limit,
       'sort': 'date,asc',
-      'startDateTime': new Date().toISOString(),
+      'startDateTime': formattedDate,
       'city': city,
       'stateCode': state,
       'radius': radius,
