@@ -29,7 +29,7 @@ NEXT_PUBLIC_MEETUP_CLIENT_ID=your_meetup_client_id
 MEETUP_CLIENT_SECRET=your_meetup_client_secret
 ```
 
-### 5. App URLs and Domains (NEW!)
+### 5. App URLs and Domains
 ```bash
 NEXT_PUBLIC_APP_URL=https://kifol.io
 NEXT_PUBLIC_PORTFOLIO_DOMAIN=my.kifol.io
@@ -48,17 +48,18 @@ NEXTAUTH_URL=https://kifol.io
 
 ## Portfolio Domain System
 
-The new portfolio domain system allows users to share portfolios at:
-- `my.kifol.io/{portfolio-id}`
+The portfolio domain system allows users to share portfolios at:
+- `my.kifol.io/p/{short-id}` (short 6-character codes)
 
 ### How It Works:
-1. **Portfolio Creation**: Generates unique UUID
+1. **Portfolio Creation**: Generates unique UUID and short ID
 2. **URL Generation**: Uses `NEXT_PUBLIC_PORTFOLIO_DOMAIN` environment variable
-3. **Public Access**: Routes to `/preview/[id]` page
-4. **Sharing**: Users can copy and share the generated URL
+3. **Public Access**: Routes to `/p/[shortId]` page
+4. **Sharing**: Users can copy and share the generated short URL
 
 ### Next.js Configuration:
-- **Rewrites**: `my.kifol.io/:id` → `/preview/:id`
+- **Rewrites**: `my.kifol.io/p/:shortId` → `/p/:shortId`
+- **Rewrites**: `my.kifol.io/preview/:portfolioId` → `/preview/:portfolioId`
 - **Redirects**: `my.kifol.io/` → `https://kifol.io`
 
 ## Setup Steps

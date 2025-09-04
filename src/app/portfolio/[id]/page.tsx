@@ -28,6 +28,7 @@ interface PortfolioData {
   isPrivate?: boolean;
   password?: string;
   hasUnsavedChanges?: boolean;
+  short_id?: string;
   achievements?: Achievement[];
 }
 
@@ -154,7 +155,7 @@ export default function PortfolioPage() {
 
   const copyToClipboard = async () => {
     if (portfolio) {
-              const url = `${DOMAIN_CONFIG.PORTFOLIO_DOMAIN}/${portfolio.id}`;
+              const url = `https://${DOMAIN_CONFIG.PORTFOLIO_DOMAIN}/p/${portfolio.short_id || portfolio.id}`;
       try {
         await navigator.clipboard.writeText(url);
         setShowCopyNotification(true);
@@ -569,7 +570,7 @@ export default function PortfolioPage() {
                     <span className="text-sm font-medium text-gray-700">Portfolio URL:</span>
                     <div className="mt-1">
                       <span className="text-xs font-mono text-kifolio-cta break-all">
-                        {DOMAIN_CONFIG.PORTFOLIO_DOMAIN}/{portfolio.id}
+                        {DOMAIN_CONFIG.PORTFOLIO_DOMAIN}/p/{portfolio.short_id || portfolio.id}
                       </span>
                     </div>
                   </div>

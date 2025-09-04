@@ -16,7 +16,17 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/:portfolioId',
+        source: '/p/:shortId',
+        destination: '/p/:shortId',
+        has: [
+          {
+            type: 'host',
+            value: 'my.kifol.io',
+          },
+        ],
+      },
+      {
+        source: '/preview/:portfolioId',
         destination: '/preview/:portfolioId',
         has: [
           {
@@ -29,19 +39,7 @@ const nextConfig = {
   },
   
   async redirects() {
-    return [
-      {
-        source: '/',
-        destination: 'https://kifol.io',
-        has: [
-          {
-            type: 'host',
-            value: 'my.kifol.io',
-          },
-        ],
-        permanent: true,
-      },
-    ];
+    return [];
   },
 };
 

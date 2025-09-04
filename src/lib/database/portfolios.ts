@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/types/database'
+import { generateShortId } from '@/lib/utils/url-shortener'
 
 type Portfolio = Database['public']['Tables']['portfolios']['Row']
 type NewPortfolio = Database['public']['Tables']['portfolios']['Insert']
@@ -12,9 +13,18 @@ export class PortfolioService {
    * Get all portfolios for the current user
    */
   async getUserPortfolios(): Promise<Portfolio[]> {
+    // Get the current user first
+    const { data: { user }, error: userError } = await this.supabase.auth.getUser()
+    
+    if (userError || !user) {
+      console.error('Error getting user:', userError)
+      throw new Error('User not authenticated')
+    }
+
     const { data, error } = await this.supabase
       .from('portfolios')
       .select('*')
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -29,10 +39,19 @@ export class PortfolioService {
    * Get a portfolio by ID with access control
    */
   async getPortfolioWithAccess(id: string): Promise<Portfolio | null> {
+    // Get the current user first
+    const { data: { user }, error: userError } = await this.supabase.auth.getUser()
+    
+    if (userError || !user) {
+      console.error('Error getting user:', userError)
+      throw new Error('User not authenticated')
+    }
+
     const { data, error } = await this.supabase
       .from('portfolios')
       .select('*')
       .eq('id', id)
+      .eq('user_id', user.id)
       .single()
 
     if (error) {
@@ -104,9 +123,28 @@ export class PortfolioService {
    * Create a new portfolio
    */
   async createPortfolio(portfolio: Omit<NewPortfolio, 'user_id'>): Promise<Portfolio> {
+    // Generate a unique short ID
+    let shortId: string = '';
+    let isUnique = false;
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    while (!isUnique && attempts < maxAttempts) {
+      shortId = generateShortId();
+      const existing = await this.getPortfolioByShortId(shortId);
+      if (!existing) {
+        isUnique = true;
+      }
+      attempts++;
+    }
+
+    if (!isUnique) {
+      throw new Error('Failed to generate unique short ID');
+    }
+
     const { data, error } = await this.supabase
       .from('portfolios')
-      .insert([portfolio])
+      .insert([{ ...portfolio, short_id: shortId }])
       .select()
       .single()
 
@@ -119,13 +157,43 @@ export class PortfolioService {
   }
 
   /**
+   * Get a portfolio by short ID
+   */
+  async getPortfolioByShortId(shortId: string): Promise<Portfolio | null> {
+    const { data, error } = await this.supabase
+      .from('portfolios')
+      .select('*')
+      .eq('short_id', shortId)
+      .single()
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return null // Portfolio not found
+      }
+      console.error('Error fetching portfolio by short ID:', error)
+      throw new Error('Failed to fetch portfolio')
+    }
+
+    return data
+  }
+
+  /**
    * Update an existing portfolio
    */
   async updatePortfolio(id: string, updates: UpdatePortfolio): Promise<Portfolio> {
+    // Get the current user first
+    const { data: { user }, error: userError } = await this.supabase.auth.getUser()
+    
+    if (userError || !user) {
+      console.error('Error getting user:', userError)
+      throw new Error('User not authenticated')
+    }
+
     const { data, error } = await this.supabase
       .from('portfolios')
       .update(updates)
       .eq('id', id)
+      .eq('user_id', user.id)
       .select()
       .single()
 
@@ -141,10 +209,19 @@ export class PortfolioService {
    * Delete a portfolio
    */
   async deletePortfolio(id: string): Promise<void> {
+    // Get the current user first
+    const { data: { user }, error: userError } = await this.supabase.auth.getUser()
+    
+    if (userError || !user) {
+      console.error('Error getting user:', userError)
+      throw new Error('User not authenticated')
+    }
+
     const { error } = await this.supabase
       .from('portfolios')
       .delete()
       .eq('id', id)
+      .eq('user_id', user.id)
 
     if (error) {
       console.error('Error deleting portfolio:', error)
