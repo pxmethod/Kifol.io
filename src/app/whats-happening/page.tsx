@@ -6,6 +6,7 @@ import Header from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { eventService, Event } from '@/lib/services/events';
+import { meetupService } from '@/lib/services/meetup';
 import { userService, eventReminderService } from '@/lib/database';
 import EventTemplateModal from '@/components/EventTemplateModal';
 import Toast from '@/components/Toast';
@@ -25,6 +26,9 @@ export default function WhatsHappeningPage() {
   const [toastMessage, setToastMessage] = useState<string>('');
   const [showToast, setShowToast] = useState(false);
   const [userReminders, setUserReminders] = useState<Set<string>>(new Set());
+  const [meetupEvents, setMeetupEvents] = useState<Event[]>([]);
+  const [meetupConnected, setMeetupConnected] = useState(false);
+  const [meetupLoading, setMeetupLoading] = useState(false);
 
   // Redirect unauthenticated users to marketing site
   useEffect(() => {
@@ -32,6 +36,70 @@ export default function WhatsHappeningPage() {
       router.push('/');
     }
   }, [user, authLoading, router]);
+
+  // Handle Meetup OAuth callback
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const meetupToken = urlParams.get('meetup_token');
+    const error = urlParams.get('error');
+
+    if (error) {
+      setError(`Meetup authentication failed: ${error}`);
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+      return;
+    }
+
+    if (meetupToken) {
+      meetupService.setAccessToken(meetupToken);
+      setMeetupConnected(true);
+      setToastMessage('Successfully connected to Meetup!');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+      
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+      
+      // Reload events to include Meetup events
+      if (userCity && userState) {
+        loadMeetupEvents(userCity, userState);
+      }
+    }
+  }, [userCity, userState]);
+
+  // Handle Meetup authentication
+  const handleMeetupConnect = () => {
+    try {
+      const authUrl = meetupService.getAuthUrl();
+      window.location.href = authUrl;
+    } catch (error) {
+      console.error('Failed to initiate Meetup OAuth:', error);
+      setError('Failed to connect to Meetup. Please try again.');
+    }
+  };
+
+  // Load Meetup events
+  const loadMeetupEvents = async (city: string, state: string) => {
+    if (!meetupConnected || !city || !state) return;
+
+    try {
+      setMeetupLoading(true);
+      const location = `${city}, ${state}`;
+      const meetupResults = await meetupService.searchEvents({
+        location,
+        radius: 20,
+        limit: 20,
+      });
+
+      const transformedEvents = meetupResults.map(event => meetupService.transformEvent(event));
+      setMeetupEvents(transformedEvents);
+    } catch (error) {
+      console.error('Failed to load Meetup events:', error);
+      setError('Failed to load Meetup events. Please try again.');
+    } finally {
+      setMeetupLoading(false);
+    }
+  };
 
   // Load user's city and state from profile and fetch events
   useEffect(() => {
@@ -62,6 +130,9 @@ export default function WhatsHappeningPage() {
             });
             
             setEvents(locationEvents);
+            
+            // Load Meetup events if connected
+            await loadMeetupEvents(city, state);
             
             // Show success message if location was loaded from profile
             setToastMessage(`Location loaded: ${city}, ${state}`);
@@ -232,7 +303,10 @@ export default function WhatsHappeningPage() {
 
   const categories = ['all', 'Arts & Crafts', 'Education', 'Sports', 'Entertainment', 'Technology'];
 
-  const filteredEvents = events.filter(event => {
+  // Combine Ticketmaster and Meetup events
+  const allEvents = [...events, ...meetupEvents];
+  
+  const filteredEvents = allEvents.filter(event => {
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || event.category === selectedCategory;
@@ -300,6 +374,46 @@ export default function WhatsHappeningPage() {
             Discover amazing activities for kids and teens in your area
           </p>
         </div>
+
+            {/* Meetup Integration Section */}
+            {!loading && (
+              <div className="mb-8">
+                <div className="bg-gradient-to-r from-kifolio-primary to-kifolio-cta rounded-lg p-6 text-white">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-xl font-semibold mb-2">Discover More Activities</h3>
+                      <p className="text-white/90">
+                        Connect with Meetup to find local art classes, science workshops, coding camps, and family activities in your area.
+                      </p>
+                    </div>
+                    <div className="ml-6">
+                      {!meetupConnected ? (
+                        <button
+                          onClick={handleMeetupConnect}
+                          className="bg-white text-kifolio-primary px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                        >
+                          Connect Meetup
+                        </button>
+                      ) : (
+                        <div className="text-center">
+                          <div className="text-green-200 text-sm mb-2">✓ Connected</div>
+                          <button
+                            onClick={() => {
+                              setMeetupConnected(false);
+                              setMeetupEvents([]);
+                              meetupService.setAccessToken('');
+                            }}
+                            className="text-white/80 hover:text-white text-sm underline"
+                          >
+                            Disconnect
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}        
 
         {/* Location Settings */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
@@ -490,9 +604,18 @@ export default function WhatsHappeningPage() {
                     {/* Event Details */}
                     <div className="p-6">
                       <div className="mb-4">
-                        <span className="inline-block bg-kifolio-primary/10 text-kifolio-primary text-sm font-medium px-3 py-1 rounded-full mb-2">
-                          {event.category}
-                        </span>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="inline-block bg-kifolio-primary/10 text-kifolio-primary text-sm font-medium px-3 py-1 rounded-full">
+                            {event.category}
+                          </span>
+                          <span className={`inline-block text-xs font-medium px-2 py-1 rounded-full ${
+                            event.source === 'meetup' 
+                              ? 'bg-purple-100 text-purple-700' 
+                              : 'bg-blue-100 text-blue-700'
+                          }`}>
+                            {event.source === 'meetup' ? 'Meetup' : 'Ticketmaster'}
+                          </span>
+                        </div>
                         <h3 className="text-xl font-semibold text-kifolio-text mb-2">
                           {event.title}
                         </h3>
@@ -551,9 +674,9 @@ export default function WhatsHappeningPage() {
                             "I'm Going"
                           )}
                         </button>
-                        {event.ticketmasterUrl && (
+                        {(event.ticketmasterUrl || event.meetupUrl) && (
                           <a
-                            href={event.ticketmasterUrl}
+                            href={event.ticketmasterUrl || event.meetupUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="px-4 py-2 border border-kifolio-primary text-kifolio-primary hover:bg-kifolio-primary hover:text-white rounded-lg font-medium transition-colors"

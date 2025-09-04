@@ -286,14 +286,13 @@ export default function PrivacyPolicyPage() {
             <div>
               <h4 className="font-semibold mb-4">Company</h4>
               <ul className="space-y-2 text-white">
-                <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
                 <li><a href="mailto:john@kifol.io" className="hover:text-white transition-colors">Contact</a></li>
                 <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link></li>
                 <li><Link href="/terms" className="hover:text-white transition-colors">Terms</Link></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-white mt-8 pt-8 text-center text-white">
+          <div className="border-t border-white/20 mt-8 pt-8 text-center text-white">
             <p>&copy; 2025 Kifolio. All rights reserved.</p>
           </div>
         </div>

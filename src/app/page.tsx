@@ -142,10 +142,12 @@ export default function MarketingPage() {
           <div className="max-w-6xl mx-auto">
             <div className="grid md:grid-cols-2 gap-12">
               <div className={`text-center ${featureCards.getItemClassName(0)}`}>
-                <div className="bg-kifolio-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-10 h-10 text-kifolio-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+                <div className="mx-auto mb-6" style={{ width: '200px', height: '200px' }}>
+                  <img 
+                    src="/marketing/academic-transitions.png" 
+                    alt="Academic Transitions" 
+                    className="w-full h-full object-contain"
+                  />
                 </div>
                 <h3 className="text-2xl font-semibold .text-kifolio-text mb-4">Academic Transitions</h3>
                 <p className="text-gray-600 leading-relaxed">
@@ -154,10 +156,12 @@ export default function MarketingPage() {
               </div>
               
               <div className={`text-center ${featureCards.getItemClassName(1)}`}>
-                <div className="bg-kifolio-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-10 h-10 text-kifolio-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                  </svg>
+                <div className="mx-auto mb-6" style={{ width: '200px', height: '200px' }}>
+                  <img 
+                    src="/marketing/scholarships-awards.png" 
+                    alt="Scholarships & Awards" 
+                    className="w-full h-full object-contain"
+                  />
                 </div>
                 <h3 className="text-2xl font-semibold .text-kifolio-text mb-4">Scholarships & Awards</h3>
                 <p className="text-gray-600 leading-relaxed">
@@ -166,10 +170,12 @@ export default function MarketingPage() {
               </div>
               
               <div className={`text-center ${featureCards.getItemClassName(2)}`}>
-                <div className="bg-kifolio-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-10 h-10 text-kifolio-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                  </svg>
+                <div className="mx-auto mb-6" style={{ width: '200px', height: '200px' }}>
+                  <img 
+                    src="/marketing/resume-early-opps.png" 
+                    alt="Resume & Early Opportunities" 
+                    className="w-full h-full object-contain"
+                  />
                 </div>
                 <h3 className="text-2xl font-semibold .text-kifolio-text mb-4">Resume & Early Opportunities</h3>
                 <p className="text-gray-600 leading-relaxed">
@@ -178,10 +184,12 @@ export default function MarketingPage() {
               </div>
 
               <div className={`text-center ${featureCards.getItemClassName(3)}`}>
-                <div className="bg-kifolio-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-10 h-10 text-kifolio-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                  </svg>
+                <div className="mx-auto mb-6" style={{ width: '200px', height: '200px' }}>
+                  <img 
+                    src="/marketing/growth-tracking.png" 
+                    alt="Personal Growth Tracking" 
+                    className="w-full h-full object-contain"
+                  />
                 </div>
                 <h3 className="text-2xl font-semibold .text-kifolio-text mb-4">Personal Growth Tracking</h3>
                 <p className="text-gray-600 leading-relaxed">
@@ -215,7 +223,7 @@ export default function MarketingPage() {
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <p className="text-gray-700">Beautiful, customizable templates that grow with your child</p>
+                  <p className="text-gray-700">Simple templates that grow with your child</p>
                 </div>
                 
                 <div className="flex items-start gap-3">
@@ -291,7 +299,7 @@ export default function MarketingPage() {
         {/* Testimonials Section */}
         <section 
           ref={testimonialsSection.ref}
-          className={`py-20 px-4 bg-white ${testimonialsSection.className}`} 
+          className={`py-20 px-4 bg-kifolio-bg ${testimonialsSection.className}`} 
           aria-labelledby="testimonials-heading"
         >
           <div className="max-w-6xl mx-auto">
@@ -299,14 +307,14 @@ export default function MarketingPage() {
               What Parents Are Saying
             </h2>
             <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-kifolio-bg rounded-lg p-6">
+              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-kifolio-primary rounded-full flex items-center justify-center mr-4">
                     <span className="text-white font-semibold">S</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold .text-kifolio-text">Sarah M.</h4>
-                    <p className="text-sm text-gray-600">Parent of Emma, age 8</p>
+                    <h4 className="font-semibold .text-kifolio-text">Kelli W.</h4>
+                    <p className="text-sm text-gray-600">Parent of a 4-year-old</p>
                   </div>
                 </div>
                 <p className="text-gray-700 italic">
@@ -314,49 +322,51 @@ export default function MarketingPage() {
                 </p>
               </div>
 
-              <div className="bg-kifolio-bg rounded-lg p-6">
+              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-kifolio-primary rounded-full flex items-center justify-center mr-4">
                     <span className="text-white font-semibold">M</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold .text-kifolio-text">Michael T.</h4>
-                    <p className="text-sm text-gray-600">Parent of Lucas, age 12</p>
+                    <h4 className="font-semibold .text-kifolio-text">Sarah M.</h4>
+                    <p className="text-sm text-gray-600">Parent of a 10-year-old</p>
                   </div>
                 </div>
                 <p className="text-gray-700 italic">
-                  &ldquo;The templates are beautiful and easy to customize. Lucas loves seeing his sports achievements documented, and it motivates him to keep improving.&rdquo;
+                  &ldquo;I used to keep boxes of my son's artwork and certificates, but it always felt messy and incomplete.
+                  With Kifolio, we finally have one beautiful place to look back at everything he's accomplished. He loves scrolling through his own progress—it makes him so proud.&rdquo;
                 </p>
               </div>
 
-              <div className="bg-kifolio-bg rounded-lg p-6">
+              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-kifolio-primary rounded-full flex items-center justify-center mr-4">
                     <span className="text-white font-semibold">M</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold .text-kifolio-text">Michael T.</h4>
-                    <p className="text-sm text-gray-600">Parent of Lucas, age 9</p>
+                    <h4 className="font-semibold .text-kifolio-text">Robert K.</h4>
+                    <p className="text-sm text-gray-600">Parent of a 16-year-old</p>
                   </div>
                 </div>
                 <p className="text-gray-700 italic">
-                  &ldquo;The templates are beautiful and easy to customize. Lucas loves seeing his sports achievements documented, and it motivates him to keep improving.&rdquo;
+                  &ldquo;I started using Kifolio just to keep track of grades and awards, but it’s become so much more. Seeing my daughter’s journey laid out—her creativity,
+                  her growth—it's something I'll cherish forever, and I know it will help her when she applies to college.&rdquo;
                 </p>
               </div>
 
-              <div className="bg-kifolio-bg rounded-lg p-6">
+              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-kifolio-primary rounded-full flex items-center justify-center mr-4">
-                    <span className="text-white font-semibold">M</span>
+                    <span className="text-white font-semibold">D</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold .text-kifolio-text">Rachel N.</h4>
-                    <p className="text-sm text-gray-600">Parent of Jack, age 12</p>
+                    <h4 className="font-semibold .text-kifolio-text">Daniel R.</h4>
+                    <p className="text-sm text-gray-600">Parent of a 15-year-old</p>
                   </div>
                 </div>
                 <p className="text-gray-700 italic">
-                  &ldquo;It’s amazing to see how his projects, awards,
-                  and even his artwork tell a complete story of who he’s becoming. It’s something we’ll cherish as a family—and I know it’ll help him when he applies to high school too.&rdquo;
+                  &ldquo;When my daughter started applying for summer programs, that was when we realized how valuable her Kifolio was.
+                  We could easily share her projects, awards, and activities in a polished way. It showed more than grades—it told her story.&rdquo;
                 </p>
               </div>
             </div>
@@ -400,7 +410,7 @@ export default function MarketingPage() {
                 </h3>
                 <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
                   <div className="text-gray-600 leading-relaxed" itemProp="text">
-                    Kifolio is completely free to start. No credit card required, 30-day free trial. You can create unlimited portfolios and use all core features without any hidden fees.
+                    Kifolio is completely free! You can create unlimited portfolios and use all core features without any hidden fees.
                   </div>
                 </div>
               </div>
@@ -469,14 +479,13 @@ export default function MarketingPage() {
             <div>
               <h4 className="font-semibold mb-4">Company</h4>
               <ul className="space-y-2 text-white">
-                <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
                 <li><a href="mailto:john@kifol.io" className="hover:text-white transition-colors">Contact</a></li>
                 <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link></li>
                 <li><Link href="/terms" className="hover:text-white transition-colors">Terms</Link></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-white mt-8 pt-8 text-center text-white">
+          <div className="border-t border-white/20 mt-8 pt-8 text-center text-white">
             <p>&copy; 2025 Kifolio. All rights reserved.</p>
           </div>
         </div>

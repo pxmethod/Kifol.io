@@ -10,6 +10,9 @@ export interface Event {
   cost: string;
   imageUrl?: string;
   ticketmasterUrl?: string;
+  meetupUrl?: string;
+  source?: 'ticketmaster' | 'meetup';
+  groupName?: string;
   latitude?: number;
   longitude?: number;
 }
@@ -219,6 +222,7 @@ class EventService {
       cost: this.formatPrice(ticketmasterEvent.priceRanges),
       imageUrl: this.getBestImage(ticketmasterEvent.images),
       ticketmasterUrl: ticketmasterEvent.url,
+      source: 'ticketmaster',
       latitude: venue ? parseFloat(venue.location.latitude) : undefined,
       longitude: venue ? parseFloat(venue.location.longitude) : undefined,
     };

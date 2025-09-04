@@ -9,6 +9,18 @@ export default function EmptyState() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 text-center">
+      {/* Empty State Image */}
+      {user && (
+        <div className="mb-8">
+          <img 
+            src="/marketing/no-portfolios.png" 
+            alt="No portfolios yet" 
+            className="mx-auto"
+            style={{ width: '260px', height: '260px' }}
+          />
+        </div>
+      )}
+      
       {/* Empty State Message */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-kifolio-text mb-4">
