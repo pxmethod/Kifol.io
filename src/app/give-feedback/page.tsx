@@ -235,12 +235,11 @@ export default function GiveFeedbackPage() {
       </main>
 
       {/* Toast Notification */}
-      {showToast && (
-        <Toast
-          message={toastMessage}
-          onDismiss={() => setShowToast(false)}
-        />
-      )}
+      <Toast
+        message={toastMessage}
+        isVisible={showToast}
+        onDismiss={() => setShowToast(false)}
+      />
     </div>
   );
 }

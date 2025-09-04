@@ -494,7 +494,7 @@ class EventService {
     try {
       // For now, we'll use the enhanced mock data for nearby events
       // You can extend the server-side API later to support lat/lng coordinates
-      console.log('Using mock data for nearby events (lat/lng not yet implemented)');
+      console.log(`Using mock data for nearby events (lat: ${lat}, lng: ${lng}, radius: ${radius}km - not yet implemented)`);
       return this.getEnhancedMockEvents('Nearby');
     } catch (error) {
       console.error('Failed to get nearby events:', error);
