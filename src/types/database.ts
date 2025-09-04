@@ -47,6 +47,7 @@ export interface Database {
           template: string
           is_private: boolean
           password: string | null
+          short_id: string
           created_at: string
           updated_at: string
         }
@@ -59,6 +60,7 @@ export interface Database {
           template: string
           is_private?: boolean
           password?: string | null
+          short_id: string
           created_at?: string
           updated_at?: string
         }
@@ -71,6 +73,7 @@ export interface Database {
           template?: string
           is_private?: boolean
           password?: string | null
+          short_id?: string
           updated_at?: string
         }
       }

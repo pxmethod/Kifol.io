@@ -87,6 +87,7 @@ export default function PortfolioPage() {
           createdAt: dbPortfolio.created_at,
           isPrivate: dbPortfolio.is_private,
           password: dbPortfolio.password || undefined,
+          short_id: dbPortfolio.short_id,
           hasUnsavedChanges: false,
           achievements: achievements.map(achievement => ({
             id: achievement.id,

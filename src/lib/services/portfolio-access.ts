@@ -20,10 +20,7 @@ export class PortfolioAccessService {
    */
   async checkAccess(portfolioId: string): Promise<PortfolioAccess> {
     try {
-      // Get current user
-      const { data: { user } } = await this.supabase.auth.getUser();
-      
-      // Get portfolio details
+      // Get portfolio details first
       const { data: portfolio, error } = await this.supabase
         .from('portfolios')
         .select('is_private, password, user_id')
@@ -47,23 +44,38 @@ export class PortfolioAccessService {
         };
       }
 
-      // If user is owner, they have access
-      if (user && user.id === portfolio.user_id) {
-        return {
-          portfolioId,
-          hasAccess: true,
-          accessType: 'owner'
-        };
-      }
+      // For private portfolios, check if user is authenticated
+      try {
+        const { data: { user } } = await this.supabase.auth.getUser();
+        
+        // If user is owner, they have access
+        if (user && user.id === portfolio.user_id) {
+          return {
+            portfolioId,
+            hasAccess: true,
+            accessType: 'owner'
+          };
+        }
 
-      // Check if user has password access (from session storage)
-      const hasPasswordAccess = this.checkPasswordAccess(portfolioId);
-      if (hasPasswordAccess) {
-        return {
-          portfolioId,
-          hasAccess: true,
-          accessType: 'password'
-        };
+        // Check if user has password access (from session storage)
+        const hasPasswordAccess = this.checkPasswordAccess(portfolioId);
+        if (hasPasswordAccess) {
+          return {
+            portfolioId,
+            hasAccess: true,
+            accessType: 'password'
+          };
+        }
+      } catch (authError) {
+        // User is not authenticated, check password access only
+        const hasPasswordAccess = this.checkPasswordAccess(portfolioId);
+        if (hasPasswordAccess) {
+          return {
+            portfolioId,
+            hasAccess: true,
+            accessType: 'password'
+          };
+        }
       }
 
       // No access

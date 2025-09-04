@@ -46,28 +46,25 @@ export default function ShortPortfolioPage() {
           return;
         }
 
-        // Check access to the portfolio
-        const access = await portfolioAccessService.checkAccess(dbPortfolio.id);
-        setAccessStatus(access);
-
-        if (!access.hasAccess) {
-          // Check if portfolio is private
-          const accessInfo = await portfolioService.getPortfolioAccessInfo(dbPortfolio.id);
+        // Check if portfolio is private
+        const accessInfo = await portfolioService.getPortfolioAccessInfo(dbPortfolio.id);
+        
+        if (accessInfo?.isPrivate) {
+          // Check if user has password access
+          const access = await portfolioAccessService.checkAccess(dbPortfolio.id);
+          setAccessStatus(access);
           
-          if (accessInfo?.isPrivate) {
+          if (!access.hasAccess) {
             // Show password prompt for private portfolio
             setShowPasswordPrompt(true);
             setLoading(false);
             return;
-          } else {
-            setError('Access denied');
-            return;
           }
         }
 
-        // User has access, load the portfolio
+        // Portfolio is public or user has access, load the portfolio
         setPortfolio(dbPortfolio as any);
-        await loadPortfolioData(dbPortfolio.id);
+        await loadPortfolioData(dbPortfolio.id, dbPortfolio);
       } catch (err) {
         console.error('Error loading portfolio:', err);
         setError('Failed to load portfolio');
@@ -79,15 +76,8 @@ export default function ShortPortfolioPage() {
     loadPortfolioByShortId();
   }, [params.shortId]);
 
-  const loadPortfolioData = async (portfolioId: string) => {
+  const loadPortfolioData = async (portfolioId: string, dbPortfolio: any) => {
     try {
-      // Get the portfolio data first
-      const dbPortfolio = await portfolioService.getPortfolio(portfolioId);
-      if (!dbPortfolio) {
-        setError('Portfolio not found');
-        return;
-      }
-
       // Get achievements for this portfolio
       const achievements = await achievementService.getPortfolioAchievements(portfolioId);
       
@@ -129,7 +119,7 @@ export default function ShortPortfolioPage() {
   const handlePasswordVerified = async () => {
     // Password was verified, now load the portfolio
     if (portfolio) {
-      await loadPortfolioData(portfolio.id);
+      await loadPortfolioData(portfolio.id, portfolio);
     }
     setShowPasswordPrompt(false);
   };

@@ -122,7 +122,7 @@ export class PortfolioService {
   /**
    * Create a new portfolio
    */
-  async createPortfolio(portfolio: Omit<NewPortfolio, 'user_id'>): Promise<Portfolio> {
+  async createPortfolio(portfolio: Omit<NewPortfolio, 'user_id' | 'short_id'>): Promise<Portfolio> {
     // Generate a unique short ID
     let shortId: string = '';
     let isUnique = false;

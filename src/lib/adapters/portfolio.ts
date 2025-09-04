@@ -42,7 +42,7 @@ export function dbPortfolioToLegacy(
 export function legacyPortfolioToDb(
   legacy: Omit<LegacyPortfolioData, 'id' | 'createdAt' | 'hasUnsavedChanges' | 'achievements'>,
   userId: string
-): Database['public']['Tables']['portfolios']['Insert'] {
+): Omit<Database['public']['Tables']['portfolios']['Insert'], 'short_id'> {
   return {
     user_id: userId,
     child_name: legacy.childName,
