@@ -167,7 +167,7 @@ export default function SignUpPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex items-center justify-center min-h-screen px-4 py-8">
+      <div className="flex items-center justify-center min-h-screen px-4 py-8 pt-20">
         <div className="w-full max-w-4xl">
           {/* Header Section */}
           <div className="text-center mb-8">
