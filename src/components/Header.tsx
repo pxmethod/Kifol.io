@@ -149,17 +149,11 @@ export default function Header({ animateLogo = false }: HeaderProps) {
               >
                 {/* Avatar */}
                 <div className="profile-menu__avatar">
-                  <svg 
-                    className="w-5 h-5 text-white" 
-                    fill="currentColor" 
-                    viewBox="0 0 20 20"
-                  >
-                    <path 
-                      fillRule="evenodd" 
-                      d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" 
-                      clipRule="evenodd" 
-                    />
-                  </svg>
+                  <img 
+                    src="/account-avatar.svg" 
+                    alt="Account" 
+                    className="w-full h-full object-cover rounded-full"
+                  />
                 </div>
 
                 {/* Email */}
@@ -307,10 +301,12 @@ export default function Header({ animateLogo = false }: HeaderProps) {
             {/* User Info */}
             <div className="p-6 border-t border-gray-200">
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-kifolio-primary rounded-full flex items-center justify-center mr-3">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                  </svg>
+                <div className="w-10 h-10 bg-kifolio-primary rounded-full flex items-center justify-center mr-3 overflow-hidden">
+                  <img 
+                    src="/account-avatar.svg" 
+                    alt="Account" 
+                    className="w-full h-full object-cover rounded-full"
+                  />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-900">{user?.email || 'User'}</p>
