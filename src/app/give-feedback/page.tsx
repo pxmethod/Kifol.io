@@ -38,7 +38,7 @@ export default function GiveFeedbackPage() {
     if (user?.email) {
       setFormData(prev => ({
         ...prev,
-        email: user.email
+        email: user.email!
       }));
     }
   }, [user]);
