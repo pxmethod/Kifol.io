@@ -233,7 +233,7 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                               {achievement.media.slice(0, 3).map((media) => (
                                 <div 
                                   key={media.id}
-                                  className="w-16 h-16 rounded border overflow-hidden"
+                                  className="w-40 h-40 rounded border overflow-hidden"
                                   style={{ borderColor: config.colors.border }}
                                 >
                                   {media.type === 'image' ? (

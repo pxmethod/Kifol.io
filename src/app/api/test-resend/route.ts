@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     // Test sending a simple email
     const { data, error } = await resend.emails.send({
-      from: 'Kifolio <onboarding@resend.dev>',
+      from: 'Kifolio <noreply@kifol.io>',
       to: ['john@kifol.io'],
       subject: 'Test Email from Kifolio',
       html: '<p>This is a test email to verify Resend configuration.</p>',

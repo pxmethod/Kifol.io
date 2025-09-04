@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     // Send feedback email
     console.log('Attempting to send email...');
     const { data, error } = await resend.emails.send({
-      from: 'Kifolio <onboarding@resend.dev>',
+      from: 'Kifolio <noreply@kifol.io>',
       to: ['john@kifol.io'],
       subject: `Kifolio Feedback: ${type}`,
       html: `

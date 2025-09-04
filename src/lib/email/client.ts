@@ -9,9 +9,9 @@ export const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Email configuration
 export const emailConfig = {
-  from: process.env.EMAIL_FROM || 'Kifolio <noreply@kifolio.com>',
-  supportEmail: process.env.SUPPORT_EMAIL || 'support@kifolio.com',
-  domain: process.env.EMAIL_DOMAIN || 'kifolio.com',
+  from: process.env.EMAIL_FROM || 'Kifolio <noreply@kifol.io>',
+  supportEmail: process.env.SUPPORT_EMAIL || 'support@kifol.io',
+  domain: process.env.EMAIL_DOMAIN || 'kifol.io',
 } as const;
 
 // Email categories for tracking and preferences
