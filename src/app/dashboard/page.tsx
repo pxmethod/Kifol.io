@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import EmptyState from '@/components/EmptyState';
 import PortfolioCard from '@/components/PortfolioCard';
-import EditPortfolioModal from '@/components/EditPortfolioModal';
 import DeletePortfolioModal from '@/components/DeletePortfolioModal';
 import Toast from '@/components/Toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -21,13 +20,10 @@ export default function Dashboard() {
     portfolios, 
     loading, 
     error, 
-    savePortfolio, 
     deletePortfolio: removePortfolio 
   } = usePortfolios();
   
-  const [editingPortfolio, setEditingPortfolio] = useState<LegacyPortfolioData | null>(null);
   const [deletingPortfolio, setDeletingPortfolio] = useState<LegacyPortfolioData | null>(null);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -75,8 +71,7 @@ export default function Dashboard() {
   }
 
   const handleEditPortfolio = (portfolio: LegacyPortfolioData) => {
-    setEditingPortfolio(portfolio);
-    setShowEditModal(true);
+    router.push(`/portfolio/${portfolio.id}`);
   };
 
   const handleRemovePortfolio = (portfolio: LegacyPortfolioData) => {
@@ -84,18 +79,6 @@ export default function Dashboard() {
     setShowDeleteModal(true);
   };
 
-  const handleSavePortfolio = async (updatedPortfolio: LegacyPortfolioData) => {
-    try {
-      await savePortfolio(updatedPortfolio);
-      setShowEditModal(false);
-      setEditingPortfolio(null);
-      setToastMessage('Portfolio updated successfully!');
-      setShowToast(true);
-    } catch (err) {
-      setToastMessage('Failed to update portfolio');
-      setShowToast(true);
-    }
-  };
 
   const handleConfirmDelete = async () => {
     if (!deletingPortfolio) return;
@@ -185,19 +168,6 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
-
-      {/* Edit Portfolio Modal */}
-      {showEditModal && editingPortfolio && (
-        <EditPortfolioModal
-          portfolio={editingPortfolio}
-          isOpen={showEditModal}
-          onClose={() => {
-            setShowEditModal(false);
-            setEditingPortfolio(null);
-          }}
-          onSave={handleSavePortfolio}
-        />
-      )}
 
       {/* Delete Portfolio Modal */}
       {showDeleteModal && deletingPortfolio && (

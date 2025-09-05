@@ -179,23 +179,28 @@ export class UserService {
       throw new Error('User not authenticated')
     }
 
-    // Note: Due to CASCADE DELETE constraints, deleting the user will also delete:
-    // - All portfolios
-    // - All achievements (via portfolio deletion)
-    // - Email preferences
-    // - Invitations sent by the user
+    // Note: Due to CASCADE DELETE constraints, deleting the user from auth.users will also delete:
+    // - All data from public.users (via CASCADE)
+    // - All portfolios (via CASCADE)
+    // - All highlights (via portfolio deletion CASCADE)
+    // - Email preferences (via CASCADE)
+    // - Invitations sent by the user (via CASCADE)
+    // - Event reminders (via CASCADE)
 
-    const { error } = await this.supabase
-      .from('users')
-      .delete()
-      .eq('id', authUser.id)
+    // Call the API route to delete the user using Admin API
+    const response = await fetch('/api/user/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
 
-    if (error) {
-      console.error('Error deleting user account:', error)
-      throw new Error('Failed to delete account')
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to delete account')
     }
 
-    // Sign out the user
+    // Sign out the user (this will happen automatically when the user is deleted)
     await this.supabase.auth.signOut()
   }
 

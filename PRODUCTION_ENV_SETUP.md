@@ -8,6 +8,7 @@ Create these environment variables in your deployment platform (Vercel, Netlify,
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=your_production_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_production_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_production_supabase_service_role_key
 ```
 
 ### 2. Email Configuration (Resend)
