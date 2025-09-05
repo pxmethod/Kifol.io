@@ -133,7 +133,7 @@ export default function GiveFeedbackPage() {
                 {/* Email Field */}
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address
+                    Your email address
                   </label>
                   <input
                     type="email"
@@ -150,7 +150,7 @@ export default function GiveFeedbackPage() {
                 {/* Feedback Type Dropdown */}
                 <div>
                   <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
-                    Type of Feedback
+                    Type of feedback
                   </label>
                   <select
                     id="type"
@@ -169,7 +169,7 @@ export default function GiveFeedbackPage() {
                 {/* Feedback Message */}
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                    Your Feedback
+                    Your feedback
                   </label>
                   <textarea
                     id="message"
