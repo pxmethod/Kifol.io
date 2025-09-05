@@ -28,8 +28,10 @@ export default function EditHighlight() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const [existingMedia, setExistingMedia] = useState<Array<{id: string, url: string, fileName: string}>>([]);
+  const [mediaPreview, setMediaPreview] = useState<{ url: string; file: File }[]>([]);
   const [loadingHighlight, setLoadingHighlight] = useState(true);
 
   const highlightService = new HighlightService();
@@ -40,6 +42,15 @@ export default function EditHighlight() {
       router.push('/auth/login?message=Please log in to edit highlights');
     }
   }, [user, loading, router]);
+
+  // Cleanup preview URLs on unmount
+  useEffect(() => {
+    return () => {
+      mediaPreview.forEach(preview => {
+        URL.revokeObjectURL(preview.url);
+      });
+    };
+  }, []);
 
   // Load existing highlight data
   useEffect(() => {
@@ -142,6 +153,7 @@ export default function EditHighlight() {
 
     try {
       const uploadedFiles: File[] = [];
+      const newPreviews: { url: string; file: File }[] = [];
       
       for (const file of files) {
         // Validate file
@@ -152,9 +164,18 @@ export default function EditHighlight() {
         }
         
         uploadedFiles.push(file);
+        
+        // Create preview URL for images
+        if (file.type.startsWith('image/')) {
+          newPreviews.push({
+            url: URL.createObjectURL(file),
+            file
+          });
+        }
       }
 
       setFormData(prev => ({ ...prev, media: [...prev.media, ...uploadedFiles] }));
+      setMediaPreview(prev => [...prev, ...newPreviews]);
     } catch (error) {
       console.error('Media upload error:', error);
       setErrors(prev => ({ 
@@ -167,10 +188,17 @@ export default function EditHighlight() {
   };
 
   const removeMedia = (index: number) => {
+    // Clean up preview URL if it exists
+    if (mediaPreview[index]) {
+      URL.revokeObjectURL(mediaPreview[index].url);
+    }
+    
     setFormData(prev => ({
       ...prev,
       media: prev.media.filter((_, i) => i !== index)
     }));
+    
+    setMediaPreview(prev => prev.filter((_, i) => i !== index));
   };
 
   const removeExistingMedia = (index: number) => {
@@ -218,11 +246,13 @@ export default function EditHighlight() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this highlight? This action cannot be undone.')) {
-      return;
-    }
+  const handleDelete = () => {
+    setShowDeleteModal(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    setShowDeleteModal(false);
+    
     try {
       await highlightService.deleteHighlight(highlightId);
       router.push(`/portfolio/${portfolioId}?highlightDeleted=true`);
@@ -230,6 +260,10 @@ export default function EditHighlight() {
       console.error('Error deleting highlight:', error);
       setErrors({ submit: 'Failed to delete highlight. Please try again.' });
     }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
   };
 
   // Show loading while checking authentication or loading highlight
@@ -266,17 +300,6 @@ export default function EditHighlight() {
             <h1 className="card__title">
               Edit Highlight
             </h1>
-            <p className="text-gray-600 mt-2">
-              Update your child's highlight details
-            </p>
-            <div className="flex justify-end mt-4">
-              <button
-                onClick={handleDelete}
-                className="btn btn--danger"
-              >
-                Delete
-              </button>
-            </div>
           </div>
 
           <div className="card__body">
@@ -390,12 +413,25 @@ export default function EditHighlight() {
           {(formData.media.length > 0 || existingMedia.length > 0) && (
             <div>
               <h3 className="text-sm font-medium text-gray-700 mb-2">Media Preview</h3>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-4 gap-3">
                 {/* Existing Media */}
                 {existingMedia.map((media, index) => (
                   <div key={media.id} className="relative">
-                    <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
-                      <span className="text-sm text-gray-500">{media.fileName}</span>
+                    <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                      {media.url.includes('.pdf') ? (
+                        <div className="flex flex-col items-center justify-center text-center p-2">
+                          <svg className="w-8 h-8 text-red-500 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                          </svg>
+                          <span className="text-xs text-gray-500 truncate">{media.fileName}</span>
+                        </div>
+                      ) : (
+                        <img 
+                          src={media.url} 
+                          alt={media.fileName}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
                     </div>
                     <button
                       type="button"
@@ -408,40 +444,69 @@ export default function EditHighlight() {
                 ))}
                 
                 {/* New Media */}
-                {formData.media.map((file, index) => (
-                  <div key={index} className="relative">
-                    <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
-                      <span className="text-sm text-gray-500">{file.name}</span>
+                {formData.media.map((file, index) => {
+                  const preview = mediaPreview.find(p => p.file === file);
+                  return (
+                    <div key={index} className="relative">
+                      <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                        {file.type.startsWith('image/') && preview ? (
+                          <img 
+                            src={preview.url} 
+                            alt={file.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : file.type === 'application/pdf' ? (
+                          <div className="flex flex-col items-center justify-center text-center p-2">
+                            <svg className="w-8 h-8 text-red-500 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                            <span className="text-xs text-gray-500 truncate">{file.name}</span>
+                          </div>
+                        ) : (
+                          <span className="text-sm text-gray-500">{file.name}</span>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeMedia(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                      >
+                        ×
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removeMedia(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
 
-              {/* Submit Button */}
+              {/* Form Actions */}
               <div className="form-actions">
-                <button
-                  type="button"
-                  onClick={handleBackClick}
-                  className="btn btn--secondary"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting || uploadingMedia}
-                  className="btn btn--primary"
-                >
-                  {isSubmitting ? 'Updating...' : 'Update Highlight'}
-                </button>
+                <div className="flex justify-between items-center w-full">
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    className="btn btn--danger"
+                  >
+                    Delete Highlight
+                  </button>
+                  <div className="flex space-x-3">
+                    <button
+                      type="button"
+                      onClick={handleBackClick}
+                      className="btn btn--secondary"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || uploadingMedia}
+                      className="btn btn--primary"
+                    >
+                      {isSubmitting ? 'Updating...' : 'Update Highlight'}
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {errors.submit && (
@@ -459,6 +524,15 @@ export default function EditHighlight() {
         onConfirm={handleConfirmNavigation}
         title="Discard Changes?"
         message="You have unsaved changes. Are you sure you want to leave without saving?"
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmNavigationModal
+        isOpen={showDeleteModal}
+        onCancel={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Delete Highlight?"
+        message="Are you sure you want to delete this highlight? This action cannot be undone."
       />
     </div>
   );

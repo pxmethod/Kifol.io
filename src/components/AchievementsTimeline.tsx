@@ -5,7 +5,7 @@ import AchievementCard from './AchievementCard';
 
 interface AchievementsTimelineProps {
   achievements: Achievement[];
-  onView: (achievement: Achievement) => void;
+  onView?: (achievement: Achievement) => void;
   onEdit?: (achievement: Achievement) => void;
 }
 

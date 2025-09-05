@@ -6,8 +6,6 @@ import Header from '@/components/Header';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import AchievementCard from '@/components/AchievementCard';
-import AchievementModal from '@/components/AchievementModal';
-import AchievementDetailModal from '@/components/AchievementDetailModal';
 import EditPortfolioModal from '@/components/EditPortfolioModal';
 import DeletePortfolioModal from '@/components/DeletePortfolioModal';
 import Toast from '@/components/Toast';
@@ -43,14 +41,8 @@ export default function PortfolioPage() {
   const [showCopyNotification, setShowCopyNotification] = useState(false);
   const [showPublishNotification, setShowPublishNotification] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showAchievementModal, setShowAchievementModal] = useState(false);
-  const [showAchievementDetailModal, setShowAchievementDetailModal] = useState(false);
-  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
-  const [editingAchievement, setEditingAchievement] = useState<Achievement | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  const [savingAchievement, setSavingAchievement] = useState(false);
-  const [deletingAchievement, setDeletingAchievement] = useState<string | null>(null);
   const [showPrivateTooltip, setShowPrivateTooltip] = useState(false);
 
   // Check if portfolio was just created
@@ -189,150 +181,12 @@ export default function PortfolioPage() {
     }
   };
 
-  const handleSaveAchievement = async (achievement: Achievement) => {
-    if (!portfolio) return;
 
-    setSavingAchievement(true);
-    try {
-      if (editingAchievement) {
-        // Update existing achievement in database
-        await achievementService.updateAchievement(achievement.id, {
-          title: achievement.title,
-          description: achievement.description || null,
-          date_achieved: achievement.date,
-          media_urls: achievement.media.map(m => m.url),
-          category: achievement.isMilestone ? 'milestone' : null,
-          type: 'achievement' // Default type for legacy achievements
-        });
-        setToastMessage('Achievement updated successfully!');
-      } else {
-        // Create new achievement in database
-        await achievementService.createAchievement({
-          portfolio_id: portfolio.id,
-          title: achievement.title,
-          description: achievement.description || null,
-          date_achieved: achievement.date,
-          media_urls: achievement.media.map(m => m.url),
-          category: achievement.isMilestone ? 'milestone' : null,
-          type: 'achievement' // Default type for legacy achievements
-        });
-        setToastMessage('Achievement added successfully!');
-      }
-      
-      setShowToast(true);
-      
-      // Reload the portfolio to get updated achievements from database
-      const portfolioId = portfolio.id;
-      const dbPortfolio = await portfolioService.getPortfolio(portfolioId);
-      if (dbPortfolio) {
-        const highlights = await achievementService.getPortfolioHighlights(portfolioId);
-        const portfolioData: PortfolioData = {
-          id: dbPortfolio.id,
-          childName: dbPortfolio.child_name,
-          portfolioTitle: dbPortfolio.portfolio_title,
-          photoUrl: dbPortfolio.photo_url || '',
-          template: dbPortfolio.template,
-          createdAt: dbPortfolio.created_at,
-          isPrivate: dbPortfolio.is_private,
-          password: dbPortfolio.password || undefined,
-          hasUnsavedChanges: false,
-          achievements: highlights.map((highlight: any) => ({
-            id: highlight.id,
-            title: highlight.title,
-            date: highlight.date_achieved,
-            description: highlight.description || undefined,
-            media: highlight.media_urls.map((url: string, index: number) => ({
-              id: `media-${index}`,
-              url,
-              type: url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
-              fileName: url.split('/').pop() || 'file',
-              fileSize: 0
-            })),
-            type: highlight.type,
-            isMilestone: highlight.type === 'milestone',
-            createdAt: highlight.created_at,
-            updatedAt: highlight.updated_at
-          }))
-        };
-        setPortfolio(portfolioData);
-      }
-      
-      setEditingAchievement(null);
-    } catch (error) {
-      console.error('Error saving achievement:', error);
-      setToastMessage('Failed to save achievement. Please try again.');
-      setShowToast(true);
-    } finally {
-      setSavingAchievement(false);
-    }
-  };
-
-  const handleDeleteAchievement = async (achievementId: string) => {
-    if (!portfolio) return;
-
-    setDeletingAchievement(achievementId);
-    try {
-      // Delete achievement from database
-      await achievementService.deleteAchievement(achievementId);
-      
-      // Show success toast for achievement removal
-      setToastMessage('Achievement removed successfully!');
-      setShowToast(true);
-      
-      // Reload the portfolio to get updated achievements from database
-      const portfolioId = portfolio.id;
-      const dbPortfolio = await portfolioService.getPortfolio(portfolioId);
-      if (dbPortfolio) {
-        const highlights = await achievementService.getPortfolioHighlights(portfolioId);
-        const portfolioData: PortfolioData = {
-          id: dbPortfolio.id,
-          childName: dbPortfolio.child_name,
-          portfolioTitle: dbPortfolio.portfolio_title,
-          photoUrl: dbPortfolio.photo_url || '',
-          template: dbPortfolio.template,
-          createdAt: dbPortfolio.created_at,
-          isPrivate: dbPortfolio.is_private,
-          password: dbPortfolio.password || undefined,
-          hasUnsavedChanges: false,
-          achievements: highlights.map((highlight: any) => ({
-            id: highlight.id,
-            title: highlight.title,
-            date: highlight.date_achieved,
-            description: highlight.description || undefined,
-            media: highlight.media_urls.map((url: string, index: number) => ({
-              id: `media-${index}`,
-              url,
-              type: url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
-              fileName: url.split('/').pop() || 'file',
-              fileSize: 0
-            })),
-            type: highlight.type,
-            isMilestone: highlight.type === 'milestone',
-            createdAt: highlight.created_at,
-            updatedAt: highlight.updated_at
-          }))
-        };
-        setPortfolio(portfolioData);
-      }
-      
-      setEditingAchievement(null);
-    } catch (error) {
-      console.error('Error deleting achievement:', error);
-      setToastMessage('Failed to delete achievement. Please try again.');
-      setShowToast(true);
-    } finally {
-      setDeletingAchievement(null);
-    }
-  };
 
   const handleEditHighlight = (achievement: Achievement) => {
     router.push(`/portfolio/${portfolio?.id}/highlight/${achievement.id}`);
   };
 
-  const handleViewAchievement = (achievement: Achievement) => {
-    setSelectedAchievement(achievement);
-    setShowAchievementDetailModal(true);
-  };
 
   const handleAddHighlight = () => {
     router.push(`/portfolio/${portfolio?.id}/highlight`);
@@ -611,7 +465,6 @@ export default function PortfolioPage() {
               {/* Achievements Timeline */}
               <AchievementsTimeline
                 achievements={portfolio.achievements || []}
-                onView={handleViewAchievement}
                 onEdit={handleEditHighlight}
               />
             </div>
@@ -642,34 +495,6 @@ export default function PortfolioPage() {
         portfolio={portfolio}
       />
 
-      {/* Achievement Modal */}
-      <AchievementModal
-        key={editingAchievement?.id || 'new-achievement'}
-        isOpen={showAchievementModal}
-        onClose={() => {
-          setShowAchievementModal(false);
-          setEditingAchievement(null);
-        }}
-        onSave={handleSaveAchievement}
-        onDelete={handleDeleteAchievement}
-        achievement={editingAchievement}
-      />
-
-      {/* Achievement Detail Modal */}
-      <AchievementDetailModal
-        isOpen={showAchievementDetailModal}
-        onClose={() => {
-          setShowAchievementDetailModal(false);
-          setSelectedAchievement(null);
-        }}
-        onEdit={(achievement) => {
-          setEditingAchievement(achievement);
-          setShowAchievementDetailModal(false);
-          setShowAchievementModal(true);
-        }}
-        achievement={selectedAchievement}
-        showEditButton={true}
-      />
 
       {/* Toast Notification */}
       <Toast

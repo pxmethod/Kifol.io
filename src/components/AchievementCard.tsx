@@ -6,7 +6,7 @@ import { Achievement } from '@/types/achievement';
 
 interface AchievementCardProps {
   achievement: Achievement;
-  onView: (achievement: Achievement) => void;
+  onView?: (achievement: Achievement) => void;
   onEdit?: (achievement: Achievement) => void;
 }
 
@@ -151,11 +151,13 @@ export default function AchievementCard({
       {renderMediaIcons()}
 
       {/* Click to view overlay */}
-      <div
-        className="absolute inset-0 cursor-pointer"
-        onClick={() => onView(achievement)}
-        title="View details"
-      />
+      {onView && (
+        <div
+          className="absolute inset-0 cursor-pointer"
+          onClick={() => onView(achievement)}
+          title="View details"
+        />
+      )}
     </div>
   );
 } 
