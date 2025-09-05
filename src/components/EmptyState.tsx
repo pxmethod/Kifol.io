@@ -28,8 +28,8 @@ export default function EmptyState() {
         </h1>
         <p className="text-kifolio-text text-base leading-relaxed max-w-md">
           {user 
-            ? "Start showcasing your children's work, milestones and achievements by creating a portfolio for them."
-            : "Create beautiful digital portfolios to showcase your children's achievements, work, and milestones."
+            ? "Start showcasing your children's work, milestones and highlights by creating a portfolio for them."
+            : "Create beautiful digital portfolios to showcase your children's highlights, work, and milestones."
           }
         </p>
       </div>

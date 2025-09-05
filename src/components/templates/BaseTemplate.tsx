@@ -11,26 +11,26 @@ interface BaseTemplateProps extends PortfolioTemplateProps {
 }
 
 export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
-  const achievements = portfolio.achievements || [];
-  const milestones = achievements.filter((a: Achievement) => a.isMilestone);
+  const highlights = portfolio.achievements || []; // Keep using achievements prop for now for compatibility
+  const milestones = highlights.filter((a: Achievement) => a.isMilestone);
   
-  // Sort all achievements by date (newest first) and group by date
-  const sortedAchievements = [...achievements].sort((a, b) => 
+  // Sort all highlights by date (newest first) and group by date
+  const sortedHighlights = [...highlights].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
   
-  // Group achievements by date
-  const achievementsByDate = sortedAchievements.reduce((groups: { [key: string]: Achievement[] }, achievement) => {
-    const date = achievement.date;
+  // Group highlights by date
+  const highlightsByDate = sortedHighlights.reduce((groups: { [key: string]: Achievement[] }, highlight) => {
+    const date = highlight.date;
     if (!groups[date]) {
       groups[date] = [];
     }
-    groups[date].push(achievement);
+    groups[date].push(highlight);
     return groups;
   }, {});
   
   // Modal state
-  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+  const [selectedHighlight, setSelectedHighlight] = useState<Achievement | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
 
   const formatDate = (dateString: string) => {
@@ -41,14 +41,14 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
     });
   };
 
-  const handleViewAchievement = (achievement: Achievement) => {
-    setSelectedAchievement(achievement);
+  const handleViewHighlight = (highlight: Achievement) => {
+    setSelectedHighlight(highlight);
     setShowDetailModal(true);
   };
 
   const handleCloseModal = () => {
     setShowDetailModal(false);
-    setSelectedAchievement(null);
+    setSelectedHighlight(null);
   };
 
   return (
@@ -133,13 +133,13 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                 className="text-3xl font-bold mb-1"
                 style={{ color: config.colors.primary }}
               >
-                {achievements.length}
+                {highlights.length}
               </div>
               <div 
                 className="text-sm uppercase tracking-wide"
                 style={{ color: config.colors.textSecondary }}
               >
-                Achievements
+                Highlights
               </div>
             </div>
             <div className="text-center">
@@ -163,8 +163,8 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
       {/* Content Section */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
-          {/* Achievements by Date */}
-          {Object.keys(achievementsByDate).length > 0 && (
+          {/* Highlights by Date */}
+          {Object.keys(highlightsByDate).length > 0 && (
             <div>
               <h2 
                 className="text-3xl font-bold mb-8 text-center"
@@ -173,7 +173,7 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                 Timeline
               </h2>
               <div className="space-y-12">
-                {Object.entries(achievementsByDate).map(([date, dateAchievements]) => (
+                {Object.entries(highlightsByDate).map(([date, dateHighlights]) => (
                   <div key={date} className="space-y-6">
                     {/* Date Header */}
                     <div 
@@ -186,26 +186,26 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                       {formatDate(date)}
                     </div>
                     
-                    {/* Achievements for this date */}
+                    {/* Highlights for this date */}
                     <div className="space-y-4">
-                      {dateAchievements.map((achievement: Achievement) => (
+                      {dateHighlights.map((highlight: Achievement) => (
                         <div 
-                          key={achievement.id}
+                          key={highlight.id}
                           className="p-6 rounded-lg border cursor-pointer hover:shadow-lg transition-shadow"
                           style={{ 
                             backgroundColor: config.colors.background,
                             borderColor: config.colors.border
                           }}
-                          onClick={() => handleViewAchievement(achievement)}
+                          onClick={() => handleViewHighlight(highlight)}
                         >
                           <div className="flex items-start justify-between mb-2">
                             <h3 
                               className="text-lg font-semibold"
                               style={{ color: config.colors.text }}
                             >
-                              {achievement.title}
+                              {highlight.title}
                             </h3>
-                            {achievement.isMilestone && (
+                            {highlight.isMilestone && (
                               <span 
                                 className="px-2 py-1 text-xs font-medium rounded-full"
                                 style={{ 
@@ -218,19 +218,19 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                             )}
                           </div>
                           
-                          {achievement.description && (
+                          {highlight.description && (
                             <p 
                               className="text-sm mb-4"
                               style={{ color: config.colors.textSecondary }}
                             >
-                              {achievement.description}
+                              {highlight.description}
                             </p>
                           )}
                           
                           {/* Media Preview */}
-                          {achievement.media && achievement.media.length > 0 && (
+                          {highlight.media && highlight.media.length > 0 && (
                             <div className="mt-4 flex space-x-2">
-                              {achievement.media.slice(0, 3).map((media) => (
+                              {highlight.media.slice(0, 3).map((media) => (
                                 <div 
                                   key={media.id}
                                   className="w-40 h-40 rounded border overflow-hidden"
@@ -256,7 +256,7 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                                   )}
                                 </div>
                               ))}
-                              {achievement.media.length > 3 && (
+                              {highlight.media.length > 3 && (
                                 <div 
                                   className="w-16 h-16 rounded border flex items-center justify-center text-sm font-medium"
                                   style={{ 
@@ -265,7 +265,7 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                                     color: config.colors.textSecondary
                                   }}
                                 >
-                                  +{achievement.media.length - 3}
+                                  +{highlight.media.length - 3}
                                 </div>
                               )}
                             </div>
@@ -280,7 +280,7 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
           )}
 
           {/* Empty State */}
-          {achievements.length === 0 && (
+          {highlights.length === 0 && (
             <div className="text-center py-16">
               <div 
                 className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
@@ -300,13 +300,13 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                 className="text-lg font-medium mb-2"
                 style={{ color: config.colors.text }}
               >
-                No Achievements Yet
+                No Highlights Yet
               </h3>
               <p 
                 className="text-sm"
                 style={{ color: config.colors.textSecondary }}
               >
-                Start building {portfolio.childName}&apos;s portfolio by adding achievements.
+                Start building {portfolio.childName}&apos;s portfolio by adding highlights.
               </p>
             </div>
           )}
@@ -326,12 +326,12 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
         </p>
       </footer>
 
-      {/* Achievement Detail Modal */}
+      {/* Highlight Detail Modal */}
       <AchievementDetailModal
         isOpen={showDetailModal}
         onClose={handleCloseModal}
         onEdit={() => {}} // No edit functionality in public view
-        achievement={selectedAchievement}
+        achievement={selectedHighlight}
         showEditButton={false}
       />
     </div>

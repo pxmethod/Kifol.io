@@ -6,6 +6,7 @@ import AchievementCard from './AchievementCard';
 interface AchievementsTimelineProps {
   achievements: Achievement[];
   onView: (achievement: Achievement) => void;
+  onEdit?: (achievement: Achievement) => void;
 }
 
 interface GroupedAchievements {
@@ -14,7 +15,8 @@ interface GroupedAchievements {
 
 export default function AchievementsTimeline({
   achievements,
-  onView
+  onView,
+  onEdit
 }: AchievementsTimelineProps) {
   const groupAchievementsByDate = (achievements: Achievement[]): GroupedAchievements => {
     const grouped: GroupedAchievements = {};
@@ -78,8 +80,8 @@ export default function AchievementsTimeline({
             style={{ width: '260px', height: '260px' }}
           />
         </div>
-        <h3 className="text-lg font-medium text-kifolio-text mb-2">No Achievements Yet</h3>
-        <p className="text-gray-500">Start building the portfolio by adding the first achievement.</p>
+        <h3 className="text-lg font-medium text-kifolio-text mb-2">No Highlights Yet</h3>
+        <p className="text-gray-500">Start building the portfolio by adding the first highlight.</p>
       </div>
     );
   }
@@ -104,6 +106,7 @@ export default function AchievementsTimeline({
                 <AchievementCard
                   achievement={achievement}
                   onView={onView}
+                  onEdit={onEdit}
                 />
               </div>
             ))}

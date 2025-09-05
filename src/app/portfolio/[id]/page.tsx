@@ -74,8 +74,8 @@ export default function PortfolioPage() {
       const dbPortfolio = await portfolioService.getPortfolio(portfolioId);
       
       if (dbPortfolio) {
-        // Get achievements for this portfolio
-        const achievements = await achievementService.getPortfolioAchievements(portfolioId);
+        // Get highlights for this portfolio
+        const highlights = await achievementService.getPortfolioHighlights(portfolioId);
         
         // Transform to legacy format
         const portfolioData: PortfolioData = {
@@ -89,21 +89,22 @@ export default function PortfolioPage() {
           password: dbPortfolio.password || undefined,
           short_id: dbPortfolio.short_id,
           hasUnsavedChanges: false,
-          achievements: achievements.map(achievement => ({
-            id: achievement.id,
-            title: achievement.title,
-            date: achievement.date_achieved,
-            description: achievement.description || undefined,
-            media: achievement.media_urls.map((url, index) => ({
+          achievements: highlights.map((highlight: any) => ({
+            id: highlight.id,
+            title: highlight.title,
+            date: highlight.date_achieved,
+            description: highlight.description || undefined,
+            media: highlight.media_urls.map((url: string, index: number) => ({
               id: `media-${index}`,
               url,
               type: url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
               fileName: url.split('/').pop() || 'file',
               fileSize: 0
             })),
-            isMilestone: achievement.category === 'milestone',
-            createdAt: achievement.created_at,
-            updatedAt: achievement.updated_at
+            type: highlight.type,
+            isMilestone: highlight.type === 'milestone',
+            createdAt: highlight.created_at,
+            updatedAt: highlight.updated_at
           }))
         };
         
@@ -200,7 +201,8 @@ export default function PortfolioPage() {
           description: achievement.description || null,
           date_achieved: achievement.date,
           media_urls: achievement.media.map(m => m.url),
-          category: achievement.isMilestone ? 'milestone' : null
+          category: achievement.isMilestone ? 'milestone' : null,
+          type: 'achievement' // Default type for legacy achievements
         });
         setToastMessage('Achievement updated successfully!');
       } else {
@@ -211,7 +213,8 @@ export default function PortfolioPage() {
           description: achievement.description || null,
           date_achieved: achievement.date,
           media_urls: achievement.media.map(m => m.url),
-          category: achievement.isMilestone ? 'milestone' : null
+          category: achievement.isMilestone ? 'milestone' : null,
+          type: 'achievement' // Default type for legacy achievements
         });
         setToastMessage('Achievement added successfully!');
       }
@@ -222,7 +225,7 @@ export default function PortfolioPage() {
       const portfolioId = portfolio.id;
       const dbPortfolio = await portfolioService.getPortfolio(portfolioId);
       if (dbPortfolio) {
-        const achievements = await achievementService.getPortfolioAchievements(portfolioId);
+        const highlights = await achievementService.getPortfolioHighlights(portfolioId);
         const portfolioData: PortfolioData = {
           id: dbPortfolio.id,
           childName: dbPortfolio.child_name,
@@ -233,21 +236,22 @@ export default function PortfolioPage() {
           isPrivate: dbPortfolio.is_private,
           password: dbPortfolio.password || undefined,
           hasUnsavedChanges: false,
-          achievements: achievements.map(achievement => ({
-            id: achievement.id,
-            title: achievement.title,
-            date: achievement.date_achieved,
-            description: achievement.description || undefined,
-            media: achievement.media_urls.map((url, index) => ({
+          achievements: highlights.map((highlight: any) => ({
+            id: highlight.id,
+            title: highlight.title,
+            date: highlight.date_achieved,
+            description: highlight.description || undefined,
+            media: highlight.media_urls.map((url: string, index: number) => ({
               id: `media-${index}`,
               url,
               type: url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
               fileName: url.split('/').pop() || 'file',
               fileSize: 0
             })),
-            isMilestone: achievement.category === 'milestone',
-            createdAt: achievement.created_at,
-            updatedAt: achievement.updated_at
+            type: highlight.type,
+            isMilestone: highlight.type === 'milestone',
+            createdAt: highlight.created_at,
+            updatedAt: highlight.updated_at
           }))
         };
         setPortfolio(portfolioData);
@@ -279,7 +283,7 @@ export default function PortfolioPage() {
       const portfolioId = portfolio.id;
       const dbPortfolio = await portfolioService.getPortfolio(portfolioId);
       if (dbPortfolio) {
-        const achievements = await achievementService.getPortfolioAchievements(portfolioId);
+        const highlights = await achievementService.getPortfolioHighlights(portfolioId);
         const portfolioData: PortfolioData = {
           id: dbPortfolio.id,
           childName: dbPortfolio.child_name,
@@ -290,21 +294,22 @@ export default function PortfolioPage() {
           isPrivate: dbPortfolio.is_private,
           password: dbPortfolio.password || undefined,
           hasUnsavedChanges: false,
-          achievements: achievements.map(achievement => ({
-            id: achievement.id,
-            title: achievement.title,
-            date: achievement.date_achieved,
-            description: achievement.description || undefined,
-            media: achievement.media_urls.map((url, index) => ({
+          achievements: highlights.map((highlight: any) => ({
+            id: highlight.id,
+            title: highlight.title,
+            date: highlight.date_achieved,
+            description: highlight.description || undefined,
+            media: highlight.media_urls.map((url: string, index: number) => ({
               id: `media-${index}`,
               url,
               type: url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
               fileName: url.split('/').pop() || 'file',
               fileSize: 0
             })),
-            isMilestone: achievement.category === 'milestone',
-            createdAt: achievement.created_at,
-            updatedAt: achievement.updated_at
+            type: highlight.type,
+            isMilestone: highlight.type === 'milestone',
+            createdAt: highlight.created_at,
+            updatedAt: highlight.updated_at
           }))
         };
         setPortfolio(portfolioData);
@@ -320,9 +325,8 @@ export default function PortfolioPage() {
     }
   };
 
-  const handleEditAchievement = (achievement: Achievement) => {
-    setEditingAchievement(achievement);
-    setShowAchievementModal(true);
+  const handleEditHighlight = (achievement: Achievement) => {
+    router.push(`/portfolio/${portfolio?.id}/highlight/${achievement.id}`);
   };
 
   const handleViewAchievement = (achievement: Achievement) => {
@@ -330,9 +334,8 @@ export default function PortfolioPage() {
     setShowAchievementDetailModal(true);
   };
 
-  const handleAddAchievement = () => {
-    setEditingAchievement(null);
-    setShowAchievementModal(true);
+  const handleAddHighlight = () => {
+    router.push(`/portfolio/${portfolio?.id}/highlight`);
   };
 
   const handlePreview = () => {
@@ -592,20 +595,15 @@ export default function PortfolioPage() {
           {/* Portfolio Content */}
           <div className="card" style={{ marginTop: '2rem' }}>
             <div className="card__header">
-              <h2 className="card__title">Achievements</h2>
+              <h2 className="card__title">Highlights</h2>
               <button
-                onClick={handleAddAchievement}
-                disabled={savingAchievement}
-                className={`btn btn--primary ${savingAchievement ? 'opacity-75 cursor-not-allowed' : ''}`}
+                onClick={handleAddHighlight}
+                className="btn btn--primary"
               >
-                {savingAchievement ? (
-                  <LoadingSpinner size="sm" className="mr-2" label="" />
-                ) : (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                )}
-                <span>{savingAchievement ? 'Adding...' : 'Add'}</span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                <span>Add Highlight</span>
               </button>
             </div>
 
@@ -614,6 +612,7 @@ export default function PortfolioPage() {
               <AchievementsTimeline
                 achievements={portfolio.achievements || []}
                 onView={handleViewAchievement}
+                onEdit={handleEditHighlight}
               />
             </div>
           </div>

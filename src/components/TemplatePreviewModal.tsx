@@ -2,6 +2,7 @@
 
 import { getTemplateConfig } from '@/config/templates';
 import TemplateFactory from './templates/TemplateFactory';
+import { HighlightType } from '@/types/achievement';
 
 interface TemplatePreviewModalProps {
   isOpen: boolean;
@@ -42,6 +43,7 @@ export default function TemplatePreviewModal({
         date: '2024-01-15',
         description: 'Took my first steps independently',
         media: [],
+        type: 'milestone' as HighlightType,
         isMilestone: true,
         createdAt: '2024-01-15T10:00:00Z',
         updatedAt: '2024-01-15T10:00:00Z'
@@ -52,6 +54,7 @@ export default function TemplatePreviewModal({
         date: '2024-02-20',
         description: 'Said my first words clearly',
         media: [],
+        type: 'milestone' as HighlightType,
         isMilestone: false,
         createdAt: '2024-02-20T14:30:00Z',
         updatedAt: '2024-02-20T14:30:00Z'

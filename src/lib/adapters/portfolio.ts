@@ -3,7 +3,7 @@ import { Achievement } from '@/types/achievement'
 
 // Database types
 type DbPortfolio = Database['public']['Tables']['portfolios']['Row']
-type DbAchievement = Database['public']['Tables']['achievements']['Row']
+type DbHighlight = Database['public']['Tables']['highlights']['Row']
 
 // Legacy localStorage types
 export interface LegacyPortfolioData {
@@ -22,7 +22,7 @@ export interface LegacyPortfolioData {
 // Transform database portfolio to legacy format for existing components
 export function dbPortfolioToLegacy(
   dbPortfolio: DbPortfolio, 
-  achievements: DbAchievement[] = []
+  highlights: DbHighlight[] = []
 ): LegacyPortfolioData {
   return {
     id: dbPortfolio.id,
@@ -34,7 +34,7 @@ export function dbPortfolioToLegacy(
     isPrivate: dbPortfolio.is_private,
     password: dbPortfolio.password || undefined,
     hasUnsavedChanges: false,
-    achievements: achievements.map(dbAchievementToLegacy)
+    achievements: highlights.map(dbHighlightToLegacy)
   }
 }
 
@@ -54,23 +54,24 @@ export function legacyPortfolioToDb(
   }
 }
 
-// Transform database achievement to legacy format
-function dbAchievementToLegacy(dbAchievement: DbAchievement): Achievement {
+// Transform database highlight to legacy format
+function dbHighlightToLegacy(dbHighlight: DbHighlight): Achievement {
   return {
-    id: dbAchievement.id,
-    title: dbAchievement.title,
-    date: dbAchievement.date_achieved,
-    description: dbAchievement.description || undefined,
-    media: dbAchievement.media_urls.map((url, index) => ({
+    id: dbHighlight.id,
+    title: dbHighlight.title,
+    date: dbHighlight.date_achieved,
+    description: dbHighlight.description || undefined,
+    media: dbHighlight.media_urls.map((url, index) => ({
       id: `media-${index}`,
       url,
       type: url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
       fileName: url.split('/').pop() || 'file',
       fileSize: 0 // We don't store file size in current schema
     })),
-    isMilestone: dbAchievement.category === 'milestone',
-    createdAt: dbAchievement.created_at,
-    updatedAt: dbAchievement.updated_at
+    type: dbHighlight.type,
+    isMilestone: dbHighlight.type === 'milestone',
+    createdAt: dbHighlight.created_at,
+    updatedAt: dbHighlight.updated_at
   }
 }
 
@@ -78,13 +79,14 @@ function dbAchievementToLegacy(dbAchievement: DbAchievement): Achievement {
 export function legacyAchievementToDb(
   legacy: Achievement,
   portfolioId: string
-): Database['public']['Tables']['achievements']['Insert'] {
+): Database['public']['Tables']['highlights']['Insert'] {
   return {
     portfolio_id: portfolioId,
     title: legacy.title,
     description: legacy.description || null,
     date_achieved: legacy.date,
     media_urls: legacy.media.map(m => m.url),
-    category: legacy.isMilestone ? 'milestone' : null
+    category: legacy.isMilestone ? 'milestone' : null,
+    type: legacy.type
   }
 }

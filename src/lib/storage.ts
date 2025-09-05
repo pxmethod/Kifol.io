@@ -73,15 +73,15 @@ export class StorageService {
    * Validate file before upload
    */
   validateFile(file: File): { valid: boolean; error?: string } {
-    // Check file size (5MB limit)
-    if (file.size > 5 * 1024 * 1024) {
-      return { valid: false, error: 'File size must be 5MB or less' }
+    // Check file size (15MB limit)
+    if (file.size > 15 * 1024 * 1024) {
+      return { valid: false, error: 'File size must be 15MB or less' }
     }
 
     // Check file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml']
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf']
     if (!allowedTypes.includes(file.type)) {
-      return { valid: false, error: 'Please upload a JPEG, PNG, GIF, or SVG file' }
+      return { valid: false, error: 'Please upload JPEG, PNG, GIF, or PDF files only' }
     }
 
     return { valid: true }

@@ -1,114 +1,139 @@
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/types/database'
 
-type Achievement = Database['public']['Tables']['achievements']['Row']
-type NewAchievement = Database['public']['Tables']['achievements']['Insert']
-type UpdateAchievement = Database['public']['Tables']['achievements']['Update']
+type Highlight = Database['public']['Tables']['highlights']['Row']
+type NewHighlight = Database['public']['Tables']['highlights']['Insert']
+type UpdateHighlight = Database['public']['Tables']['highlights']['Update']
 
-export class AchievementService {
+export class HighlightService {
   private supabase = createClient()
 
   /**
-   * Get all achievements for a specific portfolio
+   * Get all highlights for a specific portfolio
    */
-  async getPortfolioAchievements(portfolioId: string): Promise<Achievement[]> {
+  async getPortfolioHighlights(portfolioId: string): Promise<Highlight[]> {
     const { data, error } = await this.supabase
-      .from('achievements')
+      .from('highlights')
       .select('*')
       .eq('portfolio_id', portfolioId)
       .order('date_achieved', { ascending: false })
 
     if (error) {
-      console.error('Error fetching achievements:', error)
-      throw new Error('Failed to fetch achievements')
+      console.error('Error fetching highlights:', error)
+      throw new Error('Failed to fetch highlights')
     }
 
     return data || []
   }
 
+  // Legacy method for backward compatibility
+  async getPortfolioAchievements(portfolioId: string): Promise<Highlight[]> {
+    return this.getPortfolioHighlights(portfolioId)
+  }
+
   /**
-   * Get a specific achievement by ID
+   * Get a specific highlight by ID
    */
-  async getAchievement(id: string): Promise<Achievement | null> {
+  async getHighlight(id: string): Promise<Highlight | null> {
     const { data, error } = await this.supabase
-      .from('achievements')
+      .from('highlights')
       .select('*')
       .eq('id', id)
       .single()
 
     if (error) {
       if (error.code === 'PGRST116') {
-        return null // Achievement not found
+        return null // Highlight not found
       }
-      console.error('Error fetching achievement:', error)
-      throw new Error('Failed to fetch achievement')
+      console.error('Error fetching highlight:', error)
+      throw new Error('Failed to fetch highlight')
     }
 
     return data
   }
 
+  // Legacy method for backward compatibility
+  async getAchievement(id: string): Promise<Highlight | null> {
+    return this.getHighlight(id)
+  }
+
   /**
-   * Create a new achievement
+   * Create a new highlight
    */
-  async createAchievement(achievement: NewAchievement): Promise<Achievement> {
+  async createHighlight(highlight: NewHighlight): Promise<Highlight> {
     const { data, error } = await this.supabase
-      .from('achievements')
-      .insert([achievement])
+      .from('highlights')
+      .insert([highlight])
       .select()
       .single()
 
     if (error) {
-      console.error('Error creating achievement:', error)
-      throw new Error('Failed to create achievement')
+      console.error('Error creating highlight:', error)
+      throw new Error('Failed to create highlight')
     }
 
     return data
   }
 
+  // Legacy method for backward compatibility
+  async createAchievement(achievement: NewHighlight): Promise<Highlight> {
+    return this.createHighlight(achievement)
+  }
+
   /**
-   * Update an existing achievement
+   * Update an existing highlight
    */
-  async updateAchievement(id: string, updates: UpdateAchievement): Promise<Achievement> {
+  async updateHighlight(id: string, updates: UpdateHighlight): Promise<Highlight> {
     const { data, error } = await this.supabase
-      .from('achievements')
+      .from('highlights')
       .update(updates)
       .eq('id', id)
       .select()
       .single()
 
     if (error) {
-      console.error('Error updating achievement:', error)
-      throw new Error('Failed to update achievement')
+      console.error('Error updating highlight:', error)
+      throw new Error('Failed to update highlight')
     }
 
     return data
   }
 
+  // Legacy method for backward compatibility
+  async updateAchievement(id: string, updates: UpdateHighlight): Promise<Highlight> {
+    return this.updateHighlight(id, updates)
+  }
+
   /**
-   * Delete an achievement
+   * Delete a highlight
    */
-  async deleteAchievement(id: string): Promise<void> {
+  async deleteHighlight(id: string): Promise<void> {
     const { error } = await this.supabase
-      .from('achievements')
+      .from('highlights')
       .delete()
       .eq('id', id)
 
     if (error) {
-      console.error('Error deleting achievement:', error)
-      throw new Error('Failed to delete achievement')
+      console.error('Error deleting highlight:', error)
+      throw new Error('Failed to delete highlight')
     }
   }
 
+  // Legacy method for backward compatibility
+  async deleteAchievement(id: string): Promise<void> {
+    return this.deleteHighlight(id)
+  }
+
   /**
-   * Get achievements by date range
+   * Get highlights by date range
    */
-  async getAchievementsByDateRange(
+  async getHighlightsByDateRange(
     portfolioId: string, 
     startDate: string, 
     endDate: string
-  ): Promise<Achievement[]> {
+  ): Promise<Highlight[]> {
     const { data, error } = await this.supabase
-      .from('achievements')
+      .from('highlights')
       .select('*')
       .eq('portfolio_id', portfolioId)
       .gte('date_achieved', startDate)
@@ -116,33 +141,72 @@ export class AchievementService {
       .order('date_achieved', { ascending: false })
 
     if (error) {
-      console.error('Error fetching achievements by date range:', error)
-      throw new Error('Failed to fetch achievements')
+      console.error('Error fetching highlights by date range:', error)
+      throw new Error('Failed to fetch highlights')
+    }
+
+    return data || []
+  }
+
+  // Legacy method for backward compatibility
+  async getAchievementsByDateRange(
+    portfolioId: string, 
+    startDate: string, 
+    endDate: string
+  ): Promise<Highlight[]> {
+    return this.getHighlightsByDateRange(portfolioId, startDate, endDate)
+  }
+
+  /**
+   * Get highlights by type
+   */
+  async getHighlightsByType(
+    portfolioId: string, 
+    type: string
+  ): Promise<Highlight[]> {
+    const { data, error } = await this.supabase
+      .from('highlights')
+      .select('*')
+      .eq('portfolio_id', portfolioId)
+      .eq('type', type)
+      .order('date_achieved', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching highlights by type:', error)
+      throw new Error('Failed to fetch highlights')
     }
 
     return data || []
   }
 
   /**
-   * Get achievements by category
+   * Get highlights by category
    */
-  async getAchievementsByCategory(
+  async getHighlightsByCategory(
     portfolioId: string, 
     category: string
-  ): Promise<Achievement[]> {
+  ): Promise<Highlight[]> {
     const { data, error } = await this.supabase
-      .from('achievements')
+      .from('highlights')
       .select('*')
       .eq('portfolio_id', portfolioId)
       .eq('category', category)
       .order('date_achieved', { ascending: false })
 
     if (error) {
-      console.error('Error fetching achievements by category:', error)
-      throw new Error('Failed to fetch achievements')
+      console.error('Error fetching highlights by category:', error)
+      throw new Error('Failed to fetch highlights')
     }
 
     return data || []
+  }
+
+  // Legacy method for backward compatibility
+  async getAchievementsByCategory(
+    portfolioId: string, 
+    category: string
+  ): Promise<Highlight[]> {
+    return this.getHighlightsByCategory(portfolioId, category)
   }
 
   /**
@@ -150,7 +214,7 @@ export class AchievementService {
    */
   async getPortfolioCategories(portfolioId: string): Promise<string[]> {
     const { data, error } = await this.supabase
-      .from('achievements')
+      .from('highlights')
       .select('category')
       .eq('portfolio_id', portfolioId)
       .not('category', 'is', null)
@@ -163,6 +227,25 @@ export class AchievementService {
     // Extract unique categories
     const categories = [...new Set(data.map((item: { category: string | null }) => item.category).filter(Boolean))]
     return categories as string[]
+  }
+
+  /**
+   * Get unique types for a portfolio
+   */
+  async getPortfolioTypes(portfolioId: string): Promise<string[]> {
+    const { data, error } = await this.supabase
+      .from('highlights')
+      .select('type')
+      .eq('portfolio_id', portfolioId)
+
+    if (error) {
+      console.error('Error fetching types:', error)
+      throw new Error('Failed to fetch types')
+    }
+
+    // Extract unique types
+    const types = [...new Set(data.map((item: { type: string }) => item.type))] as HighlightType[]
+    return types
   }
 }
 

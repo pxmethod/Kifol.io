@@ -79,7 +79,7 @@ export default function ShortPortfolioPage() {
   const loadPortfolioData = async (portfolioId: string, dbPortfolio: any) => {
     try {
       // Get achievements for this portfolio
-      const achievements = await achievementService.getPortfolioAchievements(portfolioId);
+              const highlights = await achievementService.getPortfolioHighlights(portfolioId);
       
       // Transform to legacy format
       const portfolioData: PortfolioData = {
@@ -91,21 +91,22 @@ export default function ShortPortfolioPage() {
         createdAt: dbPortfolio.created_at,
         isPrivate: dbPortfolio.is_private,
         password: dbPortfolio.password || undefined,
-        achievements: achievements.map(achievement => ({
-          id: achievement.id,
-          title: achievement.title,
-          date: achievement.date_achieved,
-          description: achievement.description || undefined,
-          media: achievement.media_urls.map((url, index) => ({
+        achievements: highlights.map((highlight: any) => ({
+          id: highlight.id,
+          title: highlight.title,
+          date: highlight.date_achieved,
+          description: highlight.description || undefined,
+          media: highlight.media_urls.map((url: string, index: number) => ({
             id: `media-${index}`,
             url,
             type: url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
             fileName: url.split('/').pop() || 'file',
             fileSize: 0
           })),
-          isMilestone: achievement.category === 'milestone',
-          createdAt: achievement.created_at,
-          updatedAt: achievement.updated_at
+          type: highlight.type,
+          isMilestone: highlight.type === 'milestone',
+          createdAt: highlight.created_at,
+          updatedAt: highlight.updated_at
         }))
       };
       

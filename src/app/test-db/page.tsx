@@ -91,7 +91,8 @@ export default function TestDBPage() {
                   description: 'This is a test achievement',
                   date_achieved: new Date().toISOString().split('T')[0],
                   media_urls: [],
-                  category: 'milestone'
+                  category: 'milestone',
+                  type: 'achievement'
                 })
                 results.push(`✅ Test achievement created: ${testAchievement.id}`)
                 

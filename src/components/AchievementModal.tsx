@@ -14,6 +14,7 @@ export default function AchievementModal({
     title: '',
     date: new Date().toISOString().split('T')[0],
     description: '',
+    type: 'achievement',
     isMilestone: false,
     media: []
   });
@@ -21,6 +22,7 @@ export default function AchievementModal({
     title: '',
     date: new Date().toISOString().split('T')[0],
     description: '',
+    type: 'achievement',
     isMilestone: false,
     media: []
   });
@@ -41,6 +43,7 @@ export default function AchievementModal({
         title: '',
         date: new Date().toISOString().split('T')[0],
         description: '',
+        type: 'achievement',
         isMilestone: false,
         media: []
       });
@@ -48,6 +51,7 @@ export default function AchievementModal({
         title: '',
         date: new Date().toISOString().split('T')[0],
         description: '',
+        type: 'achievement',
         isMilestone: false,
         media: []
       });
@@ -80,6 +84,7 @@ export default function AchievementModal({
         title: achievement.title,
         date: achievement.date.split('T')[0],
         description: achievement.description || '',
+        type: achievement.type || 'achievement',
         isMilestone: achievement.isMilestone,
         media: []
       };
@@ -92,6 +97,7 @@ export default function AchievementModal({
         title: '',
         date: new Date().toISOString().split('T')[0],
         description: '',
+        type: 'achievement',
         isMilestone: false,
         media: []
       };
@@ -256,6 +262,7 @@ export default function AchievementModal({
         date: formData.date,
         description: formData.description,
         media: [...existingMedia, ...processedMedia],
+        type: formData.type,
         isMilestone: formData.isMilestone,
         createdAt: achievement?.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString()
