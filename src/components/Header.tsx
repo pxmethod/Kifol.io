@@ -100,26 +100,35 @@ export default function Header({ animateLogo = false }: HeaderProps) {
           <nav className="hidden md:flex items-center space-x-8">
             <Link 
               href="/dashboard" 
-              className={`text-white hover:text-gray-200 transition-colors font-medium ${
+              className={`flex items-center text-white hover:text-gray-200 transition-colors font-medium ${
                 pathname === '/dashboard' ? 'border-b-[3px] border-kifolio-primary' : ''
               }`}
             >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
               My Portfolios
             </Link>
             <Link 
               href="/whats-happening" 
-              className={`text-white hover:text-gray-200 transition-colors font-medium ${
+              className={`flex items-center text-white hover:text-gray-200 transition-colors font-medium ${
                 pathname === '/whats-happening' ? 'border-b-[3px] border-kifolio-primary' : ''
               }`}
             >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
               What&apos;s Happening
             </Link>
             <Link 
               href="/give-feedback" 
-              className={`text-white hover:text-gray-200 transition-colors font-medium ${
+              className={`flex items-center text-white hover:text-gray-200 transition-colors font-medium ${
                 pathname === '/give-feedback' ? 'border-b-[3px] border-kifolio-primary' : ''
               }`}
             >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
               Give Feedback
             </Link>
           </nav>

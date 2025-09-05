@@ -32,8 +32,52 @@ export default function HighlightForm() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [existingMedia, setExistingMedia] = useState<Array<{id: string, url: string, fileName: string}>>([]);
   const [mediaPreview, setMediaPreview] = useState<{ url: string; file: File }[]>([]);
+  const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
 
   const highlightService = new HighlightService();
+
+  // Icon mapping for highlight types
+  const getTypeIcon = (type: HighlightType) => {
+    switch (type) {
+      case 'achievement':
+        return (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+          </svg>
+        );
+      case 'creative_work':
+        return (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+          </svg>
+        );
+      case 'milestone':
+        return (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        );
+      case 'activity':
+        return (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        );
+      case 'reflection_note':
+        return (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const getSelectedType = () => {
+    return HIGHLIGHT_TYPES.find(type => type.id === formData.type);
+  };
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -50,6 +94,24 @@ export default function HighlightForm() {
       });
     };
   }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest('.type-dropdown')) {
+        setIsTypeDropdownOpen(false);
+      }
+    };
+
+    if (isTypeDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isTypeDropdownOpen]);
 
   // Load existing highlight data if editing
   useEffect(() => {
@@ -287,19 +349,56 @@ export default function HighlightForm() {
                 <label htmlFor="type" className="form-field__label form-field__label--required">
                   Type
                 </label>
-                <select
-                  id="type"
-                  value={formData.type}
-                  onChange={(e) => handleInputChange('type', e.target.value as HighlightType)}
-                  className="input select"
-                >
-                  <option value="">Select a type...</option>
-                  {HIGHLIGHT_TYPES.map((type) => (
-                    <option key={type.id} value={type.id}>
-                      {type.name} – {type.description}
-                    </option>
-                  ))}
-                </select>
+                <div className="type-dropdown relative">
+                  <button
+                    type="button"
+                    onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
+                    className={`w-full px-3 py-2 text-left border rounded-lg focus:outline-none focus:ring-2 focus:ring-kifolio-cta input cursor-pointer ${
+                      errors.type ? 'border-red-500' : 'border-gray-300'
+                    } ${isTypeDropdownOpen ? 'ring-2 ring-kifolio-cta' : ''}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        {formData.type && getTypeIcon(formData.type as HighlightType)}
+                        <span className={`ml-2 ${formData.type ? 'text-gray-900' : 'text-gray-500'}`}>
+                          {getSelectedType()?.name || 'Select a type...'}
+                        </span>
+                      </div>
+                      <svg 
+                        className={`w-5 h-5 text-gray-400 transition-transform ${isTypeDropdownOpen ? 'rotate-180' : ''}`}
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </button>
+                  
+                  {isTypeDropdownOpen && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
+                      {HIGHLIGHT_TYPES.map((type) => (
+                        <button
+                          key={type.id}
+                          type="button"
+                          onClick={() => {
+                            handleInputChange('type', type.id);
+                            setIsTypeDropdownOpen(false);
+                          }}
+                          className="w-full px-3 py-3 text-left hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg flex items-center"
+                        >
+                          <div className="flex items-center">
+                            {getTypeIcon(type.id)}
+                            <div className="ml-3">
+                              <div className="text-sm font-medium text-gray-900">{type.name}</div>
+                              <div className="text-xs text-gray-500">{type.description}</div>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 {errors.type && (
                   <p className="form-field__error">{errors.type}</p>
                 )}
@@ -337,7 +436,7 @@ export default function HighlightForm() {
                   id="date"
                   value={formData.date}
                   onChange={(e) => handleInputChange('date', e.target.value)}
-                  className="input"
+                  className="input cursor-pointer"
                 />
                 {errors.date && (
                   <p className="form-field__error">{errors.date}</p>
@@ -377,7 +476,7 @@ export default function HighlightForm() {
                   multiple
                   accept="image/jpeg,image/png,image/gif,application/pdf"
                   onChange={handleMediaUpload}
-                  className="input"
+                  className="input cursor-pointer"
                 />
                 <p className="form-field__help">
                   JPEG, PNG, GIF, or PDF up to 15MB each
