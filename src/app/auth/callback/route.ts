@@ -5,6 +5,7 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const next = searchParams.get('next') ?? '/'
+  const fromSignup = searchParams.get('from') === 'signup'
 
   if (code) {
     const supabase = await createClient()
@@ -37,6 +38,11 @@ export async function GET(request: Request) {
           console.error('Failed to send welcome email:', emailError)
           // Don't block the auth flow if email fails
         }
+      }
+
+      // If coming from signup page, redirect to signup success or onboarding
+      if (fromSignup) {
+        return NextResponse.redirect(`${origin}/auth/signup?success=true&email=${encodeURIComponent(data.user.email || '')}`)
       }
 
       // Successful authentication, redirect to dashboard

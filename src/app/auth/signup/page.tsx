@@ -38,6 +38,24 @@ export default function SignUpPage() {
     special: false,
     length: false
   });
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [successEmail, setSuccessEmail] = useState('');
+
+  // Check for success redirect from Google OAuth
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get('success');
+    const email = urlParams.get('email');
+    
+    if (success === 'true' && email) {
+      setSuccessEmail(email);
+      setShowSuccessMessage(true);
+      // Redirect to dashboard after showing success message
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 3000);
+    }
+  }, [router]);
 
   // Validate password requirements
   useEffect(() => {
@@ -123,7 +141,7 @@ export default function SignUpPage() {
     setErrors({});
 
     try {
-      const { error } = await signInWithGoogle();
+      const { error } = await signInWithGoogle(true); // Pass fromSignup=true
       
       if (error) {
         setErrors({ submit: error });
@@ -181,6 +199,26 @@ export default function SignUpPage() {
               </Link>
             </p>
           </div>
+
+          {/* Success Message */}
+          {showSuccessMessage && (
+            <div className="mb-8 bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-semibold text-green-800 mb-2">
+                Account Created Successfully!
+              </h2>
+              <p className="text-green-700 mb-4">
+                Welcome to Kifolio! Your account has been created with <strong>{successEmail}</strong>
+              </p>
+              <p className="text-sm text-green-600">
+                Redirecting you to your dashboard...
+              </p>
+            </div>
+          )}
 
           {/* Two Column Layout */}
           <div className="bg-white rounded-xl shadow-lg p-8">
