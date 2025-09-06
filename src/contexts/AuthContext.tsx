@@ -86,15 +86,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async (fromSignup: boolean = false) => {
     try {
+      // Use Supabase's default OAuth flow without custom parameters
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'select_account', // Force account selection screen
-            state: fromSignup ? 'signup' : 'login' // Pass signup flag as state
-          }
-        }
+        provider: 'google'
       })
 
       if (error) {

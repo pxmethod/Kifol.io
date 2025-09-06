@@ -4,14 +4,9 @@ import { NextResponse } from 'next/server'
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const state = searchParams.get('state')
   const next = searchParams.get('next') ?? '/'
-  const fromSignup = state === 'signup'
   
-  // Use the origin for OAuth processing (Supabase domain)
-  const baseUrl = process.env.NODE_ENV === 'production' 
-    ? 'https://kifol.io' 
-    : 'http://localhost:3000'
+  console.log('OAuth callback - code:', !!code, 'next:', next, 'origin:', origin)
 
   if (code) {
     const supabase = await createClient()
@@ -36,7 +31,7 @@ export async function GET(request: Request) {
               data: {
                 to: data.user.email,
                 userName: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'there',
-                loginUrl: `${baseUrl}/auth/login`
+                loginUrl: `${origin}/auth/login`
               }
             }),
           })
@@ -46,17 +41,13 @@ export async function GET(request: Request) {
         }
       }
 
-      // If coming from signup page, redirect to signup success or onboarding
-      if (fromSignup) {
-        return NextResponse.redirect(`${baseUrl}/auth/signup?success=true&email=${encodeURIComponent(data.user.email || '')}`)
-      }
-
       // Successful authentication, redirect to dashboard
       const redirectUrl = next === '/' ? '/dashboard' : next
-      return NextResponse.redirect(`${baseUrl}${redirectUrl}`)
+      console.log('OAuth success - redirecting to:', redirectUrl, 'origin:', origin)
+      return NextResponse.redirect(`${origin}${redirectUrl}`)
     }
   }
 
   // If there's an error or no code, redirect to login
-  return NextResponse.redirect(`${baseUrl}/auth/login?error=Authentication failed`)
+  return NextResponse.redirect(`${origin}/auth/login?error=Authentication failed`)
 }
