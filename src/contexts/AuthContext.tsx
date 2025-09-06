@@ -86,9 +86,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async (fromSignup: boolean = false) => {
     try {
-      const redirectUrl = fromSignup 
-        ? `${window.location.origin}/auth/callback?from=signup`
-        : `${window.location.origin}/auth/callback`
+      // Use custom domain for production, localhost for development
+      const baseUrl = process.env.NODE_ENV === 'production' 
+        ? 'https://kifol.io' 
+        : window.location.origin
+      
+      const redirectUrl = `${baseUrl}/auth/callback`
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -96,7 +99,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
-            prompt: 'select_account' // Force account selection screen
+            prompt: 'select_account', // Force account selection screen
+            state: fromSignup ? 'signup' : 'login' // Pass signup flag as state
           }
         }
       })
