@@ -12,6 +12,11 @@ export async function GET(request: Request) {
     const supabase = await createClient()
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     
+    if (error) {
+      console.error('OAuth exchange error:', error)
+      return NextResponse.redirect(`${origin}/auth/login?error=${encodeURIComponent(error.message)}`)
+    }
+    
     if (!error && data.user) {
       // Check if this is a new user (created within the last minute)
       const userCreated = new Date(data.user.created_at)
