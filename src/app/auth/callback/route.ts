@@ -7,6 +7,11 @@ export async function GET(request: Request) {
   const state = searchParams.get('state')
   const next = searchParams.get('next') ?? '/'
   const fromSignup = state === 'signup'
+  
+  // Force redirect to custom domain instead of Supabase domain
+  const baseUrl = process.env.NODE_ENV === 'production' 
+    ? 'https://kifol.io' 
+    : 'http://localhost:3000'
 
   if (code) {
     const supabase = await createClient()
@@ -21,7 +26,7 @@ export async function GET(request: Request) {
       // Send welcome email for new users
       if (isNewUser && data.user.email) {
         try {
-          await fetch(`${origin}/api/email/send`, {
+          await fetch(`${baseUrl}/api/email/send`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -31,7 +36,7 @@ export async function GET(request: Request) {
               data: {
                 to: data.user.email,
                 userName: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'there',
-                loginUrl: `${origin}/auth/login`
+                loginUrl: `${baseUrl}/auth/login`
               }
             }),
           })
@@ -43,15 +48,15 @@ export async function GET(request: Request) {
 
       // If coming from signup page, redirect to signup success or onboarding
       if (fromSignup) {
-        return NextResponse.redirect(`${origin}/auth/signup?success=true&email=${encodeURIComponent(data.user.email || '')}`)
+        return NextResponse.redirect(`${baseUrl}/auth/signup?success=true&email=${encodeURIComponent(data.user.email || '')}`)
       }
 
       // Successful authentication, redirect to dashboard
       const redirectUrl = next === '/' ? '/dashboard' : next
-      return NextResponse.redirect(`${origin}${redirectUrl}`)
+      return NextResponse.redirect(`${baseUrl}${redirectUrl}`)
     }
   }
 
   // If there's an error or no code, redirect to login
-  return NextResponse.redirect(`${origin}/auth/login?error=Authentication failed`)
+  return NextResponse.redirect(`${baseUrl}/auth/login?error=Authentication failed`)
 }
