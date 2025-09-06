@@ -40,6 +40,10 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`Successfully deleted user account: ${user.id}`)
+    
+    // Clear the user's session after successful deletion
+    await supabase.auth.signOut()
+    
     return NextResponse.json({ success: true })
     
   } catch (error) {

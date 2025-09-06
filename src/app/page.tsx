@@ -14,6 +14,22 @@ import {
 export default function MarketingPage() {
   const router = useRouter();
   
+  // Load animations for above-the-fold content
+  const heroAnimation = useFadeUpOnLoad(200);
+  const portfolioShowcase = useFadeUpOnLoad(600);
+
+  // Scroll animations for below-the-fold content
+  const whatSection = useFadeUpOnScroll(0.3);
+  const benefitsSection = useFadeUpOnScroll(0.3);
+  const demoSection = useFadeUpOnScroll(0.3);
+  const testimonialsSection = useFadeUpOnScroll(0.3);
+  const ctaSection = useScaleInOnScroll(0.3);
+  const faqSection = useFadeUpOnScroll(0.3);
+  
+  // Staggered animations
+  const benefitItems = useStaggeredLoadAnimation(8, 1000, 100);
+  const featureCards = useStaggeredLoadAnimation(4, 800, 150);
+  
   // Handle OAuth callback if code is present in URL
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -36,26 +52,10 @@ export default function MarketingPage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Completing sign in...</p>
-        </div>
+      </div>
       </div>
     );
   }
-  
-  // Load animations for above-the-fold content
-  const heroAnimation = useFadeUpOnLoad(200);
-  const portfolioShowcase = useFadeUpOnLoad(600);
-
-  // Scroll animations for below-the-fold content
-  const whatSection = useFadeUpOnScroll(0.3);
-  const benefitsSection = useFadeUpOnScroll(0.3);
-  const demoSection = useFadeUpOnScroll(0.3);
-  const testimonialsSection = useFadeUpOnScroll(0.3);
-  const ctaSection = useScaleInOnScroll(0.3);
-  const faqSection = useFadeUpOnScroll(0.3);
-
-  // Staggered animations
-  const benefitItems = useStaggeredLoadAnimation(8, 1000, 100);
-  const featureCards = useStaggeredLoadAnimation(4, 800, 150);
   return (
     <div className="min-h-screen bg-white">
       {/* Structured Data for SEO */}

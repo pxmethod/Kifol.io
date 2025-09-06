@@ -23,6 +23,27 @@ export async function GET(request: Request) {
       const oneMinuteAgo = new Date(Date.now() - 60 * 1000)
       const isNewUser = userCreated > oneMinuteAgo
 
+      // For existing users, verify they still exist in our database
+      if (!isNewUser) {
+        try {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('id', data.user.id)
+            .single()
+
+          // If user doesn't exist in our database (was deleted), clear session and redirect to signup
+          if (profileError || !profile) {
+            console.log('User not found in database - clearing session and redirecting to signup')
+            await supabase.auth.signOut()
+            return NextResponse.redirect(`${origin}/auth/signup?error=Account not found. Please sign up again.`)
+          }
+        } catch (dbError) {
+          console.error('Database check error:', dbError)
+          // If we can't check the database, assume user exists and proceed
+        }
+      }
+
       // Send welcome email for new users
       if (isNewUser && data.user.email) {
         try {
@@ -46,9 +67,14 @@ export async function GET(request: Request) {
         }
       }
 
-      // Successful authentication, always redirect to dashboard
-      console.log('OAuth success - redirecting to dashboard, origin:', origin)
-      return NextResponse.redirect(`${origin}/dashboard`)
+      // Redirect based on whether this is a new user or existing user
+      if (isNewUser) {
+        console.log('New user detected - redirecting to signup success, origin:', origin)
+        return NextResponse.redirect(`${origin}/auth/signup?success=true&email=${encodeURIComponent(data.user.email || '')}`)
+      } else {
+        console.log('Existing user - redirecting to dashboard, origin:', origin)
+        return NextResponse.redirect(`${origin}/dashboard`)
+      }
     }
   }
 
