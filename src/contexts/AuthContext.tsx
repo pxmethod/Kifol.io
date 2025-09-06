@@ -86,17 +86,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async (fromSignup: boolean = false) => {
     try {
-      // Use custom domain for production, localhost for development
-      const baseUrl = process.env.NODE_ENV === 'production' 
-        ? 'https://kifol.io' 
-        : window.location.origin
-      
-      const redirectUrl = `${baseUrl}/auth/callback`
-
+      // Use Supabase's default redirect URL to avoid state issues
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'select_account', // Force account selection screen

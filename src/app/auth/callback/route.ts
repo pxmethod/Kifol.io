@@ -8,7 +8,10 @@ export async function GET(request: Request) {
   const next = searchParams.get('next') ?? '/'
   const fromSignup = state === 'signup'
   
-  // Force redirect to custom domain instead of Supabase domain
+  // Debug logging
+  console.log('OAuth callback received:', { code: !!code, state, fromSignup, origin })
+  
+  // Always redirect to custom domain after OAuth processing
   const baseUrl = process.env.NODE_ENV === 'production' 
     ? 'https://kifol.io' 
     : 'http://localhost:3000'
@@ -16,6 +19,11 @@ export async function GET(request: Request) {
   if (code) {
     const supabase = await createClient()
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+    
+    if (error) {
+      console.error('OAuth exchange error:', error)
+      return NextResponse.redirect(`${baseUrl}/auth/login?error=${encodeURIComponent(error.message)}`)
+    }
     
     if (!error && data.user) {
       // Check if this is a new user (created within the last minute)
@@ -58,5 +66,6 @@ export async function GET(request: Request) {
   }
 
   // If there's an error or no code, redirect to login
+  console.log('No code received, redirecting to login')
   return NextResponse.redirect(`${baseUrl}/auth/login?error=Authentication failed`)
 }
