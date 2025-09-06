@@ -10,6 +10,7 @@ export async function POST(request: NextRequest) {
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     
     if (userError || !user) {
+      console.error('User authentication error:', userError)
       return NextResponse.json({ error: 'User not authenticated' }, { status: 401 })
     }
 
@@ -34,6 +35,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 })
     }
 
+    console.log(`Successfully deleted user account: ${user.id}`)
     return NextResponse.json({ success: true })
     
   } catch (error) {

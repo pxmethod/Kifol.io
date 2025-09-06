@@ -200,8 +200,9 @@ export class UserService {
       throw new Error(errorData.error || 'Failed to delete account')
     }
 
-    // Sign out the user (this will happen automatically when the user is deleted)
-    await this.supabase.auth.signOut()
+    // Don't call signOut here as it will invalidate the session
+    // The user will be automatically signed out when the account is deleted
+    // and the AuthContext will handle the session change
   }
 
   /**

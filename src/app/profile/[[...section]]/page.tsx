@@ -257,14 +257,16 @@ export default function ProfilePage() {
       // Delete the entire account (this will also unlink Google)
       await userService.deleteAccount();
       
-      // Show success message and redirect to signup page
+      // Show success message immediately
       setToastMessage('Account deleted successfully. You have been signed out.');
       setShowToast(true);
       
-      // Redirect to signup page after a brief delay
-      setTimeout(() => {
-        router.push('/auth/signup');
-      }, 2000);
+      // Close the confirmation modal
+      setShowGoogleDisconnectConfirmation(false);
+      
+      // Redirect to signup page immediately (don't wait for timeout)
+      // The AuthContext will handle the session change automatically
+      router.push('/auth/signup');
       
     } catch (error) {
       console.error('Error deleting account:', error);
@@ -272,7 +274,6 @@ export default function ProfilePage() {
       setShowToast(true);
     } finally {
       setIsDeleting(false);
-      setShowGoogleDisconnectConfirmation(false);
     }
   };
 
