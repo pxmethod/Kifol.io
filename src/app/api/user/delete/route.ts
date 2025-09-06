@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('Delete user API called')
+    
     const supabase = await createClient()
     
     // Get the current user
@@ -13,6 +15,8 @@ export async function POST(request: NextRequest) {
       console.error('User authentication error:', userError)
       return NextResponse.json({ error: 'User not authenticated' }, { status: 401 })
     }
+
+    console.log(`Attempting to delete user: ${user.id} (${user.email})`)
 
     // Create admin client with service role key for user deletion
     const adminSupabase = createAdminClient(
@@ -32,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     if (deleteError) {
       console.error('Error deleting user account:', deleteError)
-      return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 })
+      return NextResponse.json({ error: `Failed to delete account: ${deleteError.message}` }, { status: 500 })
     }
 
     console.log(`Successfully deleted user account: ${user.id}`)
@@ -40,6 +44,6 @@ export async function POST(request: NextRequest) {
     
   } catch (error) {
     console.error('Error in delete user API:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: `Internal server error: ${error}` }, { status: 500 })
   }
 }

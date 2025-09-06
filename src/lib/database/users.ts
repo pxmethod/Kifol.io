@@ -173,11 +173,16 @@ export class UserService {
    * Delete user account and all associated data
    */
   async deleteAccount(): Promise<void> {
+    console.log('UserService.deleteAccount() called')
+    
     const { data: { user: authUser } } = await this.supabase.auth.getUser()
     
     if (!authUser) {
+      console.error('No authenticated user found')
       throw new Error('User not authenticated')
     }
+
+    console.log(`Deleting account for user: ${authUser.id} (${authUser.email})`)
 
     // Note: Due to CASCADE DELETE constraints, deleting the user from auth.users will also delete:
     // - All data from public.users (via CASCADE)
@@ -195,11 +200,16 @@ export class UserService {
       },
     })
 
+    console.log('Delete API response status:', response.status)
+
     if (!response.ok) {
       const errorData = await response.json()
+      console.error('Delete API error:', errorData)
       throw new Error(errorData.error || 'Failed to delete account')
     }
 
+    console.log('Account deletion successful')
+    
     // Don't call signOut here as it will invalidate the session
     // The user will be automatically signed out when the account is deleted
     // and the AuthContext will handle the session change
