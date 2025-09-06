@@ -41,10 +41,9 @@ export async function GET(request: Request) {
         }
       }
 
-      // Successful authentication, redirect to dashboard
-      const redirectUrl = next === '/' ? '/dashboard' : next
-      console.log('OAuth success - redirecting to:', redirectUrl, 'origin:', origin)
-      return NextResponse.redirect(`${origin}${redirectUrl}`)
+      // Successful authentication, always redirect to dashboard
+      console.log('OAuth success - redirecting to dashboard, origin:', origin)
+      return NextResponse.redirect(`${origin}/dashboard`)
     }
   }
 
