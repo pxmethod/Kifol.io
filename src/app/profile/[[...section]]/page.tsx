@@ -60,6 +60,7 @@ export default function ProfilePage() {
   const [isSendingInvite, setIsSendingInvite] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showGoogleDisconnectConfirmation, setShowGoogleDisconnectConfirmation] = useState(false);
 
   // Determine current section from URL
   const currentSection = Array.isArray(params.section) && params.section.length > 0 
@@ -244,27 +245,39 @@ export default function ProfilePage() {
     }
   };
 
-  const handleGoogleDisconnect = async () => {
-    try {
-      // Unlink the Google provider
-      const { error } = await supabase.auth.unlinkIdentity({
-        identity_id: user?.identities?.find(identity => identity.provider === 'google')?.id || ''
-      });
+  const handleGoogleDisconnect = () => {
+    // Show confirmation dialog
+    setShowGoogleDisconnectConfirmation(true);
+  };
 
-      if (error) {
-        setToastMessage('Failed to disconnect Google account. Please try again.');
-        setShowToast(true);
-      } else {
-        // Update local state
-        setProfileData(prev => ({ ...prev, googleConnected: false }));
-        setToastMessage('Google account disconnected successfully!');
-        setShowToast(true);
-      }
-    } catch (error) {
-      console.error('Error disconnecting Google account:', error);
-      setToastMessage('Failed to disconnect Google account. Please try again.');
+  const handleConfirmGoogleDisconnect = async () => {
+    setIsDeleting(true);
+    
+    try {
+      // Delete the entire account (this will also unlink Google)
+      await userService.deleteAccount();
+      
+      // Show success message and redirect to signup page
+      setToastMessage('Account deleted successfully. You have been signed out.');
       setShowToast(true);
+      
+      // Redirect to signup page after a brief delay
+      setTimeout(() => {
+        router.push('/auth/signup');
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      setToastMessage('Failed to delete account. Please try again.');
+      setShowToast(true);
+    } finally {
+      setIsDeleting(false);
+      setShowGoogleDisconnectConfirmation(false);
     }
+  };
+
+  const handleCancelGoogleDisconnect = () => {
+    setShowGoogleDisconnectConfirmation(false);
   };
 
   const handleDeleteAccount = async () => {
@@ -753,6 +766,73 @@ export default function ProfilePage() {
                 disabled={isDeleting}
               >
                 {isDeleting ? 'Deleting...' : 'Yes, delete my account'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Google Disconnect Confirmation Modal */}
+      {showGoogleDisconnectConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-red-600">Disconnect Google Account</h2>
+              <button
+                onClick={handleCancelGoogleDisconnect}
+                className="text-gray-500 hover:text-gray-700"
+                disabled={isDeleting}
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="mb-6">
+              <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-center text-kifolio-text mb-2">
+                Are you sure you want to disconnect Google?
+              </h3>
+              <p className="text-gray-600 text-center mb-4">
+                Since you signed up with Google, disconnecting will delete your entire account and all your data. You'll be logged out and redirected to the signup page.
+              </p>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-sm text-red-700 font-medium">
+                  ⚠️ This will delete:
+                </p>
+                <ul className="text-sm text-red-700 mt-1 ml-4 list-disc">
+                  <li>All your portfolios</li>
+                  <li>All highlights and photos</li>
+                  <li>Your account settings</li>
+                  <li>All associated data</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex space-x-3">
+              <button
+                type="button"
+                onClick={handleCancelGoogleDisconnect}
+                className="flex-1 bg-gray-100 text-kifolio-text py-2 px-4 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmGoogleDisconnect}
+                className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Yes, delete account'}
               </button>
             </div>
           </div>
