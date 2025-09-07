@@ -2,8 +2,6 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { 
   useFadeUpOnLoad, 
   useFadeUpOnScroll, 
@@ -12,7 +10,6 @@ import {
 } from '@/hooks/useSimpleAnimations';
 
 export default function MarketingPage() {
-  const router = useRouter();
   
   // Load animations for above-the-fold content
   const heroAnimation = useFadeUpOnLoad(200);
@@ -30,32 +27,6 @@ export default function MarketingPage() {
   const benefitItems = useStaggeredLoadAnimation(8, 1000, 100);
   const featureCards = useStaggeredLoadAnimation(4, 800, 150);
   
-  // Handle OAuth callback if code is present in URL
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    
-    if (code) {
-      // Immediate redirect to avoid flash
-      router.replace(`/auth/callback?code=${code}`);
-    }
-  }, [router]);
-  
-  // Check if we're in the middle of OAuth redirect
-  const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  const isOAuthRedirect = urlParams.get('code') !== null;
-  
-  // Show loading state during OAuth redirect to prevent flash
-  if (isOAuthRedirect) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Completing sign in...</p>
-      </div>
-      </div>
-    );
-  }
   return (
     <div className="min-h-screen bg-white">
       {/* Structured Data for SEO */}

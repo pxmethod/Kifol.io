@@ -10,7 +10,6 @@ interface AuthContextType {
   loading: boolean
   signUp: (email: string, password: string, name?: string) => Promise<{ error?: string }>
   signIn: (email: string, password: string) => Promise<{ error?: string }>
-  signInWithGoogle: (fromSignup?: boolean) => Promise<{ error?: string }>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<{ error?: string }>
 }
@@ -84,22 +83,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const signInWithGoogle = async (fromSignup: boolean = false) => {
-    try {
-      // Use Supabase's default OAuth flow without custom parameters
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google'
-      })
-
-      if (error) {
-        return { error: error.message }
-      }
-
-      return {}
-    } catch (error) {
-      return { error: 'An unexpected error occurred' }
-    }
-  }
 
   const signOut = async () => {
     try {
@@ -133,7 +116,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loading,
     signUp,
     signIn,
-    signInWithGoogle,
     signOut,
     resetPassword
   }
