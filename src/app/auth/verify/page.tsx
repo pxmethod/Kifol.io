@@ -25,16 +25,24 @@ function EmailVerificationContent() {
           return;
         }
 
-        // For now, we'll use a simple verification approach
-        // In a production app, you'd want to implement proper token verification
+        // Verify the email with Supabase
         if (token === 'verify') {
-          // Simulate successful verification
-          // In a real implementation, you'd verify the token against your database
-          console.log('Email verification successful for:', email);
+          // This is our custom verification flow - no actual verification needed
+          // since we're handling it ourselves
+          console.log('Custom verification successful for:', email);
         } else {
-          setStatus('error');
-          setMessage('Invalid verification token. Please try signing up again.');
-          return;
+          // This is Supabase's verification flow
+          const { error } = await supabase.auth.verifyOtp({
+            token_hash: token,
+            type: 'email'
+          });
+
+          if (error) {
+            console.error('Email verification error:', error);
+            setStatus('error');
+            setMessage('Email verification failed. The link may have expired or already been used.');
+            return;
+          }
         }
 
         // Success

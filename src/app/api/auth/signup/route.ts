@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { sendEmailVerification } from '@/lib/email/service'
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,11 +12,12 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient()
     
-    // Create user account - this will trigger Supabase's default email if confirmation is enabled
+    // Create user account with email confirmation enabled
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/verify`,
         data: {
           name: name || email.split('@')[0]
         }
@@ -26,34 +28,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
-    // Always send our custom verification email (in addition to Supabase's default)
+    // Always send our custom verification email (regardless of confirmation status)
     if (data.user) {
       try {
-        // Send our custom verification email
-        const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/verify?email=${encodeURIComponent(email)}&token=verify`
+        // Send our custom verification email directly
+        const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/verify?email=${encodeURIComponent(email)}&token=verify`
         
-        const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/email/send`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            type: 'email-verification',
-            data: {
-              to: email,
-              userName: name || email.split('@')[0],
-              verificationUrl: verificationUrl
-            }
-          }),
+        console.log('Sending verification email to:', email)
+        
+        const emailResult = await sendEmailVerification({
+          to: email,
+          subject: 'Verify your email - Kifolio',
+          userName: name || email.split('@')[0],
+          verificationUrl: verificationUrl
         })
 
-        if (!emailResponse.ok) {
-          console.error('Failed to send verification email')
-          // Don't fail the signup if email sending fails
+        if (!emailResult.success) {
+          console.error('Failed to send verification email:', emailResult.error)
+        } else {
+          console.log('Verification email sent successfully to:', email)
         }
       } catch (emailError) {
         console.error('Failed to send custom verification email:', emailError)
-        // Don't fail the signup if email sending fails
       }
     }
 

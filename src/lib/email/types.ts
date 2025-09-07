@@ -8,11 +8,6 @@ export interface BaseEmailData {
   tags?: string[];
 }
 
-// Welcome email data
-export interface WelcomeEmailData extends BaseEmailData {
-  userName: string;
-  loginUrl?: string;
-}
 
 // Password reset email data
 export interface PasswordResetEmailData extends BaseEmailData {

@@ -45,7 +45,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (email: string, password: string, name?: string) => {
     try {
       // Use our custom signup API that handles email verification
-      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/auth/signup`, {
+      // Use relative URL for local development, full URL for production
+      const apiUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+        ? '/api/auth/signup' 
+        : `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/signup`
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

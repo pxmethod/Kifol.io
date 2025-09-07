@@ -1,7 +1,6 @@
 import { resend, emailConfig, EMAIL_CATEGORIES } from './client';
 import { 
   EmailResult, 
-  WelcomeEmailData, 
   PasswordResetEmailData,
   EngagementEmailData,
   InvitationEmailData,
@@ -54,33 +53,6 @@ async function sendEmail(
   }
 }
 
-/**
- * Send welcome email to new users
- */
-export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<EmailResult> {
-  try {
-    // Load and process the welcome email template
-    const html = await EmailTemplates.welcome({
-      APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-      USER_NAME: data.userName,
-      LOGIN_URL: data.loginUrl || `${process.env.NEXT_PUBLIC_APP_URL}/auth/login`,
-    });
-
-    return await sendEmail(
-      data.to,
-      data.subject || `Welcome to Kifolio, ${data.userName}!`,
-      html,
-      EMAIL_CATEGORIES.TRANSACTIONAL,
-      ['welcome', 'onboarding']
-    );
-  } catch (error) {
-    console.error('Error sending welcome email:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to send welcome email' 
-    };
-  }
-}
 
 /**
  * Send password reset email

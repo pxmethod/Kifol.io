@@ -54,11 +54,6 @@ export async function loadEmailTemplate(
 /**
  * Template variable interfaces for type safety
  */
-export interface WelcomeEmailVariables extends Record<string, string> {
-  APP_URL: string;
-  USER_NAME: string;
-  LOGIN_URL: string;
-}
 
 export interface PasswordResetVariables extends Record<string, string> {
   APP_URL: string;
@@ -98,8 +93,6 @@ export interface EmailVerificationVariables extends Record<string, string> {
  * Pre-configured template loaders with type safety
  */
 export const EmailTemplates = {
-  welcome: (variables: WelcomeEmailVariables) => 
-    loadEmailTemplate('welcome-email', variables),
     
   passwordReset: (variables: PasswordResetVariables) => 
     loadEmailTemplate('password-reset', variables),

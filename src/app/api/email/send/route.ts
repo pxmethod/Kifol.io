@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { 
-  sendWelcomeEmail, 
   sendPasswordResetEmail, 
   sendEngagementEmail, 
   sendInvitationEmail,
@@ -8,7 +7,6 @@ import {
   sendTestEmail
 } from '@/lib/email/service';
 import { 
-  WelcomeEmailData, 
   PasswordResetEmailData, 
   EngagementEmailData, 
   InvitationEmailData,
@@ -16,8 +14,8 @@ import {
 } from '@/lib/email/types';
 
 interface EmailRequest {
-  type: 'welcome' | 'password-reset' | 'engagement' | 'invitation' | 'email-verification' | 'test';
-  data: WelcomeEmailData | PasswordResetEmailData | EngagementEmailData | InvitationEmailData | EmailVerificationData | { to: string };
+  type: 'password-reset' | 'engagement' | 'invitation' | 'email-verification' | 'test';
+  data: PasswordResetEmailData | EngagementEmailData | InvitationEmailData | EmailVerificationData | { to: string };
 }
 
 export async function POST(request: NextRequest) {
@@ -28,10 +26,6 @@ export async function POST(request: NextRequest) {
     let result;
 
     switch (type) {
-      case 'welcome':
-        result = await sendWelcomeEmail(data as WelcomeEmailData);
-        break;
-        
       case 'password-reset':
         result = await sendPasswordResetEmail(data as PasswordResetEmailData);
         break;
