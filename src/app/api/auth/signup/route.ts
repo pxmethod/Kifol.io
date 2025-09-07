@@ -11,12 +11,11 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient()
     
-    // Create user account with email confirmation disabled
+    // Create user account - this will trigger Supabase's default email if confirmation is enabled
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: undefined, // This should prevent Supabase from sending its own email
         data: {
           name: name || email.split('@')[0]
         }
@@ -27,11 +26,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
-    // If user was created but needs email confirmation, send custom verification email
-    if (data.user && !data.user.email_confirmed_at) {
+    // Always send our custom verification email (in addition to Supabase's default)
+    if (data.user) {
       try {
         // Send our custom verification email
-        // We'll use a simple verification approach
         const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/verify?email=${encodeURIComponent(email)}&token=verify`
         
         const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/email/send`, {
