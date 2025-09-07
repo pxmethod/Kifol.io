@@ -150,7 +150,7 @@ export default function SignUpPage() {
 
       {/* Main Content */}
       <div className="flex items-center justify-center min-h-screen px-4 py-8 pt-20">
-        <div className="w-full max-w-4xl">
+        <div className="w-full max-w-md">
           {/* Header Section */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-kifolio-text mb-3">
@@ -164,14 +164,9 @@ export default function SignUpPage() {
             </p>
           </div>
 
-
-          {/* Two Column Layout */}
+          {/* Sign Up Form */}
           <div className="bg-white rounded-xl shadow-lg p-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              
-              {/* Left Column - Sign Up Form */}
-              <div>
-                <h2 className="text-xl font-semibold text-kifolio-text mb-6">Create your account</h2>
+            <h2 className="text-xl font-semibold text-kifolio-text mb-6 text-center">Create your account</h2>
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Email Field */}
@@ -286,19 +281,16 @@ export default function SignUpPage() {
 
 
 
-                {/* Legal Links */}
-                <div className="mt-6 text-center text-xs text-gray-500">
-                  By creating an account, you agree to our{' '}
-                  <Link href="#" className="text-primary hover:underline">
-                    Terms of Use
-                  </Link>
-                  {' '}and{' '}
-                  <Link href="#" className="text-primary hover:underline">
-                    Privacy Policy
-                  </Link>
-                </div>
-              </div>
-
+            {/* Legal Links */}
+            <div className="mt-6 text-center text-xs text-gray-500">
+              By creating an account, you agree to our{' '}
+              <Link href="#" className="text-primary hover:underline">
+                Terms of Use
+              </Link>
+              {' '}and{' '}
+              <Link href="#" className="text-primary hover:underline">
+                Privacy Policy
+              </Link>
             </div>
           </div>
         </div>
