@@ -81,7 +81,7 @@ export default function HighlightsTimeline({
           />
         </div>
         <h3 className="text-lg font-medium text-kifolio-text mb-2">No Highlights Yet</h3>
-        <p className="text-gray-500">Start this portfolio by adding the first highlight.</p>
+        <p className="text-gray-500">Start by adding their first highlight.</p>
       </div>
     );
   }
