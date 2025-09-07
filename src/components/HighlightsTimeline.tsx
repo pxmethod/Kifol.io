@@ -81,7 +81,8 @@ export default function HighlightsTimeline({
           />
         </div>
         <h3 className="text-lg font-medium text-kifolio-text mb-2">No Highlights Yet</h3>
-        <p className="text-gray-500">Start by adding their first highlight.</p>
+        <p className="text-gray-500">Every journey starts with one moment. Add their first highlight—it could be their latest artwork,
+            a great report card, a team win, or simply a milestone that made you smile.</p>
       </div>
     );
   }
