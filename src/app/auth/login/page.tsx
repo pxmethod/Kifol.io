@@ -35,13 +35,17 @@ export default function LoginPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Handle success message from signup
+  // Handle success message from signup or email verification
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
       const message = urlParams.get('message');
+      const verified = urlParams.get('verified');
+      
       if (message) {
         setSuccessMessage(message);
+      } else if (verified === 'true') {
+        setSuccessMessage('Email verified successfully! You can now log in to your account.');
       }
     }
   }, []);

@@ -166,7 +166,7 @@ export default function SignUpPage() {
 
           {/* Sign Up Form */}
           <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-xl font-semibold text-kifolio-text mb-6 text-center">Create your account</h2>
+            <h2 className="text-xl font-semibold text-kifolio-text mb-6 text-center">Create your free account</h2>
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Email Field */}
@@ -284,11 +284,11 @@ export default function SignUpPage() {
             {/* Legal Links */}
             <div className="mt-6 text-center text-xs text-gray-500">
               By creating an account, you agree to our{' '}
-              <Link href="#" className="text-primary hover:underline">
+              <Link href="/terms" className="text-primary hover:underline">
                 Terms of Use
               </Link>
               {' '}and{' '}
-              <Link href="#" className="text-primary hover:underline">
+              <Link href="/privacy" className="text-primary hover:underline">
                 Privacy Policy
               </Link>
             </div>

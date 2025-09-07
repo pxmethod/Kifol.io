@@ -6,7 +6,8 @@ import {
   EngagementEmailData,
   InvitationEmailData,
   InvoiceEmailData,
-  CancellationEmailData
+  CancellationEmailData,
+  EmailVerificationData
 } from './types';
 
 // Import email template loader
@@ -290,4 +291,33 @@ export async function sendTestEmail(to: string): Promise<EmailResult> {
     EMAIL_CATEGORIES.SYSTEM,
     ['test']
   );
+}
+
+/**
+ * Send email verification email
+ */
+export async function sendEmailVerification(data: EmailVerificationData): Promise<EmailResult> {
+  try {
+    // Load and process the email verification template
+    const html = await EmailTemplates.emailVerification({
+      APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      USER_NAME: data.userName,
+      VERIFICATION_URL: data.verificationUrl,
+      SUPPORT_EMAIL: process.env.SUPPORT_EMAIL || 'support@kifol.io',
+    });
+
+    return await sendEmail(
+      data.to,
+      data.subject || `Verify your email - Kifolio`,
+      html,
+      EMAIL_CATEGORIES.TRANSACTIONAL,
+      ['verification', 'onboarding']
+    );
+  } catch (error) {
+    console.error('Error sending email verification:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to send email verification' 
+    };
+  }
 }

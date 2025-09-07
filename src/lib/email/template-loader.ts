@@ -87,6 +87,13 @@ export interface InvitationEmailVariables extends Record<string, string> {
   EXPIRES_AT: string;
 }
 
+export interface EmailVerificationVariables extends Record<string, string> {
+  APP_URL: string;
+  USER_NAME: string;
+  VERIFICATION_URL: string;
+  SUPPORT_EMAIL: string;
+}
+
 /**
  * Pre-configured template loaders with type safety
  */
@@ -102,4 +109,7 @@ export const EmailTemplates = {
     
   invitation: (variables: InvitationEmailVariables) => 
     loadEmailTemplate('invitation', variables),
+    
+  emailVerification: (variables: EmailVerificationVariables) => 
+    loadEmailTemplate('email-verification', variables),
 };

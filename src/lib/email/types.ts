@@ -67,6 +67,12 @@ export interface InvitationEmailData extends BaseEmailData {
   personalMessage?: string;
 }
 
+// Email verification data
+export interface EmailVerificationData extends BaseEmailData {
+  userName: string;
+  verificationUrl: string;
+}
+
 // Email send result
 export interface EmailResult {
   success: boolean;

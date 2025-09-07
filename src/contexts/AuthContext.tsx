@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, name?: string) => {
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -56,6 +56,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         return { error: error.message }
+      }
+
+      // If user was created but needs email confirmation, send custom verification email
+      if (data.user && !data.user.email_confirmed_at) {
+        try {
+          // Get the email confirmation token from Supabase
+          const { data: confirmationData, error: confirmationError } = await supabase.auth.resend({
+            type: 'signup',
+            email: email
+          })
+
+          if (confirmationError) {
+            console.error('Error getting confirmation token:', confirmationError)
+            // Don't fail the signup if email sending fails
+          } else {
+            // Send our custom verification email
+            const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/verify?token=${confirmationData?.token || 'fallback'}&email=${encodeURIComponent(email)}`
+            
+            await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/email/send`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                type: 'email-verification',
+                data: {
+                  to: email,
+                  userName: name || email.split('@')[0],
+                  verificationUrl: verificationUrl
+                }
+              }),
+            })
+          }
+        } catch (emailError) {
+          console.error('Failed to send custom verification email:', emailError)
+          // Don't fail the signup if email sending fails
+        }
       }
 
       // Note: User profile and email preferences will be automatically created

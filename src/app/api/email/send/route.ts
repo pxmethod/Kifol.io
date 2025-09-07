@@ -2,20 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { 
   sendWelcomeEmail, 
   sendPasswordResetEmail, 
-  sendEngagementEmail,
+  sendEngagementEmail, 
   sendInvitationEmail,
+  sendEmailVerification,
   sendTestEmail
 } from '@/lib/email/service';
 import { 
   WelcomeEmailData, 
   PasswordResetEmailData, 
-  EngagementEmailData,
-  InvitationEmailData 
+  EngagementEmailData, 
+  InvitationEmailData,
+  EmailVerificationData
 } from '@/lib/email/types';
 
 interface EmailRequest {
-  type: 'welcome' | 'password-reset' | 'engagement' | 'invitation' | 'test';
-  data: WelcomeEmailData | PasswordResetEmailData | EngagementEmailData | InvitationEmailData | { to: string };
+  type: 'welcome' | 'password-reset' | 'engagement' | 'invitation' | 'email-verification' | 'test';
+  data: WelcomeEmailData | PasswordResetEmailData | EngagementEmailData | InvitationEmailData | EmailVerificationData | { to: string };
 }
 
 export async function POST(request: NextRequest) {
@@ -40,6 +42,10 @@ export async function POST(request: NextRequest) {
         
       case 'invitation':
         result = await sendInvitationEmail(data as InvitationEmailData);
+        break;
+        
+      case 'email-verification':
+        result = await sendEmailVerification(data as EmailVerificationData);
         break;
         
       case 'test':
