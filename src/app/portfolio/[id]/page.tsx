@@ -13,7 +13,7 @@ import { portfolioService, achievementService } from '@/lib/database';
 import { DOMAIN_CONFIG } from '@/config/domains';
 import { Achievement } from '@/types/achievement';
 import Image from 'next/image';
-import AchievementsTimeline from '@/components/AchievementsTimeline';
+import HighlightsTimeline from '@/components/HighlightsTimeline';
 
 interface PortfolioData {
   id: string;
@@ -461,9 +461,9 @@ export default function PortfolioPage() {
             </div>
 
             <div className="card__body">
-              {/* Achievements Timeline */}
-              <AchievementsTimeline
-                achievements={portfolio.achievements || []}
+              {/* Highlights Timeline */}
+              <HighlightsTimeline
+                highlights={portfolio.achievements || []}
                 onEdit={handleEditHighlight}
               />
             </div>

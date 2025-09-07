@@ -3,26 +3,26 @@
 import { Achievement } from '@/types/achievement';
 import AchievementCard from './AchievementCard';
 
-interface AchievementsTimelineProps {
-  achievements: Achievement[];
-  onView?: (achievement: Achievement) => void;
-  onEdit?: (achievement: Achievement) => void;
+interface HighlightsTimelineProps {
+  highlights: Achievement[];
+  onView?: (highlight: Achievement) => void;
+  onEdit?: (highlight: Achievement) => void;
 }
 
-interface GroupedAchievements {
+interface GroupedHighlights {
   [key: string]: Achievement[];
 }
 
-export default function AchievementsTimeline({
-  achievements,
+export default function HighlightsTimeline({
+  highlights,
   onView,
   onEdit
-}: AchievementsTimelineProps) {
-  const groupAchievementsByDate = (achievements: Achievement[]): GroupedAchievements => {
-    const grouped: GroupedAchievements = {};
+}: HighlightsTimelineProps) {
+  const groupHighlightsByDate = (highlights: Achievement[]): GroupedHighlights => {
+    const grouped: GroupedHighlights = {};
     
-    achievements.forEach(achievement => {
-      const date = new Date(achievement.date);
+    highlights.forEach(highlight => {
+      const date = new Date(highlight.date);
       const dateKey = date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long'
@@ -31,10 +31,10 @@ export default function AchievementsTimeline({
       if (!grouped[dateKey]) {
         grouped[dateKey] = [];
       }
-      grouped[dateKey].push(achievement);
+      grouped[dateKey].push(highlight);
     });
     
-    // Sort achievements within each group by date (newest first)
+    // Sort highlights within each group by date (newest first)
     Object.keys(grouped).forEach(key => {
       grouped[key].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     });
@@ -62,26 +62,26 @@ export default function AchievementsTimeline({
     return dateKey;
   };
 
-  const groupedAchievements = groupAchievementsByDate(achievements);
-  const sortedGroups = Object.keys(groupedAchievements).sort((a, b) => {
+  const groupedHighlights = groupHighlightsByDate(highlights);
+  const sortedGroups = Object.keys(groupedHighlights).sort((a, b) => {
     const dateA = new Date(a);
     const dateB = new Date(b);
     return dateB.getTime() - dateA.getTime(); // Newest first
   });
 
-  if (achievements.length === 0) {
+  if (highlights.length === 0) {
     return (
       <div className="text-center py-12">
         <div className="mx-auto mb-4">
           <img 
             src="/marketing/no-achievements.png" 
-            alt="No achievements yet" 
+            alt="No highlights yet" 
             className="mx-auto"
             style={{ width: '260px', height: '260px' }}
           />
         </div>
         <h3 className="text-lg font-medium text-kifolio-text mb-2">No Highlights Yet</h3>
-        <p className="text-gray-500">Start building the portfolio by adding the first highlight.</p>
+        <p className="text-gray-500">Start this portfolio by adding the first highlight.</p>
       </div>
     );
   }
@@ -99,12 +99,12 @@ export default function AchievementsTimeline({
             <div className="flex-1 border-t border-gray-200"></div>
           </div>
           
-          {/* Achievements for this date */}
+          {/* Highlights for this date */}
           <div className="space-y-4">
-            {groupedAchievements[dateKey].map((achievement) => (
-              <div key={achievement.id} className="relative">
+            {groupedHighlights[dateKey].map((highlight) => (
+              <div key={highlight.id} className="relative">
                 <AchievementCard
-                  achievement={achievement}
+                  achievement={highlight}
                   onView={onView}
                   onEdit={onEdit}
                 />
@@ -115,4 +115,4 @@ export default function AchievementsTimeline({
       ))}
     </div>
   );
-} 
+}
