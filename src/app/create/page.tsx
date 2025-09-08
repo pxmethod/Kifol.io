@@ -268,17 +268,35 @@ export default function CreatePortfolio() {
 
             {/* Photo Upload */}
             <div className="form-field">
-              <label htmlFor="photo" className="form-field__label">
+              <label className="form-field__label">
                 Child&apos;s photo (totally optional)
               </label>
-              <input
-                type="file"
-                id="photo"
-                onChange={handlePhotoUpload}
-                accept="image/jpeg,image/png,image/gif,image/svg+xml"
-                className="input"
-                disabled={uploadingPhoto}
-              />
+              
+              {/* File Input */}
+              <div className="relative">
+                <input
+                  type="file"
+                  id="photo"
+                  onChange={handlePhotoUpload}
+                  accept="image/jpeg,image/png,image/gif,image/svg+xml"
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  disabled={uploadingPhoto}
+                />
+                <label
+                  htmlFor="photo"
+                  className={`inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer transition-colors ${
+                    uploadingPhoto 
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                      : 'bg-white hover:bg-gray-50 text-gray-700'
+                  }`}
+                >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  Choose file
+                </label>
+              </div>
+              
               {uploadingPhoto && (
                 <div className="flex items-center mt-2">
                   <LoadingSpinner size="sm" className="mr-2" label="" />
@@ -310,12 +328,26 @@ export default function CreatePortfolio() {
                     onClick={() => handleInputChange('template', template.id)}
                   >
                     <div className="text-center">
+                      {/* Template Image */}
+                      <div className="mb-3">
+                        <img
+                          src={`/marketing/template_${template.id}.png`}
+                          alt={`${template.name} template preview`}
+                          className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                        />
+                      </div>
+                      
+                      {/* Template Name */}
                       <h3 className="font-semibold text-kifolio-text">{template.name}</h3>
+                      
+                      {/* Template Description */}
                       <p className="text-sm text-gray-600 mt-1">{template.description}</p>
+                      
+                      {/* Action Buttons */}
                       <div className="mt-3 space-y-2">
                         <button
                           type="button"
-                          className="w-full px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                          className="w-full px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedTemplateForPreview(template.id);
@@ -326,13 +358,13 @@ export default function CreatePortfolio() {
                         </button>
                         <button
                           type="button"
-                          className="w-full px-3 py-1 text-xs bg-kifolio-cta text-white rounded hover:bg-kifolio-cta/90"
+                          className="w-full px-4 py-2 text-sm bg-kifolio-cta text-white rounded hover:bg-kifolio-cta/90 transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleInputChange('template', template.id);
                           }}
                         >
-                          Select
+                          Choose
                         </button>
                       </div>
                     </div>
