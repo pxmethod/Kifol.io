@@ -479,7 +479,7 @@ export default function HighlightForm() {
                   className="input cursor-pointer"
                 />
                 <p className="form-field__help">
-                  JPEG, PNG, GIF, or PDF up to 15MB each
+                  JPEG, PNG, GIF, or PDF up to 50MB each
                 </p>
                 {errors.media && (
                   <p className="form-field__error">{errors.media}</p>

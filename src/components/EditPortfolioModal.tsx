@@ -362,7 +362,7 @@ export default function EditPortfolioModal({
                 <p className="text-red-500 text-sm mt-1">{errors.photo}</p>
               )}
               <p className="text-gray-500 text-sm mt-1">
-                JPEG, PNG, GIF, or SVG. Max size of 5MB
+                JPEG, PNG, GIF, or SVG. Max size of 50MB
               </p>
             </div>
 

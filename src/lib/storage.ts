@@ -73,9 +73,9 @@ export class StorageService {
    * Validate file before upload
    */
   validateFile(file: File): { valid: boolean; error?: string } {
-    // Check file size (15MB limit)
-    if (file.size > 15 * 1024 * 1024) {
-      return { valid: false, error: 'File size must be 15MB or less' }
+    // Check file size (50MB limit)
+    if (file.size > 50 * 1024 * 1024) {
+      return { valid: false, error: 'File size must be 50MB or less' }
     }
 
     // Check file type
