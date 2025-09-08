@@ -31,6 +31,7 @@ export default function CreatePortfolio() {
   const [showPassword, setShowPassword] = useState(true);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -115,6 +116,9 @@ export default function CreatePortfolio() {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Store the selected file for preview
+    setSelectedFile(file);
+
     // Validate file
     const validation = storageService.validateFile(file);
     if (!validation.valid) {
@@ -137,6 +141,17 @@ export default function CreatePortfolio() {
       }));
     } finally {
       setUploadingPhoto(false);
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    setSelectedFile(null);
+    setFormData(prev => ({ ...prev, photoUrl: '' }));
+    setErrors(prev => ({ ...prev, photo: '' }));
+    // Reset the file input
+    const fileInput = document.getElementById('photo') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
     }
   };
 
@@ -293,9 +308,41 @@ export default function CreatePortfolio() {
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
-                  Choose file
+                  {selectedFile ? 'Replace photo' : 'Choose file'}
                 </label>
               </div>
+              
+              {/* Photo Preview */}
+              {selectedFile && (
+                <div className="mt-3 p-3 bg-gray-50 rounded-lg border">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex-shrink-0">
+                      <img
+                        src={URL.createObjectURL(selectedFile)}
+                        alt="Selected photo preview"
+                        className="w-12 h-12 object-cover rounded-lg border border-gray-200"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {selectedFile.name}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRemovePhoto}
+                      className="flex-shrink-0 p-1 text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              )}
               
               {uploadingPhoto && (
                 <div className="flex items-center mt-2">
@@ -447,15 +494,24 @@ export default function CreatePortfolio() {
           </form>
           </div>
           <div className="card__footer">
-            <div className="form-actions form-actions--center">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`btn btn--primary btn--wide ${isSubmitting ? 'btn--loading' : ''}`}
-                form="portfolioForm"
-              >
-                {isSubmitting ? 'Creating Portfolio...' : 'Create Portfolio'}
-              </button>
+            <div className="form-actions form-actions--right">
+              <div className="flex space-x-3">
+                <button
+                  type="button"
+                  onClick={handleBackClick}
+                  className="btn btn--secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={`btn btn--primary ${isSubmitting ? 'btn--loading' : ''}`}
+                  form="portfolioForm"
+                >
+                  {isSubmitting ? 'Creating Portfolio...' : 'Create Portfolio'}
+                </button>
+              </div>
             </div>
             {errors.submit && (
               <p className="form-field__error text-center mt-4">{errors.submit}</p>
