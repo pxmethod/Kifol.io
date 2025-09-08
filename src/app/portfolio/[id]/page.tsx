@@ -422,24 +422,22 @@ export default function PortfolioPage() {
 
               {/* Portfolio URL - On its own row */}
               <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <div className="flex-1">
-                    <span className="text-sm font-medium text-gray-700">Portfolio URL:</span>
-                    <div className="mt-1">
-                      <span className="text-xs font-mono text-kifolio-cta break-all">
-                        {DOMAIN_CONFIG.PORTFOLIO_DOMAIN}/p/{portfolio.short_id || portfolio.id}
-                      </span>
-                    </div>
+                <div className="space-y-2">
+                  <span className="text-sm font-medium text-gray-700">Portfolio URL:</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono text-kifolio-cta break-all flex-1 min-w-0">
+                      {DOMAIN_CONFIG.PORTFOLIO_DOMAIN}/p/{portfolio.short_id || portfolio.id}
+                    </span>
+                    <button
+                      onClick={copyToClipboard}
+                      className="btn btn--ghost btn--icon-only btn--sm flex-shrink-0"
+                      title="Copy URL"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    </button>
                   </div>
-                  <button
-                    onClick={copyToClipboard}
-                    className="btn btn--ghost btn--icon-only btn--sm flex-shrink-0"
-                    title="Copy URL"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                  </button>
                 </div>
               </div>
             </div>
