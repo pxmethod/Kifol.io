@@ -17,6 +17,7 @@ export default function MarketingPage() {
 
   // Scroll animations for below-the-fold content
   const whatSection = useFadeUpOnScroll(0.3);
+  const howItWorksSection = useFadeUpOnScroll(0.3);
   const benefitsSection = useFadeUpOnScroll(0.3);
   const demoSection = useFadeUpOnScroll(0.3);
   const testimonialsSection = useFadeUpOnScroll(0.3);
@@ -151,7 +152,7 @@ export default function MarketingPage() {
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <h3 className="text-2xl font-semibold .text-kifolio-text mb-4">Academic Transitions</h3>
+                <h3 className="text-2xl font-semibold .text-kifolio-text mb-4">Academic transitions</h3>
                 <p className="text-gray-600 leading-relaxed">
                   Provide a polished portfolio that complements transcripts and test scores—helping admissions teams see the full story behind the student.
                 </p>
@@ -165,7 +166,7 @@ export default function MarketingPage() {
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <h3 className="text-2xl font-semibold .text-kifolio-text mb-4">Scholarships & Awards</h3>
+                <h3 className="text-2xl font-semibold .text-kifolio-text mb-4">Scholarships & awards</h3>
                 <p className="text-gray-600 leading-relaxed">
                   Present a record of academic honors, leadership roles, volunteer work, and creative projects to strengthen applications.
                 </p>
@@ -179,7 +180,7 @@ export default function MarketingPage() {
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <h3 className="text-2xl font-semibold .text-kifolio-text mb-4">Resume & Early Opportunities</h3>
+                <h3 className="text-2xl font-semibold .text-kifolio-text mb-4">Resume & early opportunities</h3>
                 <p className="text-gray-600 leading-relaxed">
                   For internships, summer programs, or specialized schools, Kifolio helps highlight experiences and growth in a clear, organized format.
                 </p>
@@ -193,9 +194,61 @@ export default function MarketingPage() {
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <h3 className="text-2xl font-semibold .text-kifolio-text mb-4">Personal Growth Tracking</h3>
+                <h3 className="text-2xl font-semibold .text-kifolio-text mb-4">Personal growth tracking</h3>
                 <p className="text-gray-600 leading-relaxed">
                   Beyond academics, Kifolio gives your child a narrative of progress that builds confidence and shows them how far they've come.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* How It Works Section */}
+        <section 
+          ref={howItWorksSection.ref}
+          className={`py-20 px-4 bg-kifolio-header ${howItWorksSection.className}`}
+        >
+          <div className="max-w-6xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">
+              How it works
+            </h2>
+            <div className="grid md:grid-cols-3 gap-8 md:gap-12">
+              {/* Step 1 */}
+              <div className="text-center">
+                <div className="mx-auto mb-6 w-16 h-16 bg-kifolio-primary rounded-full flex items-center justify-center">
+                  <span className="text-2xl font-bold text-white">1</span>
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-4">
+                  Create your child's portfolio
+                </h3>
+                <p className="text-white leading-relaxed">
+                  Start by setting up a dedicated space for your child or children. Add their name, photo, and a few details to make it their own.
+                </p>
+              </div>
+
+              {/* Step 2 */}
+              <div className="text-center">
+                <div className="mx-auto mb-6 w-16 h-16 bg-kifolio-primary rounded-full flex items-center justify-center">
+                  <span className="text-2xl font-bold text-white">2</span>
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-4">
+                  Add their first highlight
+                </h3>
+                <p className="text-white leading-relaxed">
+                  Capture a special moment — an award, artwork, report card, or milestone — with a title, description, and photo.
+                </p>
+              </div>
+
+              {/* Step 3 */}
+              <div className="text-center">
+                <div className="mx-auto mb-6 w-16 h-16 bg-kifolio-primary rounded-full flex items-center justify-center">
+                  <span className="text-2xl font-bold text-white">3</span>
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-4">
+                  Build their story over time
+                </h3>
+                <p className="text-white leading-relaxed">
+                  Keep adding highlights as they grow. From small wins to big achievements, Kifolio helps you preserve it all in one place.
                 </p>
               </div>
             </div>
@@ -210,7 +263,7 @@ export default function MarketingPage() {
         >
           <div className="max-w-6xl mx-auto text-center">
             <h2 id="benefits-heading" className="text-3xl md:text-4xl font-bold .text-kifolio-text mb-4">
-              Why Parents Choose Kifolio
+              Why parents choose Kifolio
             </h2>
             <p className="text-lg text-gray-600 mb-16 leading-relaxed">
               Everything you need to showcase your child&apos;s growth and achievements in one beautiful platform
@@ -306,7 +359,7 @@ export default function MarketingPage() {
         >
           <div className="max-w-6xl mx-auto">
             <h2 id="testimonials-heading" className="text-3xl md:text-4xl font-bold .text-kifolio-text mb-12 text-center">
-              What Parents Are Saying
+              What parents are saying
             </h2>
             <div className="grid md:grid-cols-2 gap-8">
               <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
@@ -381,7 +434,7 @@ export default function MarketingPage() {
         >
           <div className="max-w-4xl mx-auto text-center text-white">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Ready to Get Started?
+              Ready to get started?
             </h2>
             <p className="text-xl mb-8 opacity-90">
               Start building a record today that will support your child for years to come.
@@ -403,7 +456,7 @@ export default function MarketingPage() {
         >
           <div className="max-w-4xl mx-auto">
             <h2 id="faq-heading" className="text-3xl md:text-4xl font-bold .text-kifolio-text mb-12 text-center">
-              Frequently Asked Questions
+              Frequently asked questions
             </h2>
             <div className="space-y-8" itemScope itemType="https://schema.org/FAQPage">
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">

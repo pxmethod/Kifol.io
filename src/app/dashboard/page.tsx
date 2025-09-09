@@ -140,9 +140,6 @@ export default function Dashboard() {
               <h1 className="text-2xl font-bold text-kifolio-text">
                 My Portfolios
               </h1>
-              <p className="text-md text-gray-600">
-                Support and manage your child&apos;s portfolio
-              </p>
             </div>
             {user && (
               <button
