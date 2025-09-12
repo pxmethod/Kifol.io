@@ -36,21 +36,21 @@ export default function PricingPage() {
     },
     premium: {
       name: 'Premium',
-      price: isAnnual ? '$8.99' : '$9.99',
-      period: isAnnual ? 'per month' : 'per month',
-      originalPrice: isAnnual ? '$11.99' : null,
+      price: isAnnual ? '$81.00' : '$8.99',
+      period: isAnnual ? 'annually' : 'per month',
+      originalPrice: isAnnual ? '$108.00' : null,
       description: 'For families with multiple children',
       features: [
         'Unlimited children',
         'Unlimited highlights',
-        'All premium templates',
         'Extra storage (videos, PDFs, audio)',
         'Advanced organization (tags, categories, filters)',
         'Export/share features (PDF generation)',
         'Priority support',
-        '7-day free trial'
+        '14-day free trial',
+        'Cancel anytime'
       ],
-      cta: 'Start free trial',
+      cta: 'Start free 14-day trial',
       popular: true
     }
   };
@@ -113,7 +113,7 @@ export default function PricingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-center space-x-4">
             <span className={`text-lg ${!isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
-              Monthly
+              Pay monthly
             </span>
             <button
               onClick={() => setIsAnnual(!isAnnual)}
@@ -128,7 +128,7 @@ export default function PricingPage() {
               />
             </button>
             <span className={`text-lg ${isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
-              Annual (25% discount)
+              Pay annually (25% discount)
             </span>
           </div>
         </div>
@@ -230,7 +230,7 @@ export default function PricingPage() {
               
               <Link
                 href="/auth/signup?plan=premium"
-                className="w-full bg-orange-500 text-white hover:bg-orange-600 px-6 py-3 rounded-lg text-lg font-semibold transition-colors text-center block"
+                className="w-full bg-kifolio-primary text-white hover:bg-orange-600 px-6 py-3 rounded-lg text-lg font-semibold transition-colors text-center block"
               >
                 {pricing.premium.cta}
               </Link>
@@ -291,17 +291,6 @@ export default function PricingPage() {
                     </td>
                     <td className="px-6 py-4 text-center text-sm text-gray-600">
                       Unlimited
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-sm text-gray-900 font-medium">
-                      Templates
-                    </td>
-                    <td className="px-6 py-4 text-center text-sm text-gray-600">
-                      Basic
-                    </td>
-                    <td className="px-6 py-4 text-center text-sm text-gray-600">
-                      All premium
                     </td>
                   </tr>
                   <tr className="bg-gray-50">
@@ -391,7 +380,7 @@ export default function PricingPage() {
                 Is there a free trial for Premium?
               </h3>
               <p className="text-gray-600">
-                Yes! Premium comes with a 7-day free trial. No credit card required to start, and you can cancel anytime during the trial.
+                Yes! Premium comes with a 14-day free trial. No credit card required to start, and you can cancel anytime during the trial.
               </p>
             </div>
             

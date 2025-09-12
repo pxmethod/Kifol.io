@@ -70,6 +70,20 @@ export default function Dashboard() {
     return null; // Will redirect to marketing site
   }
 
+  // Show loading while portfolios are being fetched
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-kifolio-bg">
+        <Header animateLogo={true} />
+        <main className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <LoadingSpinner size="lg" label="Loading portfolios..." />
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   const handleEditPortfolio = (portfolio: LegacyPortfolioData) => {
     router.push(`/portfolio/${portfolio.id}`);
   };
