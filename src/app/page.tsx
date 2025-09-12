@@ -212,7 +212,7 @@ export default function MarketingPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">
               How it works
             </h2>
-            <div className="grid md:grid-cols-3 gap-8 md:gap-12">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
               {/* Step 1 */}
               <div className="text-center">
                 <div className="mx-auto mb-6 w-16 h-16 bg-kifolio-primary rounded-full flex items-center justify-center">
@@ -249,6 +249,19 @@ export default function MarketingPage() {
                 </h3>
                 <p className="text-white leading-relaxed">
                   Keep adding highlights as they grow. From small wins to big achievements, Kifolio helps you preserve it all in one place.
+                </p>
+              </div>
+
+              {/* Step 4 */}
+              <div className="text-center">
+                <div className="mx-auto mb-6 w-16 h-16 bg-kifolio-primary rounded-full flex items-center justify-center">
+                  <span className="text-2xl font-bold text-white">4</span>
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-4">
+                  Put it to work
+                </h3>
+                <p className="text-white leading-relaxed">
+                  Export a polished record for transcripts, résumés, college and scholarship applications — or simply as a keepsake of their journey.
                 </p>
               </div>
             </div>
