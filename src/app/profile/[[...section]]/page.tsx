@@ -521,18 +521,20 @@ export default function ProfilePage() {
                   <h3 className="text-xl font-semibold text-kifolio-text">
                     Current Plan
                   </h3>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      subscription?.plan === 'free' 
-                        ? 'bg-gray-100 text-gray-800' 
-                        : subscription?.plan === 'trial'
-                        ? 'bg-orange-100 text-orange-800'
-                        : 'bg-green-100 text-green-800'
-                    }`}>
-                      {subscription?.plan === 'free' ? 'Free Plan' : 
-                       subscription?.plan === 'trial' ? 'Premium Trial' : 
-                       'Kifolio Premium'}
-                    </span>
+                  <div className="flex flex-col space-y-1 mt-1">
+                    <div className="flex items-center space-x-2">
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        subscription?.plan === 'free' 
+                          ? 'bg-gray-100 text-gray-800' 
+                          : subscription?.plan === 'trial'
+                          ? 'bg-orange-100 text-orange-800'
+                          : 'bg-green-100 text-green-800'
+                      }`}>
+                        {subscription?.plan === 'free' ? 'Free Plan' : 
+                         subscription?.plan === 'trial' ? 'Premium Trial' : 
+                         'Kifolio Premium'}
+                      </span>
+                    </div>
                     {subscription?.isTrialActive && subscription?.trialEndsAt && (
                       <span className="text-sm text-orange-600 font-medium">
                         {getDaysRemaining(subscription.trialEndsAt)} days remaining

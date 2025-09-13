@@ -22,6 +22,15 @@ export default function Header({ animateLogo = false }: HeaderProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
+  // Calculate days remaining for trial
+  const getDaysRemaining = (trialEndsAt: string) => {
+    const now = new Date();
+    const trialEnd = new Date(trialEndsAt);
+    const diffTime = trialEnd.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.max(0, diffDays);
+  };
+
   // Trigger logo animation on page load (only when animateLogo is true)
   useEffect(() => {
     if (animateLogo) {
@@ -176,7 +185,7 @@ export default function Header({ animateLogo = false }: HeaderProps) {
                 </div>
 
                 {/* Email and Plan */}
-                <div className="hidden sm:block">
+                <div className="hidden sm:block text-left">
                   <div className="profile-menu__email">
                     {user.email}
                   </div>
@@ -189,7 +198,8 @@ export default function Header({ animateLogo = false }: HeaderProps) {
                         : 'bg-white text-green-600'
                     }`}>
                       {subscription.plan === 'free' ? 'Free plan' : 
-                       subscription.plan === 'trial' ? 'Premium trial' : 
+                       subscription.plan === 'trial' ? 
+                         `Premium trial - ${subscription.trialEndsAt ? getDaysRemaining(subscription.trialEndsAt) : 0} days left` : 
                        'Kifolio Premium'}
                     </div>
                   )}

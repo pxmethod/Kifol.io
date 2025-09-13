@@ -53,6 +53,8 @@
   border: none;
   cursor: pointer;
   transition: background-color var(--transition-normal);
+  min-width: 0; /* Allow shrinking */
+  flex-shrink: 1; /* Allow shrinking */
 }
 
 .profile-menu__trigger:hover {
@@ -73,6 +75,11 @@
 .profile-menu__email {
   font-size: var(--font-size-sm);
   color: var(--color-white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px; /* Limit email width to make room for plan badge */
+  text-align: left; /* Ensure left alignment */
 }
 
 .profile-menu__chevron {
@@ -413,6 +420,19 @@
   
   .action-bar__container {
     padding: 0 var(--space-3);
+  }
+}
+
+/* Responsive plan badge for longer text */
+@media (max-width: 768px) {
+  .profile-menu__email {
+    max-width: 150px; /* Smaller on tablets */
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-menu__email {
+    max-width: 120px; /* Even smaller on mobile */
   }
 }
 
