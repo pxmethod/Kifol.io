@@ -8,6 +8,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { createClient } from '@/lib/supabase/client';
 import { userService } from '@/lib/database';
+import { useSubscription } from '@/hooks/useSubscription';
+import PricingModal from '@/components/PricingModal';
 
 interface ProfileData {
   email: string;
@@ -25,6 +27,7 @@ interface InvitationData {
 
 const navigationItems = [
   { id: 'general', label: 'General', path: '/profile' },
+  { id: 'billing', label: 'Plan & Billing', path: '/profile/billing' },
   { id: 'password', label: 'Password', path: '/profile/password' },
   { id: 'email-notifications', label: 'Email Notifications', path: '/profile/email-notifications' },
   { id: 'invitations', label: 'Invitations', path: '/profile/invitations' },
@@ -35,6 +38,7 @@ export default function ProfilePage() {
   const params = useParams();
   const router = useRouter();
   const { user, loading } = useAuth();
+  const { subscription, loading: subscriptionLoading, startTrial, refresh } = useSubscription();
   const supabase = createClient();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [profileData, setProfileData] = useState<ProfileData>({
@@ -58,6 +62,9 @@ export default function ProfilePage() {
   const [isSendingInvite, setIsSendingInvite] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isStartingTrial, setIsStartingTrial] = useState(false);
+  const [trialError, setTrialError] = useState<string | null>(null);
+  const [showPricingModal, setShowPricingModal] = useState(false);
 
   // Determine current section from URL
   const currentSection = Array.isArray(params.section) && params.section.length > 0 
@@ -97,8 +104,8 @@ export default function ProfilePage() {
     }
   }, [user, loading, router]);
 
-  // Show loading while checking authentication
-  if (loading) {
+  // Show loading while checking authentication or subscription data
+  if (loading || (currentSection === 'billing' && subscriptionLoading)) {
     return (
       <div className="min-h-screen bg-kifolio-bg flex items-center justify-center">
         <LoadingSpinner size="lg" label="Loading..." />
@@ -239,6 +246,49 @@ export default function ProfilePage() {
     }
   };
 
+  const handleStartTrial = async () => {
+    if (!user) return;
+    
+    setIsStartingTrial(true);
+    setTrialError(null);
+    
+    try {
+      const result = await startTrial();
+      if (result.success) {
+        // Refresh subscription data
+        await refresh();
+        setToastMessage('Trial started successfully!');
+        setShowToast(true);
+      } else {
+        setTrialError(result.error || 'Failed to start trial');
+      }
+    } catch (error) {
+      setTrialError('An unexpected error occurred');
+    } finally {
+      setIsStartingTrial(false);
+    }
+  };
+
+  const handleUpgrade = () => {
+    setShowPricingModal(true);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const getDaysRemaining = (endDate: string) => {
+    const now = new Date();
+    const end = new Date(endDate);
+    const diffTime = end.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.max(0, diffDays);
+  };
+
   const getCurrentSectionLabel = () => {
     const currentItem = navigationItems.find(item => 
       (item.id === 'general' && currentSection === 'general') || item.id === currentSection
@@ -273,15 +323,15 @@ export default function ProfilePage() {
 
 
             {/* Save Button */}
-            <div className="form-actions">
-              <button
-                onClick={handleSaveChanges}
-                className="btn btn--primary"
+              <div className="form-actions">
+                <button
+                  onClick={handleSaveChanges}
+                  className="btn btn--primary"
                 disabled={!hasChanges}
-              >
-                Save Changes
-              </button>
-            </div>
+                >
+                  Save Changes
+                </button>
+              </div>
           </div>
         );
 
@@ -316,15 +366,15 @@ export default function ProfilePage() {
             </div>
 
             {/* Change Password Button */}
-            <div className="form-actions">
-              <button
-                onClick={handlePasswordChange}
-                className="btn btn--primary"
+              <div className="form-actions">
+                <button
+                  onClick={handlePasswordChange}
+                  className="btn btn--primary"
                 disabled={!formData.password}
-              >
-                Change Password
-              </button>
-            </div>
+                >
+                  Change Password
+                </button>
+              </div>
           </div>
         );
 
@@ -420,6 +470,200 @@ export default function ProfilePage() {
                 </button>
               </div>
             </form>
+          </div>
+        );
+
+      case 'billing':
+        return (
+          <div className="space-y-8">
+            <div>
+              <h2 className="text-2xl font-bold text-kifolio-text mb-2">Plan & Billing</h2>
+              <p className="text-gray-600">Manage your subscription and billing preferences</p>
+            </div>
+
+            {/* Current Plan Card */}
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-xl font-semibold text-kifolio-text">
+                    Current Plan
+                  </h3>
+                  <div className="flex items-center space-x-2 mt-1">
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      subscription?.plan === 'free' 
+                        ? 'bg-gray-100 text-gray-800' 
+                        : subscription?.plan === 'trial'
+                        ? 'bg-orange-100 text-orange-800'
+                        : 'bg-green-100 text-green-800'
+                    }`}>
+                      {subscription?.plan === 'free' ? 'Free Plan' : 
+                       subscription?.plan === 'trial' ? 'Premium Trial' : 
+                       'Kifolio Premium'}
+                    </span>
+                    {subscription?.isTrialActive && subscription?.trialEndsAt && (
+                      <span className="text-sm text-orange-600 font-medium">
+                        {getDaysRemaining(subscription.trialEndsAt)} days remaining
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {subscription?.plan === 'free' && (
+                  <button
+                    onClick={handleStartTrial}
+                    disabled={isStartingTrial}
+                    className="btn btn--primary"
+                  >
+                    {isStartingTrial ? 'Starting Trial...' : 'Start 14-Day Free Trial'}
+                  </button>
+                )}
+              </div>
+
+              {trialError && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                  <p className="text-red-700 text-sm">{trialError}</p>
+                </div>
+              )}
+
+              {/* Plan Details */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-3">What's included:</h4>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-center">
+                      <span className="text-green-500 mr-2">✓</span>
+                      {subscription?.limits.maxPortfolios === -1 ? 'Unlimited' : subscription?.limits.maxPortfolios} portfolios
+                    </li>
+                    <li className="flex items-center">
+                      <span className="text-green-500 mr-2">✓</span>
+                      {subscription?.limits.maxHighlightsPerPortfolio === -1 ? 'Unlimited' : subscription?.limits.maxHighlightsPerPortfolio} highlights per portfolio
+                    </li>
+                    <li className="flex items-center">
+                      <span className="text-green-500 mr-2">✓</span>
+                      {subscription?.limits.allowedMediaTypes.length === 3 ? 'Photos only' : 'All media types'}
+                    </li>
+                    <li className="flex items-center">
+                      <span className="text-green-500 mr-2">✓</span>
+                      {subscription?.limits.canExportPDF ? 'PDF export' : 'Public sharing only'}
+                    </li>
+                    <li className="flex items-center">
+                      <span className="text-green-500 mr-2">✓</span>
+                      {subscription?.limits.supportLevel === 'priority' ? 'Priority support' : 'Email support'}
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-3">Usage:</h4>
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Portfolios</span>
+                        <span className="font-medium">
+                          {subscription?.plan === 'free' ? '1/1' : 'Unlimited'}
+                        </span>
+                      </div>
+                      {subscription?.plan === 'free' && (
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-kifolio-primary h-2 rounded-full" style={{ width: '100%' }}></div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Highlights per portfolio</span>
+                        <span className="font-medium">
+                          {subscription?.plan === 'free' ? '0/10' : 'Unlimited'}
+                        </span>
+                      </div>
+                      {subscription?.plan === 'free' && (
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-kifolio-primary h-2 rounded-full" style={{ width: '0%' }}></div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Trial Information */}
+            {subscription?.isTrialActive && subscription?.trialEndsAt && (
+              <div className="bg-orange-50 border border-orange-200 rounded-xl p-6 mb-8">
+                <div className="flex items-start space-x-3">
+                  <div className="flex-shrink-0">
+                    <svg className="h-6 w-6 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-medium text-orange-800 mb-2">
+                      Premium Trial Active
+                    </h3>
+                    <p className="text-orange-700 mb-4">
+                      Your trial ends on {formatDate(subscription.trialEndsAt)}. 
+                      Upgrade to Premium to continue enjoying unlimited features.
+                    </p>
+                    <button
+                      onClick={handleUpgrade}
+                      className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors"
+                    >
+                      Upgrade to Premium
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Upgrade Card for Free Users */}
+            {subscription?.plan === 'free' && (
+              <div className="bg-gradient-to-r from-kifolio-primary to-orange-600 rounded-xl p-6 text-white">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2">
+                      Ready to unlock Premium features?
+                    </h3>
+                    <p className="text-orange-100 mb-4">
+                      Get unlimited portfolios, highlights, advanced media support, and more.
+                    </p>
+                    <div className="flex space-x-4">
+                      <button
+                        onClick={handleStartTrial}
+                        disabled={isStartingTrial}
+                        className="bg-white text-kifolio-primary px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors disabled:opacity-50"
+                      >
+                        {isStartingTrial ? 'Starting...' : 'Start Free Trial'}
+                      </button>
+                      <button
+                        onClick={handleUpgrade}
+                        className="border border-white text-white px-6 py-2 rounded-lg font-medium hover:bg-white hover:text-kifolio-primary transition-colors"
+                      >
+                        View Pricing
+                      </button>
+                    </div>
+                  </div>
+                  <div className="hidden md:block">
+                    <div className="text-right">
+                      <div className="text-3xl font-bold">$8.99</div>
+                      <div className="text-orange-100">per month</div>
+                      <div className="text-xs text-orange-200 mt-1">$81/year <div className="line-through">$108.00</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Billing Information (for future implementation) */}
+            {subscription?.plan === 'premium' && (
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="text-xl font-semibold text-kifolio-text mb-4">
+                  Billing Information
+                </h3>
+                <p className="text-gray-600">
+                  Billing management will be available soon. For now, please contact support for any billing questions.
+                </p>
+              </div>
+            )}
           </div>
         );
 
@@ -586,6 +830,12 @@ export default function ProfilePage() {
         variant="success"
         isVisible={showToast}
         onDismiss={() => setShowToast(false)}
+      />
+
+      {/* Pricing Modal */}
+      <PricingModal
+        isOpen={showPricingModal}
+        onClose={() => setShowPricingModal(false)}
       />
 
       {/* Delete Account Confirmation Modal */}

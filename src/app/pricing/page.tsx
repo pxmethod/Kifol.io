@@ -57,7 +57,6 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Global Header */}
       <header className="bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-50">
         <div className="flex items-center justify-between max-w-6xl mx-auto">
           <div className="flex items-center">
@@ -88,7 +87,6 @@ export default function PricingPage() {
           </div>
         </div>
       </header>
-
       {/* Hero Section */}
       <div className="bg-kifolio-header">
         <div className="max-w-6xl mx-auto px-4 py-16">
@@ -177,7 +175,7 @@ export default function PricingPage() {
                 href="/auth/signup"
                 className="w-full bg-kifolio-primary text-white hover:bg-orange-600 px-6 py-3 rounded-lg text-lg font-semibold transition-colors text-center block"
               >
-                Get started free
+                Get started for free
               </Link>
             </div>
 
@@ -228,12 +226,17 @@ export default function PricingPage() {
                 ))}
               </ul>
               
-              <Link
-                href="/auth/signup?plan=premium"
-                className="w-full bg-kifolio-primary text-white hover:bg-orange-600 px-6 py-3 rounded-lg text-lg font-semibold transition-colors text-center block"
-              >
-                {pricing.premium.cta}
-              </Link>
+              <div className="space-y-2">
+                <Link
+                  href="/auth/signup?plan=premium"
+                  className="w-full bg-kifolio-primary text-white hover:bg-orange-600 px-6 py-3 rounded-lg text-lg font-semibold transition-colors text-center block"
+                >
+                  {pricing.premium.cta}
+                </Link>
+                <p className="text-xs text-gray-500 text-center">
+                  No credit-card required to start.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -273,7 +276,7 @@ export default function PricingPage() {
                 <tbody className="divide-y divide-gray-200">
                   <tr>
                     <td className="px-6 py-4 text-sm text-gray-900 font-medium">
-                      Number of children
+                      Number of children (portfolios)
                     </td>
                     <td className="px-6 py-4 text-center text-sm text-gray-600">
                       1
@@ -284,7 +287,7 @@ export default function PricingPage() {
                   </tr>
                   <tr className="bg-gray-50">
                     <td className="px-6 py-4 text-sm text-gray-900 font-medium">
-                      Highlights per child
+                      Highlights per child portfolio
                     </td>
                     <td className="px-6 py-4 text-center text-sm text-gray-600">
                       Up to 10

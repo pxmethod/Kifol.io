@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
 
 interface HeaderProps {
   animateLogo?: boolean;
@@ -14,6 +15,7 @@ export default function Header({ animateLogo = false }: HeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, signOut } = useAuth();
+  const { subscription } = useSubscription();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLogoAnimated, setIsLogoAnimated] = useState(false);
@@ -173,10 +175,25 @@ export default function Header({ animateLogo = false }: HeaderProps) {
                   />
                 </div>
 
-                {/* Email */}
-                <span className="profile-menu__email hidden sm:block">
-                  {user.email}
-                </span>
+                {/* Email and Plan */}
+                <div className="hidden sm:block">
+                  <div className="profile-menu__email">
+                    {user.email}
+                  </div>
+                  {subscription && (
+                    <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                      subscription.plan === 'free' 
+                        ? 'bg-white text-gray-600' 
+                        : subscription.plan === 'trial'
+                        ? 'bg-white text-orange-600'
+                        : 'bg-white text-green-600'
+                    }`}>
+                      {subscription.plan === 'free' ? 'Free plan' : 
+                       subscription.plan === 'trial' ? 'Premium trial' : 
+                       'Kifolio Premium'}
+                    </div>
+                  )}
+                </div>
 
                 {/* Dropdown Arrow */}
                 <svg 

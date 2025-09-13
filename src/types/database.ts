@@ -16,6 +16,13 @@ export interface Database {
           name: string | null
           city: string | null
           state: string | null
+          subscription_plan: 'free' | 'trial' | 'premium'
+          subscription_status: 'active' | 'canceled' | 'past_due' | 'unpaid'
+          trial_started_at: string | null
+          trial_ends_at: string | null
+          subscription_ends_at: string | null
+          stripe_customer_id: string | null
+          paypal_subscription_id: string | null
           created_at: string
           updated_at: string
         }
@@ -25,6 +32,13 @@ export interface Database {
           name?: string | null
           city?: string | null
           state?: string | null
+          subscription_plan?: 'free' | 'trial' | 'premium'
+          subscription_status?: 'active' | 'canceled' | 'past_due' | 'unpaid'
+          trial_started_at?: string | null
+          trial_ends_at?: string | null
+          subscription_ends_at?: string | null
+          stripe_customer_id?: string | null
+          paypal_subscription_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -34,6 +48,13 @@ export interface Database {
           name?: string | null
           city?: string | null
           state?: string | null
+          subscription_plan?: 'free' | 'trial' | 'premium'
+          subscription_status?: 'active' | 'canceled' | 'past_due' | 'unpaid'
+          trial_started_at?: string | null
+          trial_ends_at?: string | null
+          subscription_ends_at?: string | null
+          stripe_customer_id?: string | null
+          paypal_subscription_id?: string | null
           updated_at?: string
         }
       }
