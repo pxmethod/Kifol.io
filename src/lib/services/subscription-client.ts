@@ -204,6 +204,7 @@ export class SubscriptionServiceClient {
       .from('users')
       .update({
         subscription_plan: 'trial',
+        subscription_status: 'active',
         trial_started_at: now.toISOString(),
         trial_ends_at: trialEndsAt.toISOString(),
         updated_at: now.toISOString()

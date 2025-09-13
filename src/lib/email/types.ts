@@ -93,3 +93,39 @@ export interface EmailTemplateProps {
     url: string;
   }[];
 }
+
+// Subscription email data
+export interface TrialStartData extends BaseEmailData {
+  userName: string;
+  trialStartDate: string;
+  trialEndDate: string;
+  dashboardUrl: string;
+  pricingUrl: string;
+  supportEmail: string;
+  privacyUrl: string;
+  termsUrl: string;
+}
+
+export interface TrialEndingData extends BaseEmailData {
+  userName: string;
+  trialStartDate: string;
+  trialEndDate: string;
+  daysRemaining: number;
+  upgradeUrl: string;
+  dashboardUrl: string;
+  pricingUrl: string;
+  supportEmail: string;
+  privacyUrl: string;
+  termsUrl: string;
+}
+
+export interface TrialEndedData extends BaseEmailData {
+  userName: string;
+  trialEndDate: string;
+  upgradeUrl: string;
+  dashboardUrl: string;
+  pricingUrl: string;
+  supportEmail: string;
+  privacyUrl: string;
+  termsUrl: string;
+}

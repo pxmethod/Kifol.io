@@ -89,6 +89,44 @@ export interface EmailVerificationVariables extends Record<string, string> {
   SUPPORT_EMAIL: string;
 }
 
+export interface TrialStartVariables extends Record<string, string> {
+  APP_URL: string;
+  USER_NAME: string;
+  TRIAL_START_DATE: string;
+  TRIAL_END_DATE: string;
+  DASHBOARD_URL: string;
+  PRICING_URL: string;
+  SUPPORT_EMAIL: string;
+  PRIVACY_URL: string;
+  TERMS_URL: string;
+}
+
+export interface TrialEndingVariables extends Record<string, string> {
+  APP_URL: string;
+  USER_NAME: string;
+  TRIAL_START_DATE: string;
+  TRIAL_END_DATE: string;
+  DAYS_REMAINING: string;
+  UPGRADE_URL: string;
+  DASHBOARD_URL: string;
+  PRICING_URL: string;
+  SUPPORT_EMAIL: string;
+  PRIVACY_URL: string;
+  TERMS_URL: string;
+}
+
+export interface TrialEndedVariables extends Record<string, string> {
+  APP_URL: string;
+  USER_NAME: string;
+  TRIAL_END_DATE: string;
+  UPGRADE_URL: string;
+  DASHBOARD_URL: string;
+  PRICING_URL: string;
+  SUPPORT_EMAIL: string;
+  PRIVACY_URL: string;
+  TERMS_URL: string;
+}
+
 /**
  * Pre-configured template loaders with type safety
  */
@@ -105,4 +143,13 @@ export const EmailTemplates = {
     
   emailVerification: (variables: EmailVerificationVariables) => 
     loadEmailTemplate('email-verification', variables),
+    
+  trialStart: (variables: TrialStartVariables) => 
+    loadEmailTemplate('trial-start', variables),
+    
+  trialEnding: (variables: TrialEndingVariables) => 
+    loadEmailTemplate('trial-ending', variables),
+    
+  trialEnded: (variables: TrialEndedVariables) => 
+    loadEmailTemplate('trial-ended', variables),
 };

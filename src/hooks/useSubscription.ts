@@ -63,7 +63,15 @@ export function useSubscription() {
     if (!user) return { success: false, error: 'Not authenticated' };
 
     try {
-      const result = await SubscriptionServiceClient.startTrial(user.id);
+      const response = await fetch('/api/subscription/start-trial', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result = await response.json();
+      
       if (result.success) {
         await loadSubscription(); // Refresh subscription details
       }

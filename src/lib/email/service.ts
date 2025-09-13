@@ -6,7 +6,10 @@ import {
   InvitationEmailData,
   InvoiceEmailData,
   CancellationEmailData,
-  EmailVerificationData
+  EmailVerificationData,
+  TrialStartData,
+  TrialEndingData,
+  TrialEndedData
 } from './types';
 
 // Import email template loader
@@ -290,6 +293,107 @@ export async function sendEmailVerification(data: EmailVerificationData): Promis
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Failed to send email verification' 
+    };
+  }
+}
+
+/**
+ * Send trial start welcome email
+ */
+export async function sendTrialStartEmail(data: TrialStartData): Promise<EmailResult> {
+  try {
+    const html = await EmailTemplates.trialStart({
+      APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      USER_NAME: data.userName,
+      TRIAL_START_DATE: data.trialStartDate,
+      TRIAL_END_DATE: data.trialEndDate,
+      DASHBOARD_URL: data.dashboardUrl,
+      PRICING_URL: data.pricingUrl,
+      SUPPORT_EMAIL: data.supportEmail,
+      PRIVACY_URL: data.privacyUrl,
+      TERMS_URL: data.termsUrl,
+    });
+
+    return await sendEmail(
+      data.to,
+      data.subject || `Welcome to Kifolio Premium Trial!`,
+      html,
+      EMAIL_CATEGORIES.TRANSACTIONAL,
+      ['trial', 'welcome', 'premium']
+    );
+  } catch (error) {
+    console.error('Error sending trial start email:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to send trial start email' 
+    };
+  }
+}
+
+/**
+ * Send trial ending reminder email
+ */
+export async function sendTrialEndingEmail(data: TrialEndingData): Promise<EmailResult> {
+  try {
+    const html = await EmailTemplates.trialEnding({
+      APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      USER_NAME: data.userName,
+      TRIAL_START_DATE: data.trialStartDate,
+      TRIAL_END_DATE: data.trialEndDate,
+      DAYS_REMAINING: data.daysRemaining.toString(),
+      UPGRADE_URL: data.upgradeUrl,
+      DASHBOARD_URL: data.dashboardUrl,
+      PRICING_URL: data.pricingUrl,
+      SUPPORT_EMAIL: data.supportEmail,
+      PRIVACY_URL: data.privacyUrl,
+      TERMS_URL: data.termsUrl,
+    });
+
+    return await sendEmail(
+      data.to,
+      data.subject || `Your Kifolio Premium trial ends in ${data.daysRemaining} days`,
+      html,
+      EMAIL_CATEGORIES.TRANSACTIONAL,
+      ['trial', 'reminder', 'upgrade']
+    );
+  } catch (error) {
+    console.error('Error sending trial ending email:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to send trial ending email' 
+    };
+  }
+}
+
+/**
+ * Send trial ended email
+ */
+export async function sendTrialEndedEmail(data: TrialEndedData): Promise<EmailResult> {
+  try {
+    const html = await EmailTemplates.trialEnded({
+      APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      USER_NAME: data.userName,
+      TRIAL_END_DATE: data.trialEndDate,
+      UPGRADE_URL: data.upgradeUrl,
+      DASHBOARD_URL: data.dashboardUrl,
+      PRICING_URL: data.pricingUrl,
+      SUPPORT_EMAIL: data.supportEmail,
+      PRIVACY_URL: data.privacyUrl,
+      TERMS_URL: data.termsUrl,
+    });
+
+    return await sendEmail(
+      data.to,
+      data.subject || `Your Kifolio Premium trial has ended`,
+      html,
+      EMAIL_CATEGORIES.TRANSACTIONAL,
+      ['trial', 'ended', 'upgrade']
+    );
+  } catch (error) {
+    console.error('Error sending trial ended email:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to send trial ended email' 
     };
   }
 }
