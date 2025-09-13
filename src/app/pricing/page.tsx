@@ -57,6 +57,7 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Global Header */}
       <header className="bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-50">
         <div className="flex items-center justify-between max-w-6xl mx-auto">
           <div className="flex items-center">
@@ -87,6 +88,7 @@ export default function PricingPage() {
           </div>
         </div>
       </header>
+
       {/* Hero Section */}
       <div className="bg-kifolio-header">
         <div className="max-w-6xl mx-auto px-4 py-16">

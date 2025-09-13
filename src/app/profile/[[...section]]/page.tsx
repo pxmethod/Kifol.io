@@ -273,6 +273,39 @@ export default function ProfilePage() {
     setShowPricingModal(true);
   };
 
+  const handleDowngrade = async () => {
+    if (!user) return;
+    
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from('users')
+        .update({
+          subscription_plan: 'free',
+          subscription_status: 'active',
+          trial_started_at: null,
+          trial_ends_at: null,
+          subscription_ends_at: null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error downgrading:', error);
+        setToastMessage('Failed to downgrade. Please try again.');
+        setShowToast(true);
+      } else {
+        await refresh();
+        setToastMessage('Successfully downgraded to free plan!');
+        setShowToast(true);
+      }
+    } catch (error) {
+      console.error('Error downgrading:', error);
+      setToastMessage('Failed to downgrade. Please try again.');
+      setShowToast(true);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -514,6 +547,14 @@ export default function ProfilePage() {
                     className="btn btn--primary"
                   >
                     {isStartingTrial ? 'Starting Trial...' : 'Start 14-Day Free Trial'}
+                  </button>
+                )}
+                {(subscription?.plan === 'trial' || subscription?.plan === 'premium') && (
+                  <button
+                    onClick={handleDowngrade}
+                    className="btn btn--secondary"
+                  >
+                    Downgrade to Free
                   </button>
                 )}
               </div>
@@ -817,7 +858,7 @@ export default function ProfilePage() {
           </div>
 
           <div className="p-4 lg:p-8">
-            <div className="max-w-2xl mx-auto lg:mx-0">
+            <div className="max-w-4xl mx-auto lg:mx-0">
               {renderContent()}
             </div>
           </div>
