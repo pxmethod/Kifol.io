@@ -535,11 +535,6 @@ export default function ProfilePage() {
                          'Kifolio Premium'}
                       </span>
                     </div>
-                    {subscription?.isTrialActive && subscription?.trialEndsAt && (
-                      <span className="text-sm text-orange-600 font-medium">
-                        {getDaysRemaining(subscription.trialEndsAt)} days remaining
-                      </span>
-                    )}
                   </div>
                 </div>
                 {subscription?.plan === 'free' && (
@@ -643,6 +638,11 @@ export default function ProfilePage() {
                     <h3 className="text-lg font-medium text-orange-800 mb-2">
                       Premium Trial Active
                     </h3>
+                    {subscription?.isTrialActive && subscription?.trialEndsAt && (
+                      <span className="text-sm text-orange-600 font-medium">
+                        {getDaysRemaining(subscription.trialEndsAt)} days remaining
+                      </span>
+                    )}
                     <p className="text-orange-700 mb-4">
                       Your trial ends on {formatDate(subscription.trialEndsAt)}. 
                       Upgrade to Premium to continue enjoying unlimited features.
