@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     // Get user details
     const { data: userData, error: userError } = await supabase
       .from('users')
-      .select('email, name, subscription_plan')
+      .select('email, name, subscription_plan, trial_used')
       .eq('id', user.id)
       .single();
 
@@ -34,6 +34,13 @@ export async function POST(request: NextRequest) {
     if (userData.subscription_plan !== 'free') {
       return NextResponse.json({ 
         error: 'User is already on a trial or premium plan' 
+      }, { status: 400 });
+    }
+
+    // Check if user has already used their trial
+    if (userData.trial_used) {
+      return NextResponse.json({ 
+        error: 'You have already used your 14-day free trial. Please upgrade to Premium to access all features.' 
       }, { status: 400 });
     }
 

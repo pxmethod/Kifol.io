@@ -64,6 +64,11 @@ export default function ProfilePage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isStartingTrial, setIsStartingTrial] = useState(false);
   const [trialError, setTrialError] = useState<string | null>(null);
+  
+  // Testing mode state
+  const [isTestingMode, setIsTestingMode] = useState(false);
+  const [testingPlan, setTestingPlan] = useState<'free' | 'trial' | 'premium'>('free');
+  const [testingTrialUsed, setTestingTrialUsed] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
 
   // Determine current section from URL
@@ -103,6 +108,14 @@ export default function ProfilePage() {
       router.push('/auth/login?message=Please log in to access your profile');
     }
   }, [user, loading, router]);
+
+  // Initialize testing state when subscription loads
+  useEffect(() => {
+    if (subscription) {
+      setTestingPlan(subscription.plan);
+      setTestingTrialUsed(subscription.hasUsedTrial);
+    }
+  }, [subscription]);
 
   // Show loading while checking authentication or subscription data
   if (loading || (currentSection === 'billing' && subscriptionLoading)) {
@@ -320,6 +333,87 @@ export default function ProfilePage() {
     const diffTime = end.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return Math.max(0, diffDays);
+  };
+
+  // Testing mode functions
+  const handleTestingPlanChange = async (newPlan: 'free' | 'trial' | 'premium') => {
+    if (!user) return;
+    
+    try {
+      const supabase = createClient();
+      const now = new Date();
+      const trialEndsAt = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+      
+      const updateData: any = {
+        subscription_plan: newPlan,
+        subscription_status: 'active',
+        updated_at: now.toISOString()
+      };
+
+      if (newPlan === 'trial') {
+        updateData.trial_started_at = now.toISOString();
+        updateData.trial_ends_at = trialEndsAt.toISOString();
+        updateData.trial_used = true;
+      } else if (newPlan === 'premium') {
+        updateData.subscription_ends_at = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString();
+        updateData.trial_used = true;
+      } else {
+        updateData.trial_started_at = null;
+        updateData.trial_ends_at = null;
+        updateData.subscription_ends_at = null;
+        updateData.trial_used = testingTrialUsed;
+      }
+
+      const { error } = await supabase
+        .from('users')
+        .update(updateData)
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error updating plan:', error);
+        setToastMessage('Failed to update plan. Please try again.');
+        setShowToast(true);
+      } else {
+        setTestingPlan(newPlan);
+        await refresh();
+        setToastMessage(`Plan updated to ${newPlan}!`);
+        setShowToast(true);
+      }
+    } catch (error) {
+      console.error('Error updating plan:', error);
+      setToastMessage('Failed to update plan. Please try again.');
+      setShowToast(true);
+    }
+  };
+
+  const handleTestingTrialUsedChange = async (trialUsed: boolean) => {
+    if (!user) return;
+    
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from('users')
+        .update({ 
+          trial_used: trialUsed,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error updating trial used:', error);
+        setToastMessage('Failed to update trial status. Please try again.');
+        setShowToast(true);
+      } else {
+        setTestingTrialUsed(trialUsed);
+        await refresh();
+        setToastMessage(`Trial used status updated to ${trialUsed}!`);
+        setShowToast(true);
+      }
+    } catch (error) {
+      console.error('Error updating trial used:', error);
+      setToastMessage('Failed to update trial status. Please try again.');
+      setShowToast(true);
+    }
   };
 
   const getCurrentSectionLabel = () => {
@@ -717,6 +811,114 @@ export default function ProfilePage() {
                 <p className="text-gray-600">
                   Billing management will be available soon. For now, please contact support for any billing questions.
                 </p>
+              </div>
+            )}
+
+            {/* Testing Mode Interface - Only show in development */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-yellow-800">
+                    🧪 Testing Mode
+                  </h3>
+                  <button
+                    onClick={() => setIsTestingMode(!isTestingMode)}
+                    className="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors text-sm"
+                  >
+                    {isTestingMode ? 'Hide' : 'Show'} Testing Controls
+                  </button>
+                </div>
+                
+                {isTestingMode && (
+                  <div className="space-y-4">
+                    <p className="text-yellow-700 text-sm">
+                      Use these controls to test different subscription states. Changes are applied to your actual account.
+                    </p>
+                    
+                    {/* Plan Selection */}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-yellow-800">
+                        Subscription Plan
+                      </label>
+                      <div className="flex space-x-2">
+                        {(['free', 'trial', 'premium'] as const).map((plan) => (
+                          <button
+                            key={plan}
+                            onClick={() => handleTestingPlanChange(plan)}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                              subscription?.plan === plan
+                                ? 'bg-yellow-600 text-white'
+                                : 'bg-white text-yellow-800 border border-yellow-300 hover:bg-yellow-100'
+                            }`}
+                          >
+                            {plan.charAt(0).toUpperCase() + plan.slice(1)}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Trial Used Toggle */}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-yellow-800">
+                        Trial Used Status
+                      </label>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleTestingTrialUsedChange(!testingTrialUsed)}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            testingTrialUsed
+                              ? 'bg-red-600 text-white'
+                              : 'bg-green-600 text-white'
+                          }`}
+                        >
+                          {testingTrialUsed ? 'Trial Used' : 'Trial Available'}
+                        </button>
+                        <span className="text-sm text-yellow-700">
+                          Current: {subscription?.hasUsedTrial ? 'Used' : 'Available'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Current Status Display */}
+                    <div className="bg-white rounded-lg p-4 border border-yellow-200">
+                      <h4 className="font-medium text-yellow-800 mb-2">Current Status</h4>
+                      <div className="text-sm text-yellow-700 space-y-1">
+                        <div>Plan: <span className="font-medium">{subscription?.plan}</span></div>
+                        <div>Trial Used: <span className="font-medium">{subscription?.hasUsedTrial ? 'Yes' : 'No'}</span></div>
+                        <div>Is Trial Active: <span className="font-medium">{subscription?.isTrialActive ? 'Yes' : 'No'}</span></div>
+                        <div>Is Premium Active: <span className="font-medium">{subscription?.isPremiumActive ? 'Yes' : 'No'}</span></div>
+                      </div>
+                    </div>
+
+                    {/* Debug Tools */}
+                    <div className="bg-white rounded-lg p-4 border border-yellow-200">
+                      <h4 className="font-medium text-yellow-800 mb-2">Debug Tools</h4>
+                      <div className="space-y-2">
+                        <button
+                          onClick={async () => {
+                            try {
+                              const response = await fetch('/api/debug/user');
+                              const data = await response.json();
+                              console.log('Debug user data:', data);
+                              setToastMessage('Debug data logged to console');
+                              setShowToast(true);
+                            } catch (error) {
+                              console.error('Debug error:', error);
+                              setToastMessage('Debug failed - check console');
+                              setShowToast(true);
+                            }
+                          }}
+                          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors"
+                        >
+                          Debug User Data
+                        </button>
+                        <p className="text-xs text-yellow-600">
+                          Check browser console for detailed user data
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

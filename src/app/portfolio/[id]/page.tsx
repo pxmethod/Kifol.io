@@ -155,7 +155,7 @@ export default function PortfolioPage() {
     } finally {
       setLoading(false);
     }
-  }, [params.id]);
+  }, [params.id, subscription?.plan]);
 
   // Load portfolio data
   useEffect(() => {
@@ -229,11 +229,21 @@ export default function PortfolioPage() {
 
 
   const handleEditHighlight = (achievement: Achievement) => {
+    if (isPortfolioLocked) {
+      setToastMessage('This portfolio is locked. Upgrade to Premium to edit highlights.');
+      setShowToast(true);
+      return;
+    }
     router.push(`/portfolio/${portfolio?.id}/highlight/${achievement.id}`);
   };
 
 
   const handleAddHighlight = () => {
+    if (isPortfolioLocked) {
+      setToastMessage('This portfolio is locked. Upgrade to Premium to add highlights.');
+      setShowToast(true);
+      return;
+    }
     router.push(`/portfolio/${portfolio?.id}/highlight`);
   };
 
