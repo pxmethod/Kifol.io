@@ -32,6 +32,22 @@
   pointer-events: none;
 }
 
+.btn--disabled {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn--disabled:hover {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  transform: none;
+  box-shadow: var(--shadow-md);
+}
+
 /* Button Elements */
 .btn__icon {
   flex-shrink: 0;

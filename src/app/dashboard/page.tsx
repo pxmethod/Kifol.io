@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
@@ -18,7 +18,7 @@ import { LegacyPortfolioData } from '@/lib/adapters/portfolio';
 export default function Dashboard() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const { subscription } = useSubscription();
+  const { subscription, canCreatePortfolio } = useSubscription();
   const { 
     portfolios, 
     loading, 
@@ -31,6 +31,8 @@ export default function Dashboard() {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [animatedCards, setAnimatedCards] = useState<Set<string>>(new Set());
+  const [canCreate, setCanCreate] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Redirect unauthenticated users to marketing site
   useEffect(() => {
@@ -38,6 +40,25 @@ export default function Dashboard() {
       router.push('/');
     }
   }, [user, authLoading, router]);
+
+  // Check portfolio creation limit
+  const checkCreateLimit = useCallback(async () => {
+    if (user && subscription) {
+      try {
+        const result = await canCreatePortfolio();
+        setCanCreate(result.allowed);
+      } catch (error) {
+        console.error('Error checking portfolio creation limit:', error);
+        setCanCreate(true); // Default to allowing creation if check fails
+      } finally {
+        setIsInitialLoad(false);
+      }
+    }
+  }, [user, subscription, canCreatePortfolio]);
+
+  useEffect(() => {
+    checkCreateLimit();
+  }, [checkCreateLimit]);
 
   // Trigger animations when portfolios change
   useEffect(() => {
@@ -160,10 +181,12 @@ export default function Dashboard() {
             </div>
             {user && (
               <button
-                onClick={() => router.push('/create')}
-                className="btn btn--primary"
+                onClick={() => canCreate ? router.push('/create') : null}
+                disabled={!canCreate || isInitialLoad}
+                className={`btn ${canCreate ? 'btn--primary' : 'btn--disabled'} ${isInitialLoad ? 'btn--loading' : ''}`}
+                title={!canCreate ? 'Upgrade to Premium to create unlimited portfolios' : ''}
               >
-                Create New Portfolio
+                {isInitialLoad ? 'Loading...' : 'Create New Portfolio'}
               </button>
             )}
           </div>
@@ -174,11 +197,13 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-orange-800 mb-2">
-                    Unlock Premium Features
+                    {!canCreate ? 'Portfolio Limit Reached' : 'Unlock Premium Features'}
                   </h3>
                   <p className="text-orange-700 mb-4">
-                    You're on the free plan. Upgrade to Premium for unlimited portfolios, 
-                    unlimited highlights, video uploads, PDF export, and more!
+                    {!canCreate 
+                      ? 'You\'ve reached your free plan limit of 1 portfolio. Upgrade to Premium for unlimited portfolios and more features!'
+                      : 'You\'re on the free plan. Upgrade to Premium for unlimited portfolios, unlimited highlights, video uploads, PDF export, and more!'
+                    }
                   </p>
                   <div className="flex flex-wrap gap-2 text-sm text-orange-600">
                     <span className="flex items-center">
