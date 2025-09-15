@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Header from '@/components/Header';
 import EmptyState from '@/components/EmptyState';
 import PortfolioCard from '@/components/PortfolioCard';
@@ -11,11 +12,13 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import { usePortfolios } from '@/hooks/usePortfolios';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
 import { LegacyPortfolioData } from '@/lib/adapters/portfolio';
 
 export default function Dashboard() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const { subscription } = useSubscription();
   const { 
     portfolios, 
     loading, 
@@ -164,18 +167,80 @@ export default function Dashboard() {
               </button>
             )}
           </div>
+
+          {/* Upsell CTA for Free Users */}
+          {subscription?.plan === 'free' && (
+            <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg p-6 animate-fade-in">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-orange-800 mb-2">
+                    Unlock Premium Features
+                  </h3>
+                  <p className="text-orange-700 mb-4">
+                    You're on the free plan. Upgrade to Premium for unlimited portfolios, 
+                    unlimited highlights, video uploads, PDF export, and more!
+                  </p>
+                  <div className="flex flex-wrap gap-2 text-sm text-orange-600">
+                    <span className="flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Unlimited portfolios
+                    </span>
+                    <span className="flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Unlimited highlights
+                    </span>
+                    <span className="flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Video & PDF uploads
+                    </span>
+                    <span className="flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      PDF export
+                    </span>
+                  </div>
+                </div>
+                <div className="ml-6">
+                  <Link
+                    href="/profile/billing"
+                    className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium inline-block"
+                  >
+                    {subscription?.hasUsedTrial ? 'Upgrade to Premium' : 'Start free 14-day trial'}
+                  </Link>
+                  {!subscription?.hasUsedTrial && (
+                    <p className="text-xs text-orange-600 mt-2 text-center">
+                      No credit-card required to start
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
           
           {/* Portfolio Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {portfolios.map((portfolio) => (
-              <PortfolioCard
-                key={portfolio.id}
-                portfolio={portfolio}
-                onEdit={handleEditPortfolio}
-                onRemove={handleRemovePortfolio}
-                isAnimated={animatedCards.has(portfolio.id)}
-              />
-            ))}
+            {portfolios.map((portfolio, index) => {
+              // For free users, only the first portfolio is unlocked
+              const isLocked = subscription?.plan === 'free' && index > 0;
+              
+              return (
+                <PortfolioCard
+                  key={portfolio.id}
+                  portfolio={portfolio}
+                  onEdit={handleEditPortfolio}
+                  onRemove={handleRemovePortfolio}
+                  isAnimated={animatedCards.has(portfolio.id)}
+                  isLocked={isLocked}
+                />
+              );
+            })}
           </div>
         </div>
       </main>

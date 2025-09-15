@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 import Header from '@/components/Header';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -9,7 +10,9 @@ import EditPortfolioModal from '@/components/EditPortfolioModal';
 import DeletePortfolioModal from '@/components/DeletePortfolioModal';
 import Toast from '@/components/Toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
 import { portfolioService, achievementService } from '@/lib/database';
+import { createClient } from '@/lib/supabase/client';
 import { DOMAIN_CONFIG } from '@/config/domains';
 import { Achievement } from '@/types/achievement';
 import Image from 'next/image';
@@ -34,6 +37,7 @@ export default function PortfolioPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
+  const { subscription } = useSubscription();
   const [portfolio, setPortfolio] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,6 +47,7 @@ export default function PortfolioPage() {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [showPrivateTooltip, setShowPrivateTooltip] = useState(false);
+  const [isPortfolioLocked, setIsPortfolioLocked] = useState(false);
 
   // Check if portfolio was just created
   useEffect(() => {
@@ -54,6 +59,38 @@ export default function PortfolioPage() {
       router.replace(`/portfolio/${params.id}`);
     }
   }, [searchParams, params.id, router]);
+
+  const checkIfPortfolioIsLocked = async (portfolioId: string): Promise<boolean> => {
+    try {
+      if (!user?.id) return false;
+      
+      // Get all portfolios for this user, ordered by creation date
+      const supabase = createClient();
+      const { data: allPortfolios, error } = await supabase
+        .from('portfolios')
+        .select('id, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching portfolios:', error);
+        return false;
+      }
+      
+      if (!allPortfolios || allPortfolios.length <= 1) {
+        return false; // First portfolio is never locked
+      }
+      
+      // Find the index of this portfolio in the ordered list
+      const portfolioIndex = allPortfolios.findIndex((p: any) => p.id === portfolioId);
+      
+      // If this is not the first portfolio (index > 0), it's locked
+      return portfolioIndex > 0;
+    } catch (error) {
+      console.error('Error checking portfolio lock status:', error);
+      return false; // Default to unlocked if there's an error
+    }
+  };
 
   const loadPortfolio = useCallback(async () => {
     try {
@@ -100,6 +137,15 @@ export default function PortfolioPage() {
         };
         
         setPortfolio(portfolioData);
+        
+        // Check if portfolio is locked for free users
+        if (subscription?.plan === 'free') {
+          const isLocked = await checkIfPortfolioIsLocked(portfolioId);
+          setIsPortfolioLocked(isLocked);
+          
+          // If portfolio is locked, show a message but don't redirect
+          // Users can still view the portfolio but with limited functionality
+        }
       } else {
         setError('Portfolio not found');
       }
@@ -264,6 +310,33 @@ export default function PortfolioPage() {
     <div className="min-h-screen bg-kifolio-bg">
       <Header />
       
+      {/* Locked Portfolio Notice */}
+      {isPortfolioLocked && (
+        <div className="bg-orange-50 border-b border-orange-200 px-4 py-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <svg className="w-6 h-6 text-orange-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                </svg>
+                <div>
+                  <h2 className="text-lg font-semibold text-orange-800">Portfolio Locked</h2>
+                  <p className="text-orange-700">
+                    This portfolio is locked on the free plan. Upgrade to Premium to unlock all features.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/profile/billing"
+                className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium"
+              >
+                Upgrade to Premium
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Action Bar */}
       <div className="action-bar">
         <div className="action-bar__container">
@@ -282,14 +355,15 @@ export default function PortfolioPage() {
             <div className="flex items-center space-x-2">
               <button
                 onClick={handlePreview}
-                className="btn btn--secondary"
+                disabled={isPortfolioLocked}
+                className={`btn btn--secondary ${isPortfolioLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 Preview
               </button>
               <button
                 onClick={handlePublish}
-                disabled={!portfolio.hasUnsavedChanges}
-                className="btn btn--primary"
+                disabled={!portfolio.hasUnsavedChanges || isPortfolioLocked}
+                className={`btn btn--primary ${isPortfolioLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 Publish
               </button>
@@ -313,14 +387,15 @@ export default function PortfolioPage() {
             <div className="action-bar__right">
               <button
                 onClick={handlePreview}
-                className="btn btn--secondary"
+                disabled={isPortfolioLocked}
+                className={`btn btn--secondary ${isPortfolioLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 Preview
               </button>
               <button
                 onClick={handlePublish}
-                disabled={!portfolio.hasUnsavedChanges}
-                className="btn btn--primary"
+                disabled={!portfolio.hasUnsavedChanges || isPortfolioLocked}
+                className={`btn btn--primary ${isPortfolioLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 Publish
               </button>
@@ -447,15 +522,24 @@ export default function PortfolioPage() {
           <div className="card" style={{ marginTop: '2rem' }}>
             <div className="card__header">
               <h2 className="card__title">Highlights</h2>
-              <button
-                onClick={handleAddHighlight}
-                className="btn btn--primary"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                <span>Add Highlight</span>
-              </button>
+              {isPortfolioLocked ? (
+                <div className="flex items-center text-orange-600 text-sm">
+                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                  </svg>
+                  <span>Locked - Upgrade to add highlights</span>
+                </div>
+              ) : (
+                <button
+                  onClick={handleAddHighlight}
+                  className="btn btn--primary"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <span>Add Highlight</span>
+                </button>
+              )}
             </div>
 
             <div className="card__body">
@@ -463,6 +547,7 @@ export default function PortfolioPage() {
               <HighlightsTimeline
                 highlights={portfolio.achievements || []}
                 onEdit={handleEditHighlight}
+                isLocked={isPortfolioLocked}
               />
             </div>
           </div>

@@ -172,8 +172,8 @@
                 <h2 class="trial-title">🎉 Your Premium Trial is Active</h2>
                 <p class="trial-details">
                     <strong>Trial Period:</strong> 14 days<br>
-                    <strong>Started:</strong> {{trialStartDate}}<br>
-                    <strong>Expires:</strong> {{trialEndDate}}<br>
+                    <strong>Started:</strong> {{TRIAL_START_DATE}}<br>
+                    <strong>Expires:</strong> {{TRIAL_END_DATE}}<br>
                     <strong>No credit card required</strong> - you can cancel anytime during the trial.
                 </p>
             </div>
@@ -244,7 +244,7 @@
         <div class="footer">
             <p class="footer-text">
                 Questions about your trial? We're here to help!<br>
-                Reply to this email or contact us at <a href="mailto:john@kifol.io" class="footer-link">{{supportEmail}}</a>
+                Reply to this email or contact us at <a href="mailto:{{SUPPORT_EMAIL}}" class="footer-link">{{SUPPORT_EMAIL}}</a>
             </p>
             <div class="footer-links">
                 <a href="{{dashboardUrl}}" class="footer-link">Dashboard</a>

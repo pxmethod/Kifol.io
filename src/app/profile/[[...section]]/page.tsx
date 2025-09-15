@@ -667,16 +667,28 @@ export default function ProfilePage() {
                       Ready to unlock Premium features?
                     </h3>
                     <p className="text-orange-100 mb-4">
-                      Get unlimited portfolios, highlights, advanced media support, and more.
+                      {subscription?.hasUsedTrial 
+                        ? 'You\'ve already used your free trial. Upgrade to Premium to access all features.'
+                        : 'Get unlimited portfolios, highlights, advanced media support, and more.'
+                      }
                     </p>
                     <div className="flex space-x-4">
-                      <button
-                        onClick={handleStartTrial}
-                        disabled={isStartingTrial}
-                        className="bg-white text-kifolio-primary px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors disabled:opacity-50"
-                      >
-                        {isStartingTrial ? 'Starting...' : 'Start Free Trial'}
-                      </button>
+                      {subscription?.hasUsedTrial ? (
+                        <button
+                          onClick={handleUpgrade}
+                          className="bg-white text-kifolio-primary px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                        >
+                          Upgrade to Premium
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleStartTrial}
+                          disabled={isStartingTrial}
+                          className="bg-white text-kifolio-primary px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors disabled:opacity-50"
+                        >
+                          {isStartingTrial ? 'Starting...' : 'Start Free Trial'}
+                        </button>
+                      )}
                       <button
                         onClick={handleUpgrade}
                         className="border border-white text-white px-6 py-2 rounded-lg font-medium hover:bg-white hover:text-kifolio-primary transition-colors"

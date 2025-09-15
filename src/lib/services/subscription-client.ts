@@ -16,6 +16,24 @@ export interface SubscriptionLimits {
 
 export class SubscriptionServiceClient {
   /**
+   * Check if user has already used their 14-day trial
+   */
+  static async hasUsedTrial(userId: string): Promise<boolean> {
+    const supabase = createClient();
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('trial_used')
+      .eq('id', userId)
+      .single();
+
+    if (error || !user) {
+      return false;
+    }
+
+    return user.trial_used || false;
+  }
+
+  /**
    * Get user's current subscription plan
    */
   static async getUserPlan(userId: string): Promise<SubscriptionPlan> {
@@ -131,22 +149,57 @@ export class SubscriptionServiceClient {
       return { allowed: true };
     }
 
-    // Count existing highlights for this portfolio
     const supabase = createClient();
-    const { count, error } = await supabase
-      .from('highlights')
-      .select('*', { count: 'exact', head: true })
-      .eq('portfolio_id', portfolioId);
 
-    if (error) {
-      return { allowed: false, reason: 'Unable to check highlight limit' };
-    }
+    // For free users, check highlights across ALL portfolios
+    if (plan === 'free') {
+      // Get all portfolios for this user
+      const { data: portfolios, error: portfoliosError } = await supabase
+        .from('portfolios')
+        .select('id')
+        .eq('user_id', userId);
 
-    if (count && count >= limits.maxHighlightsPerPortfolio) {
-      return { 
-        allowed: false, 
-        reason: `Free plan limited to ${limits.maxHighlightsPerPortfolio} highlights per portfolio. Upgrade to Premium for unlimited highlights.` 
-      };
+      if (portfoliosError) {
+        return { allowed: false, reason: 'Unable to check highlight limit' };
+      }
+
+      if (!portfolios || portfolios.length === 0) {
+        return { allowed: true };
+      }
+
+      // Count highlights across all portfolios
+      const { count, error } = await supabase
+        .from('highlights')
+        .select('*', { count: 'exact', head: true })
+        .in('portfolio_id', portfolios.map((p: any) => p.id));
+
+      if (error) {
+        return { allowed: false, reason: 'Unable to check highlight limit' };
+      }
+
+      if (count && count >= limits.maxHighlightsPerPortfolio) {
+        return { 
+          allowed: false, 
+          reason: `Free plan limited to ${limits.maxHighlightsPerPortfolio} highlights total across all portfolios. Upgrade to Premium for unlimited highlights.` 
+        };
+      }
+    } else {
+      // For premium users, check highlights per portfolio (current behavior)
+      const { count, error } = await supabase
+        .from('highlights')
+        .select('*', { count: 'exact', head: true })
+        .eq('portfolio_id', portfolioId);
+
+      if (error) {
+        return { allowed: false, reason: 'Unable to check highlight limit' };
+      }
+
+      if (count && count >= limits.maxHighlightsPerPortfolio) {
+        return { 
+          allowed: false, 
+          reason: `Plan limited to ${limits.maxHighlightsPerPortfolio} highlights per portfolio.` 
+        };
+      }
     }
 
     return { allowed: true };
@@ -196,6 +249,15 @@ export class SubscriptionServiceClient {
    * Start a 14-day trial for a user
    */
   static async startTrial(userId: string): Promise<{ success: boolean; error?: string }> {
+    // Check if user has already used their trial
+    const hasUsedTrial = await this.hasUsedTrial(userId);
+    if (hasUsedTrial) {
+      return { 
+        success: false, 
+        error: 'You have already used your 14-day free trial. Please upgrade to Premium to access all features.' 
+      };
+    }
+
     const now = new Date();
     const trialEndsAt = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000); // 14 days from now
 
@@ -207,6 +269,7 @@ export class SubscriptionServiceClient {
         subscription_status: 'active',
         trial_started_at: now.toISOString(),
         trial_ends_at: trialEndsAt.toISOString(),
+        trial_used: true, // Mark that user has used their trial
         updated_at: now.toISOString()
       })
       .eq('id', userId);
@@ -248,11 +311,12 @@ export class SubscriptionServiceClient {
     subscriptionEndsAt?: string;
     isTrialActive: boolean;
     isPremiumActive: boolean;
+    hasUsedTrial: boolean;
   }> {
     const supabase = createClient();
     const { data: user, error } = await supabase
       .from('users')
-      .select('subscription_plan, subscription_status, trial_ends_at, subscription_ends_at')
+      .select('subscription_plan, subscription_status, trial_ends_at, subscription_ends_at, trial_used')
       .eq('id', userId)
       .single();
 
@@ -261,7 +325,8 @@ export class SubscriptionServiceClient {
         plan: 'free',
         status: 'active',
         isTrialActive: false,
-        isPremiumActive: false
+        isPremiumActive: false,
+        hasUsedTrial: false
       };
     }
 
@@ -278,7 +343,8 @@ export class SubscriptionServiceClient {
       trialEndsAt: user.trial_ends_at,
       subscriptionEndsAt: user.subscription_ends_at,
       isTrialActive,
-      isPremiumActive
+      isPremiumActive,
+      hasUsedTrial: user.trial_used || false
     };
   }
 }

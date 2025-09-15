@@ -23,9 +23,10 @@ interface PortfolioCardProps {
   onEdit: (portfolio: PortfolioData) => void;
   onRemove: (portfolio: PortfolioData) => void;
   isAnimated?: boolean;
+  isLocked?: boolean;
 }
 
-export default function PortfolioCard({ portfolio, onEdit, onRemove, isAnimated = false }: PortfolioCardProps) {
+export default function PortfolioCard({ portfolio, onEdit, onRemove, isAnimated = false, isLocked = false }: PortfolioCardProps) {
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -182,6 +183,17 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove, isAnimated 
         <p className="text-gray-600 text-sm mb-4">
           {portfolio.portfolioTitle}
         </p>
+
+        {/* Locked Status */}
+        {isLocked && (
+          <div className="flex items-center text-orange-600 text-sm mb-4 bg-orange-50 border border-orange-200 rounded-lg p-3">
+            <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+            </svg>
+            <span className="font-medium">Locked</span>
+            <span className="text-orange-500 ml-1">- Upgrade to Premium to unlock</span>
+          </div>
+        )}
 
         {/* Highlights Count */}
         <div className="flex items-center text-sm text-gray-600">

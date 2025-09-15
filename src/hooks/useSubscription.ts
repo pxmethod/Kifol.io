@@ -11,6 +11,7 @@ export interface SubscriptionDetails {
   subscriptionEndsAt?: string;
   isTrialActive: boolean;
   isPremiumActive: boolean;
+  hasUsedTrial: boolean;
   limits: {
     maxPortfolios: number;
     maxHighlightsPerPortfolio: number;
