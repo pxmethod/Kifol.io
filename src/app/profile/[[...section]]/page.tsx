@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Toast from '@/components/Toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,6 +9,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { createClient } from '@/lib/supabase/client';
 import { userService } from '@/lib/database';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useStripe } from '@/hooks/useStripe';
 import PricingModal from '@/components/PricingModal';
 
 interface ProfileData {
@@ -37,8 +38,10 @@ const navigationItems = [
 export default function ProfilePage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, loading } = useAuth();
   const { subscription, loading: subscriptionLoading, startTrial, refresh } = useSubscription();
+  const { redirectToCheckout, redirectToCustomerPortal, isLoading: stripeLoading, error: stripeError } = useStripe();
   const supabase = createClient();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [profileData, setProfileData] = useState<ProfileData>({
@@ -69,6 +72,7 @@ export default function ProfilePage() {
   const [isTestingMode, setIsTestingMode] = useState(false);
   const [testingPlan, setTestingPlan] = useState<'free' | 'trial' | 'premium'>('free');
   const [testingTrialUsed, setTestingTrialUsed] = useState(false);
+  const [isRefreshingSubscription, setIsRefreshingSubscription] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
 
   // Determine current section from URL
@@ -117,11 +121,38 @@ export default function ProfilePage() {
     }
   }, [subscription]);
 
+  // Handle Stripe checkout success/cancel
+  useEffect(() => {
+    const success = searchParams.get('success');
+    const canceled = searchParams.get('canceled');
+    
+    if (success === 'true') {
+      // Add a small delay to ensure webhook has processed the payment
+      setIsRefreshingSubscription(true);
+      setTimeout(async () => {
+        await refresh();
+        setIsRefreshingSubscription(false);
+      }, 2000);
+      setToastMessage('Payment successful! Your subscription has been activated.');
+      setShowToast(true);
+      // Clean up URL parameters
+      router.replace('/profile/billing');
+    } else if (canceled === 'true') {
+      setToastMessage('Payment was canceled. You can try again anytime.');
+      setShowToast(true);
+      // Clean up URL parameters
+      router.replace('/profile/billing');
+    }
+  }, [searchParams, refresh, router]);
+
   // Show loading while checking authentication or subscription data
-  if (loading || (currentSection === 'billing' && subscriptionLoading)) {
+  if (loading || (currentSection === 'billing' && (subscriptionLoading || isRefreshingSubscription))) {
     return (
       <div className="min-h-screen bg-kifolio-bg flex items-center justify-center">
-        <LoadingSpinner size="lg" label="Loading..." />
+        <LoadingSpinner 
+          size="lg" 
+          label={isRefreshingSubscription ? "Updating subscription..." : "Loading..."} 
+        />
       </div>
     );
   }
@@ -741,12 +772,22 @@ export default function ProfilePage() {
                       Your trial ends on {formatDate(subscription.trialEndsAt)}. 
                       Upgrade to Premium to continue enjoying unlimited features.
                     </p>
-                    <button
-                      onClick={handleUpgrade}
-                      className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors"
-                    >
-                      Upgrade to Premium
-                    </button>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => redirectToCheckout({ billingCycle: 'monthly' })}
+                        disabled={stripeLoading}
+                        className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50"
+                      >
+                        {stripeLoading ? 'Loading...' : 'Upgrade Monthly ($8.99)'}
+                      </button>
+                      <button
+                        onClick={() => redirectToCheckout({ billingCycle: 'yearly' })}
+                        disabled={stripeLoading}
+                        className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50"
+                      >
+                        {stripeLoading ? 'Loading...' : 'Upgrade Yearly ($81.00)'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -766,15 +807,8 @@ export default function ProfilePage() {
                         : 'Get unlimited portfolios, highlights, advanced media support, and more.'
                       }
                     </p>
-                    <div className="flex space-x-4">
-                      {subscription?.hasUsedTrial ? (
-                        <button
-                          onClick={handleUpgrade}
-                          className="bg-white text-kifolio-primary px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors"
-                        >
-                          Upgrade to Premium
-                        </button>
-                      ) : (
+                    <div className="flex flex-wrap gap-3">
+                      {!subscription?.hasUsedTrial && (
                         <button
                           onClick={handleStartTrial}
                           disabled={isStartingTrial}
@@ -783,6 +817,20 @@ export default function ProfilePage() {
                           {isStartingTrial ? 'Starting...' : 'Start Free Trial'}
                         </button>
                       )}
+                      <button
+                        onClick={() => redirectToCheckout({ billingCycle: 'monthly' })}
+                        disabled={stripeLoading}
+                        className="bg-white text-kifolio-primary px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors disabled:opacity-50"
+                      >
+                        {stripeLoading ? 'Loading...' : 'Upgrade Monthly ($8.99)'}
+                      </button>
+                      <button
+                        onClick={() => redirectToCheckout({ billingCycle: 'yearly' })}
+                        disabled={stripeLoading}
+                        className="bg-white text-kifolio-primary px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors disabled:opacity-50"
+                      >
+                        {stripeLoading ? 'Loading...' : 'Upgrade Yearly ($81.00)'}
+                      </button>
                       <button
                         onClick={handleUpgrade}
                         className="border border-white text-white px-6 py-2 rounded-lg font-medium hover:bg-white hover:text-kifolio-primary transition-colors"
@@ -802,15 +850,25 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {/* Billing Information (for future implementation) */}
+            {/* Billing Management for Premium Users */}
             {subscription?.plan === 'premium' && (
               <div className="bg-white rounded-xl shadow-lg p-6">
                 <h3 className="text-xl font-semibold text-kifolio-text mb-4">
-                  Billing Information
+                  Billing Management
                 </h3>
-                <p className="text-gray-600">
-                  Billing management will be available soon. For now, please contact support for any billing questions.
+                <p className="text-gray-600 mb-4">
+                  Manage your subscription, update payment methods, and view billing history.
                 </p>
+                <button
+                  onClick={redirectToCustomerPortal}
+                  disabled={stripeLoading}
+                  className="bg-kifolio-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-orange-600 transition-colors disabled:opacity-50"
+                >
+                  {stripeLoading ? 'Loading...' : 'Manage Billing'}
+                </button>
+                {stripeError && (
+                  <p className="text-red-600 text-sm mt-2">{stripeError}</p>
+                )}
               </div>
             )}
 
