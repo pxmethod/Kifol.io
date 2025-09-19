@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { useSubscription } from '@/hooks/useSubscription';
 
 interface HeaderProps {
   animateLogo?: boolean;
@@ -15,21 +14,12 @@ export default function Header({ animateLogo = false }: HeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, signOut } = useAuth();
-  const { subscription } = useSubscription();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLogoAnimated, setIsLogoAnimated] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
-  // Calculate days remaining for trial
-  const getDaysRemaining = (trialEndsAt: string) => {
-    const now = new Date();
-    const trialEnd = new Date(trialEndsAt);
-    const diffTime = trialEnd.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return Math.max(0, diffDays);
-  };
 
   // Trigger logo animation on page load (only when animateLogo is true)
   useEffect(() => {
@@ -149,7 +139,7 @@ export default function Header({ animateLogo = false }: HeaderProps) {
         {user ? (
           <>
             {/* Mobile Hamburger Menu Button */}
-            <button
+          <button
               onClick={toggleMobileMenu}
               className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-white/10 transition-colors"
               aria-label="Open mobile menu"
@@ -182,53 +172,39 @@ export default function Header({ animateLogo = false }: HeaderProps) {
                     alt="Account" 
                     className="w-full h-full object-cover rounded-full"
                   />
-                </div>
+            </div>
 
-                {/* Email and Plan */}
+                {/* Email */}
                 <div className="hidden sm:block text-left">
                   <div className="profile-menu__email">
                     {user.email}
                   </div>
-                  {subscription && (
-                    <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                      subscription.plan === 'free' 
-                        ? 'bg-white text-gray-600' 
-                        : subscription.plan === 'trial'
-                        ? 'bg-white text-orange-600'
-                        : 'bg-white text-green-600'
-                    }`}>
-                      {subscription.plan === 'free' ? 'Free plan' : 
-                       subscription.plan === 'trial' ? 
-                         `Premium trial - ${subscription.trialEndsAt ? getDaysRemaining(subscription.trialEndsAt) : 0} days left` : 
-                       'Kifolio Premium'}
-                    </div>
-                  )}
                 </div>
 
-                {/* Dropdown Arrow */}
-                <svg 
-                  className={`profile-menu__chevron ${isDropdownOpen ? 'profile-menu__chevron--open' : ''}`}
-                  fill="currentColor" 
-                  viewBox="0 0 20 20"
-                >
-                  <path 
-                    fillRule="evenodd" 
-                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
-                    clipRule="evenodd" 
-                  />
-                </svg>
-              </button>
+            {/* Dropdown Arrow */}
+            <svg 
+              className={`profile-menu__chevron ${isDropdownOpen ? 'profile-menu__chevron--open' : ''}`}
+              fill="currentColor" 
+              viewBox="0 0 20 20"
+            >
+              <path 
+                fillRule="evenodd" 
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
+                clipRule="evenodd" 
+              />
+            </svg>
+          </button>
 
-              {/* Dropdown Menu */}
-              {isDropdownOpen && (
-                <div className="profile-menu__dropdown">
-                  <Link 
-                    href="/profile"
-                    className="profile-menu__item"
-                    onClick={() => setIsDropdownOpen(false)}
-                  >
-                    Profile
-                  </Link>
+          {/* Dropdown Menu */}
+          {isDropdownOpen && (
+            <div className="profile-menu__dropdown">
+              <Link 
+                href="/profile"
+                className="profile-menu__item"
+                onClick={() => setIsDropdownOpen(false)}
+              >
+                Profile
+              </Link>
                   <button
                     onClick={handleLogout}
                     className="profile-menu__item text-left w-full"

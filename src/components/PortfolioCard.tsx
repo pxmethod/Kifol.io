@@ -23,10 +23,9 @@ interface PortfolioCardProps {
   onEdit: (portfolio: PortfolioData) => void;
   onRemove: (portfolio: PortfolioData) => void;
   isAnimated?: boolean;
-  isLocked?: boolean;
 }
 
-export default function PortfolioCard({ portfolio, onEdit, onRemove, isAnimated = false, isLocked = false }: PortfolioCardProps) {
+export default function PortfolioCard({ portfolio, onEdit, onRemove, isAnimated = false }: PortfolioCardProps) {
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -126,14 +125,7 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove, isAnimated 
 
         {/* Status Tag - positioned absolutely over the image */}
         <div className="absolute top-3 left-3">
-          {isLocked ? (
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-              </svg>
-              Locked
-            </span>
-          ) : portfolio.isPrivate ? (
+          {portfolio.isPrivate ? (
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
               <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />

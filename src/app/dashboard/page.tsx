@@ -12,13 +12,11 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import { usePortfolios } from '@/hooks/usePortfolios';
 import { useAuth } from '@/contexts/AuthContext';
-import { useSubscription } from '@/hooks/useSubscription';
 import { LegacyPortfolioData } from '@/lib/adapters/portfolio';
 
 export default function Dashboard() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const { subscription, canCreatePortfolio } = useSubscription();
   const { 
     portfolios, 
     loading, 
@@ -31,8 +29,6 @@ export default function Dashboard() {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [animatedCards, setAnimatedCards] = useState<Set<string>>(new Set());
-  const [canCreate, setCanCreate] = useState(true);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Redirect unauthenticated users to marketing site
   useEffect(() => {
@@ -41,24 +37,6 @@ export default function Dashboard() {
     }
   }, [user, authLoading, router]);
 
-  // Check portfolio creation limit
-  const checkCreateLimit = useCallback(async () => {
-    if (user && subscription) {
-      try {
-        const result = await canCreatePortfolio();
-        setCanCreate(result.allowed);
-      } catch (error) {
-        console.error('Error checking portfolio creation limit:', error);
-        setCanCreate(true); // Default to allowing creation if check fails
-      } finally {
-        setIsInitialLoad(false);
-      }
-    }
-  }, [user, subscription, canCreatePortfolio]);
-
-  useEffect(() => {
-    checkCreateLimit();
-  }, [checkCreateLimit]);
 
   // Trigger animations when portfolios change
   useEffect(() => {
@@ -181,80 +159,18 @@ export default function Dashboard() {
             </div>
             {user && (
               <button
-                onClick={() => canCreate ? router.push('/create') : null}
-                disabled={!canCreate || isInitialLoad}
-                className={`btn ${canCreate ? 'btn--primary' : 'btn--disabled'} ${isInitialLoad ? 'btn--loading' : ''}`}
-                title={!canCreate ? 'Upgrade to Premium to create unlimited portfolios' : ''}
+                onClick={() => router.push('/create')}
+                className="btn btn--primary"
               >
-                {isInitialLoad ? 'Loading...' : 'Create New Portfolio'}
+                Create New Portfolio
               </button>
             )}
           </div>
 
-          {/* Upsell CTA for Free Users */}
-          {subscription?.plan === 'free' && (
-            <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg p-6 animate-fade-in">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-orange-800 mb-2">
-                    {!canCreate ? 'Portfolio Limit Reached' : 'Unlock Premium Features'}
-                  </h3>
-                  <p className="text-orange-700 mb-4">
-                    {!canCreate 
-                      ? 'You\'ve reached your free plan limit of 1 portfolio. Upgrade to Premium for unlimited portfolios and more features!'
-                      : 'You\'re on the free plan. Upgrade to Premium for unlimited portfolios, unlimited highlights, video uploads, PDF export, and more!'
-                    }
-                  </p>
-                  <div className="flex flex-wrap gap-2 text-sm text-orange-600">
-                    <span className="flex items-center">
-                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      Unlimited portfolios
-                    </span>
-                    <span className="flex items-center">
-                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      Unlimited highlights
-                    </span>
-                    <span className="flex items-center">
-                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      Video & PDF uploads
-                    </span>
-                    <span className="flex items-center">
-                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      PDF export
-                    </span>
-                  </div>
-                </div>
-                <div className="ml-6">
-                  <Link
-                    href="/profile/billing"
-                    className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium inline-block"
-                  >
-                    {subscription?.hasUsedTrial ? 'Upgrade to Premium' : 'Start free 14-day trial'}
-                  </Link>
-                  {!subscription?.hasUsedTrial && (
-                    <p className="text-xs text-orange-600 mt-2 text-center">
-                      No credit-card required to start
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
           
           {/* Portfolio Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {portfolios.map((portfolio, index) => {
-              // For free users, only the first portfolio is unlocked
-              const isLocked = subscription?.plan === 'free' && index > 0;
-              
+            {portfolios.map((portfolio) => {
               return (
                 <PortfolioCard
                   key={portfolio.id}
@@ -262,7 +178,6 @@ export default function Dashboard() {
                   onEdit={handleEditPortfolio}
                   onRemove={handleRemovePortfolio}
                   isAnimated={animatedCards.has(portfolio.id)}
-                  isLocked={isLocked}
                 />
               );
             })}

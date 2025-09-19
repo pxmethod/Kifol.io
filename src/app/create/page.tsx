@@ -9,7 +9,6 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { getRandomPlaceholder } from '@/utils/placeholders';
 import { usePortfolios } from '@/hooks/usePortfolios';
 import { useAuth } from '@/contexts/AuthContext';
-import { useSubscription } from '@/hooks/useSubscription';
 import { storageService } from '@/lib/storage';
 
 
@@ -17,7 +16,6 @@ export default function CreatePortfolio() {
   const router = useRouter();
   const { user, loading } = useAuth();
   const { createPortfolio } = usePortfolios();
-  const { subscription, canCreatePortfolio } = useSubscription();
   const [formData, setFormData] = useState({
     childName: '',
     portfolioTitle: '',
@@ -42,29 +40,15 @@ export default function CreatePortfolio() {
     }
   }, [user, loading, router]);
 
-  // Check portfolio creation limits
-  useEffect(() => {
-    const checkPortfolioLimit = async () => {
-      if (user && subscription) {
-        const canCreate = await canCreatePortfolio();
-        if (!canCreate.allowed) {
-          // Redirect to billing page with upgrade message
-          router.push('/profile/billing?message=' + encodeURIComponent(canCreate.reason || 'Upgrade to create more portfolios'));
-        }
-      }
-    };
 
-    checkPortfolioLimit();
-  }, [user, subscription, canCreatePortfolio, router]);
-
-  // Show loading while checking subscription limits
-  if (loading || (user && !subscription)) {
+  // Show loading while checking authentication
+  if (loading) {
     return (
       <div className="min-h-screen bg-kifolio-bg">
         <Header animateLogo={true} />
         <main className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[60vh]">
-            <LoadingSpinner size="lg" label="Checking subscription limits..." />
+            <LoadingSpinner size="lg" label="Loading..." />
           </div>
         </main>
       </div>

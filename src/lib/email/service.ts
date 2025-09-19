@@ -4,12 +4,7 @@ import {
   PasswordResetEmailData,
   EngagementEmailData,
   InvitationEmailData,
-  InvoiceEmailData,
-  CancellationEmailData,
-  EmailVerificationData,
-  TrialStartData,
-  TrialEndingData,
-  TrialEndedData
+  EmailVerificationData
 } from './types';
 
 // Import email template loader
@@ -163,84 +158,7 @@ export async function sendInvitationEmail(data: InvitationEmailData): Promise<Em
   }
 }
 
-/**
- * Send invoice confirmation email
- */
-export async function sendInvoiceEmail(data: InvoiceEmailData): Promise<EmailResult> {
-  try {
-    // Basic HTML template (we'll enhance this later)
-    const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2>Your Kifolio Invoice</h2>
-        <p>Hi ${data.userName},</p>
-        <p>Thank you for your payment! Here are your invoice details:</p>
-        <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
-          <p><strong>Invoice #:</strong> ${data.invoiceNumber}</p>
-          <p><strong>Amount:</strong> ${data.currency} ${data.amount}</p>
-          <p><strong>Billing Period:</strong> ${data.billingPeriod.start.toLocaleDateString()} - ${data.billingPeriod.end.toLocaleDateString()}</p>
-          <p><strong>Next Billing Date:</strong> ${data.nextBillingDate.toLocaleDateString()}</p>
-        </div>
-        <p>
-          <a href="${data.downloadUrl}" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
-            Download Invoice
-          </a>
-        </p>
-      </div>
-    `;
 
-    return await sendEmail(
-      data.to,
-      data.subject || `Invoice ${data.invoiceNumber} - Kifolio`,
-      html,
-      EMAIL_CATEGORIES.TRANSACTIONAL,
-      ['invoice', 'billing']
-    );
-  } catch (error) {
-    console.error('Error sending invoice email:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to send invoice email' 
-    };
-  }
-}
-
-/**
- * Send cancellation confirmation email
- */
-export async function sendCancellationEmail(data: CancellationEmailData): Promise<EmailResult> {
-  try {
-    // Basic HTML template (we'll enhance this later)
-    const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2>Cancellation Confirmed</h2>
-        <p>Hi ${data.userName},</p>
-        <p>We're sorry to see you go. Your Kifolio account cancellation has been confirmed.</p>
-        <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
-          <p><strong>Cancellation Date:</strong> ${data.cancellationDate.toLocaleDateString()}</p>
-          ${data.finalBillingDate ? `<p><strong>Final Billing Date:</strong> ${data.finalBillingDate.toLocaleDateString()}</p>` : ''}
-          ${data.dataRetentionDate ? `<p><strong>Data Deletion Date:</strong> ${data.dataRetentionDate.toLocaleDateString()}</p>` : ''}
-        </div>
-        <p>Your account will remain active until your final billing date.</p>
-        ${data.feedbackUrl ? `<p><a href="${data.feedbackUrl}">Share feedback about your experience</a></p>` : ''}
-        ${data.reactivationUrl ? `<p><a href="${data.reactivationUrl}" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">Reactivate Account</a></p>` : ''}
-      </div>
-    `;
-
-    return await sendEmail(
-      data.to,
-      data.subject || 'Your Kifolio account has been cancelled',
-      html,
-      EMAIL_CATEGORIES.TRANSACTIONAL,
-      ['cancellation', 'account']
-    );
-  } catch (error) {
-    console.error('Error sending cancellation email:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to send cancellation email' 
-    };
-  }
-}
 
 /**
  * Test email service (development only)
@@ -297,103 +215,5 @@ export async function sendEmailVerification(data: EmailVerificationData): Promis
   }
 }
 
-/**
- * Send trial start welcome email
- */
-export async function sendTrialStartEmail(data: TrialStartData): Promise<EmailResult> {
-  try {
-    const html = await EmailTemplates.trialStart({
-      APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-      USER_NAME: data.userName,
-      TRIAL_START_DATE: data.trialStartDate,
-      TRIAL_END_DATE: data.trialEndDate,
-      DASHBOARD_URL: data.dashboardUrl,
-      PRICING_URL: data.pricingUrl,
-      SUPPORT_EMAIL: data.supportEmail,
-      PRIVACY_URL: data.privacyUrl,
-      TERMS_URL: data.termsUrl,
-    });
 
-    return await sendEmail(
-      data.to,
-      data.subject || `Welcome to Kifolio Premium Trial!`,
-      html,
-      EMAIL_CATEGORIES.TRANSACTIONAL,
-      ['trial', 'welcome', 'premium']
-    );
-  } catch (error) {
-    console.error('Error sending trial start email:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to send trial start email' 
-    };
-  }
-}
 
-/**
- * Send trial ending reminder email
- */
-export async function sendTrialEndingEmail(data: TrialEndingData): Promise<EmailResult> {
-  try {
-    const html = await EmailTemplates.trialEnding({
-      APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-      USER_NAME: data.userName,
-      TRIAL_START_DATE: data.trialStartDate,
-      TRIAL_END_DATE: data.trialEndDate,
-      DAYS_REMAINING: data.daysRemaining.toString(),
-      UPGRADE_URL: data.upgradeUrl,
-      DASHBOARD_URL: data.dashboardUrl,
-      PRICING_URL: data.pricingUrl,
-      SUPPORT_EMAIL: data.supportEmail,
-      PRIVACY_URL: data.privacyUrl,
-      TERMS_URL: data.termsUrl,
-    });
-
-    return await sendEmail(
-      data.to,
-      data.subject || `Your Kifolio Premium trial ends in ${data.daysRemaining} days`,
-      html,
-      EMAIL_CATEGORIES.TRANSACTIONAL,
-      ['trial', 'reminder', 'upgrade']
-    );
-  } catch (error) {
-    console.error('Error sending trial ending email:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to send trial ending email' 
-    };
-  }
-}
-
-/**
- * Send trial ended email
- */
-export async function sendTrialEndedEmail(data: TrialEndedData): Promise<EmailResult> {
-  try {
-    const html = await EmailTemplates.trialEnded({
-      APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-      USER_NAME: data.userName,
-      TRIAL_END_DATE: data.trialEndDate,
-      UPGRADE_URL: data.upgradeUrl,
-      DASHBOARD_URL: data.dashboardUrl,
-      PRICING_URL: data.pricingUrl,
-      SUPPORT_EMAIL: data.supportEmail,
-      PRIVACY_URL: data.privacyUrl,
-      TERMS_URL: data.termsUrl,
-    });
-
-    return await sendEmail(
-      data.to,
-      data.subject || `Your Kifolio Premium trial has ended`,
-      html,
-      EMAIL_CATEGORIES.TRANSACTIONAL,
-      ['trial', 'ended', 'upgrade']
-    );
-  } catch (error) {
-    console.error('Error sending trial ended email:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to send trial ended email' 
-    };
-  }
-}

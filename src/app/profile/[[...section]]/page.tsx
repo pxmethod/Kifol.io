@@ -8,9 +8,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { createClient } from '@/lib/supabase/client';
 import { userService } from '@/lib/database';
-import { useSubscription } from '@/hooks/useSubscription';
-import { useStripe } from '@/hooks/useStripe';
-import PricingModal from '@/components/PricingModal';
 
 interface ProfileData {
   email: string;
@@ -28,7 +25,6 @@ interface InvitationData {
 
 const navigationItems = [
   { id: 'general', label: 'General', path: '/profile' },
-  { id: 'billing', label: 'Plan & Billing', path: '/profile/billing' },
   { id: 'password', label: 'Password', path: '/profile/password' },
   { id: 'email-notifications', label: 'Email Notifications', path: '/profile/email-notifications' },
   { id: 'invitations', label: 'Invitations', path: '/profile/invitations' },
@@ -40,8 +36,6 @@ export default function ProfilePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading } = useAuth();
-  const { subscription, loading: subscriptionLoading, startTrial, refresh } = useSubscription();
-  const { redirectToCheckout, redirectToCustomerPortal, isLoading: stripeLoading, error: stripeError } = useStripe();
   const supabase = createClient();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [profileData, setProfileData] = useState<ProfileData>({
@@ -65,15 +59,6 @@ export default function ProfilePage() {
   const [isSendingInvite, setIsSendingInvite] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isStartingTrial, setIsStartingTrial] = useState(false);
-  const [trialError, setTrialError] = useState<string | null>(null);
-  
-  // Testing mode state
-  const [isTestingMode, setIsTestingMode] = useState(false);
-  const [testingPlan, setTestingPlan] = useState<'free' | 'trial' | 'premium'>('free');
-  const [testingTrialUsed, setTestingTrialUsed] = useState(false);
-  const [isRefreshingSubscription, setIsRefreshingSubscription] = useState(false);
-  const [showPricingModal, setShowPricingModal] = useState(false);
 
   // Determine current section from URL
   const currentSection = Array.isArray(params.section) && params.section.length > 0 
@@ -113,45 +98,14 @@ export default function ProfilePage() {
     }
   }, [user, loading, router]);
 
-  // Initialize testing state when subscription loads
-  useEffect(() => {
-    if (subscription) {
-      setTestingPlan(subscription.plan);
-      setTestingTrialUsed(subscription.hasUsedTrial);
-    }
-  }, [subscription]);
 
-  // Handle Stripe checkout success/cancel
-  useEffect(() => {
-    const success = searchParams.get('success');
-    const canceled = searchParams.get('canceled');
-    
-    if (success === 'true') {
-      // Add a small delay to ensure webhook has processed the payment
-      setIsRefreshingSubscription(true);
-      setTimeout(async () => {
-        await refresh();
-        setIsRefreshingSubscription(false);
-      }, 2000);
-      setToastMessage('Payment successful! Your subscription has been activated.');
-      setShowToast(true);
-      // Clean up URL parameters
-      router.replace('/profile/billing');
-    } else if (canceled === 'true') {
-      setToastMessage('Payment was canceled. You can try again anytime.');
-      setShowToast(true);
-      // Clean up URL parameters
-      router.replace('/profile/billing');
-    }
-  }, [searchParams, refresh, router]);
-
-  // Show loading while checking authentication or subscription data
-  if (loading || (currentSection === 'billing' && (subscriptionLoading || isRefreshingSubscription))) {
+  // Show loading while checking authentication
+  if (loading) {
     return (
       <div className="min-h-screen bg-kifolio-bg flex items-center justify-center">
         <LoadingSpinner 
           size="lg" 
-          label={isRefreshingSubscription ? "Updating subscription..." : "Loading..."} 
+          label="Loading..." 
         />
       </div>
     );
@@ -290,162 +244,6 @@ export default function ProfilePage() {
     }
   };
 
-  const handleStartTrial = async () => {
-    if (!user) return;
-    
-    setIsStartingTrial(true);
-    setTrialError(null);
-    
-    try {
-      const result = await startTrial();
-      if (result.success) {
-        // Refresh subscription data
-        await refresh();
-        setToastMessage('Trial started successfully!');
-        setShowToast(true);
-      } else {
-        setTrialError(result.error || 'Failed to start trial');
-      }
-    } catch (error) {
-      setTrialError('An unexpected error occurred');
-    } finally {
-      setIsStartingTrial(false);
-    }
-  };
-
-  const handleUpgrade = () => {
-    setShowPricingModal(true);
-  };
-
-  const handleDowngrade = async () => {
-    if (!user) return;
-    
-    try {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from('users')
-        .update({
-          subscription_plan: 'free',
-          subscription_status: 'active',
-          trial_started_at: null,
-          trial_ends_at: null,
-          subscription_ends_at: null,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-
-      if (error) {
-        console.error('Error downgrading:', error);
-        setToastMessage('Failed to downgrade. Please try again.');
-        setShowToast(true);
-      } else {
-        await refresh();
-        setToastMessage('Successfully downgraded to free plan!');
-        setShowToast(true);
-      }
-    } catch (error) {
-      console.error('Error downgrading:', error);
-      setToastMessage('Failed to downgrade. Please try again.');
-      setShowToast(true);
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  const getDaysRemaining = (endDate: string) => {
-    const now = new Date();
-    const end = new Date(endDate);
-    const diffTime = end.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return Math.max(0, diffDays);
-  };
-
-  // Testing mode functions
-  const handleTestingPlanChange = async (newPlan: 'free' | 'trial' | 'premium') => {
-    if (!user) return;
-    
-    try {
-      const supabase = createClient();
-      const now = new Date();
-      const trialEndsAt = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
-      
-      const updateData: any = {
-        subscription_plan: newPlan,
-        subscription_status: 'active',
-        updated_at: now.toISOString()
-      };
-
-      if (newPlan === 'trial') {
-        updateData.trial_started_at = now.toISOString();
-        updateData.trial_ends_at = trialEndsAt.toISOString();
-        updateData.trial_used = true;
-      } else if (newPlan === 'premium') {
-        updateData.subscription_ends_at = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString();
-        updateData.trial_used = true;
-      } else {
-        updateData.trial_started_at = null;
-        updateData.trial_ends_at = null;
-        updateData.subscription_ends_at = null;
-        updateData.trial_used = testingTrialUsed;
-      }
-
-      const { error } = await supabase
-        .from('users')
-        .update(updateData)
-        .eq('id', user.id);
-
-      if (error) {
-        console.error('Error updating plan:', error);
-        setToastMessage('Failed to update plan. Please try again.');
-        setShowToast(true);
-      } else {
-        setTestingPlan(newPlan);
-        await refresh();
-        setToastMessage(`Plan updated to ${newPlan}!`);
-        setShowToast(true);
-      }
-    } catch (error) {
-      console.error('Error updating plan:', error);
-      setToastMessage('Failed to update plan. Please try again.');
-      setShowToast(true);
-    }
-  };
-
-  const handleTestingTrialUsedChange = async (trialUsed: boolean) => {
-    if (!user) return;
-    
-    try {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from('users')
-        .update({ 
-          trial_used: trialUsed,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-
-      if (error) {
-        console.error('Error updating trial used:', error);
-        setToastMessage('Failed to update trial status. Please try again.');
-        setShowToast(true);
-      } else {
-        setTestingTrialUsed(trialUsed);
-        await refresh();
-        setToastMessage(`Trial used status updated to ${trialUsed}!`);
-        setShowToast(true);
-      }
-    } catch (error) {
-      console.error('Error updating trial used:', error);
-      setToastMessage('Failed to update trial status. Please try again.');
-      setShowToast(true);
-    }
-  };
 
   const getCurrentSectionLabel = () => {
     const currentItem = navigationItems.find(item => 
@@ -631,356 +429,6 @@ export default function ProfilePage() {
           </div>
         );
 
-      case 'billing':
-        return (
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-2xl font-bold text-kifolio-text mb-2">Plan & Billing</h2>
-              <p className="text-gray-600">Manage your subscription and billing preferences</p>
-            </div>
-
-            {/* Current Plan Card */}
-            <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h3 className="text-xl font-semibold text-kifolio-text">
-                    Current Plan
-                  </h3>
-                  <div className="flex flex-col space-y-1 mt-1">
-                    <div className="flex items-center space-x-2">
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        subscription?.plan === 'free' 
-                          ? 'bg-gray-100 text-gray-800' 
-                          : subscription?.plan === 'trial'
-                          ? 'bg-orange-100 text-orange-800'
-                          : 'bg-green-100 text-green-800'
-                      }`}>
-                        {subscription?.plan === 'free' ? 'Free Plan' : 
-                         subscription?.plan === 'trial' ? 'Premium Trial' : 
-                         'Kifolio Premium'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                {subscription?.plan === 'free' && (
-                  <button
-                    onClick={handleStartTrial}
-                    disabled={isStartingTrial}
-                    className="btn btn--primary"
-                  >
-                    {isStartingTrial ? 'Starting Trial...' : 'Start 14-Day Free Trial'}
-                  </button>
-                )}
-                {(subscription?.plan === 'trial' || subscription?.plan === 'premium') && (
-                  <button
-                    onClick={handleDowngrade}
-                    className="btn btn--secondary"
-                  >
-                    Downgrade to Free
-                  </button>
-                )}
-              </div>
-
-              {trialError && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                  <p className="text-red-700 text-sm">{trialError}</p>
-                </div>
-              )}
-
-              {/* Plan Details */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-3">What's included:</h4>
-                  <ul className="space-y-2 text-sm text-gray-600">
-                    <li className="flex items-center">
-                      <span className="text-green-500 mr-2">✓</span>
-                      {subscription?.limits.maxPortfolios === -1 ? 'Unlimited' : subscription?.limits.maxPortfolios} portfolios
-                    </li>
-                    <li className="flex items-center">
-                      <span className="text-green-500 mr-2">✓</span>
-                      {subscription?.limits.maxHighlightsPerPortfolio === -1 ? 'Unlimited' : subscription?.limits.maxHighlightsPerPortfolio} highlights per portfolio
-                    </li>
-                    <li className="flex items-center">
-                      <span className="text-green-500 mr-2">✓</span>
-                      {subscription?.limits.allowedMediaTypes.length === 3 ? 'Photos only' : 'All media types'}
-                    </li>
-                    <li className="flex items-center">
-                      <span className="text-green-500 mr-2">✓</span>
-                      {subscription?.limits.canExportPDF ? 'PDF export' : 'Public sharing only'}
-                    </li>
-                    <li className="flex items-center">
-                      <span className="text-green-500 mr-2">✓</span>
-                      {subscription?.limits.supportLevel === 'priority' ? 'Priority support' : 'Email support'}
-                    </li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-3">Usage:</h4>
-                  <div className="space-y-3">
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Portfolios</span>
-                        <span className="font-medium">
-                          {subscription?.plan === 'free' ? '1/1' : 'Unlimited'}
-                        </span>
-                      </div>
-                      {subscription?.plan === 'free' && (
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div className="bg-kifolio-primary h-2 rounded-full" style={{ width: '100%' }}></div>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Highlights per portfolio</span>
-                        <span className="font-medium">
-                          {subscription?.plan === 'free' ? '0/10' : 'Unlimited'}
-                        </span>
-                      </div>
-                      {subscription?.plan === 'free' && (
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div className="bg-kifolio-primary h-2 rounded-full" style={{ width: '0%' }}></div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Trial Information */}
-            {subscription?.isTrialActive && subscription?.trialEndsAt && (
-              <div className="bg-orange-50 border border-orange-200 rounded-xl p-6 mb-8">
-                <div className="flex items-start space-x-3">
-                  <div className="flex-shrink-0">
-                    <svg className="h-6 w-6 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-medium text-orange-800 mb-2">
-                      Premium Trial Active
-                    </h3>
-                    {subscription?.isTrialActive && subscription?.trialEndsAt && (
-                      <span className="text-sm text-orange-600 font-medium">
-                        {getDaysRemaining(subscription.trialEndsAt)} days remaining
-                      </span>
-                    )}
-                    <p className="text-orange-700 mb-4">
-                      Your trial ends on {formatDate(subscription.trialEndsAt)}. 
-                      Upgrade to Premium to continue enjoying unlimited features.
-                    </p>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => redirectToCheckout({ billingCycle: 'monthly' })}
-                        disabled={stripeLoading}
-                        className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50"
-                      >
-                        {stripeLoading ? 'Loading...' : 'Upgrade Monthly ($8.99)'}
-                      </button>
-                      <button
-                        onClick={() => redirectToCheckout({ billingCycle: 'yearly' })}
-                        disabled={stripeLoading}
-                        className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50"
-                      >
-                        {stripeLoading ? 'Loading...' : 'Upgrade Yearly ($81.00)'}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Upgrade Card for Free Users */}
-            {subscription?.plan === 'free' && (
-              <div className="bg-gradient-to-r from-kifolio-primary to-orange-600 rounded-xl p-6 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2">
-                      Ready to unlock Premium features?
-                    </h3>
-                    <p className="text-orange-100 mb-4">
-                      {subscription?.hasUsedTrial 
-                        ? 'You\'ve already used your free trial. Upgrade to Premium to access all features.'
-                        : 'Get unlimited portfolios, highlights, advanced media support, and more.'
-                      }
-                    </p>
-                    <div className="flex flex-wrap gap-3">
-                      {!subscription?.hasUsedTrial && (
-                        <button
-                          onClick={handleStartTrial}
-                          disabled={isStartingTrial}
-                          className="bg-white text-kifolio-primary px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors disabled:opacity-50"
-                        >
-                          {isStartingTrial ? 'Starting...' : 'Start Free Trial'}
-                        </button>
-                      )}
-                      <button
-                        onClick={() => redirectToCheckout({ billingCycle: 'monthly' })}
-                        disabled={stripeLoading}
-                        className="bg-white text-kifolio-primary px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors disabled:opacity-50"
-                      >
-                        {stripeLoading ? 'Loading...' : 'Upgrade Monthly ($8.99)'}
-                      </button>
-                      <button
-                        onClick={() => redirectToCheckout({ billingCycle: 'yearly' })}
-                        disabled={stripeLoading}
-                        className="bg-white text-kifolio-primary px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors disabled:opacity-50"
-                      >
-                        {stripeLoading ? 'Loading...' : 'Upgrade Yearly ($81.00)'}
-                      </button>
-                      <button
-                        onClick={handleUpgrade}
-                        className="border border-white text-white px-6 py-2 rounded-lg font-medium hover:bg-white hover:text-kifolio-primary transition-colors"
-                      >
-                        View Pricing
-                      </button>
-                    </div>
-                  </div>
-                  <div className="hidden md:block">
-                    <div className="text-right">
-                      <div className="text-3xl font-bold">$8.99</div>
-                      <div className="text-orange-100">per month</div>
-                      <div className="text-xs text-orange-200 mt-1">$81/year <div className="line-through">$108.00</div></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Billing Management for Premium Users */}
-            {subscription?.plan === 'premium' && (
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <h3 className="text-xl font-semibold text-kifolio-text mb-4">
-                  Billing Management
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Manage your subscription, update payment methods, and view billing history.
-                </p>
-                <button
-                  onClick={redirectToCustomerPortal}
-                  disabled={stripeLoading}
-                  className="bg-kifolio-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-orange-600 transition-colors disabled:opacity-50"
-                >
-                  {stripeLoading ? 'Loading...' : 'Manage Billing'}
-                </button>
-                {stripeError && (
-                  <p className="text-red-600 text-sm mt-2">{stripeError}</p>
-                )}
-              </div>
-            )}
-
-            {/* Testing Mode Interface - Only show in development */}
-            {process.env.NODE_ENV === 'development' && (
-              <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-yellow-800">
-                    🧪 Testing Mode
-                  </h3>
-                  <button
-                    onClick={() => setIsTestingMode(!isTestingMode)}
-                    className="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors text-sm"
-                  >
-                    {isTestingMode ? 'Hide' : 'Show'} Testing Controls
-                  </button>
-                </div>
-                
-                {isTestingMode && (
-                  <div className="space-y-4">
-                    <p className="text-yellow-700 text-sm">
-                      Use these controls to test different subscription states. Changes are applied to your actual account.
-                    </p>
-                    
-                    {/* Plan Selection */}
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-yellow-800">
-                        Subscription Plan
-                      </label>
-                      <div className="flex space-x-2">
-                        {(['free', 'trial', 'premium'] as const).map((plan) => (
-                          <button
-                            key={plan}
-                            onClick={() => handleTestingPlanChange(plan)}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                              subscription?.plan === plan
-                                ? 'bg-yellow-600 text-white'
-                                : 'bg-white text-yellow-800 border border-yellow-300 hover:bg-yellow-100'
-                            }`}
-                          >
-                            {plan.charAt(0).toUpperCase() + plan.slice(1)}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Trial Used Toggle */}
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-yellow-800">
-                        Trial Used Status
-                      </label>
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => handleTestingTrialUsedChange(!testingTrialUsed)}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                            testingTrialUsed
-                              ? 'bg-red-600 text-white'
-                              : 'bg-green-600 text-white'
-                          }`}
-                        >
-                          {testingTrialUsed ? 'Trial Used' : 'Trial Available'}
-                        </button>
-                        <span className="text-sm text-yellow-700">
-                          Current: {subscription?.hasUsedTrial ? 'Used' : 'Available'}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Current Status Display */}
-                    <div className="bg-white rounded-lg p-4 border border-yellow-200">
-                      <h4 className="font-medium text-yellow-800 mb-2">Current Status</h4>
-                      <div className="text-sm text-yellow-700 space-y-1">
-                        <div>Plan: <span className="font-medium">{subscription?.plan}</span></div>
-                        <div>Trial Used: <span className="font-medium">{subscription?.hasUsedTrial ? 'Yes' : 'No'}</span></div>
-                        <div>Is Trial Active: <span className="font-medium">{subscription?.isTrialActive ? 'Yes' : 'No'}</span></div>
-                        <div>Is Premium Active: <span className="font-medium">{subscription?.isPremiumActive ? 'Yes' : 'No'}</span></div>
-                      </div>
-                    </div>
-
-                    {/* Debug Tools */}
-                    <div className="bg-white rounded-lg p-4 border border-yellow-200">
-                      <h4 className="font-medium text-yellow-800 mb-2">Debug Tools</h4>
-                      <div className="space-y-2">
-                        <button
-                          onClick={async () => {
-                            try {
-                              const response = await fetch('/api/debug/user');
-                              const data = await response.json();
-                              console.log('Debug user data:', data);
-                              setToastMessage('Debug data logged to console');
-                              setShowToast(true);
-                            } catch (error) {
-                              console.error('Debug error:', error);
-                              setToastMessage('Debug failed - check console');
-                              setShowToast(true);
-                            }
-                          }}
-                          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors"
-                        >
-                          Debug User Data
-                        </button>
-                        <p className="text-xs text-yellow-600">
-                          Check browser console for detailed user data
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        );
 
       case 'delete-account':
         return (
@@ -1147,11 +595,6 @@ export default function ProfilePage() {
         onDismiss={() => setShowToast(false)}
       />
 
-      {/* Pricing Modal */}
-      <PricingModal
-        isOpen={showPricingModal}
-        onClose={() => setShowPricingModal(false)}
-      />
 
       {/* Delete Account Confirmation Modal */}
       {showDeleteConfirmation && (

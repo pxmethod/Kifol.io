@@ -7,7 +7,6 @@ import Header from '@/components/Header';
 import ConfirmNavigationModal from '@/components/ConfirmNavigationModal';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useAuth } from '@/contexts/AuthContext';
-import { useSubscription } from '@/hooks/useSubscription';
 import { storageService } from '@/lib/storage';
 import { HighlightService } from '@/lib/database/achievements';
 import { HIGHLIGHT_TYPES, HighlightType, HighlightFormData } from '@/types/achievement';
@@ -16,7 +15,6 @@ export default function HighlightForm() {
   const router = useRouter();
   const params = useParams();
   const { user, loading } = useAuth();
-  const { subscription, canAddHighlight } = useSubscription();
   const portfolioId = params.id as string;
   const highlightId = params.highlightId as string; // For editing existing highlights
   
@@ -89,20 +87,6 @@ export default function HighlightForm() {
     }
   }, [user, loading, router]);
 
-  // Check highlight creation limits
-  useEffect(() => {
-    const checkHighlightLimit = async () => {
-      if (user && subscription && portfolioId) {
-        const canAdd = await canAddHighlight(portfolioId);
-        if (!canAdd.allowed) {
-          // Redirect to billing page with upgrade message
-          router.push('/profile/billing?message=' + encodeURIComponent(canAdd.reason || 'Upgrade to add more highlights'));
-        }
-      }
-    };
-
-    checkHighlightLimit();
-  }, [user, subscription, portfolioId, canAddHighlight, router]);
 
   // Cleanup preview URLs on unmount
   useEffect(() => {
@@ -333,14 +317,14 @@ export default function HighlightForm() {
     return null; // Will redirect
   }
 
-  // Show loading while checking subscription limits
-  if (loading || (user && !subscription)) {
+  // Show loading while checking authentication
+  if (loading) {
     return (
       <div className="min-h-screen bg-kifolio-bg">
         <Header animateLogo={true} />
         <main className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[60vh]">
-            <LoadingSpinner size="lg" label="Checking subscription limits..." />
+            <LoadingSpinner size="lg" label="Loading..." />
           </div>
         </main>
       </div>
@@ -506,26 +490,13 @@ export default function HighlightForm() {
                   type="file"
                   id="media"
                   multiple
-                  accept={subscription?.plan === 'free' ? "image/jpeg,image/png,image/gif" : "image/jpeg,image/png,image/gif,application/pdf,video/mp4,video/quicktime,audio/mpeg,audio/wav"}
+                  accept="image/jpeg,image/png,image/gif,application/pdf,video/mp4,video/quicktime,audio/mpeg,audio/wav"
                   onChange={handleMediaUpload}
                   className="input cursor-pointer"
                 />
                 <p className="form-field__help">
-                  {subscription?.plan === 'free' 
-                    ? "Photos only (JPEG, PNG, GIF) up to 50MB each. Upgrade to Premium for videos, PDFs, and audio files."
-                    : "Photos, videos, PDFs, and audio files up to 50MB each"
-                  }
+                  Photos, videos, PDFs, and audio files up to 50MB each
                 </p>
-                {subscription?.plan === 'free' && (
-                  <div className="mt-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                    <p className="text-sm text-orange-800">
-                      <strong>Free Plan:</strong> Only photos are allowed. 
-                      <Link href="/profile/billing" className="text-orange-600 hover:text-orange-700 underline ml-1">
-                        Upgrade to Premium
-                      </Link> to upload videos, PDFs, and audio files.
-                    </p>
-                  </div>
-                )}
                 {errors.media && (
                   <p className="form-field__error">{errors.media}</p>
                 )}

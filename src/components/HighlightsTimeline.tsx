@@ -7,7 +7,6 @@ interface HighlightsTimelineProps {
   highlights: Achievement[];
   onView?: (highlight: Achievement) => void;
   onEdit?: (highlight: Achievement) => void;
-  isLocked?: boolean;
 }
 
 interface GroupedHighlights {
@@ -17,8 +16,7 @@ interface GroupedHighlights {
 export default function HighlightsTimeline({
   highlights,
   onView,
-  onEdit,
-  isLocked = false
+  onEdit
 }: HighlightsTimelineProps) {
   const groupHighlightsByDate = (highlights: Achievement[]): GroupedHighlights => {
     const grouped: GroupedHighlights = {};
@@ -110,7 +108,6 @@ export default function HighlightsTimeline({
                   achievement={highlight}
                   onView={onView}
                   onEdit={onEdit}
-                  isLocked={isLocked}
                 />
               </div>
             ))}

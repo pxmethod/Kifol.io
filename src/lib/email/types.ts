@@ -29,29 +29,6 @@ export interface EngagementEmailData extends BaseEmailData {
   ctaText?: string;
 }
 
-// Invoice confirmation email data  
-export interface InvoiceEmailData extends BaseEmailData {
-  userName: string;
-  invoiceNumber: string;
-  amount: number;
-  currency: string;
-  billingPeriod: {
-    start: Date;
-    end: Date;
-  };
-  downloadUrl: string;
-  nextBillingDate: Date;
-}
-
-// Cancellation confirmation email data
-export interface CancellationEmailData extends BaseEmailData {
-  userName: string;
-  cancellationDate: Date;
-  finalBillingDate?: Date;
-  dataRetentionDate?: Date;
-  feedbackUrl?: string;
-  reactivationUrl?: string;
-}
 
 // Invitation email data
 export interface InvitationEmailData extends BaseEmailData {
@@ -94,38 +71,3 @@ export interface EmailTemplateProps {
   }[];
 }
 
-// Subscription email data
-export interface TrialStartData extends BaseEmailData {
-  userName: string;
-  trialStartDate: string;
-  trialEndDate: string;
-  dashboardUrl: string;
-  pricingUrl: string;
-  supportEmail: string;
-  privacyUrl: string;
-  termsUrl: string;
-}
-
-export interface TrialEndingData extends BaseEmailData {
-  userName: string;
-  trialStartDate: string;
-  trialEndDate: string;
-  daysRemaining: number;
-  upgradeUrl: string;
-  dashboardUrl: string;
-  pricingUrl: string;
-  supportEmail: string;
-  privacyUrl: string;
-  termsUrl: string;
-}
-
-export interface TrialEndedData extends BaseEmailData {
-  userName: string;
-  trialEndDate: string;
-  upgradeUrl: string;
-  dashboardUrl: string;
-  pricingUrl: string;
-  supportEmail: string;
-  privacyUrl: string;
-  termsUrl: string;
-}
