@@ -6,7 +6,6 @@ import { useState, useEffect, useCallback } from 'react';
 import Header from '@/components/Header';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorDisplay from '@/components/ErrorDisplay';
-import EditPortfolioModal from '@/components/EditPortfolioModal';
 import DeletePortfolioModal from '@/components/DeletePortfolioModal';
 import Toast from '@/components/Toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -41,7 +40,6 @@ export default function PortfolioPage() {
   const [error, setError] = useState<string | null>(null);
   const [showCopyNotification, setShowCopyNotification] = useState(false);
   const [showPublishNotification, setShowPublishNotification] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [showPrivateTooltip, setShowPrivateTooltip] = useState(false);
@@ -162,26 +160,6 @@ export default function PortfolioPage() {
     }
   };
 
-  const handleSavePortfolio = async (updatedPortfolio: PortfolioData) => {
-    try {
-      // Update portfolio in database using the database service
-      await portfolioService.updatePortfolio(updatedPortfolio.id, {
-        child_name: updatedPortfolio.childName,
-        portfolio_title: updatedPortfolio.portfolioTitle,
-        photo_url: updatedPortfolio.photoUrl || null,
-        template: updatedPortfolio.template,
-        is_private: updatedPortfolio.isPrivate || false,
-        password: updatedPortfolio.password || null
-      });
-      
-      // Update state
-      setPortfolio(updatedPortfolio);
-    } catch (error) {
-      console.error('Error saving portfolio:', error);
-      setToastMessage('Failed to save portfolio. Please try again.');
-      setShowToast(true);
-    }
-  };
 
 
 
@@ -199,33 +177,31 @@ export default function PortfolioPage() {
     }
   };
 
-  const handleDeletePortfolio = async (portfolioId: string) => {
-    try {
-      // Delete portfolio from database
-      await portfolioService.deletePortfolio(portfolioId);
-      
-      // Show success toast for portfolio removal
-      setToastMessage('Portfolio removed successfully!');
-      setShowToast(true);
-      
-      // Redirect to dashboard (My Portfolios page)
-      router.push('/dashboard');
-    } catch (error) {
-      console.error('Error deleting portfolio:', error);
-      setToastMessage('Failed to delete portfolio. Please try again.');
-      setShowToast(true);
-    }
-  };
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (portfolio) {
-      // Mark portfolio as published (no unsaved changes)
-      const updatedPortfolio = { ...portfolio, hasUnsavedChanges: false };
-      handleSavePortfolio(updatedPortfolio);
-      
-      // Show success notification
-      setShowPublishNotification(true);
-      setTimeout(() => setShowPublishNotification(false), 3000);
+      try {
+        // Mark portfolio as published (no unsaved changes)
+        await portfolioService.updatePortfolio(portfolio.id, {
+          child_name: portfolio.childName,
+          portfolio_title: portfolio.portfolioTitle,
+          photo_url: portfolio.photoUrl || null,
+          template: portfolio.template,
+          is_private: portfolio.isPrivate || false,
+          password: portfolio.password || null
+        });
+        
+        // Update local state
+        setPortfolio({ ...portfolio, hasUnsavedChanges: false });
+        
+        // Show success notification
+        setShowPublishNotification(true);
+        setTimeout(() => setShowPublishNotification(false), 3000);
+      } catch (error) {
+        console.error('Error publishing portfolio:', error);
+        setToastMessage('Failed to publish portfolio. Please try again.');
+        setShowToast(true);
+      }
     }
   };
 
@@ -338,15 +314,15 @@ export default function PortfolioPage() {
           <div className="card card--profile">
             {/* Edit Button */}
             <div className="card__actions">
-              <button 
-                onClick={() => setShowEditModal(true)}
+              <Link 
+                href={`/portfolio/${portfolio.id}/edit`}
                 className="btn btn--ghost"
                 style={{ width: '2.75rem', height: '2.75rem', padding: '0.5rem' }}
               >
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
-              </button>
+              </Link>
             </div>
 
             <div className="card__body">
@@ -486,14 +462,6 @@ export default function PortfolioPage() {
         </div>
       )}
 
-      {/* Edit Portfolio Modal */}
-      <EditPortfolioModal
-        isOpen={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        onSave={handleSavePortfolio}
-        onDelete={handleDeletePortfolio}
-        portfolio={portfolio}
-      />
 
 
       {/* Toast Notification */}
