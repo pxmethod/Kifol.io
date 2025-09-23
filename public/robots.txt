@@ -15,5 +15,4 @@ Disallow: /api/
 Allow: /
 Allow: /auth/login
 Allow: /auth/signup
-Allow: /whats-happening
 Allow: /preview/

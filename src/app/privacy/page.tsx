@@ -281,7 +281,6 @@ export default function PrivacyPolicyPage() {
               <ul className="space-y-2 text-white">
                 <li><Link href="/auth/signup" className="hover:text-white transition-colors">Sign Up</Link></li>
                 <li><Link href="/auth/login" className="hover:text-white transition-colors">Log In</Link></li>
-                <li><Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
               </ul>
             </div>
             <div>

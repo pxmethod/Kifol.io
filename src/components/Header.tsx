@@ -111,17 +111,6 @@ export default function Header({ animateLogo = false }: HeaderProps) {
               My Portfolios
             </Link>
             <Link 
-              href="/whats-happening" 
-              className={`flex items-center text-white hover:text-gray-200 transition-colors font-medium ${
-                pathname === '/whats-happening' ? 'border-b-[3px] border-kifolio-primary' : ''
-              }`}
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              What&apos;s Happening
-            </Link>
-            <Link 
               href="/give-feedback" 
               className={`flex items-center text-white hover:text-gray-200 transition-colors font-medium ${
                 pathname === '/give-feedback' ? 'border-b-[3px] border-kifolio-primary' : ''
@@ -281,20 +270,6 @@ export default function Header({ animateLogo = false }: HeaderProps) {
                 My Portfolios
               </Link>
 
-              <Link
-                href="/whats-happening"
-                className={`flex items-center px-4 py-3 rounded-lg text-lg font-medium transition-colors mobile-menu-item ${
-                  pathname === '/whats-happening' 
-                    ? 'active' 
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                What&apos;s Happening
-              </Link>
 
               <Link
                 href="/give-feedback"

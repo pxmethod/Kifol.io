@@ -42,8 +42,7 @@ export default function MarketingPage() {
             "url": "https://kifol.io",
             "logo": "https://kifol.io/kifolio_logo_dark.svg",
             "sameAs": [
-              "https://kifol.io/auth/signup",
-              "https://kifol.io/whats-happening"
+              "https://kifol.io/auth/signup"
             ],
             "contactPoint": {
               "@type": "ContactPoint",
@@ -444,89 +443,6 @@ export default function MarketingPage() {
             </div>
           </div>
         </section>
-        {/* Kifolio Premium Section */}
-        <section 
-          ref={ctaSection.ref}
-          className={`py-20 px-4 bg-gradient-to-br from-orange-500 to-pink-500 ${ctaSection.className}`}
-        >
-          <div className="max-w-6xl mx-auto text-white">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Optional: Kifolio Premium
-              </h2>
-              <p className="text-xl mb-6 opacity-90">
-                Unlock advanced features such as unlimited highlights, multiple portfolios, extra storage, and advanced organization.
-              </p>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              {/* Premium Features List */}
-              <div className="space-y-6">
-                <h3 className="text-2xl font-semibold mb-6">Premium features include:</h3>
-                <ul className="space-y-4">
-                  <li className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 w-6 h-6 bg-white rounded-full flex items-center justify-center mt-0.5">
-                      <svg className="w-4 h-4 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <span className="text-lg">Multiple children under one account</span>
-                  </li>
-                  <li className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 w-6 h-6 bg-white rounded-full flex items-center justify-center mt-0.5">
-                      <svg className="w-4 h-4 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <span className="text-lg">Unlimited highlights</span>
-                  </li>
-                  <li className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 w-6 h-6 bg-white rounded-full flex items-center justify-center mt-0.5">
-                      <svg className="w-4 h-4 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <span className="text-lg">Extra storage (videos, PDFs, audio)</span>
-                  </li>
-                  <li className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 w-6 h-6 bg-white rounded-full flex items-center justify-center mt-0.5">
-                      <svg className="w-4 h-4 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <span className="text-lg">Advanced organization (tags, categories, timeline filters)</span>
-                  </li>
-                  <li className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 w-6 h-6 bg-white rounded-full flex items-center justify-center mt-0.5">
-                      <svg className="w-4 h-4 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <span className="text-lg">Export/share features (e.g., generate a portfolio PDF for college apps)</span>
-                  </li>
-                </ul>
-              </div>
-              
-              {/* Call to Action */}
-              <div className="text-center md:text-left">
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-                  <h3 className="text-xl font-semibold mb-4">Try Kifolio Premium free for 7 days.</h3>
-                  <div className="space-y-4">
-                    <Link
-                      href="/pricing"
-                      className="inline-block bg-white text-orange-600 hover:bg-gray-100 px-8 py-4 rounded-lg text-lg font-semibold transition-colors shadow-lg hover:shadow-xl w-full md:w-auto"
-                    >
-                      Learn more
-                    </Link>
-                    <p className="text-sm opacity-80">
-                      No commitment • Cancel anytime • PayPal and all major credit and debit cards accepted.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* FAQ Section for Featured Snippets */}
         <section 
@@ -545,7 +461,7 @@ export default function MarketingPage() {
                 </h3>
                 <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
                   <div className="text-gray-600 leading-relaxed" itemProp="text">
-                    Kifolio is completely free! There is also our optional <a href="/pricing" className="text-kifolio-primary hover:underline">Kifolio Premium plan</a> that offers unlimited highlights, multiple portfolios, extra storage, and advanced organization.
+                    Kifolio is completely free! Parent's will have access to all features and will be able to create unlimited portfolios and highlights for their children.
                   </div>
                 </div>
               </div>
@@ -609,7 +525,6 @@ export default function MarketingPage() {
               <ul className="space-y-2 text-white">
                 <li><Link href="/auth/signup" className="hover:text-white transition-colors">Sign Up</Link></li>
                 <li><Link href="/auth/login" className="hover:text-white transition-colors">Log In</Link></li>
-                <li><Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
               </ul>
             </div>
             <div>

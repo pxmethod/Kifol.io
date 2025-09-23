@@ -24,13 +24,7 @@ SUPPORT_EMAIL=support@yourdomain.com
 NEXT_PUBLIC_TICKETMASTER_API_KEY=your_production_ticketmaster_api_key
 ```
 
-### 4. Meetup API (Optional - for additional event sources)
-```bash
-NEXT_PUBLIC_MEETUP_CLIENT_ID=your_meetup_client_id
-MEETUP_CLIENT_SECRET=your_meetup_client_secret
-```
-
-### 5. App URLs
+### 4. App URLs
 ```bash
 NEXT_PUBLIC_APP_URL=https://yourdomain.com
 ```

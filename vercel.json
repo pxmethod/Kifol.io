@@ -27,10 +27,4 @@
       ]
     }
   ],
-  "crons": [
-    {
-      "path": "/api/cron/event-followups",
-      "schedule": "0 9 * * *"
-    }
-  ]
 }
