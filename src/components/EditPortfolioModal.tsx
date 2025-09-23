@@ -211,7 +211,7 @@ export default function EditPortfolioModal({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-semibold text-kifolio-text">
-            {modalMode === 'delete-confirmation' ? 'Delete Portfolio?' : 'Edit Portfolio'}
+            {modalMode === 'delete-confirmation' ? 'Delete portfolio?' : 'Edit portfolio'}
           </h2>
           <button
             onClick={modalMode === 'delete-confirmation' ? handleCancelDelete : onClose}
@@ -234,7 +234,7 @@ export default function EditPortfolioModal({
                 </svg>
               </div>
               <h3 className="text-lg font-semibold text-kifolio-text mb-2">
-                Delete Portfolio?
+                Delete portfolio?
               </h3>
               <p className="text-gray-600 mb-6">
                 Are you sure you want to delete this portfolio? This action cannot be undone and will remove all achievements.
@@ -252,7 +252,7 @@ export default function EditPortfolioModal({
                   onClick={handleDeletePortfolio}
                   className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700"
                 >
-                  Delete Portfolio
+                  Delete portfolio
                 </button>
               </div>
             </div>
@@ -506,7 +506,7 @@ export default function EditPortfolioModal({
                 disabled={isSubmitting || !hasChanges()}
                 className="w-full bg-kifolio-cta text-white py-3 px-6 rounded-lg font-semibold hover:bg-kifolio-cta/90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Saving Changes...' : 'Save Changes'}
+                {isSubmitting ? 'Saving changes...' : 'Save changes'}
               </button>
               {errors.submit && (
                 <p className="text-red-500 text-sm mt-2 text-center">{errors.submit}</p>
@@ -521,7 +521,7 @@ export default function EditPortfolioModal({
                   onClick={handleShowDeleteConfirmation}
                   className="w-full bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors"
                 >
-                  Delete Portfolio
+                  Delete portfolio
                 </button>
               </div>
             )}

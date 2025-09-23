@@ -43,8 +43,8 @@
 }
 
 .card__subtitle {
-  font-size: var(--font-size-sm);
-  color: var(--color-gray-600);
+  font-size: var(--font-size-md);
+  color: var(--color-text);
   margin: 0;
   line-height: var(--line-height-normal);
 }
@@ -289,7 +289,7 @@
 }
 
 .card--profile .card__subtitle {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-md);
   margin-bottom: var(--space-3);
 }
 

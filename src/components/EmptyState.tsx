@@ -24,7 +24,7 @@ export default function EmptyState() {
       {/* Empty State Message */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-kifolio-text mb-4">
-          {user ? "No portfolio's to show yet" : "Welcome to Kifolio"}
+          {user ? "No portfolios to show yet" : "Welcome to Kifolio"}
         </h1>
         <p className="text-kifolio-text text-base leading-relaxed max-w-md">
           {user 
@@ -40,7 +40,7 @@ export default function EmptyState() {
           onClick={() => router.push('/create')}
           className="bg-kifolio-cta text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-kifolio-cta/90 transition-colors shadow-md"
         >
-          Create New Portfolio
+          Create new portfolio
         </button>
       ) : (
         <div className="flex space-x-4">

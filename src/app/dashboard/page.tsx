@@ -162,7 +162,7 @@ export default function Dashboard() {
                 onClick={() => router.push('/create')}
                 className="btn btn--primary"
               >
-                Create New Portfolio
+                Create new portfolio
               </button>
             )}
           </div>

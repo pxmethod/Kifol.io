@@ -300,7 +300,7 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                 className="text-lg font-medium mb-2"
                 style={{ color: config.colors.text }}
               >
-                No Highlights Yet
+                No highlights yet
               </h3>
               <p 
                 className="text-sm"

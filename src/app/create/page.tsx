@@ -248,7 +248,7 @@ export default function CreatePortfolio() {
       <main className="container mx-auto px-4 py-8 max-w-2xl">
         <div className="card">
           <div className="card__header">
-            <h1 className="card__title">Create New Portfolio</h1>
+            <h1 className="card__title">Create new portfolio</h1>
           </div>
           <div className="card__body">
             <form id="portfolioForm" onSubmit={handleSubmit} className="form">

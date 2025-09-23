@@ -285,7 +285,7 @@ export default function ProfilePage() {
                   className="btn btn--primary"
                 disabled={!hasChanges}
                 >
-                  Save Changes
+                  Save changes
                 </button>
               </div>
           </div>

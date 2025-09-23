@@ -314,7 +314,7 @@ export default function EditPortfolio() {
       <main className="container mx-auto px-4 py-8 max-w-2xl">
         <div className="card">
           <div className="card__header">
-            <h1 className="card__title">Edit Portfolio</h1>
+            <h1 className="card__title">Edit portfolio</h1>
           </div>
           <div className="card__body">
             <form id="portfolioForm" onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="form">
@@ -623,7 +623,7 @@ export default function EditPortfolio() {
                   className={`btn btn--primary ${isSubmitting ? 'btn--loading' : ''}`}
                   form="portfolioForm"
                 >
-                  {isSubmitting ? 'Saving Changes...' : 'Save Changes'}
+                  {isSubmitting ? 'Saving changes...' : 'Save changes'}
                 </button>
               </div>
             </div>
@@ -650,7 +650,7 @@ export default function EditPortfolio() {
           isOpen={showConfirmModal}
           onCancel={handleCancelLeave}
           onConfirm={handleConfirmLeave}
-          title="Unsaved Changes"
+          title="Unsaved changes"
           message="You have unsaved changes. Are you sure you want to leave without saving?"
         />
       )}

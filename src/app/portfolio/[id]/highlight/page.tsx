@@ -354,7 +354,7 @@ export default function HighlightForm() {
         <div className="card">
           <div className="card__header">
             <h1 className="card__title">
-              {isEditMode ? 'Edit Highlight' : 'Add Highlight'}
+              {isEditMode ? 'Edit highlight' : 'Add highlight'}
             </h1>
           </div>
 
@@ -587,7 +587,7 @@ export default function HighlightForm() {
                   disabled={isSubmitting || uploadingMedia}
                   className="btn btn--primary"
                 >
-                  {isSubmitting ? 'Saving...' : (isEditMode ? 'Update Highlight' : 'Add Highlight')}
+                  {isSubmitting ? 'Saving...' : (isEditMode ? 'Update highlight' : 'Add highlight')}
                 </button>
               </div>
 

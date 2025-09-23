@@ -39,7 +39,7 @@ export default function PortfolioPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCopyNotification, setShowCopyNotification] = useState(false);
-  const [showPublishNotification, setShowPublishNotification] = useState(false);
+  const [showSaveNotification, setShowSaveNotification] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [showPrivateTooltip, setShowPrivateTooltip] = useState(false);
@@ -178,10 +178,10 @@ export default function PortfolioPage() {
   };
 
 
-  const handlePublish = async () => {
+  const handleSave = async () => {
     if (portfolio) {
       try {
-        // Mark portfolio as published (no unsaved changes)
+        // Mark portfolio as saved (no unsaved changes)
         await portfolioService.updatePortfolio(portfolio.id, {
           child_name: portfolio.childName,
           portfolio_title: portfolio.portfolioTitle,
@@ -195,11 +195,11 @@ export default function PortfolioPage() {
         setPortfolio({ ...portfolio, hasUnsavedChanges: false });
         
         // Show success notification
-        setShowPublishNotification(true);
-        setTimeout(() => setShowPublishNotification(false), 3000);
+        setShowSaveNotification(true);
+        setTimeout(() => setShowSaveNotification(false), 3000);
       } catch (error) {
-        console.error('Error publishing portfolio:', error);
-        setToastMessage('Failed to publish portfolio. Please try again.');
+        console.error('Error saving portfolio:', error);
+        setToastMessage('Failed to save portfolio. Please try again.');
         setShowToast(true);
       }
     }
@@ -266,11 +266,11 @@ export default function PortfolioPage() {
                 Preview
               </button>
               <button
-                onClick={handlePublish}
+                onClick={handleSave}
                 disabled={!portfolio.hasUnsavedChanges}
                 className="btn btn--primary"
               >
-                Publish
+                Save
               </button>
             </div>
           </div>
@@ -297,11 +297,11 @@ export default function PortfolioPage() {
                 Preview
               </button>
               <button
-                onClick={handlePublish}
+                onClick={handleSave}
                 disabled={!portfolio.hasUnsavedChanges}
                 className="btn btn--primary"
               >
-                Publish
+                Save
               </button>
             </div>
           </div>
@@ -309,7 +309,8 @@ export default function PortfolioPage() {
       </div>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto">
+        {/* Mobile Layout - Stacked */}
+        <div className="lg:hidden max-w-2xl mx-auto">
           {/* Portfolio Header Card */}
           <div className="card card--profile">
             {/* Edit Button */}
@@ -422,6 +423,29 @@ export default function PortfolioPage() {
             </div>
           </div>
 
+          {/* Organizations Section */}
+          <div className="card" style={{ marginTop: '2rem' }}>
+            <div className="card__header">
+              <h2 className="card__title">Organizations</h2>
+            </div>
+
+            <div className="card__body">
+              {/* Organizations Empty State */}
+              <div className="text-center py-12">
+                <div className="mx-auto mb-4">
+                  <img 
+                    src="/marketing/no-orgs.png" 
+                    alt="No organizations yet" 
+                    className="mx-auto"
+                    style={{ width: '260px', height: '260px' }}
+                  />
+                </div>
+                <h3 className="text-lg font-medium text-kifolio-text mb-2">No orgs to show</h3>
+                <p className="text-gray-500">Organizations that your child is a part of will display here.</p>
+              </div>
+            </div>
+          </div>
+
           {/* Portfolio Content */}
           <div className="card" style={{ marginTop: '2rem' }}>
             <div className="card__header">
@@ -433,7 +457,7 @@ export default function PortfolioPage() {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                <span>Add Highlight</span>
+                <span>Add highlight</span>
               </button>
             </div>
 
@@ -446,6 +470,174 @@ export default function PortfolioPage() {
             </div>
           </div>
         </div>
+
+        {/* Desktop Layout - Two Column */}
+        <div className="hidden lg:flex gap-8">
+          {/* Left Column - Fixed */}
+          <div className="w-96 flex-shrink-0">
+            <div className="sticky top-8 space-y-8">
+              {/* Portfolio Header Card */}
+              <div className="card card--profile">
+                {/* Edit Button */}
+                <div className="card__actions">
+                  <Link 
+                    href={`/portfolio/${portfolio.id}/edit`}
+                    className="btn btn--ghost"
+                    style={{ width: '2.75rem', height: '2.75rem', padding: '0.5rem' }}
+                  >
+                    <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </Link>
+                </div>
+
+                <div className="card__body">
+                  {/* Avatar */}
+                  <div className="card__avatar">
+                    {portfolio.photoUrl ? (
+                      portfolio.photoUrl.startsWith('/placeholders/') ? (
+                        <div className="w-full h-full rounded-full overflow-hidden">
+                          <Image 
+                            src={portfolio.photoUrl} 
+                            alt={portfolio.childName}
+                            width={120}
+                            height={120}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <Image 
+                          src={portfolio.photoUrl} 
+                          alt={portfolio.childName}
+                          width={120}
+                          height={120}
+                          className="w-full h-full object-cover"
+                        />
+                      )
+                    ) : (
+                      <span className="card__avatar--placeholder">
+                        {portfolio.childName.charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                  
+                  {/* Name and Title */}
+                  <h1 className="card__title">
+                    {portfolio.childName}
+                  </h1>
+                  
+                  {/* Status Badge - Center aligned underneath the name */}
+                  <div className="flex justify-center mb-4 relative">
+                    {portfolio.isPrivate ? (
+                      <div 
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 cursor-help"
+                        onMouseEnter={() => setShowPrivateTooltip(true)}
+                        onMouseLeave={() => setShowPrivateTooltip(false)}
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        Private
+                        
+                        {/* Custom Tooltip */}
+                        {showPrivateTooltip && (
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap z-10">
+                            This portfolio is private. Recipients will need the password to view it.
+                            {/* Tooltip arrow */}
+                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Public
+                      </div>
+                    )}
+                  </div>
+                  
+                  <p className="card__subtitle">
+                    {portfolio.portfolioTitle}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Member since {formatMemberSince(portfolio.createdAt)}
+                  </p>
+
+                  {/* Portfolio URL - On its own row */}
+                  <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono text-kifolio-cta break-all flex-1 min-w-0">
+                          {DOMAIN_CONFIG.PORTFOLIO_DOMAIN}/p/{portfolio.short_id || portfolio.id}
+                        </span>
+                        <button
+                          onClick={copyToClipboard}
+                          className="btn btn--ghost btn--icon-only btn--sm flex-shrink-0"
+                          title="Copy URL"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Organizations Section */}
+              <div className="card">
+                <div className="card__header">
+                  <h2 className="card__title">Organizations</h2>
+                </div>
+
+                <div className="card__body">
+                  {/* Organizations Empty State */}
+                  <div className="text-center py-12">
+                    <div className="mx-auto mb-4">
+                      <img 
+                        src="/marketing/no-orgs.png" 
+                        alt="No organizations yet" 
+                        className="mx-auto"
+                        style={{ width: '260px', height: '260px' }}
+                      />
+                    </div>
+                    <h3 className="text-lg font-medium text-kifolio-text mb-2">No orgs to show</h3>
+                    <p className="text-gray-500">Organizations that your child is a part of will display here.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Scrollable */}
+          <div className="flex-1">
+            <div className="card">
+              <div className="card__header">
+                <h2 className="card__title">Highlights</h2>
+                <button
+                  onClick={handleAddHighlight}
+                  className="btn btn--primary"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <span>Add highlight</span>
+                </button>
+              </div>
+
+              <div className="card__body">
+                {/* Highlights Timeline */}
+                <HighlightsTimeline
+                  highlights={portfolio.achievements || []}
+                  onEdit={handleEditHighlight}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
 
       {/* Copy Notification */}
@@ -455,10 +647,10 @@ export default function PortfolioPage() {
         </div>
       )}
 
-      {/* Publish Notification */}
-      {showPublishNotification && (
+      {/* Save Notification */}
+      {showSaveNotification && (
         <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
-          Portfolio successfully published!
+          Portfolio successfully saved!
         </div>
       )}
 

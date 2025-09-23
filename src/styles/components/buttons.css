@@ -130,6 +130,7 @@
   min-height: auto;
   text-decoration: underline;
   text-underline-offset: 2px;
+  font-family: var(--font-inter), Inter, sans-serif;
 }
 
 .btn--link:hover:not(:disabled) {
