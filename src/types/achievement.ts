@@ -14,7 +14,7 @@ export interface Highlight {
 export interface HighlightMedia {
   id: string;
   url: string;
-  type: 'image' | 'pdf';
+  type: 'image' | 'pdf' | 'video' | 'audio';
   fileName: string;
   fileSize: number;
 }

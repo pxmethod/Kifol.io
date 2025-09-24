@@ -258,7 +258,7 @@ export default function PortfolioPage() {
                 onClick={handlePreview}
                 className="btn btn--secondary"
               >
-                Preview
+                Preview Portfolio
               </button>
             </div>
           </div>

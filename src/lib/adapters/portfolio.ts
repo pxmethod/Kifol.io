@@ -67,7 +67,7 @@ function dbHighlightToLegacy(dbHighlight: DbHighlight): Achievement {
       const extension = filename.split('.').pop()?.toLowerCase() || '';
       
       // Determine media type based on URL and extension
-      let mediaType = 'image'; // default
+      let mediaType: 'image' | 'pdf' | 'video' | 'audio' = 'image'; // default
       
       if (urlLower.includes('.pdf') || extension === 'pdf') {
         mediaType = 'pdf';

@@ -114,7 +114,12 @@ export const useVideoUpload = () => {
         status: 'Uploading to server...'
       }));
 
-      const url = await storageService.uploadFile(uploadFile, 'highlight-media');
+      // Convert Blob to File if needed
+      const fileToUpload = uploadFile instanceof File 
+        ? uploadFile 
+        : new File([uploadFile], file.name, { type: file.type });
+      
+      const url = await storageService.uploadFile(fileToUpload, 'highlight-media');
 
       setState(prev => ({
         ...prev,
