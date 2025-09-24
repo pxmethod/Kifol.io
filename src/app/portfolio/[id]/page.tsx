@@ -25,7 +25,6 @@ interface PortfolioData {
   createdAt: string;
   isPrivate?: boolean;
   password?: string;
-  hasUnsavedChanges?: boolean;
   short_id?: string;
   achievements?: Achievement[];
 }
@@ -39,7 +38,6 @@ export default function PortfolioPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCopyNotification, setShowCopyNotification] = useState(false);
-  const [showSaveNotification, setShowSaveNotification] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [showPrivateTooltip, setShowPrivateTooltip] = useState(false);
@@ -80,7 +78,6 @@ export default function PortfolioPage() {
           isPrivate: dbPortfolio.is_private,
           password: dbPortfolio.password || undefined,
           short_id: dbPortfolio.short_id,
-          hasUnsavedChanges: false,
           achievements: highlights.map((highlight: any) => ({
             id: highlight.id,
             title: highlight.title,
@@ -178,32 +175,6 @@ export default function PortfolioPage() {
   };
 
 
-  const handleSave = async () => {
-    if (portfolio) {
-      try {
-        // Mark portfolio as saved (no unsaved changes)
-        await portfolioService.updatePortfolio(portfolio.id, {
-          child_name: portfolio.childName,
-          portfolio_title: portfolio.portfolioTitle,
-          photo_url: portfolio.photoUrl || null,
-          template: portfolio.template,
-          is_private: portfolio.isPrivate || false,
-          password: portfolio.password || null
-        });
-        
-        // Update local state
-        setPortfolio({ ...portfolio, hasUnsavedChanges: false });
-        
-        // Show success notification
-        setShowSaveNotification(true);
-        setTimeout(() => setShowSaveNotification(false), 3000);
-      } catch (error) {
-        console.error('Error saving portfolio:', error);
-        setToastMessage('Failed to save portfolio. Please try again.');
-        setShowToast(true);
-      }
-    }
-  };
 
   if (loading) {
     return (
@@ -263,14 +234,7 @@ export default function PortfolioPage() {
                 onClick={handlePreview}
                 className="btn btn--secondary"
               >
-                Preview
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={!portfolio.hasUnsavedChanges}
-                className="btn btn--primary"
-              >
-                Save
+                Preview Portfolio
               </button>
             </div>
           </div>
@@ -295,13 +259,6 @@ export default function PortfolioPage() {
                 className="btn btn--secondary"
               >
                 Preview
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={!portfolio.hasUnsavedChanges}
-                className="btn btn--primary"
-              >
-                Save
               </button>
             </div>
           </div>
@@ -647,12 +604,6 @@ export default function PortfolioPage() {
         </div>
       )}
 
-      {/* Save Notification */}
-      {showSaveNotification && (
-        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
-          Portfolio successfully saved!
-        </div>
-      )}
 
 
 
