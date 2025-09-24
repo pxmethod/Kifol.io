@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { TemplateConfig, PortfolioTemplateProps } from '@/types/template';
 import { Achievement } from '@/types/achievement';
 import AchievementDetailModal from '@/components/AchievementDetailModal';
+import AchievementCard from '@/components/AchievementCard';
 
 interface BaseTemplateProps extends PortfolioTemplateProps {
   config: TemplateConfig;
@@ -189,88 +190,11 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                     {/* Highlights for this date */}
                     <div className="space-y-4">
                       {dateHighlights.map((highlight: Achievement) => (
-                        <div 
+                        <AchievementCard
                           key={highlight.id}
-                          className="p-6 rounded-lg border cursor-pointer hover:shadow-lg transition-shadow"
-                          style={{ 
-                            backgroundColor: config.colors.background,
-                            borderColor: config.colors.border
-                          }}
-                          onClick={() => handleViewHighlight(highlight)}
-                        >
-                          <div className="flex items-start justify-between mb-2">
-                            <h3 
-                              className="text-lg font-semibold"
-                              style={{ color: config.colors.text }}
-                            >
-                              {highlight.title}
-                            </h3>
-                            {highlight.isMilestone && (
-                              <span 
-                                className="px-2 py-1 text-xs font-medium rounded-full"
-                                style={{ 
-                                  backgroundColor: config.colors.primary,
-                                  color: 'white'
-                                }}
-                              >
-                                Milestone
-                              </span>
-                            )}
-                          </div>
-                          
-                          {highlight.description && (
-                            <p 
-                              className="text-sm mb-4"
-                              style={{ color: config.colors.textSecondary }}
-                            >
-                              {highlight.description}
-                            </p>
-                          )}
-                          
-                          {/* Media Preview */}
-                          {highlight.media && highlight.media.length > 0 && (
-                            <div className="mt-4 flex space-x-2">
-                              {highlight.media.slice(0, 3).map((media) => (
-                                <div 
-                                  key={media.id}
-                                  className="w-40 h-40 rounded border overflow-hidden"
-                                  style={{ borderColor: config.colors.border }}
-                                >
-                                  {media.type === 'image' ? (
-                                    <Image 
-                                      src={media.url} 
-                                      alt={media.fileName}
-                                      width={64}
-                                      height={64}
-                                      className="w-full h-full object-cover"
-                                    />
-                                  ) : (
-                                    <div 
-                                      className="w-full h-full flex items-center justify-center"
-                                      style={{ backgroundColor: config.colors.primary }}
-                                    >
-                                      <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-                                      </svg>
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
-                              {highlight.media.length > 3 && (
-                                <div 
-                                  className="w-16 h-16 rounded border flex items-center justify-center text-sm font-medium"
-                                  style={{ 
-                                    backgroundColor: config.colors.background,
-                                    borderColor: config.colors.border,
-                                    color: config.colors.textSecondary
-                                  }}
-                                >
-                                  +{highlight.media.length - 3}
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
+                          achievement={highlight}
+                          onView={handleViewHighlight}
+                        />
                       ))}
                     </div>
                   </div>

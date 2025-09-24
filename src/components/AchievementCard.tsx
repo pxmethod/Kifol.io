@@ -16,6 +16,8 @@ export default function AchievementCard({
   onEdit
 }: AchievementCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedImageUrl, setSelectedImageUrl] = useState('');
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -33,25 +35,31 @@ export default function AchievementCard({
 
     if (imageMedia.length === 0) return null;
 
+    const handleThumbnailClick = (url: string) => {
+      setSelectedImageUrl(url);
+      setShowImageModal(true);
+    };
+
     return (
-      <div className="flex items-center space-x-1 mt-3">
+      <div className="flex items-center space-x-2 mt-3">
         {imageMedia.slice(0, displayCount).map((media, index) => (
           <div
             key={media.id}
-            className="w-8 h-8 rounded overflow-hidden bg-gray-100 flex-shrink-0"
+            className="w-24 h-24 rounded overflow-hidden bg-gray-100 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => handleThumbnailClick(media.url)}
           >
             <Image
               src={media.url}
               alt=""
-              width={32}
-              height={32}
+              width={96}
+              height={96}
               className="w-full h-full object-cover"
             />
           </div>
         ))}
         {hasMore && (
-          <div className="w-8 h-8 rounded bg-gray-200 flex items-center justify-center flex-shrink-0">
-            <span className="text-xs text-gray-600 font-medium">
+          <div className="w-24 h-24 rounded bg-gray-200 flex items-center justify-center flex-shrink-0">
+            <span className="text-sm text-gray-600 font-medium">
               +{imageMedia.length - 5}
             </span>
           </div>
@@ -180,8 +188,8 @@ export default function AchievementCard({
 
   return (
     <div
-      className={`bg-white rounded-lg shadow-sm border border-gray-200 p-4 transition-all duration-200 ${
-        isHovered ? 'shadow-md border-gray-300' : ''
+      className={`bg-white rounded-lg shadow-sm border border-gray-200 p-4 transition-all duration-200 relative ${
+        isHovered ? 'shadow-md border-gray-300 bg-gray-50' : ''
       }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -203,17 +211,19 @@ export default function AchievementCard({
           </p>
         </div>
         
-        {/* Edit Button */}
+        {/* Edit Button - Only show on hover */}
         {onEdit && (
           <button
             onClick={(e) => {
               e.stopPropagation();
               onEdit(achievement);
             }}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+            className={`p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200 ${
+              isHovered ? 'opacity-100' : 'opacity-0'
+            }`}
             title="Edit highlight"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
           </button>
@@ -223,7 +233,7 @@ export default function AchievementCard({
 
       {/* Description */}
       {achievement.description && (
-        <p className="text-gray-700 text-sm mb-3 line-clamp-2">
+        <p className="text-gray-700 text-sm mb-3">
           {achievement.description}
         </p>
       )}
@@ -241,6 +251,31 @@ export default function AchievementCard({
           onClick={() => onView(achievement)}
           title="View details"
         />
+      )}
+
+      {/* Image Modal */}
+      {showImageModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onClick={() => setShowImageModal(false)}>
+          <div className="relative max-w-4xl max-h-4xl p-4">
+            <button
+              onClick={() => setShowImageModal(false)}
+              className="absolute top-2 right-2 text-white hover:text-gray-300 transition-colors z-10"
+            >
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="relative" onClick={(e) => e.stopPropagation()}>
+              <Image
+                src={selectedImageUrl}
+                alt="Enlarged view"
+                width={800}
+                height={600}
+                className="max-w-full max-h-full object-contain rounded-lg"
+              />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

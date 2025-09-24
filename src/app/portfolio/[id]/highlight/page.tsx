@@ -261,19 +261,31 @@ export default function HighlightForm() {
       };
     }
 
-    // Parse the date
-    const date = new Date(dateString);
-    
-    // Check if the date is valid
-    if (isNaN(date.getTime())) {
+    // Parse the date components manually to avoid timezone issues
+    const [yearStr, monthStr, dayStr] = dateString.split('-');
+    const year = parseInt(yearStr, 10);
+    const month = parseInt(monthStr, 10);
+    const day = parseInt(dayStr, 10);
+
+    // Validate the date components
+    if (month < 1 || month > 12) {
       return {
         isValid: false,
-        error: 'Please enter a valid date'
+        error: 'Please enter a valid month (1-12)'
       };
     }
 
-    // Check if the parsed date matches the input (prevents dates like 2024-02-30)
-    const [year, month, day] = dateString.split('-').map(Number);
+    if (day < 1 || day > 31) {
+      return {
+        isValid: false,
+        error: 'Please enter a valid day (1-31)'
+      };
+    }
+
+    // Create a date object using local timezone to avoid UTC issues
+    const date = new Date(year, month - 1, day);
+    
+    // Check if the date is valid (handles invalid dates like Feb 30)
     if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
       return {
         isValid: false,
@@ -522,12 +534,13 @@ export default function HighlightForm() {
 
       if (isEditMode && highlightId) {
         await highlightService.updateHighlight(highlightId, highlightData);
+        // Redirect back to portfolio with update confirmation
+        router.push(`/portfolio/${portfolioId}?highlightUpdated=true`);
       } else {
         await highlightService.createHighlight(highlightData);
+        // Redirect back to portfolio with add confirmation
+        router.push(`/portfolio/${portfolioId}?highlightAdded=true`);
       }
-
-      // Redirect back to portfolio
-      router.push(`/portfolio/${portfolioId}?highlightAdded=true`);
     } catch (error) {
       console.error('Error saving highlight:', error);
       setErrors({ submit: 'Failed to save highlight. Please try again.' });

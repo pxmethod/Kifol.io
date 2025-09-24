@@ -42,11 +42,24 @@ export default function PortfolioPage() {
   const [toastMessage, setToastMessage] = useState('');
   const [showPrivateTooltip, setShowPrivateTooltip] = useState(false);
 
-  // Check if portfolio was just created
+  // Check if portfolio was just created or highlight was added
   useEffect(() => {
     const wasCreated = searchParams.get('created') === 'true';
+    const highlightAdded = searchParams.get('highlightAdded') === 'true';
+    const highlightUpdated = searchParams.get('highlightUpdated') === 'true';
+    
     if (wasCreated) {
       setToastMessage('Portfolio created successfully!');
+      setShowToast(true);
+      // Remove the query parameter from URL
+      router.replace(`/portfolio/${params.id}`);
+    } else if (highlightAdded) {
+      setToastMessage('Highlight added successfully!');
+      setShowToast(true);
+      // Remove the query parameter from URL
+      router.replace(`/portfolio/${params.id}`);
+    } else if (highlightUpdated) {
+      setToastMessage('Highlight updated successfully!');
       setShowToast(true);
       // Remove the query parameter from URL
       router.replace(`/portfolio/${params.id}`);
