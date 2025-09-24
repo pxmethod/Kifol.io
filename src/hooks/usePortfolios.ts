@@ -26,17 +26,13 @@ export function usePortfolios() {
         return
       }
 
-      // Get portfolios from database
-      const dbPortfolios = await portfolioService.getUserPortfolios()
+      // Get portfolios with achievements in a single optimized query
+      const dbPortfoliosWithAchievements = await portfolioService.getUserPortfoliosWithAchievements()
       
       // Transform to legacy format
-      const legacyPortfolios = await Promise.all(
-        dbPortfolios.map(async (dbPortfolio) => {
-          // Get achievements for this portfolio
-          const achievements = await achievementService.getPortfolioAchievements(dbPortfolio.id)
-          return dbPortfolioToLegacy(dbPortfolio, achievements)
-        })
-      )
+      const legacyPortfolios = dbPortfoliosWithAchievements.map((dbPortfolio) => {
+        return dbPortfolioToLegacy(dbPortfolio, dbPortfolio.achievements || [])
+      })
       
       setPortfolios(legacyPortfolios)
     } catch (err) {

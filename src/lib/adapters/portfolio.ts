@@ -61,13 +61,37 @@ function dbHighlightToLegacy(dbHighlight: DbHighlight): Achievement {
     title: dbHighlight.title,
     date: dbHighlight.date_achieved,
     description: dbHighlight.description || undefined,
-    media: dbHighlight.media_urls.map((url, index) => ({
-      id: `media-${index}`,
-      url,
-      type: url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
-      fileName: url.split('/').pop() || 'file',
-      fileSize: 0 // We don't store file size in current schema
-    })),
+    media: dbHighlight.media_urls.map((url, index) => {
+      const urlLower = url.toLowerCase();
+      const filename = url.split('/').pop() || 'file';
+      const extension = filename.split('.').pop()?.toLowerCase() || '';
+      
+      // Determine media type based on URL and extension
+      let mediaType = 'image'; // default
+      
+      if (urlLower.includes('.pdf') || extension === 'pdf') {
+        mediaType = 'pdf';
+      } else if (['mp4', 'mov', 'avi', 'mkv', 'webm', 'm4v'].includes(extension) || 
+                 urlLower.includes('mp4') || urlLower.includes('video') || 
+                 urlLower.includes('highlight-media')) {
+        mediaType = 'video';
+      } else if (['mp3', 'wav', 'm4a', 'aac', 'ogg', 'flac'].includes(extension)) {
+        mediaType = 'audio';
+      } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(extension)) {
+        mediaType = 'image';
+      } else if (urlLower.includes('storage') && !urlLower.includes('image') && !urlLower.includes('photo')) {
+        // For storage URLs without clear extensions, assume video if not explicitly image
+        mediaType = 'video';
+      }
+      
+      return {
+        id: `media-${index}`,
+        url,
+        type: mediaType,
+        fileName: filename,
+        fileSize: 0 // We don't store file size in current schema
+      };
+    }),
     type: dbHighlight.type,
     isMilestone: dbHighlight.type === 'milestone',
     createdAt: dbHighlight.created_at,

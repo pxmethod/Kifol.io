@@ -36,6 +36,35 @@ export class PortfolioService {
   }
 
   /**
+   * Get all portfolios for the current user with their achievements (optimized)
+   */
+  async getUserPortfoliosWithAchievements(): Promise<Array<Portfolio & { achievements: any[] }>> {
+    // Get the current user first
+    const { data: { user }, error: userError } = await this.supabase.auth.getUser()
+    
+    if (userError || !user) {
+      console.error('Error getting user:', userError)
+      throw new Error('User not authenticated')
+    }
+
+    const { data, error } = await this.supabase
+      .from('portfolios')
+      .select(`
+        *,
+        achievements:highlights(*)
+      `)
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching portfolios with achievements:', error)
+      throw new Error('Failed to fetch portfolios')
+    }
+
+    return data || []
+  }
+
+  /**
    * Get a portfolio by ID with access control
    */
   async getPortfolioWithAccess(id: string): Promise<Portfolio | null> {

@@ -22,10 +22,9 @@ interface PortfolioCardProps {
   portfolio: PortfolioData;
   onEdit: (portfolio: PortfolioData) => void;
   onRemove: (portfolio: PortfolioData) => void;
-  isAnimated?: boolean;
 }
 
-export default function PortfolioCard({ portfolio, onEdit, onRemove, isAnimated = false }: PortfolioCardProps) {
+export default function PortfolioCard({ portfolio, onEdit, onRemove }: PortfolioCardProps) {
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -85,7 +84,7 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove, isAnimated 
 
   return (
     <div 
-      className={`bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 cursor-pointer ${isAnimated ? 'animate-card-enter' : 'animate-card-initial'}`}
+      className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
       onClick={handleCardClick}
     >
       {/* Portfolio Image */}

@@ -28,30 +28,12 @@ export default function Dashboard() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  const [animatedCards, setAnimatedCards] = useState<Set<string>>(new Set());
-
   // Redirect unauthenticated users to marketing site
   useEffect(() => {
     if (!authLoading && !user) {
       router.push('/');
     }
   }, [user, authLoading, router]);
-
-
-  // Trigger animations when portfolios change
-  useEffect(() => {
-    if (portfolios.length > 0) {
-      // Reset animations first
-      setAnimatedCards(new Set());
-      
-      // Animate each card with a staggered delay
-      portfolios.forEach((portfolio, index) => {
-        setTimeout(() => {
-          setAnimatedCards(prev => new Set(prev).add(portfolio.id));
-        }, index * 100); // 100ms delay between each card
-      });
-    }
-  }, [portfolios]);
 
   // Show loading while checking authentication
   if (authLoading) {
@@ -177,7 +159,6 @@ export default function Dashboard() {
                   portfolio={portfolio}
                   onEdit={handleEditPortfolio}
                   onRemove={handleRemovePortfolio}
-                  isAnimated={animatedCards.has(portfolio.id)}
                 />
               );
             })}

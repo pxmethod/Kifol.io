@@ -62,7 +62,9 @@ export default function AchievementCard({
 
   const renderMediaIcons = () => {
     const hasImages = achievement.media.some(m => m.type === 'image');
+    const hasVideos = achievement.media.some(m => m.type === 'video');
     const hasPdfs = achievement.media.some(m => m.type === 'pdf');
+    const hasAudio = achievement.media.some(m => m.type === 'audio');
     const totalMedia = achievement.media.length;
 
     if (totalMedia === 0) return null;
@@ -76,6 +78,26 @@ export default function AchievementCard({
             </svg>
             <span className="text-xs text-gray-500">
               {achievement.media.filter(m => m.type === 'image').length}
+            </span>
+          </div>
+        )}
+        {hasVideos && (
+          <div className="flex items-center space-x-1">
+            <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            <span className="text-xs text-gray-500">
+              {achievement.media.filter(m => m.type === 'video').length}
+            </span>
+          </div>
+        )}
+        {hasAudio && (
+          <div className="flex items-center space-x-1">
+            <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+            </svg>
+            <span className="text-xs text-gray-500">
+              {achievement.media.filter(m => m.type === 'audio').length}
             </span>
           </div>
         )}
@@ -93,11 +115,74 @@ export default function AchievementCard({
     );
   };
 
+  // Get type icon and display name
+  const getTypeInfo = (type: string) => {
+    switch (type) {
+      case 'achievement':
+        return {
+          icon: (
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+            </svg>
+          ),
+          name: 'Achievement'
+        };
+      case 'creative_work':
+        return {
+          icon: (
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+            </svg>
+          ),
+          name: 'Creative Work'
+        };
+      case 'milestone':
+        return {
+          icon: (
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          ),
+          name: 'Milestone'
+        };
+      case 'activity':
+        return {
+          icon: (
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          ),
+          name: 'Activity'
+        };
+      case 'reflection_note':
+        return {
+          icon: (
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          ),
+          name: 'Reflection/Note'
+        };
+      default:
+        return {
+          icon: (
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+            </svg>
+          ),
+          name: 'Achievement'
+        };
+    }
+  };
+
+  const typeInfo = getTypeInfo(achievement.type);
+
   return (
     <div
       className={`bg-white rounded-lg shadow-sm border border-gray-200 p-4 transition-all duration-200 ${
         isHovered ? 'shadow-md border-gray-300' : ''
-      } ${achievement.isMilestone ? 'border-l-4 border-l-kifolio-cta' : ''}`}
+      }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -108,11 +193,10 @@ export default function AchievementCard({
             <h3 className="text-lg font-semibold text-kifolio-text truncate">
               {achievement.title}
             </h3>
-            {achievement.isMilestone && (
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-kifolio-cta/10 text-kifolio-cta">
-                Milestone
-              </span>
-            )}
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-kifolio-cta/10 text-kifolio-cta">
+              {typeInfo.icon}
+              <span className="ml-1">{typeInfo.name}</span>
+            </span>
           </div>
           <p className="text-sm text-gray-500">
             {formatDate(achievement.date)}

@@ -108,7 +108,7 @@ export default function MarketingPage() {
               <Link
                 href="/auth/signup"
                 className="inline-block btn-primary hover:bg-kifolio-primary-dark px-10 py-4 rounded-lg text-xl font-semibold transition-colors shadow-lg hover:shadow-xl">
-                Get Started
+                Get started for free
               </Link>
             </div>
             <p className="py-4 text-white text-sm">Create your child&apos;s free portfolio in minutes.</p>
@@ -378,7 +378,7 @@ export default function MarketingPage() {
               What parents are saying
             </h2>
             <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+              <div className="bg-white rounded-lg p-6 shadow-sm">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-kifolio-primary rounded-full flex items-center justify-center mr-4">
                     <span className="text-white font-semibold">S</span>
@@ -393,7 +393,7 @@ export default function MarketingPage() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+              <div className="bg-white rounded-lg p-6 shadow-sm">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-kifolio-primary rounded-full flex items-center justify-center mr-4">
                     <span className="text-white font-semibold">M</span>
@@ -409,7 +409,7 @@ export default function MarketingPage() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+              <div className="bg-white rounded-lg p-6 shadow-sm">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-kifolio-primary rounded-full flex items-center justify-center mr-4">
                     <span className="text-white font-semibold">M</span>
@@ -425,7 +425,7 @@ export default function MarketingPage() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+              <div className="bg-white rounded-lg p-6 shadow-sm">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-kifolio-primary rounded-full flex items-center justify-center mr-4">
                     <span className="text-white font-semibold">D</span>

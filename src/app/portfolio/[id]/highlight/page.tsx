@@ -10,6 +10,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { storageService } from '@/lib/storage';
 import { HighlightService } from '@/lib/database/achievements';
 import { HIGHLIGHT_TYPES, HighlightType, HighlightFormData } from '@/types/achievement';
+import { useVideoUpload } from '@/hooks/useVideoUpload';
+import { Video, FileText, Music, Image } from 'lucide-react';
 
 export default function HighlightForm() {
   const router = useRouter();
@@ -17,6 +19,7 @@ export default function HighlightForm() {
   const { user, loading } = useAuth();
   const portfolioId = params.id as string;
   const highlightId = params.highlightId as string; // For editing existing highlights
+  const { uploadVideo, generateThumbnail, ...videoUploadState } = useVideoUpload();
   
   const [formData, setFormData] = useState<HighlightFormData>({
     title: '',
@@ -36,6 +39,103 @@ export default function HighlightForm() {
   const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
 
   const highlightService = new HighlightService();
+
+  // Utility function to extract filename from URL
+  const getFileNameFromUrl = (url: string): string => {
+    try {
+      const urlObj = new URL(url);
+      const pathname = urlObj.pathname;
+      let filename = pathname.split('/').pop() || 'Unknown file';
+      
+      // If the filename doesn't have an extension, try to extract from query params or other parts
+      if (!filename.includes('.')) {
+        // Check if there's a filename in query parameters
+        const searchParams = urlObj.searchParams;
+        const queryFilename = searchParams.get('filename') || searchParams.get('name');
+        if (queryFilename) {
+          filename = queryFilename;
+        } else {
+          // Generate a more descriptive name based on the URL structure
+          const pathParts = pathname.split('/').filter(part => part.length > 0);
+          if (pathParts.length > 1) {
+            filename = `${pathParts[pathParts.length - 2]}_${pathParts[pathParts.length - 1]}`;
+          }
+        }
+      }
+      
+      return filename;
+    } catch {
+      // If URL parsing fails, try to extract from the string
+      const parts = url.split('/');
+      let filename = parts[parts.length - 1] || 'Unknown file';
+      
+      // If still no extension, try to make it more descriptive
+      if (!filename.includes('.')) {
+        const pathParts = url.split('/').filter(part => part.length > 0);
+        if (pathParts.length > 1) {
+          filename = `${pathParts[pathParts.length - 2]}_${pathParts[pathParts.length - 1]}`;
+        }
+      }
+      
+      return filename;
+    }
+  };
+
+  // Utility function to detect file type from URL
+  const getFileTypeFromUrl = (url: string): string => {
+    const filename = getFileNameFromUrl(url);
+    const extension = filename.split('.').pop()?.toLowerCase() || '';
+    
+    // Debug logging
+    console.log('URL:', url);
+    console.log('Filename:', filename);
+    console.log('Extension:', extension);
+    
+    // Check URL path for video indicators (some URLs might not have extensions)
+    const urlLower = url.toLowerCase();
+    
+    // FIRST: Check for explicit video indicators in URL
+    if (urlLower.includes('mp4') || urlLower.includes('mov') || urlLower.includes('avi') || 
+        urlLower.includes('mkv') || urlLower.includes('webm') || urlLower.includes('m4v') ||
+        urlLower.includes('video') || urlLower.includes('highlight-media')) {
+      console.log('Detected as VIDEO based on URL content');
+      return 'video';
+    }
+    
+    // SECOND: Check file extension
+    if (['mp4', 'mov', 'avi', 'mkv', 'webm', 'm4v'].includes(extension)) {
+      console.log('Detected as VIDEO based on extension');
+      return 'video';
+    }
+    
+    // THIRD: Check for audio
+    if (['mp3', 'wav', 'm4a', 'aac', 'ogg', 'flac'].includes(extension)) {
+      console.log('Detected as AUDIO based on extension');
+      return 'audio';
+    }
+    
+    // FOURTH: Check for PDF
+    if (extension === 'pdf') {
+      console.log('Detected as PDF based on extension');
+      return 'pdf';
+    }
+    
+    // FIFTH: Check for images (only if explicitly image extensions)
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(extension)) {
+      console.log('Detected as IMAGE based on extension');
+      return 'image';
+    }
+    
+    // SIXTH: For storage URLs without clear extensions, assume video if not explicitly image
+    if (urlLower.includes('storage') && !urlLower.includes('image') && !urlLower.includes('photo')) {
+      console.log('Detected as VIDEO based on storage URL pattern');
+      return 'video';
+    }
+    
+    // SEVENTH: Default to video for any unknown media files
+    console.log('Defaulting to VIDEO for unknown file type');
+    return 'video';
+  };
 
   // Icon mapping for highlight types
   const getTypeIcon = (type: HighlightType) => {
@@ -133,10 +233,14 @@ export default function HighlightForm() {
           type: highlight.type as HighlightType,
           media: []
         });
+        // Debug the highlight data
+        console.log('Highlight data:', highlight);
+        console.log('Media URLs:', highlight.media_urls);
+        
         setExistingMedia(highlight.media_urls.map((url, index) => ({
           id: `existing-${index}`,
           url,
-          fileName: `Media ${index + 1}`
+          fileName: getFileNameFromUrl(url)
         })));
         setIsEditMode(true);
       }
@@ -144,6 +248,62 @@ export default function HighlightForm() {
       console.error('Error loading highlight:', error);
       setErrors({ submit: 'Failed to load highlight data' });
     }
+  };
+
+  // Date validation function
+  const validateDate = (dateString: string): { isValid: boolean; error?: string } => {
+    // Check if the date string is in the correct format (YYYY-MM-DD)
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(dateString)) {
+      return {
+        isValid: false,
+        error: 'Please enter a valid date in MM/DD/YYYY format'
+      };
+    }
+
+    // Parse the date
+    const date = new Date(dateString);
+    
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      return {
+        isValid: false,
+        error: 'Please enter a valid date'
+      };
+    }
+
+    // Check if the parsed date matches the input (prevents dates like 2024-02-30)
+    const [year, month, day] = dateString.split('-').map(Number);
+    if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+      return {
+        isValid: false,
+        error: 'Please enter a valid date (e.g., 02/30/2024 is not a valid date)'
+      };
+    }
+
+    // Check year range (reasonable limits for child achievements)
+    const currentYear = new Date().getFullYear();
+    const minYear = 1900; // Reasonable minimum
+    const maxYear = currentYear + 10; // Allow future dates up to 10 years
+
+    if (year < minYear || year > maxYear) {
+      return {
+        isValid: false,
+        error: `Please enter a date between ${minYear} and ${maxYear}`
+      };
+    }
+
+    // Check if date is too far in the future (more than 10 years)
+    const futureLimit = new Date();
+    futureLimit.setFullYear(currentYear + 10);
+    if (date > futureLimit) {
+      return {
+        isValid: false,
+        error: 'Date cannot be more than 10 years in the future'
+      };
+    }
+
+    return { isValid: true };
   };
 
   const validateForm = () => {
@@ -161,6 +321,12 @@ export default function HighlightForm() {
 
     if (!formData.date) {
       newErrors.date = 'Date is required';
+    } else {
+      // Validate date format and range
+      const dateValidation = validateDate(formData.date);
+      if (!dateValidation.isValid && dateValidation.error) {
+        newErrors.date = dateValidation.error;
+      }
     }
 
     if (formData.description && formData.description.length > 500) {
@@ -196,9 +362,18 @@ export default function HighlightForm() {
 
   const handleInputChange = (field: keyof HighlightFormData, value: string | File[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+    
+    // Real-time date validation
+    if (field === 'date' && typeof value === 'string' && value.trim()) {
+      const dateValidation = validateDate(value);
+      if (!dateValidation.isValid && dateValidation.error) {
+        setErrors(prev => ({ ...prev, date: dateValidation.error! }));
+      }
     }
   };
 
@@ -221,14 +396,61 @@ export default function HighlightForm() {
           return;
         }
         
-        uploadedFiles.push(file);
-        
-        // Create preview URL for images
-        if (file.type.startsWith('image/')) {
-          newPreviews.push({
-            url: URL.createObjectURL(file),
-            file
-          });
+        // Handle video files with compression
+        if (file.type.startsWith('video/')) {
+          try {
+            // Upload video with compression
+            const videoUrl = await uploadVideo(file, {
+              maxSizeMB: 25,
+              quality: 28,
+              maxWidth: 1280,
+              maxHeight: 720
+            });
+            
+            // Generate thumbnail for video
+            let thumbnailUrl = '';
+            try {
+              thumbnailUrl = await generateThumbnail(file);
+            } catch (thumbError) {
+              console.warn('Thumbnail generation failed:', thumbError);
+            }
+            
+            // Create a mock file object for the form data
+            const processedFile = new File([file], file.name, {
+              type: file.type,
+              lastModified: file.lastModified
+            });
+            
+            // Store the uploaded URL in a custom property
+            (processedFile as any).uploadedUrl = videoUrl;
+            (processedFile as any).thumbnailUrl = thumbnailUrl;
+            
+            uploadedFiles.push(processedFile);
+            
+            // Create preview URL for video
+            newPreviews.push({
+              url: URL.createObjectURL(file),
+              file: processedFile
+            });
+          } catch (videoError) {
+            console.error('Video processing failed:', videoError);
+            setErrors(prev => ({ 
+              ...prev, 
+              media: 'Failed to process video. Please try again.' 
+            }));
+            return;
+          }
+        } else {
+          // Handle non-video files normally
+          uploadedFiles.push(file);
+          
+          // Create preview URL for images
+          if (file.type.startsWith('image/')) {
+            newPreviews.push({
+              url: URL.createObjectURL(file),
+              file
+            });
+          }
         }
       }
 
@@ -271,12 +493,18 @@ export default function HighlightForm() {
     setIsSubmitting(true);
 
     try {
-      // Upload media files
+      // Process media files (videos are already uploaded, others need uploading)
       const mediaUrls: string[] = [];
       
       for (const file of formData.media) {
-        const url = await storageService.uploadFile(file, `${formData.title}-${Date.now()}`);
-        mediaUrls.push(url);
+        // Check if this is a video that was already uploaded
+        if ((file as any).uploadedUrl) {
+          mediaUrls.push((file as any).uploadedUrl);
+        } else {
+          // Upload non-video files normally
+          const url = await storageService.uploadFile(file, `${formData.title}-${Date.now()}`);
+          mediaUrls.push(url);
+        }
       }
 
       // Combine existing media URLs with new ones
@@ -452,7 +680,7 @@ export default function HighlightForm() {
                   id="date"
                   value={formData.date}
                   onChange={(e) => handleInputChange('date', e.target.value)}
-                  className="input cursor-pointer"
+                  className={`input cursor-pointer ${errors.date ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                 />
                 {errors.date && (
                   <p className="form-field__error">{errors.date}</p>
@@ -495,8 +723,43 @@ export default function HighlightForm() {
                   className="input cursor-pointer"
                 />
                 <p className="form-field__help">
-                  Photos, videos, PDFs, and audio files up to 50MB each
+                  Photos, videos, PDFs, and audio files up to 200MB each. Large videos will be automatically compressed for optimal playback.
                 </p>
+                
+                {/* Video Upload Progress */}
+                {(videoUploadState.isUploading || videoUploadState.isCompressing) && (
+                  <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <LoadingSpinner size="sm" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-blue-800">
+                          {videoUploadState.status}
+                        </p>
+                        {videoUploadState.progress > 0 && (
+                          <div className="mt-2">
+                            <div className="w-full bg-blue-200 rounded-full h-2">
+                              <div 
+                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${videoUploadState.progress}%` }}
+                              ></div>
+                            </div>
+                            <p className="text-xs text-blue-600 mt-1">
+                              {Math.round(videoUploadState.progress)}% complete
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Video Upload Error */}
+                {videoUploadState.error && (
+                  <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-800">{videoUploadState.error}</p>
+                  </div>
+                )}
+                
                 {errors.media && (
                   <p className="form-field__error">{errors.media}</p>
                 )}
@@ -508,33 +771,83 @@ export default function HighlightForm() {
               <h3 className="text-sm font-medium text-gray-700 mb-2">Media Preview</h3>
               <div className="grid grid-cols-4 gap-3">
                 {/* Existing Media */}
-                {existingMedia.map((media, index) => (
-                  <div key={media.id} className="relative">
-                    <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                      {media.url.includes('.pdf') ? (
-                        <div className="flex flex-col items-center justify-center text-center p-2">
-                          <svg className="w-8 h-8 text-red-500 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                          </svg>
-                          <span className="text-xs text-gray-500 truncate">{media.fileName}</span>
-                        </div>
-                      ) : (
-                        <img 
-                          src={media.url} 
-                          alt={media.fileName}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
+                {existingMedia.map((media, index) => {
+                  const fileType = getFileTypeFromUrl(media.url);
+                  const filename = getFileNameFromUrl(media.url);
+                  
+                  // Debug info (remove this after testing)
+                  console.log(`Media ${index}:`, {
+                    url: media.url,
+                    filename: filename,
+                    fileType: fileType,
+                    originalFileName: media.fileName,
+                    urlLength: media.url.length,
+                    urlParts: media.url.split('/'),
+                    lastPart: media.url.split('/').pop()
+                  });
+                  
+                  // Use the detected file type
+                  const displayFileType = fileType;
+                  
+                  return (
+                    <div key={media.id} className="relative">
+                      <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                        {displayFileType === 'pdf' ? (
+                          <div className="flex flex-col items-center justify-center text-center p-2">
+                            <FileText className="w-8 h-8 text-red-500 mb-1" />
+                            <span className="text-xs text-gray-500 truncate">{filename}</span>
+                          </div>
+                        ) : displayFileType === 'video' ? (
+                          <div className="flex flex-col items-center justify-center text-center p-2">
+                            <Video className="w-8 h-8 text-blue-500 mb-1" />
+                            <span className="text-xs text-gray-500 truncate">{filename}</span>
+                            <span className="text-xs text-red-500 mt-1">DEBUG: {fileType}</span>
+                            <span className="text-xs text-blue-500 mt-1">URL: {media.url.substring(0, 30)}...</span>
+                          </div>
+                        ) : displayFileType === 'audio' ? (
+                          <div className="flex flex-col items-center justify-center text-center p-2">
+                            <Music className="w-8 h-8 text-green-500 mb-1" />
+                            <span className="text-xs text-gray-500 truncate">{filename}</span>
+                          </div>
+                        ) : displayFileType === 'image' ? (
+                          <img 
+                            src={media.url} 
+                            alt={filename}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              // Fallback to icon if image fails to load
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = `
+                                  <div class="flex flex-col items-center justify-center text-center p-2">
+                                    <svg class="w-8 h-8 text-gray-500 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="text-xs text-gray-500 truncate">${filename}</span>
+                                  </div>
+                                `;
+                              }
+                            }}
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center justify-center text-center p-2">
+                            <Image className="w-8 h-8 text-gray-500 mb-1" />
+                            <span className="text-xs text-gray-500 truncate">{filename}</span>
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeExistingMedia(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                      >
+                        ×
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removeExistingMedia(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
+                  );
+                })}
                 
                 {/* New Media */}
                 {formData.media.map((file, index) => {
@@ -550,13 +863,24 @@ export default function HighlightForm() {
                           />
                         ) : file.type === 'application/pdf' ? (
                           <div className="flex flex-col items-center justify-center text-center p-2">
-                            <svg className="w-8 h-8 text-red-500 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                            </svg>
+                            <FileText className="w-8 h-8 text-red-500 mb-1" />
+                            <span className="text-xs text-gray-500 truncate">{file.name}</span>
+                          </div>
+                        ) : file.type.startsWith('video/') ? (
+                          <div className="flex flex-col items-center justify-center text-center p-2">
+                            <Video className="w-8 h-8 text-blue-500 mb-1" />
+                            <span className="text-xs text-gray-500 truncate">{file.name}</span>
+                          </div>
+                        ) : file.type.startsWith('audio/') ? (
+                          <div className="flex flex-col items-center justify-center text-center p-2">
+                            <Music className="w-8 h-8 text-green-500 mb-1" />
                             <span className="text-xs text-gray-500 truncate">{file.name}</span>
                           </div>
                         ) : (
-                          <span className="text-sm text-gray-500">{file.name}</span>
+                          <div className="flex flex-col items-center justify-center text-center p-2">
+                            <Image className="w-8 h-8 text-gray-500 mb-1" />
+                            <span className="text-xs text-gray-500 truncate">{file.name}</span>
+                          </div>
                         )}
                       </div>
                       <button

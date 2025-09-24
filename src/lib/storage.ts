@@ -73,15 +73,24 @@ export class StorageService {
    * Validate file before upload
    */
   validateFile(file: File): { valid: boolean; error?: string } {
-    // Check file size (50MB limit)
-    if (file.size > 50 * 1024 * 1024) {
-      return { valid: false, error: 'File size must be 50MB or less' }
+    // Check file size (200MB limit)
+    if (file.size > 200 * 1024 * 1024) {
+      return { valid: false, error: 'File size must be 200MB or less' }
     }
 
     // Check file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf']
+    const allowedTypes = [
+      'image/jpeg', 
+      'image/png', 
+      'image/gif', 
+      'application/pdf',
+      'video/mp4',
+      'video/quicktime',
+      'audio/mpeg',
+      'audio/wav'
+    ]
     if (!allowedTypes.includes(file.type)) {
-      return { valid: false, error: 'Please upload JPEG, PNG, GIF, or PDF files only' }
+      return { valid: false, error: 'Please upload JPEG, PNG, GIF, PDF, MP4, MOV, MP3, or WAV files only' }
     }
 
     return { valid: true }
