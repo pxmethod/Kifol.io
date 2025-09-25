@@ -73,36 +73,20 @@
 }
 
 .profile-menu__email {
-  font-size: var(--font-size-sm);
-  color: var(--color-white);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  @apply text-sm text-white whitespace-nowrap overflow-hidden text-ellipsis text-left;
   max-width: 200px; /* Limit email width to make room for plan badge */
-  text-align: left; /* Ensure left alignment */
 }
 
 .profile-menu__chevron {
-  width: 1.25rem;
-  height: 1.25rem;
-  transition: transform var(--transition-normal);
+  @apply w-5 h-5 transition-transform duration-200;
 }
 
 .profile-menu__chevron--open {
-  transform: rotate(180deg);
+  @apply rotate-180;
 }
 
 .profile-menu__dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: var(--space-2);
-  width: 12rem;
-  background-color: var(--color-white);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--color-gray-200);
-  overflow: hidden;
+  @apply absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 overflow-hidden;
   z-index: 5;
   animation: dropdown-enter var(--transition-normal);
 }
@@ -121,13 +105,7 @@
 .profile-menu__item {
   display: block;
   width: 100%;
-  padding: var(--space-3) var(--space-4);
-  color: var(--color-gray-700);
-  text-decoration: none;
-  font-size: var(--font-size-sm);
-  border: none;
-  background: none;
-  cursor: pointer;
+  @apply px-4 py-3 text-gray-700 no-underline text-sm border-none bg-none cursor-pointer;
   transition: background-color var(--transition-normal);
   text-align: left;
 }
@@ -164,13 +142,7 @@
 .sidebar__item {
   display: block;
   width: 100%;
-  padding: var(--space-3) var(--space-4);
-  color: var(--color-gray-700);
-  text-decoration: none;
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-medium);
-  border: none;
-  background: none;
+  @apply px-4 py-3 text-gray-700 no-underline text-base font-medium border-none bg-none;
   cursor: pointer;
   border-radius: var(--radius-lg);
   transition: all var(--transition-normal);
@@ -215,13 +187,7 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--space-3) var(--space-4);
-  background-color: var(--color-white);
-  border: 1px solid var(--color-gray-300);
-  border-radius: var(--radius-lg);
-  font-size: var(--font-size-base);
-  color: var(--color-gray-700);
-  font-weight: var(--font-weight-medium);
-  cursor: pointer;
+  @apply bg-white border border-gray-300 rounded-lg text-base text-gray-700 font-medium cursor-pointer;
   transition: all var(--transition-normal);
 }
 
@@ -258,13 +224,7 @@
 .mobile-nav__item {
   display: block;
   width: 100%;
-  padding: var(--space-3) var(--space-4);
-  color: var(--color-gray-700);
-  text-decoration: none;
-  font-size: var(--font-size-base);
-  border: none;
-  background: none;
-  cursor: pointer;
+  @apply px-4 py-3 text-gray-700 no-underline text-base border-none bg-none cursor-pointer;
   transition: background-color var(--transition-normal);
   text-align: left;
 }
@@ -285,12 +245,7 @@
 
 /* Breadcrumb Block */
 .breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--font-size-sm);
-  color: var(--color-gray-600);
-  margin-bottom: var(--space-6);
+  @apply flex items-center gap-2 text-sm text-gray-600 mb-6;
 }
 
 .breadcrumb__item {
@@ -348,13 +303,7 @@
 }
 
 .tab-nav__item {
-  padding: var(--space-3) var(--space-4);
-  color: var(--color-gray-600);
-  text-decoration: none;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  border-bottom: 2px solid transparent;
-  transition: all var(--transition-normal);
+  @apply px-4 py-3 text-gray-600 no-underline text-sm font-medium border-b-2 border-transparent transition-all duration-200;
   white-space: nowrap;
 }
 

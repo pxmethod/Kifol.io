@@ -27,10 +27,7 @@
 
 /* Form Field Elements */
 .form-field__label {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text);
-  margin-bottom: var(--space-1);
+  @apply text-sm font-medium text-kifolio-text mb-1;
 }
 
 .form-field__label--required::after {
@@ -39,94 +36,67 @@
 }
 
 .form-field__help {
-  font-size: var(--font-size-sm);
-  color: var(--color-gray-600);
-  margin-top: var(--space-1);
+  @apply text-sm text-gray-600 mt-1;
 }
 
 .form-field__error {
-  font-size: var(--font-size-sm);
-  color: var(--color-danger);
-  margin-top: var(--space-1);
+  @apply text-sm text-red-600 mt-1;
 }
 
 /* Input Block */
 .input {
-  width: 100%;
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-gray-300);
-  border-radius: var(--radius-lg);
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-normal);
-  color: var(--color-text);
-  background-color: var(--color-white);
-  transition: all var(--transition-normal);
+  @apply w-full px-4 py-3 border border-gray-300 rounded-lg text-base text-kifolio-text bg-white leading-normal transition-all duration-200;
   min-height: 2.75rem;
 }
 
 .input::placeholder {
-  color: var(--color-gray-400);
+  @apply text-gray-400;
 }
 
 .input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  ring: 2px;
-  ring-color: var(--color-primary-light);
-  box-shadow: 0 0 0 3px var(--color-primary-light);
+  @apply outline-none border-kifolio-primary ring-2 ring-kifolio-primary-light;
 }
 
 .input:disabled {
-  background-color: var(--color-gray-50);
-  color: var(--color-gray-500);
-  cursor: not-allowed;
+  @apply bg-gray-50 text-gray-500 cursor-not-allowed;
 }
 
 .input:read-only {
-  background-color: var(--color-gray-50);
-  cursor: default;
+  @apply bg-gray-50 cursor-default;
 }
 
 /* Input Modifiers - Variants */
 .input--error {
-  border-color: var(--color-danger);
-  box-shadow: 0 0 0 3px var(--color-danger-light);
+  @apply border-danger ring-2 ring-danger-light;
 }
 
 .input--error:focus {
-  border-color: var(--color-danger);
-  box-shadow: 0 0 0 3px var(--color-danger-light);
+  @apply border-danger ring-2 ring-danger-light;
 }
 
 .input--success {
-  border-color: var(--color-success);
-  box-shadow: 0 0 0 3px var(--color-success-light);
+  @apply border-success ring-2 ring-success-light;
 }
 
 /* Input Modifiers - Sizes */
 .input--sm {
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--font-size-sm);
+  @apply px-3 py-2 text-sm;
   min-height: 2rem;
 }
 
 .input--lg {
-  padding: var(--space-4) var(--space-5);
-  font-size: var(--font-size-lg);
+  @apply px-5 py-4 text-lg;
   min-height: 3.5rem;
 }
 
 /* Textarea */
 .textarea {
-  resize: vertical;
-  min-height: 6rem;
-  line-height: var(--line-height-relaxed);
+  @apply resize-y min-h-24 leading-relaxed;
   font-family: inherit;
 }
 
 .textarea--auto-resize {
-  resize: none;
-  overflow: hidden;
+  @apply resize-none overflow-hidden;
 }
 
 /* Select */

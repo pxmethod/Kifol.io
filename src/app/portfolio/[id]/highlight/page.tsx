@@ -617,7 +617,7 @@ export default function HighlightForm() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         {formData.type && getTypeIcon(formData.type as HighlightType)}
-                        <span className={`ml-2 ${formData.type ? 'text-gray-900' : 'text-gray-500'}`}>
+                        <span className={`ml-2 ${formData.type ? 'text-kifolio-text' : 'text-gray-500'}`}>
                           {getSelectedType()?.name || 'Select a type...'}
                         </span>
                       </div>
@@ -647,7 +647,7 @@ export default function HighlightForm() {
                           <div className="flex items-center">
                             {getTypeIcon(type.id)}
                             <div className="ml-3">
-                              <div className="text-sm font-medium text-gray-900">{type.name}</div>
+                              <div className="text-base font-medium text-kifolio-text">{type.name}</div>
                               <div className="text-xs text-gray-500">{type.description}</div>
                             </div>
                           </div>
@@ -724,17 +724,36 @@ export default function HighlightForm() {
 
               {/* Media Upload */}
               <div className="form-field">
-                <label htmlFor="media" className="form-field__label">
+                <label className="form-field__label">
                   Add Media (Optional)
                 </label>
-                <input
-                  type="file"
-                  id="media"
-                  multiple
-                  accept="image/jpeg,image/png,image/gif,application/pdf,video/mp4,video/quicktime,audio/mpeg,audio/wav"
-                  onChange={handleMediaUpload}
-                  className="input cursor-pointer"
-                />
+                
+                {/* File Input */}
+                <div className="relative">
+                  <input
+                    type="file"
+                    id="media"
+                    multiple
+                    accept="image/jpeg,image/png,image/gif,application/pdf,video/mp4,video/quicktime,audio/mpeg,audio/wav"
+                    onChange={handleMediaUpload}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    disabled={uploadingMedia}
+                  />
+                  <label
+                    htmlFor="media"
+                    className={`inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer transition-colors ${
+                      uploadingMedia 
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                        : 'bg-white hover:bg-gray-50 text-gray-700'
+                    }`}
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    Choose files
+                  </label>
+                </div>
+                
                 <p className="form-field__help">
                   Photos, videos, PDFs, and audio files up to 200MB each. Large videos will be automatically compressed for optimal playback.
                 </p>

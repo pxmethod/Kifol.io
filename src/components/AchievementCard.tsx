@@ -233,7 +233,7 @@ export default function AchievementCard({
 
       {/* Description */}
       {achievement.description && (
-        <p className="text-gray-700 text-sm mb-3">
+        <p className="text-gray-500 text-sm mb-3">
           {achievement.description}
         </p>
       )}

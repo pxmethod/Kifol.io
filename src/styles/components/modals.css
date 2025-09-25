@@ -58,11 +58,7 @@
 }
 
 .modal__title {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  margin: 0;
-  line-height: var(--line-height-tight);
+  @apply text-xl font-semibold text-kifolio-text m-0 leading-tight;
 }
 
 .modal__close {
@@ -177,8 +173,7 @@
 }
 
 .modal--confirmation .modal__title {
-  font-size: var(--font-size-lg);
-  margin-bottom: var(--space-3);
+  @apply text-lg mb-3;
 }
 
 .modal--confirmation .modal__message {
@@ -261,18 +256,11 @@
 }
 
 .toast__title {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  margin: 0 0 var(--space-1) 0;
-  line-height: var(--line-height-tight);
+  @apply text-sm font-semibold text-kifolio-text mb-1 leading-tight;
 }
 
 .toast__message {
-  font-size: var(--font-size-sm);
-  color: var(--color-gray-600);
-  margin: 0;
-  line-height: var(--line-height-normal);
+  @apply text-sm text-gray-600 m-0 leading-normal;
 }
 
 .toast__close {
