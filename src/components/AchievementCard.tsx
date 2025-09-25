@@ -197,8 +197,20 @@ export default function AchievementCard({
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center space-x-2 mb-1">
+          {/* Desktop Layout - Title and Type Tag on same row */}
+          <div className="hidden md:flex items-center space-x-2 mb-1">
             <h3 className="text-lg font-semibold text-kifolio-text truncate">
+              {achievement.title}
+            </h3>
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-kifolio-cta/10 text-kifolio-cta flex-shrink-0">
+              {typeInfo.icon}
+              <span className="ml-1">{typeInfo.name}</span>
+            </span>
+          </div>
+          
+          {/* Mobile Layout - Type Tag below Title */}
+          <div className="md:hidden">
+            <h3 className="text-lg font-semibold text-kifolio-text mb-2">
               {achievement.title}
             </h3>
             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-kifolio-cta/10 text-kifolio-cta">
@@ -206,7 +218,8 @@ export default function AchievementCard({
               <span className="ml-1">{typeInfo.name}</span>
             </span>
           </div>
-          <p className="text-sm text-gray-500">
+          
+          <p className="text-sm text-gray-500 mt-1">
             {formatDate(achievement.date)}
           </p>
         </div>
