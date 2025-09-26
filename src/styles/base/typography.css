@@ -9,6 +9,11 @@ body {
   background-color: var(--color-bg);
 }
 
+/* Headings use Inter Tight */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-inter-tight), Inter Tight, sans-serif;
+}
+
 /* Heading styles */
 .heading {
   font-weight: var(--font-weight-bold);

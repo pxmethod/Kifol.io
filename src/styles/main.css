@@ -273,6 +273,11 @@ body {
   line-height: 1.6;
 }
 
+/* Headings use Inter Tight */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-inter-tight), Inter Tight, sans-serif;
+}
+
 /* Focus styles for accessibility */
 *:focus-visible {
   outline: 2px solid var(--color-primary);

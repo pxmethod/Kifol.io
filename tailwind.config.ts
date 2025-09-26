@@ -10,6 +10,8 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ["var(--font-inter)", "Inter", "sans-serif"],
+        heading: ["var(--font-inter-tight)", "Inter Tight", "sans-serif"],
+        tight: ["var(--font-inter-tight)", "Inter Tight", "sans-serif"],
       },
       fontSize: {
         'xs': '0.75rem',    /* 12px */
@@ -22,16 +24,77 @@ const config: Config = {
         '4xl': '2.25rem',   /* 36px */
       },
       colors: {
-        kifolio: {
-          bg: "#f0f8f6",
-          header: "#1a5f5f",
-          cta: "#ff6b35",
-          text: "#2d5a5a",
-          primary: "#ff6b35",
-          "primary-dark": "#e55a2b",
-          "primary-hover": "rgba(255, 107, 53, 0.9)",
-          "primary-light": "rgba(255, 107, 53, 0.1)",
+        // Discovery Template Color System (for marketing website)
+        discovery: {
+          // Primary brand colors
+          primary: "#00664e",      // Main green
+          black: "#1b1b1b",        // Main black
+          grey: "#2e2e2e",         // Main grey
+          yellow: "#ffe549",       // Main yellow
+          orange: "#ff5938",       // Main orange
+          
+          // Blue palette
+          blue: {
+            100: "#9fdbcd",        // Light teal-blue
+            200: "#7fc0b1",        // Medium teal-blue
+            900: "#385f56",        // Dark teal-green
+          },
+          
+          // Beige palette
+          beige: {
+            100: "#f6f5f3",        // Very light beige
+            200: "#fcf9eb",        // Light beige
+            300: "#dfd6d2",        // Medium beige
+            800: "#747271",        // Dark beige
+            900: "#625e5b",        // Darkest beige
+          },
+          
+          // White variations
+          white: {
+            100: "#ffffff",        // Pure white
+            80: "#ffffffcc",       // 80% opacity
+            40: "#ffffff66",       // 40% opacity
+          },
+          
+          // Grey palette
+          gray: {
+            400: "#3c3c3fb3",      // Medium grey with transparency
+            600: "#363636",         // Dark grey
+            700: "#7d7d88",         // Medium warm grey
+          },
         },
+        
+        // Kifolio App Color System (for application)
+        kifolio: {
+          bg: "#f0f8f6",           // Light green background
+          header: "#1a5f5f",       // Dark teal header
+          cta: "#ff6b35",          // Orange CTA
+          text: "#2d5a5a",         // Dark teal text
+          primary: "#ff6b35",      // Primary orange
+          "primary-dark": "#e55a2b", // Darker orange
+          "primary-hover": "rgba(255, 107, 53, 0.9)", // Orange hover
+          "primary-light": "rgba(255, 107, 53, 0.1)", // Light orange
+        },
+        
+        // Shared color system (common colors used across both)
+        shared: {
+          white: "#ffffff",        // Pure white
+          black: "#1b1b1b",        // Pure black
+          gray: {
+            50: "#f9fafb",         // Very light gray
+            100: "#f3f4f6",        // Light gray
+            200: "#e5e7eb",        // Lighter gray
+            300: "#d1d5db",        // Light gray
+            400: "#9ca3af",        // Medium gray
+            500: "#6b7280",        // Gray
+            600: "#4b5563",        // Dark gray
+            700: "#374151",        // Darker gray
+            800: "#1f2937",        // Very dark gray
+            900: "#111827",        // Darkest gray
+          },
+        },
+        
+        // Status colors (consistent across both systems)
         success: {
           DEFAULT: "#16a34a",
           light: "rgba(22, 163, 74, 0.1)",
