@@ -214,7 +214,7 @@ export default function Header({ animateLogo = false }: HeaderProps) {
             </Link>
             <Link 
               href="/auth/signup"
-              className="bg-white text-kifolio-header px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="bg-white text-kifolio-header px-4 py-2 rounded-pill hover:bg-gray-100 transition-colors"
             >
               Sign Up
             </Link>

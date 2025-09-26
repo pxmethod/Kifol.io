@@ -28,9 +28,12 @@ const config: Config = {
         discovery: {
           // Primary brand colors
           primary: "#00664e",      // Main green
+          "primary-light": "#008a6b", // Lighter green for hovers
+          "primary-dark": "#004d3a",  // Darker green for active states
           black: "#1b1b1b",        // Main black
           grey: "#2e2e2e",         // Main grey
           yellow: "#ffe549",       // Main yellow
+          "yellow-dark": "#dabe16", // Darker yellow for hovers
           orange: "#ff5938",       // Main orange
           
           // Blue palette
@@ -138,6 +141,7 @@ const config: Config = {
         'lg': '0.75rem',     // 12px
         'xl': '1rem',        // 16px
         'full': '9999px',
+        'pill': '9rem',      // 144px - fully rounded pill shape
       },
       fontWeight: {
         'normal': '400',

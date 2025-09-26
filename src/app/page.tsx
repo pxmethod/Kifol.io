@@ -60,11 +60,11 @@ export default function MarketingPage() {
       />
 
       {/* Header */}
-      <header className="bg-discovery-primary text-white px-4 py-4 sticky top-0 z-50">
+      <header className="bg-discovery-beige-200 text-white px-9 py-4 sticky top-0 z-50">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center">
             <Image 
-              src="/kifolio_logo.svg" 
+              src="/kifolio_logo_dark.svg" 
               alt="Kifolio Logo" 
               width={144}
               height={38}
@@ -75,13 +75,13 @@ export default function MarketingPage() {
           <div className="flex items-center space-x-4">
             <Link 
               href="/auth/login"
-              className="text-white hover:text-discovery-white-80 transition-colors font-medium"
+              className="text-discovery-black hover:text-discovery-grey transition-colors font-medium"
             >
               Log In
             </Link>
             <Link 
               href="/auth/signup"
-              className="bg-white text-discovery-primary px-6 py-2 rounded-lg hover:bg-discovery-beige-100 transition-colors font-medium"
+              className="bg-discovery-yellow text-discovery-black px-8 py-4 rounded-pill hover:bg-discovery-yellow-dark transition-colors font-medium"
             >
               Sign Up
             </Link>
@@ -92,15 +92,15 @@ export default function MarketingPage() {
       {/* Main Content */}
       <main>
         {/* Hero Section */}
-        <section className="pt-20 pb-0 px-4 bg-discovery-primary">
+        <section className="pt-7 pb-0 px-9 bg-discovery-beige-200">
           <div className={`max-w-7xl mx-auto ${heroAnimation.className}`}>
-            <div className="grid lg:grid-cols-2 gap-12 items-end">
+            <div className="flex flex-col lg:flex-row lg:items-end lg:gap-8">
               {/* Left Column - Content */}
-              <div className="text-left pb-20">
-                <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+              <div className="text-left pb-20 lg:flex-1 lg:max-w-2xl">
+                <h1 className="text-5xl lg:text-7xl font-semibold text-discovery-black mb-6">
                   Every milestone matters. Capture them all with Kifolio.
                 </h1>
-                <p className="text-xl text-discovery-white-80 mb-8 leading-relaxed">
+                <p className="text-lg text-discovery-grey mb-8 leading-relaxed">
                   Build beautiful portfolios for your children that showcase their work, 
                   milestones, and achievements. Whether it&apos;s artwork, school projects, 
                   sports accomplishments, or personal growth, Kifolio has you covered. 
@@ -109,16 +109,16 @@ export default function MarketingPage() {
                 <div className="flex flex-col sm:flex-row gap-4 mb-6">
                   <Link
                     href="/auth/signup"
-                    className="inline-block bg-white text-discovery-primary px-8 py-4 rounded-lg text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-beige-100 text-center">
+                    className="inline-block bg-discovery-primary text-white px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-primary-light text-center">
                     Get started for free
                   </Link>
                 </div>
-                <p className="text-discovery-white-80 text-sm">Create your child&apos;s free portfolio in minutes.</p>
+                <p className="text-discovery-grey text-sm">Create your child&apos;s free portfolio in minutes.</p>
               </div>
               
               {/* Right Column - Image */}
-              <div className="flex justify-center lg:justify-end">
-                <div className="w-full max-w-lg">
+              <div className="flex justify-center lg:justify-end lg:flex-1 lg:-ml-16">
+                <div className="max-w-6xl">
                   <img 
                     src="/marketing/portfolio-ren-web.png" 
                     alt="Kifolio Portfolio Example" 
@@ -130,16 +130,25 @@ export default function MarketingPage() {
           </div>
         </section>
 
+        {/* Color Strip Section */}
+        <section className="py-0">
+          <div className="grid grid-cols-3 h-3">
+            <div className="bg-discovery-blue-100"></div>
+            <div className="bg-discovery-yellow"></div>
+            <div className="bg-discovery-orange"></div>
+          </div>
+        </section>
+
         {/* The What Section */}
         <section 
           ref={whatSection.ref}
-          className={`py-20 px-4 bg-discovery-beige-100 ${whatSection.className}`}
+          className={`py-20 px-4 bg-discovery-primary ${whatSection.className}`}
         >
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-discovery-black mb-8">
+            <h2 className="text-5xl lg:text-5xl font-medium text-discovery-white-100 mb-6">
             From first drawing to graduation
             </h2>
-            <p className="text-lg text-discovery-grey mb-12 leading-relaxed">
+            <p className="text-lg text-discovery-white-100 mb-8 leading-relaxed">
             Kifolio isn&apos;t only about preserving memories—it&apos;s about setting your child up for success. By curating their achievements and progress over the years, you&apos;ll have a ready-made portfolio that supports important milestones like:
             </p>
           </div>
@@ -154,8 +163,8 @@ export default function MarketingPage() {
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <h3 className="text-2xl font-semibold text-discovery-black mb-4">Academic transitions</h3>
-                <p className="text-discovery-grey leading-relaxed">
+                <h3 className="text-4xl lg:text-4xl font-medium text-discovery-white-100 mb-3">Academic transitions</h3>
+                <p className="text-discovery-white-80 leading-relaxed">
                   Provide a polished portfolio that complements transcripts and test scores—helping admissions teams see the full story behind the student.
                 </p>
               </div>
@@ -168,8 +177,8 @@ export default function MarketingPage() {
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <h3 className="text-2xl font-semibold text-discovery-black mb-4">Scholarships & awards</h3>
-                <p className="text-discovery-grey leading-relaxed">
+                <h3 className="text-4xl lg:text-4xl font-medium text-discovery-white-100 mb-3">Scholarships & awards</h3>
+                <p className="text-discovery-white-80 leading-relaxed">
                   Present a record of academic honors, leadership roles, volunteer work, and creative projects to strengthen applications.
                 </p>
               </div>
@@ -182,8 +191,8 @@ export default function MarketingPage() {
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <h3 className="text-2xl font-semibold text-discovery-black mb-4">Resume & early opportunities</h3>
-                <p className="text-discovery-grey leading-relaxed">
+                <h3 className="text-4xl lg:text-4xl font-medium text-discovery-white-100 mb-3">Resume & early opportunities</h3>
+                <p className="text-discovery-white-80 leading-relaxed">
                   For internships, summer programs, or specialized schools, Kifolio helps highlight experiences and growth in a clear, organized format.
                 </p>
               </div>
@@ -196,8 +205,8 @@ export default function MarketingPage() {
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <h3 className="text-2xl font-semibold text-discovery-black mb-4">Personal growth tracking</h3>
-                <p className="text-discovery-grey leading-relaxed">
+                <h3 className="text-4xl lg:text-4xl font-medium text-discovery-white-100 mb-3">Personal growth tracking</h3>
+                <p className="text-discovery-white-80 leading-relaxed">
                   Beyond academics, Kifolio gives your child a narrative of progress that builds confidence and shows them how far they've come.
                 </p>
               </div>
@@ -208,7 +217,7 @@ export default function MarketingPage() {
         {/* How It Works Section */}
         <section 
           ref={howItWorksSection.ref}
-          className={`py-20 px-4 bg-discovery-primary ${howItWorksSection.className}`}
+          className={`py-20 px-4 bg-discovery-orange ${howItWorksSection.className}`}
         >
           <div className="max-w-6xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">
@@ -217,10 +226,10 @@ export default function MarketingPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
               {/* Step 1 */}
               <div className="text-center">
-                <div className="mx-auto mb-6 w-16 h-16 bg-white rounded-full flex items-center justify-center">
+                <div className="mx-auto mb-6 w-16 h-16 bg-discovery-yellow rounded-full flex items-center justify-center">
                   <span className="text-2xl font-bold text-discovery-primary">1</span>
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-4">
+                <h3 className="text-4xl lg:text-3xl font-medium text-discovery-yellow mb-2 leading-tight">
                   Create your child's portfolio
                 </h3>
                 <p className="text-discovery-white-80 leading-relaxed">
