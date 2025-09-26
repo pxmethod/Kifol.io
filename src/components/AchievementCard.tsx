@@ -18,6 +18,10 @@ export default function AchievementCard({
   const [isHovered, setIsHovered] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState('');
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [selectedVideoUrl, setSelectedVideoUrl] = useState('');
+  const [videoError, setVideoError] = useState<string | null>(null);
+  const [showAllThumbnails, setShowAllThumbnails] = useState(false);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -30,37 +34,79 @@ export default function AchievementCard({
 
   const renderMediaThumbnails = () => {
     const imageMedia = achievement.media.filter(m => m.type === 'image');
-    const displayCount = Math.min(5, imageMedia.length);
-    const hasMore = imageMedia.length > 5;
+    const videoMedia = achievement.media.filter(m => m.type === 'video');
+    const allMedia = [...imageMedia, ...videoMedia];
+    
+    const maxDisplay = 4;
+    const displayCount = showAllThumbnails ? allMedia.length : Math.min(maxDisplay, allMedia.length);
+    const hasMore = allMedia.length > maxDisplay;
 
-    if (imageMedia.length === 0) return null;
+    if (allMedia.length === 0) return null;
 
-    const handleThumbnailClick = (url: string) => {
-      setSelectedImageUrl(url);
-      setShowImageModal(true);
+    const handleThumbnailClick = (media: any) => {
+      console.log('Thumbnail click debug:', {
+        mediaType: media.type,
+        mediaUrl: media.url,
+        isImage: media.type === 'image' && !media.url.includes('.mp4') && !media.url.includes('.mov') && !media.url.includes('.avi'),
+        isVideo: media.type === 'video' || media.url.includes('.mp4') || media.url.includes('.mov') || media.url.includes('.avi')
+      });
+      
+      if (media.type === 'image' && !media.url.includes('.mp4') && !media.url.includes('.mov') && !media.url.includes('.avi')) {
+        setSelectedImageUrl(media.url);
+        setShowImageModal(true);
+      } else if (media.type === 'video' || media.url.includes('.mp4') || media.url.includes('.mov') || media.url.includes('.avi')) {
+        setSelectedVideoUrl(media.url);
+        setVideoError(null); // Reset error when opening new video
+        setShowVideoModal(true);
+      }
     };
 
     return (
-      <div className="flex items-center space-x-2 mt-3">
-        {imageMedia.slice(0, displayCount).map((media, index) => (
+      <div className="flex flex-wrap items-center gap-2 mt-3">
+        {allMedia.slice(0, displayCount).map((media, index) => (
           <div
             key={media.id}
             className="w-24 h-24 rounded overflow-hidden bg-gray-100 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() => handleThumbnailClick(media.url)}
+            onClick={() => handleThumbnailClick(media)}
           >
-            <Image
-              src={media.url}
-              alt=""
-              width={96}
-              height={96}
-              className="w-full h-full object-cover"
-            />
+            {media.type === 'image' && !media.url.includes('.mp4') && !media.url.includes('.mov') && !media.url.includes('.avi') ? (
+              <Image
+                src={media.url}
+                alt=""
+                width={96}
+                height={96}
+                className="w-full h-full object-cover"
+              />
+            ) : media.type === 'video' || media.url.includes('.mp4') || media.url.includes('.mov') || media.url.includes('.avi') ? (
+              <div className="w-full h-full flex items-center justify-center bg-gray-200 relative">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-6 h-6 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            ) : null}
           </div>
         ))}
-        {hasMore && (
-          <div className="w-24 h-24 rounded bg-gray-200 flex items-center justify-center flex-shrink-0">
+        {hasMore && !showAllThumbnails && (
+          <div 
+            className="w-24 h-24 rounded bg-gray-200 flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-gray-300 transition-colors"
+            onClick={() => setShowAllThumbnails(true)}
+          >
             <span className="text-sm text-gray-600 font-medium">
-              +{imageMedia.length - 5}
+              +{allMedia.length - maxDisplay}
+            </span>
+          </div>
+        )}
+        {hasMore && showAllThumbnails && (
+          <div 
+            className="w-24 h-24 rounded bg-gray-300 flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-gray-400 transition-colors"
+            onClick={() => setShowAllThumbnails(false)}
+          >
+            <span className="text-sm text-gray-700 font-medium">
+              Show Less
             </span>
           </div>
         )}
@@ -78,7 +124,7 @@ export default function AchievementCard({
     if (totalMedia === 0) return null;
 
     return (
-      <div className="flex items-center space-x-2 mt-2">
+      <div className="flex flex-wrap items-center gap-2 mt-2">
         {hasImages && (
           <div className="flex items-center space-x-1">
             <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -91,7 +137,7 @@ export default function AchievementCard({
         )}
         {hasVideos && (
           <div className="flex items-center space-x-1">
-            <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
             </svg>
             <span className="text-xs text-gray-500">
@@ -198,7 +244,7 @@ export default function AchievementCard({
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
           {/* Desktop Layout - Title and Type Tag on same row */}
-          <div className="hidden md:flex items-center space-x-2 mb-1">
+          <div className="hidden md:flex items-center gap-2 mb-1">
             <h3 className="text-lg font-semibold text-kifolio-text truncate">
               {achievement.title}
             </h3>
@@ -286,6 +332,53 @@ export default function AchievementCard({
                 height={600}
                 className="max-w-full max-h-full object-contain rounded-lg"
               />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Video Modal */}
+      {showVideoModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onClick={() => setShowVideoModal(false)}>
+          <div className="relative max-w-4xl max-h-4xl p-4">
+            <button
+              onClick={() => setShowVideoModal(false)}
+              className="absolute top-2 right-2 text-white hover:text-gray-300 transition-colors z-10"
+            >
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="relative" onClick={(e) => e.stopPropagation()}>
+              <video
+                src={selectedVideoUrl}
+                controls
+                className="max-w-full max-h-full rounded-lg"
+                style={{ maxHeight: '80vh' }}
+                onError={(e) => {
+                  const video = e.target as HTMLVideoElement;
+                  const error = video.error;
+                  
+                  if (error) {
+                    const errorMessages = {
+                      1: 'MEDIA_ERR_ABORTED - The video download was aborted',
+                      2: 'MEDIA_ERR_NETWORK - A network error occurred',
+                      3: 'MEDIA_ERR_DECODE - An error occurred while decoding the video',
+                      4: 'MEDIA_ERR_SRC_NOT_SUPPORTED - The video format is not supported or the file is corrupted'
+                    };
+                    const errorMessage = errorMessages[error.code as keyof typeof errorMessages] || 'Unknown error';
+                    setVideoError(errorMessage);
+                  }
+                }}
+              >
+                Your browser does not support the video tag.
+              </video>
+              {videoError && (
+                <div className="absolute top-4 left-4 right-4 text-white text-sm bg-red-600 bg-opacity-90 px-3 py-2 rounded">
+                  <div className="font-semibold">Video Error:</div>
+                  <div>{videoError}</div>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -33,7 +33,8 @@ export default function AchievementDetailModal({
     });
   };
 
-  const imageMedia = achievement.media.filter(m => m.type === 'image');
+  const imageMedia = achievement.media.filter(m => m.type === 'image' && !m.url.includes('.mp4') && !m.url.includes('.mov') && !m.url.includes('.avi'));
+  const videoMedia = achievement.media.filter(m => m.type === 'video' || m.url.includes('.mp4') || m.url.includes('.mov') || m.url.includes('.avi'));
   const pdfMedia = achievement.media.filter(m => m.type === 'pdf');
 
   const formatFileSize = (bytes: number) => {
@@ -175,15 +176,45 @@ export default function AchievementDetailModal({
             </div>
           )}
 
-          {/* Achievement Info */}
-          <div className="pt-4 border-t border-gray-200">
-            <div className="flex items-center justify-between text-sm text-gray-500">
-              <span>Created: {formatDate(achievement.createdAt)}</span>
-              {achievement.updatedAt !== achievement.createdAt && (
-                <span>Updated: {formatDate(achievement.updatedAt)}</span>
-              )}
+          {/* Video Media */}
+          {videoMedia.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-sm font-medium text-kifolio-text mb-3">Videos</h3>
+              <div className="space-y-2">
+                {videoMedia.map((media) => (
+                  <div
+                    key={media.id}
+                    className="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-blue-100 rounded flex items-center justify-center">
+                        <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-kifolio-text">
+                          {media.fileName}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Video • {formatFileSize(media.fileSize)}
+                        </p>
+                      </div>
+                    </div>
+                    <a
+                      href={media.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-kifolio-cta hover:text-kifolio-cta/80 text-sm font-medium"
+                    >
+                      View
+                    </a>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+
         </div>
 
         {/* Fixed Bottom Bar */}

@@ -9,6 +9,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { storageService } from '@/lib/storage';
 import { HighlightService } from '@/lib/database/achievements';
 import { HIGHLIGHT_TYPES, HighlightType, HighlightFormData } from '@/types/achievement';
+import { useVideoUpload } from '@/hooks/useVideoUpload';
+import { Video, FileText, Music, Image } from 'lucide-react';
 
 export default function EditHighlight() {
   const router = useRouter();
@@ -36,6 +38,68 @@ export default function EditHighlight() {
   const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
 
   const highlightService = new HighlightService();
+  const { uploadVideo, ...videoUploadState } = useVideoUpload();
+
+  // Utility function to extract filename from URL
+  const getFileNameFromUrl = (url: string): string => {
+    try {
+      // Try to extract from URL path
+      const urlPath = new URL(url).pathname;
+      const filename = urlPath.split('/').pop() || '';
+      
+      // If we got a filename, return it
+      if (filename && filename.includes('.')) {
+        return filename;
+      }
+      
+      // Fallback: return a generic name
+      return 'Media file';
+    } catch (error) {
+      // If URL parsing fails, try to extract from the string
+      const parts = url.split('/');
+      const filename = parts[parts.length - 1];
+      return filename || 'Media file';
+    }
+  };
+
+  // Utility function to detect file type from URL
+  const getFileTypeFromUrl = (url: string): string => {
+    const filename = getFileNameFromUrl(url);
+    const extension = filename.split('.').pop()?.toLowerCase() || '';
+    
+    // Check URL path for video indicators (some URLs might not have extensions)
+    const urlLower = url.toLowerCase();
+    
+    // Video extensions
+    if (['mp4', 'mov', 'avi', 'mkv', 'webm', 'm4v'].includes(extension) || 
+        urlLower.includes('video') || urlLower.includes('mp4')) {
+      return 'video';
+    }
+    
+    // Audio extensions
+    if (['mp3', 'wav', 'aac', 'ogg', 'm4a'].includes(extension) || 
+        urlLower.includes('audio')) {
+      return 'audio';
+    }
+    
+    // PDF
+    if (extension === 'pdf' || urlLower.includes('pdf')) {
+      return 'pdf';
+    }
+    
+    // Image extensions
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(extension) || 
+        urlLower.includes('image')) {
+      return 'image';
+    }
+    
+    // Default to video for unknown storage URLs (likely videos from our system)
+    if (url.includes('storage') || url.includes('supabase')) {
+      return 'video';
+    }
+    
+    return 'image'; // fallback
+  };
 
   // Icon mapping for highlight types
   const getTypeIcon = (type: HighlightType) => {
@@ -218,21 +282,44 @@ export default function EditHighlight() {
       const newPreviews: { url: string; file: File }[] = [];
       
       for (const file of files) {
-        // Validate file
-        const validation = storageService.validateFile(file);
-        if (!validation.valid) {
-          setErrors(prev => ({ ...prev, media: validation.error || 'Invalid file' }));
-          return;
-        }
-        
-        uploadedFiles.push(file);
-        
-        // Create preview URL for images
-        if (file.type.startsWith('image/')) {
-          newPreviews.push({
-            url: URL.createObjectURL(file),
-            file
-          });
+        // Handle video files with compression
+        if (file.type.startsWith('video/')) {
+          try {
+            const uploadedUrl = await uploadVideo(file);
+            // Create a special file object with the uploaded URL
+            const videoFile = Object.assign(file, { uploadedUrl });
+            uploadedFiles.push(videoFile);
+            
+            // Create preview for video
+            newPreviews.push({
+              url: URL.createObjectURL(file),
+              file: videoFile
+            });
+          } catch (videoError) {
+            console.error('Video upload error:', videoError);
+            setErrors(prev => ({ 
+              ...prev, 
+              media: 'Failed to upload video. Please try again.' 
+            }));
+            continue;
+          }
+        } else {
+          // Validate non-video files
+          const validation = storageService.validateFile(file);
+          if (!validation.valid) {
+            setErrors(prev => ({ ...prev, media: validation.error || 'Invalid file' }));
+            return;
+          }
+          
+          uploadedFiles.push(file);
+          
+          // Create preview URL for images
+          if (file.type.startsWith('image/')) {
+            newPreviews.push({
+              url: URL.createObjectURL(file),
+              file
+            });
+          }
         }
       }
 
@@ -275,12 +362,18 @@ export default function EditHighlight() {
     setIsSubmitting(true);
 
     try {
-      // Upload media files
+      // Process media files (videos are already uploaded, others need uploading)
       const mediaUrls: string[] = [];
       
       for (const file of formData.media) {
-        const url = await storageService.uploadFile(file, `${formData.title}-${Date.now()}`);
-        mediaUrls.push(url);
+        // Check if this is a video that was already uploaded
+        if ((file as any).uploadedUrl) {
+          mediaUrls.push((file as any).uploadedUrl);
+        } else {
+          // Upload non-video files normally
+          const url = await storageService.uploadFile(file, `${formData.title}-${Date.now()}`);
+          mediaUrls.push(url);
+        }
       }
 
       // Combine existing media URLs with new ones
@@ -489,20 +582,60 @@ export default function EditHighlight() {
 
               {/* Media Upload */}
               <div className="form-field">
-                <label htmlFor="media" className="form-field__label">
+                <label className="form-field__label">
                   Add Media (Optional)
                 </label>
-                <input
-                  type="file"
-                  id="media"
-                  multiple
-                  accept="image/jpeg,image/png,image/gif,application/pdf"
-                  onChange={handleMediaUpload}
-                  className="input cursor-pointer"
-                />
+                
+                {/* File Input */}
+                <div className="relative">
+                  <input
+                    type="file"
+                    id="media"
+                    multiple
+                    accept="image/jpeg,image/png,image/gif,application/pdf,video/mp4,video/quicktime,audio/mpeg,audio/wav"
+                    onChange={handleMediaUpload}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    disabled={uploadingMedia}
+                  />
+                  <label
+                    htmlFor="media"
+                    className={`inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer transition-colors ${
+                      uploadingMedia 
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                        : 'bg-white hover:bg-gray-50 text-gray-700'
+                    }`}
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    Choose files
+                  </label>
+                </div>
+                
                 <p className="form-field__help">
-                  JPEG, PNG, GIF, or PDF up to 50MB each
+                  Photos, videos, PDFs, and audio files up to 50MB each. 
                 </p>
+                
+                {/* Video Upload Progress */}
+                {(videoUploadState.isUploading || videoUploadState.isCompressing) && (
+                  <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-blue-800">
+                        {videoUploadState.status}
+                      </span>
+                      <span className="text-sm text-blue-600">
+                        {videoUploadState.progress}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-blue-200 rounded-full h-2">
+                      <div 
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${videoUploadState.progress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+                
                 {errors.media && (
                   <p className="form-field__error">{errors.media}</p>
                 )}
@@ -514,33 +647,67 @@ export default function EditHighlight() {
               <h3 className="text-sm font-medium text-gray-700 mb-2">Media Preview</h3>
               <div className="grid grid-cols-4 gap-3">
                 {/* Existing Media */}
-                {existingMedia.map((media, index) => (
-                  <div key={media.id} className="relative">
-                    <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                      {media.url.includes('.pdf') ? (
-                        <div className="flex flex-col items-center justify-center text-center p-2">
-                          <svg className="w-8 h-8 text-red-500 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                          </svg>
-                          <span className="text-xs text-gray-500 truncate">{media.fileName}</span>
-                        </div>
-                      ) : (
-                        <img 
-                          src={media.url} 
-                          alt={media.fileName}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
+                {existingMedia.map((media, index) => {
+                  const fileType = getFileTypeFromUrl(media.url);
+                  const filename = getFileNameFromUrl(media.url);
+                  
+                  return (
+                    <div key={media.id} className="relative">
+                      <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                        {fileType === 'pdf' ? (
+                          <div className="flex flex-col items-center justify-center text-center p-2">
+                            <FileText className="w-8 h-8 text-red-500 mb-1" />
+                            <span className="text-xs text-gray-500 truncate">{filename}</span>
+                          </div>
+                        ) : fileType === 'video' ? (
+                          <div className="flex flex-col items-center justify-center text-center p-2">
+                            <Video className="w-8 h-8 text-blue-500 mb-1" />
+                            <span className="text-xs text-gray-500 truncate">{filename}</span>
+                          </div>
+                        ) : fileType === 'audio' ? (
+                          <div className="flex flex-col items-center justify-center text-center p-2">
+                            <Music className="w-8 h-8 text-green-500 mb-1" />
+                            <span className="text-xs text-gray-500 truncate">{filename}</span>
+                          </div>
+                        ) : fileType === 'image' ? (
+                          <img 
+                            src={media.url} 
+                            alt={filename}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              // Fallback to icon if image fails to load
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = `
+                                  <div class="flex flex-col items-center justify-center text-center p-2">
+                                    <svg class="w-8 h-8 text-gray-500 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="text-xs text-gray-500 truncate">${filename}</span>
+                                  </div>
+                                `;
+                              }
+                            }}
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center justify-center text-center p-2">
+                            <Image className="w-8 h-8 text-gray-500 mb-1" />
+                            <span className="text-xs text-gray-500 truncate">{filename}</span>
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeExistingMedia(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                      >
+                        ×
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removeExistingMedia(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
+                  );
+                })}
                 
                 {/* New Media */}
                 {formData.media.map((file, index) => {
@@ -556,13 +723,35 @@ export default function EditHighlight() {
                           />
                         ) : file.type === 'application/pdf' ? (
                           <div className="flex flex-col items-center justify-center text-center p-2">
-                            <svg className="w-8 h-8 text-red-500 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                            </svg>
+                            <FileText className="w-8 h-8 text-red-500 mb-1" />
+                            <span className="text-xs text-gray-500 truncate">{file.name}</span>
+                          </div>
+                        ) : file.type.startsWith('video/') ? (
+                          <div className="flex flex-col items-center justify-center text-center p-2 w-full h-full">
+                            {/* Video thumbnail frame */}
+                            <div className="w-full h-full bg-gray-200 rounded flex items-center justify-center mb-2">
+                              <Video className="w-8 h-8 text-blue-500" />
+                            </div>
+                            {/* Filename and size below */}
+                            <div className="text-center">
+                              <div className="text-xs text-gray-700 font-medium truncate w-full" title={file.name}>
+                                {file.name}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {(file.size / (1024 * 1024)).toFixed(1)} MB
+                              </div>
+                            </div>
+                          </div>
+                        ) : file.type.startsWith('audio/') ? (
+                          <div className="flex flex-col items-center justify-center text-center p-2">
+                            <Music className="w-8 h-8 text-green-500 mb-1" />
                             <span className="text-xs text-gray-500 truncate">{file.name}</span>
                           </div>
                         ) : (
-                          <span className="text-sm text-gray-500">{file.name}</span>
+                          <div className="flex flex-col items-center justify-center text-center p-2">
+                            <Image className="w-8 h-8 text-gray-500 mb-1" />
+                            <span className="text-xs text-gray-500 truncate">{file.name}</span>
+                          </div>
                         )}
                       </div>
                       <button

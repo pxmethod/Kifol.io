@@ -755,7 +755,7 @@ export default function HighlightForm() {
                 </div>
                 
                 <p className="form-field__help">
-                  Photos, videos, PDFs, and audio files up to 200MB each. Large videos will be automatically compressed for optimal playback.
+                  Photos, videos, PDFs, and audio files up to 50MB each.
                 </p>
                 
                 {/* Video Upload Progress */}
@@ -899,9 +899,20 @@ export default function HighlightForm() {
                             <span className="text-xs text-gray-500 truncate">{file.name}</span>
                           </div>
                         ) : file.type.startsWith('video/') ? (
-                          <div className="flex flex-col items-center justify-center text-center p-2">
-                            <Video className="w-8 h-8 text-blue-500 mb-1" />
-                            <span className="text-xs text-gray-500 truncate">{file.name}</span>
+                          <div className="flex flex-col items-center justify-center text-center p-2 w-full h-full">
+                            {/* Video thumbnail frame */}
+                            <div className="w-full h-full bg-gray-200 rounded flex items-center justify-center mb-2">
+                              <Video className="w-8 h-8 text-blue-500" />
+                            </div>
+                            {/* Filename and size below */}
+                            <div className="text-center">
+                              <div className="text-xs text-gray-700 font-medium truncate w-full" title={file.name}>
+                                {file.name}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {(file.size / (1024 * 1024)).toFixed(1)} MB
+                              </div>
+                            </div>
                           </div>
                         ) : file.type.startsWith('audio/') ? (
                           <div className="flex flex-col items-center justify-center text-center p-2">

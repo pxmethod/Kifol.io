@@ -84,6 +84,7 @@ function dbHighlightToLegacy(dbHighlight: DbHighlight): Achievement {
         mediaType = 'video';
       }
       
+      
       return {
         id: `media-${index}`,
         url,

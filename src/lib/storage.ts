@@ -26,7 +26,15 @@ export class StorageService {
 
       if (error) {
         console.error('Upload error:', error)
-        throw new Error(`Failed to upload file: ${error.message}`)
+        
+        // Provide more specific error messages
+        if (error.message.includes('exceeded the maximum allowed size')) {
+          throw new Error('File is too large. Please use files under 50MB.')
+        } else if (error.message.includes('Invalid file type')) {
+          throw new Error('File type not supported. Please use JPEG, PNG, GIF, PDF, MP4, MOV, MP3, or WAV files.')
+        } else {
+          throw new Error(`Failed to upload file: ${error.message}`)
+        }
       }
 
       // Get public URL
@@ -73,9 +81,10 @@ export class StorageService {
    * Validate file before upload
    */
   validateFile(file: File): { valid: boolean; error?: string } {
-    // Check file size (200MB limit)
-    if (file.size > 200 * 1024 * 1024) {
-      return { valid: false, error: 'File size must be 200MB or less' }
+    // Check file size (50MB limit - Supabase default limit)
+    const maxSizeMB = 50;
+    if (file.size > maxSizeMB * 1024 * 1024) {
+      return { valid: false, error: `File size must be ${maxSizeMB}MB or less` }
     }
 
     // Check file type

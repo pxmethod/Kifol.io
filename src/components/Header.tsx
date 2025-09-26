@@ -80,7 +80,7 @@ export default function Header({ animateLogo = false }: HeaderProps) {
 
   return (
     <header className="bg-kifolio-header text-white px-4 py-3 shadow-sm">
-      <div className="flex items-center justify-between max-w-6xl mx-auto">
+      <div className="flex items-center justify-between max-w-7xl mx-auto">
         {/* Logo */}
         <Link 
           href={user ? "/dashboard" : "/"} 

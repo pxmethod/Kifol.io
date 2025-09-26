@@ -30,12 +30,6 @@ export const useVideoUpload = () => {
     file: File,
     options: VideoUploadOptions = {}
   ): Promise<string> => {
-    const {
-      maxSizeMB = 25,
-      quality = 28,
-      maxWidth = 1280,
-      maxHeight = 720
-    } = options;
 
     // Reset state
     setState({
@@ -48,64 +42,19 @@ export const useVideoUpload = () => {
 
     try {
       // Check file size limits
-      const maxAllowedSize = 200 * 1024 * 1024; // 200MB
+      const maxAllowedSize = 50 * 1024 * 1024; // 50MB (Supabase default limit)
       if (file.size > maxAllowedSize) {
         throw new Error(`Video file is too large. Maximum size allowed is ${maxAllowedSize / (1024 * 1024)}MB.`);
       }
 
-      let processedFile: File | Blob = file;
-      let uploadFile: File | Blob = file;
+      const uploadFile: File | Blob = file;
 
-      // Determine if compression is needed
-      const needsCompression = file.size > maxSizeMB * 1024 * 1024;
-      
-      if (needsCompression) {
-        setState(prev => ({
-          ...prev,
-          isCompressing: true,
-          status: 'Compressing video for optimal playback...'
-        }));
-
-        try {
-          // Compress the video
-          const compressedBlob = await videoCompressionService.compressVideo(file, {
-            maxSizeMB,
-            quality,
-            maxWidth,
-            maxHeight,
-            onProgress: (progress) => {
-              setState(prev => ({
-                ...prev,
-                progress: progress * 0.8 // 80% for compression
-              }));
-            }
-          });
-
-          processedFile = compressedBlob;
-          uploadFile = new File([compressedBlob], file.name, {
-            type: 'video/mp4',
-            lastModified: Date.now()
-          });
-
-          setState(prev => ({
-            ...prev,
-            isCompressing: false,
-            status: 'Video compressed successfully!'
-          }));
-        } catch (compressionError) {
-          console.warn('Video compression failed, proceeding with original file:', compressionError);
-          setState(prev => ({
-            ...prev,
-            isCompressing: false,
-            status: 'Compression failed, uploading original file...'
-          }));
-        }
-      } else {
-        setState(prev => ({
-          ...prev,
-          status: 'Video size is optimal, uploading directly...'
-        }));
-      }
+      // Temporarily disable compression to fix corrupted video issue
+      // TODO: Re-enable compression once FFmpeg issues are resolved
+      setState(prev => ({
+        ...prev,
+        status: 'Uploading video directly (compression disabled)...'
+      }));
 
       // Upload the file
       setState(prev => ({
