@@ -60,7 +60,7 @@ export default function MarketingPage() {
       />
 
       {/* Header */}
-      <header className="bg-discovery-beige-200 text-white px-9 py-4 sticky top-0 z-50">
+      <header className="bg-discovery-beige-200 text-white px-9 py-4 top-0 z-50">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center">
             <Image 
@@ -113,7 +113,7 @@ export default function MarketingPage() {
                     Get started for free
                   </Link>
                 </div>
-                <p className="text-discovery-grey text-sm">Create your child&apos;s free portfolio in minutes.</p>
+                <p className="text-discovery-orange text-md font-medium">Create your child&apos;s free portfolio in minutes.</p>
               </div>
               
               {/* Right Column - Image */}
@@ -220,7 +220,7 @@ export default function MarketingPage() {
           className={`py-20 px-4 bg-discovery-orange ${howItWorksSection.className}`}
         >
           <div className="max-w-6xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">
+            <h2 className="text-5xl lg:text-5xl font-medium text-discovery-yellow mb-12">
               How it works
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
@@ -232,46 +232,46 @@ export default function MarketingPage() {
                 <h3 className="text-4xl lg:text-3xl font-medium text-discovery-yellow mb-2 leading-tight">
                   Create your child's portfolio
                 </h3>
-                <p className="text-discovery-white-80 leading-relaxed">
+                <p className="text-discovery-white-100 leading-relaxed">
                   Start by setting up a dedicated space for your child or children. Add their name, photo, and a few details to make it their own.
                 </p>
               </div>
 
               {/* Step 2 */}
               <div className="text-center">
-                <div className="mx-auto mb-6 w-16 h-16 bg-white rounded-full flex items-center justify-center">
+                <div className="mx-auto mb-6 w-16 h-16 bg-discovery-yellow rounded-full flex items-center justify-center">
                   <span className="text-2xl font-bold text-discovery-primary">2</span>
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-4">
+                <h3 className="text-4xl lg:text-3xl font-medium text-discovery-yellow mb-2 leading-tight">
                   Add their first highlight
                 </h3>
-                <p className="text-discovery-white-80 leading-relaxed">
+                <p className="text-discovery-white-100 leading-relaxed">
                   Capture a special moment — an award, artwork, report card, or milestone — with a title, description, and photo.
                 </p>
               </div>
 
               {/* Step 3 */}
               <div className="text-center">
-                <div className="mx-auto mb-6 w-16 h-16 bg-white rounded-full flex items-center justify-center">
+                <div className="mx-auto mb-6 w-16 h-16 bg-discovery-yellow rounded-full flex items-center justify-center">
                   <span className="text-2xl font-bold text-discovery-primary">3</span>
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-4">
+                <h3 className="text-4xl lg:text-3xl font-medium text-discovery-yellow mb-2 leading-tight">
                   Build their story over time
                 </h3>
-                <p className="text-discovery-white-80 leading-relaxed">
+                <p className="text-discovery-white-100 leading-relaxed">
                   Keep adding highlights as they grow. From small wins to big achievements, Kifolio helps you preserve it all in one place.
                 </p>
               </div>
 
               {/* Step 4 */}
               <div className="text-center">
-                <div className="mx-auto mb-6 w-16 h-16 bg-white rounded-full flex items-center justify-center">
+                <div className="mx-auto mb-6 w-16 h-16 bg-discovery-yellow rounded-full flex items-center justify-center">
                   <span className="text-2xl font-bold text-discovery-primary">4</span>
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-4">
-                  Put it to work
+                <h3 className="text-4xl lg:text-3xl font-medium text-discovery-yellow mb-2 leading-tight">
+                   Share it out
                 </h3>
-                <p className="text-discovery-white-80 leading-relaxed">
+                <p className="text-discovery-white-100 leading-relaxed">
                   Export a polished record for transcripts, résumés, college and scholarship applications — or simply as a keepsake of their journey.
                 </p>
               </div>
@@ -382,40 +382,40 @@ export default function MarketingPage() {
         {/* Testimonials Section */}
         <section 
           ref={testimonialsSection.ref}
-          className={`py-20 px-4 bg-kifolio-bg ${testimonialsSection.className}`} 
+          className={`py-20 px-4 bg-discovery-beige-200 ${testimonialsSection.className}`} 
           aria-labelledby="testimonials-heading"
         >
           <div className="max-w-6xl mx-auto">
-            <h2 id="testimonials-heading" className="text-3xl md:text-4xl font-bold .text-kifolio-text mb-12 text-center">
+            <h2 id="testimonials-heading" className="text-5xl lg:text-5xl sm:text-center lg:text-center font-medium text-discovery-black mb-12">
               What parents are saying
             </h2>
             <div className="grid md:grid-cols-2 gap-8">
               <div className="bg-white rounded-lg p-6 shadow-sm">
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-kifolio-primary rounded-full flex items-center justify-center mr-4">
-                    <span className="text-white font-semibold">S</span>
+                  <div className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4">
+                    <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100">K</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold .text-kifolio-text">Kelli W.</h4>
-                    <p className="text-sm text-gray-600">Parent of a 4-year-old</p>
+                    <h4 className="text-3xl lg:text-2xl font-medium text-discovery-orange">Kelli W.</h4>
+                    <p className="text-discovery-gray-400 leading-relaxed">Parent of a 4-year-old</p>
                   </div>
                 </div>
-                <p className="text-gray-700 italic">
+                <p className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight">
                   &ldquo;Kifolio has made it so easy to document Emma&apos;s artistic journey. Her grandparents love being able to see her progress, and it&apos;s become a beautiful digital keepsake.&rdquo;
                 </p>
               </div>
 
               <div className="bg-white rounded-lg p-6 shadow-sm">
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-discovery-primary rounded-full flex items-center justify-center mr-4">
-                    <span className="text-white font-semibold">M</span>
+                  <div className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4">
+                    <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100">S</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-discovery-black">Sarah M.</h4>
-                    <p className="text-sm text-discovery-grey">Parent of a 10-year-old</p>
+                    <h4 className="text-3xl lg:text-2xl font-medium text-discovery-orange">Sarah M.</h4>
+                    <p className="text-discovery-gray-400 leading-relaxed">Parent of a 10-year-old</p>
                   </div>
                 </div>
-                <p className="text-discovery-grey italic">
+                <p className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight">
                   &ldquo;I used to keep boxes of my son's artwork and certificates, but it always felt messy and incomplete.
                   With Kifolio, we finally have one beautiful place to look back at everything he's accomplished. He loves scrolling through his own progress—it makes him so proud.&rdquo;
                 </p>
@@ -423,15 +423,15 @@ export default function MarketingPage() {
 
               <div className="bg-white rounded-lg p-6 shadow-sm">
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-kifolio-primary rounded-full flex items-center justify-center mr-4">
-                    <span className="text-white font-semibold">M</span>
+                  <div className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4">
+                    <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100">R</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold .text-kifolio-text">Robert K.</h4>
-                    <p className="text-sm text-gray-600">Parent of a 16-year-old</p>
+                    <h4 className="text-3xl lg:text-2xl font-medium text-discovery-orange">Robert K.</h4>
+                    <p className="text-discovery-gray-400 leading-relaxed">Parent of a 16-year-old</p>
                   </div>
                 </div>
-                <p className="text-gray-700 italic">
+                <p className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight">
                   &ldquo;I started using Kifolio just to keep track of grades and awards, but it’s become so much more. Seeing my daughter’s journey laid out—her creativity,
                   her growth—it's something I'll cherish forever, and I know it will help her when she applies to college.&rdquo;
                 </p>
@@ -439,15 +439,15 @@ export default function MarketingPage() {
 
               <div className="bg-white rounded-lg p-6 shadow-sm">
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-kifolio-primary rounded-full flex items-center justify-center mr-4">
-                    <span className="text-white font-semibold">D</span>
+                  <div className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4">
+                    <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100">D</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold .text-kifolio-text">Daniel R.</h4>
-                    <p className="text-sm text-gray-600">Parent of a 15-year-old</p>
+                    <h4 className="text-3xl lg:text-2xl font-medium text-discovery-orange">Daniel R.</h4>
+                    <p className="text-discovery-gray-400 leading-relaxed">Parent of a 15-year-old</p>
                   </div>
                 </div>
-                <p className="text-gray-700 italic">
+                <p className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight">
                   &ldquo;When my daughter started applying for summer programs, that was when we realized how valuable her Kifolio was.
                   We could easily share her projects, awards, and activities in a polished way. It showed more than grades—it told her story.&rdquo;
                 </p>
