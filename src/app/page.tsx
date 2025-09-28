@@ -466,53 +466,53 @@ export default function MarketingPage() {
         {/* FAQ Section for Featured Snippets */}
         <section 
           ref={faqSection.ref}
-          className={`py-20 px-4 bg-discovery-beige-100 ${faqSection.className}`} 
+          className={`py-20 px-4 bg-discovery-yellow ${faqSection.className}`} 
           aria-labelledby="faq-heading"
         >
           <div className="max-w-4xl mx-auto">
-            <h2 id="faq-heading" className="text-3xl md:text-4xl font-bold text-discovery-black mb-12 text-center">
+            <h2 id="faq-heading" className="text-5xl lg:text-5xl sm:text-center lg:text-center font-medium text-discovery-black mb-12">
               Frequently asked questions
             </h2>
             <div className="space-y-8" itemScope itemType="https://schema.org/FAQPage">
               <div className="bg-white rounded-lg p-6 shadow-sm" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
-                <h3 className="text-xl font-semibold text-discovery-black mb-3" itemProp="name">
+                <h3 className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight" itemProp="name">
                   How much does Kifolio cost?
                 </h3>
                 <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
-                  <div className="text-discovery-grey leading-relaxed" itemProp="text">
+                  <div className="text-lg text-discovery-grey leading-relaxed" itemProp="text">
                     Kifolio is completely free! Parent's will have access to all features and will be able to create unlimited portfolios and highlights for their children.
                   </div>
                 </div>
               </div>
 
               <div className="bg-white rounded-lg p-6 shadow-sm" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
-                <h3 className="text-xl font-semibold text-discovery-black mb-3" itemProp="name">
+                <h3 className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight" itemProp="name">
                   What can I include in my child&apos;s portfolio?
                 </h3>
                 <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
-                  <div className="text-discovery-grey leading-relaxed" itemProp="text">
+                  <div className="text-lg text-discovery-grey leading-relaxed" itemProp="text">
                     You can include artwork, school projects, sports achievements, academic milestones, creative writing, photos, videos, and any other accomplishments that showcase your child&apos;s growth and development.
                   </div>
                 </div>
       </div>
 
               <div className="bg-white rounded-lg p-6 shadow-sm" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
-                <h3 className="text-xl font-semibold text-discovery-black mb-3" itemProp="name">
+                <h3 className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight" itemProp="name">
                   Can I share the portfolio with family and friends?
                 </h3>
                 <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
-                  <div className="text-discovery-grey leading-relaxed" itemProp="text">
+                  <div className="text-lg text-discovery-grey leading-relaxed" itemProp="text">
                     Yes! Kifolio portfolios are fully responsive and can be shared with anyone. You can control privacy settings and choose whether to make portfolios public or password-protected.
                   </div>
                 </div>
       </div>
 
               <div className="bg-white rounded-lg p-6 shadow-sm" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
-                <h3 className="text-xl font-semibold text-discovery-black mb-3" itemProp="name">
+                <h3 className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight" itemProp="name">
                   How do I get started?
                 </h3>
                 <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
-                  <div className="text-discovery-grey leading-relaxed" itemProp="text">
+                  <div className="text-lg text-discovery-grey leading-relaxed" itemProp="text">
                     Getting started is simple! <a href="/auth/signup" className="text-discovery-primary hover:underline">Sign up for free</a>, choose a template, add your child&apos;s information, and start documenting their milestones and achievements. The entire setup takes just minutes.
                   </div>
                 </div>
@@ -523,7 +523,7 @@ export default function MarketingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-discovery-primary text-white py-12 px-4">
+      <footer className="bg-discovery-black text-white py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
@@ -534,21 +534,21 @@ export default function MarketingPage() {
                 height={38}
                 className="h-10 w-auto mb-4"
               />
-              <p className="text-white mb-4">
+              <p className="text-discovery-white-100 leading-relaxed">
                 Create beautiful portfolios to showcase your children&apos;s work, 
                 milestones, and achievements.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-white">
+              <h4 className="text-2xl lg:text-2xl font-medium text-discovery-yellow mb-2 leading-tight">Product</h4>
+              <ul className="space-y-2 text-discovery-white-100 leading-relaxed">
                 <li><Link href="/auth/signup" className="hover:text-discovery-white-80 transition-colors">Sign Up</Link></li>
                 <li><Link href="/auth/login" className="hover:text-discovery-white-80 transition-colors">Log In</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-white">
+              <h4 className="text-2xl lg:text-2xl font-medium text-discovery-yellow mb-2 leading-tight">Company</h4>
+              <ul className="space-y-2 text-discovery-white-100 leading-relaxed">
                 <li><a href="mailto:john@kifol.io" className="hover:text-discovery-white-80 transition-colors">Contact</a></li>
                 <li><Link href="/privacy" className="hover:text-discovery-white-80 transition-colors">Privacy</Link></li>
                 <li><Link href="/terms" className="hover:text-discovery-white-80 transition-colors">Terms</Link></li>
