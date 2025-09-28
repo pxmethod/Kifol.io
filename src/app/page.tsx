@@ -282,97 +282,104 @@ export default function MarketingPage() {
         {/* Benefits Section */}
         <section 
           ref={benefitsSection.ref}
-          className={`py-20 px-4 relative bg-cover bg-center bg-no-repeat ${benefitsSection.className}`} 
+          className={`py-20 px-4 relative ${benefitsSection.className}`} 
           style={{ backgroundImage: 'url(/marketing/kifolio_mobile_hand.png)' }}
           aria-labelledby="benefits-heading"
         >
           {/* Overlay */}
-          <div className="absolute inset-0 bg-black/50"></div>
+          <div className="absolute inset-0 bg-discovery-blue-100"></div>
           
-          <div className="max-w-6xl mx-auto text-center relative z-10">
-            <h2 id="benefits-heading" className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <div className="text-5xl lg:text-5xl text-center relative z-10">
+            <h2 id="benefits-heading" className="text-5xl lg:text-5xl sm:text-center lg:text-center font-medium text-discovery-black mb-12">
               Why parents choose Kifolio
             </h2>
-            <p className="text-lg text-white mb-16 leading-relaxed">
-              Everything you need to showcase your child&apos;s growth and achievements in one beautiful platform
-            </p>
-            
+
             <div className="grid md:grid-cols-2 gap-8 md:gap-16">
-              {/* Left Column */}
-              <div className="space-y-6 text-left">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 bg-white rounded-full flex items-center justify-center mt-0.5">
-                    <svg className="w-4 h-4 text-discovery-primary" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              {/* Left Column - Image Placeholder */}
+              <div className="flex items-center justify-center">
+                <div className="w-[307px] h-[405px] bg-discovery-white-100/20 rounded-lg flex items-center justify-center border-2 border-dashed border-discovery-white-100/40">
+                  <div className="text-center">
+                    <svg className="w-16 h-16 text-discovery-white-100/60 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
+                    <p className="text-discovery-white-100/80 text-sm font-medium">Image Placeholder</p>
+                    <p className="text-discovery-white-100/60 text-xs mt-1">307w × 405h</p>
                   </div>
-                  <p className="text-white">Simple templates that grow with your child</p>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 bg-white rounded-full flex items-center justify-center mt-0.5">
-                    <svg className="w-4 h-4 text-discovery-primary" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <p className="text-white">Organize achievements by date, category, or milestone</p>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 bg-white rounded-full flex items-center justify-center mt-0.5">
-                    <svg className="w-4 h-4 text-discovery-primary" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <p className="text-white">Share with family and friends on any device</p>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 bg-white rounded-full flex items-center justify-center mt-0.5">
-                    <svg className="w-4 h-4 text-discovery-primary" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <p className="text-white">Privacy controls to keep portfolios secure</p>
                 </div>
               </div>
               
-              {/* Right Column */}
+              {/* Right Column - All Checked Items */}
               <div className="space-y-6 text-left">
                 <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 bg-white rounded-full flex items-center justify-center mt-0.5">
-                    <svg className="w-4 h-4 text-discovery-primary" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <div className="flex-shrink-0 w-6 h-6 bg-discovery-yellow rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-discovery-black" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <p className="text-white">Track progress over time with visual timelines</p>
+                  <p className="text-lg text-discovery-grey leading-relaxed">Simple templates that grow with your child</p>
                 </div>
                 
                 <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 bg-white rounded-full flex items-center justify-center mt-0.5">
-                    <svg className="w-4 h-4 text-discovery-primary" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <div className="flex-shrink-0 w-6 h-6 bg-discovery-yellow rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-discovery-black" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <p className="text-white">Add photos, videos, and documents easily</p>
+                  <p className="text-lg text-discovery-grey leading-relaxed">Organize achievements by date, category, or milestone</p>
                 </div>
                 
                 <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 bg-white rounded-full flex items-center justify-center mt-0.5">
-                    <svg className="w-4 h-4 text-discovery-primary" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <div className="flex-shrink-0 w-6 h-6 bg-discovery-yellow rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-discovery-black" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <p className="text-white">Export and print for physical keepsakes</p>
+                  <p className="text-lg text-discovery-grey leading-relaxed">Share with family and friends on any device</p>
                 </div>
                 
                 <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 bg-white rounded-full flex items-center justify-center mt-0.5">
-                    <svg className="w-4 h-4 text-discovery-primary" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <div className="flex-shrink-0 w-6 h-6 bg-discovery-yellow rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-discovery-black" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <p className="text-white">Perfect for school applications and memories</p>
+                  <p className="text-lg text-discovery-grey leading-relaxed">Privacy controls to keep portfolios secure</p>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-discovery-yellow rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-discovery-black" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-lg text-discovery-grey leading-relaxed">Track progress over time with visual timelines</p>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-discovery-yellow rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-discovery-black" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-lg text-discovery-grey leading-relaxed">Add photos, videos, and documents easily</p>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-discovery-yellow rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-discovery-black" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-lg text-discovery-grey leading-relaxed">Export and print for physical keepsakes</p>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-discovery-yellow rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-discovery-black" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-lg text-discovery-grey leading-relaxed">Perfect for school applications and memories</p>
                 </div>
               </div>
             </div>
