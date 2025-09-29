@@ -84,7 +84,7 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove }: Portfolio
 
   return (
     <div 
-      className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+      className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
       onClick={handleCardClick}
     >
       {/* Portfolio Image */}
@@ -173,18 +173,18 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove }: Portfolio
       {/* Portfolio Details */}
       <div className="p-6">
         {/* Child's Name */}
-        <h3 className="text-xl font-semibold text-kifolio-text mb-2">
+        <h3 className="text-xl font-semibold text-discovery-black mb-2">
           {portfolio.childName}
         </h3>
 
         {/* Portfolio Title */}
-        <p className="text-gray-600 text-sm mb-4">
+        <p className="text-discovery-grey text-sm mb-4 leading-relaxed">
           {portfolio.portfolioTitle}
         </p>
 
 
         {/* Highlights Count */}
-        <div className="flex items-center text-sm text-gray-600">
+        <div className="flex items-center text-sm text-discovery-grey">
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
           </svg>

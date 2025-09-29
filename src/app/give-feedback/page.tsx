@@ -171,9 +171,9 @@ export default function GiveFeedbackPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-kifolio-bg">
+      <div className="min-h-screen bg-discovery-beige-200">
         <Header animateLogo={true} />
-        <main className="container mx-auto px-4 py-8">
+        <main className="max-w-7xl mx-auto px-9 py-12">
           <div className="flex items-center justify-center py-12">
             <LoadingSpinner size="lg" label="Loading..." />
           </div>
@@ -187,28 +187,28 @@ export default function GiveFeedbackPage() {
   }
 
   return (
-    <div className="min-h-screen bg-kifolio-bg">
+    <div className="min-h-screen bg-discovery-beige-200">
       <Header animateLogo={true} />
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto">
+      <main className="max-w-7xl mx-auto px-9 py-12">
+        <div className="max-w-4xl mx-auto">
           {/* Page Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-kifolio-text mb-4">
+          <div className="text-center mb-12">
+            <h1 className="text-5xl lg:text-5xl font-medium text-discovery-black mb-6">
               Give Feedback
             </h1>
-            <p className="text-lg text-gray-600 leading-relaxed">
+            <p className="text-lg text-discovery-grey leading-relaxed">
               Help us improve Kifolio by sharing your thoughts, suggestions, or reporting any issues you've encountered.
             </p>
           </div>
 
           {/* Feedback Form or Confirmation */}
           {!isSubmitted ? (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+            <div className="bg-discovery-white-100 rounded-lg shadow-sm border border-discovery-beige-300 p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Email Field */}
                 <div className="form-field">
-                  <label htmlFor="email" className="form-field__label form-field__label--required">
-                    Your email address
+                  <label htmlFor="email" className="block text-md font-medium text-discovery-black mb-2">
+                    Your email address *
                   </label>
                   <input
                     type="email"
@@ -217,33 +217,37 @@ export default function GiveFeedbackPage() {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className="input"
+                    className="w-full px-4 py-3 border border-discovery-grey-300 rounded-lg focus:border-transparent transition-colors"
                     placeholder="your@email.com"
                   />
                 </div>
 
                 {/* Feedback Type Dropdown */}
                 <div className="form-field">
-                  <label className="form-field__label form-field__label--required">
-                    Type of feedback
+                  <label className="block text-md font-medium text-discovery-black mb-2">
+                    Type of feedback *
                   </label>
                   <div className="type-dropdown relative" ref={dropdownRef}>
                     <button
                       type="button"
                       onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
-                      className={`w-full px-3 py-2 text-left border rounded-lg focus:outline-none focus:ring-2 focus:ring-kifolio-cta input cursor-pointer ${
-                        isTypeDropdownOpen ? 'ring-2 ring-kifolio-cta' : ''
+                      className={`w-full px-4 py-3 text-left rounded-lg transition-colors cursor-pointer ${
+                        isTypeDropdownOpen ? 'ring-2 ring-discovery-orange' : ''
                       }`}
+                      style={{
+                        border: '1px solid #DDDDE1',
+                        backgroundColor: '#ffffff'
+                      }}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           {getTypeIcon(formData.type)}
-                          <span className={`ml-2 ${formData.type ? 'text-kifolio-text' : 'text-gray-500'}`}>
+                          <span className={`ml-2 ${formData.type ? 'text-discovery-black' : 'text-discovery-grey'}`}>
                             {getSelectedType()?.name || 'Select a type...'}
                           </span>
                         </div>
                         <svg 
-                          className={`w-5 h-5 text-gray-400 transition-transform ${isTypeDropdownOpen ? 'rotate-180' : ''}`}
+                          className={`w-5 h-5 text-discovery-grey transition-transform ${isTypeDropdownOpen ? 'rotate-180' : ''}`}
                           fill="none" 
                           stroke="currentColor" 
                           viewBox="0 0 24 24"
@@ -254,7 +258,7 @@ export default function GiveFeedbackPage() {
                     </button>
                     
                     {isTypeDropdownOpen && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
+                      <div className="absolute z-10 w-full mt-1 bg-discovery-white-100 border border-discovery-beige-300 rounded-lg shadow-lg">
                         {FEEDBACK_TYPES.map((type) => (
                           <button
                             key={type.id}
@@ -263,13 +267,13 @@ export default function GiveFeedbackPage() {
                               handleInputChange('type', type.id);
                               setIsTypeDropdownOpen(false);
                             }}
-                            className="w-full px-3 py-3 text-left hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg flex items-center"
+                            className="w-full px-4 py-3 text-left hover:bg-discovery-beige-100 first:rounded-t-lg last:rounded-b-lg flex items-center transition-colors"
                           >
                             <div className="flex items-center">
                               {getTypeIcon(type.id)}
                               <div className="ml-3">
-                                <div className="text-base font-medium text-kifolio-text">{type.name}</div>
-                                <div className="text-xs text-gray-500">{type.description}</div>
+                                <div className="text-base font-medium text-discovery-black">{type.name}</div>
+                                <div className="text-sm text-discovery-grey">{type.description}</div>
                               </div>
                             </div>
                           </button>
@@ -281,8 +285,8 @@ export default function GiveFeedbackPage() {
 
                 {/* Feedback Message */}
                 <div className="form-field">
-                  <label htmlFor="message" className="form-field__label form-field__label--required">
-                    Your feedback
+                  <label htmlFor="message" className="block text-md font-medium text-discovery-black mb-2">
+                    Your feedback *
                   </label>
                   <textarea
                     id="message"
@@ -291,7 +295,7 @@ export default function GiveFeedbackPage() {
                     onChange={handleInputChange}
                     required
                     rows={6}
-                    className="input textarea"
+                    className="w-full px-4 py-3 border border-discovery-grey-300 rounded-lg focus:border-transparent transition-colors resize-vertical"
                     placeholder="Please share your feedback, suggestions, or describe any issues you've encountered..."
                   />
                 </div>
@@ -301,10 +305,10 @@ export default function GiveFeedbackPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`px-8 py-3 rounded-lg font-semibold text-white transition-colors ${
+                    className={`px-8 py-4 rounded-pill text-lg font-semibold text-white transition-colors shadow-lg hover:shadow-xl text-center disabled:opacity-50 disabled:cursor-not-allowed ${
                       isSubmitting
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-kifolio-cta hover:bg-kifolio-cta/90'
+                        ? 'bg-discovery-beige-300 cursor-not-allowed'
+                        : 'bg-discovery-orange hover:bg-discovery-orange-light'
                     }`}
                   >
                     {isSubmitting ? (
@@ -321,24 +325,24 @@ export default function GiveFeedbackPage() {
             </div>
           ) : (
             /* Confirmation Message */
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+            <div className="bg-discovery-white-100 rounded-lg shadow-sm border border-discovery-beige-300 p-8 text-center">
               <div className="mb-6">
-                <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-16 h-16 mx-auto mb-4 bg-discovery-beige-100 rounded-full flex items-center justify-center">
+                  <svg className="w-8 h-8 text-discovery-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h2 className="text-2xl font-bold text-kifolio-text mb-4">
+                <h2 className="text-3xl font-medium text-discovery-black mb-4">
                   Thank You!
                 </h2>
-                <p className="text-lg text-gray-600 leading-relaxed">
+                <p className="text-lg text-discovery-grey leading-relaxed">
                   Your feedback really matters, so thank you! If necessary, we'll be in touch.
                 </p>
               </div>
               
               <button
                 onClick={handleGoHome}
-                className="px-8 py-3 bg-kifolio-cta text-white rounded-lg font-semibold hover:bg-kifolio-cta/90 transition-colors"
+                className="px-8 py-4 bg-discovery-primary text-white rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-primary-light"
               >
                 Back to Dashboard
               </button>

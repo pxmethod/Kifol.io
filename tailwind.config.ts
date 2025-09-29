@@ -63,7 +63,8 @@ const config: Config = {
           
           // Grey palette
           gray: {
-            400: "#3c3c3fb3",      // Medium grey with transparency
+            300: "#DDDDE1",      // Lighter grey with transparency
+            400: "#3c3c3f",      // Medium grey with transparency
             600: "#363636",         // Dark grey
             700: "#7d7d88",         // Medium warm grey
           },

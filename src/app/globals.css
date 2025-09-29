@@ -13,7 +13,7 @@
   inset: 0 0 20px;
   border-radius: 50px 50px 10px 10px;
   padding: 1px;
-  background: linear-gradient(#4A53E2 33%,#FFAA00 0 66%, #FF6B35 0) content-box;
+  background: linear-gradient(#ff5938 33%,#ffe549 0 66%, #7fc0b1 0) content-box;
   --c:radial-gradient(farthest-side,#000 94%,#0000);
   -webkit-mask:
     linear-gradient(#0000 0 0),
@@ -46,7 +46,7 @@
   content: "";
   position: absolute;
   inset: 50% calc(50% - 4px) 0;
-  background: #e0a267;
+  background: #D4AF37;
   border-radius: 50px;
 }
 @keyframes l3 {

@@ -79,7 +79,7 @@ export default function Header({ animateLogo = false }: HeaderProps) {
   };
 
   return (
-    <header className="bg-kifolio-header text-white px-4 py-3 shadow-sm">
+    <header className="bg-discovery-primary text-white px-9 py-4 shadow-sm">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         {/* Logo */}
         <Link 
@@ -101,25 +101,39 @@ export default function Header({ animateLogo = false }: HeaderProps) {
           <nav className="hidden md:flex items-center space-x-8">
             <Link 
               href="/dashboard" 
-              className={`flex items-center text-white hover:text-gray-200 transition-colors font-medium ${
-                pathname === '/dashboard' ? 'border-b-[3px] border-kifolio-primary' : ''
-              }`}
+              className="flex items-center text-discovery-white-100 hover:text-discovery-white-80 transition-colors font-medium relative"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
               My Portfolios
+              {pathname === '/dashboard' && (
+                <Image
+                  src="/marketing/doodle-1.svg"
+                  alt="Active page indicator"
+                  width={40}
+                  height={24}
+                  className="absolute -bottom-3 left-1/2 transform -translate-x-1/2"
+                />
+              )}
             </Link>
             <Link 
               href="/give-feedback" 
-              className={`flex items-center text-white hover:text-gray-200 transition-colors font-medium ${
-                pathname === '/give-feedback' ? 'border-b-[3px] border-kifolio-primary' : ''
-              }`}
+              className="flex items-center text-discovery-white-100 hover:text-discovery-white-80 transition-colors font-medium relative"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
               Give Feedback
+              {pathname === '/give-feedback' && (
+                <Image
+                  src="/marketing/doodle-2.svg"
+                  alt="Active page indicator"
+                  width={40}
+                  height={24}
+                  className="absolute -bottom-3 left-1/2 transform -translate-x-1/2"
+                />
+              )}
             </Link>
           </nav>
         )}
@@ -208,13 +222,13 @@ export default function Header({ animateLogo = false }: HeaderProps) {
           <div className="flex items-center space-x-4">
             <Link 
               href="/auth/login"
-              className="text-white hover:text-gray-200 transition-colors"
+              className="text-discovery-white-100 hover:text-discovery-white-80 transition-colors font-medium"
             >
               Login
             </Link>
             <Link 
               href="/auth/signup"
-              className="bg-white text-kifolio-header px-4 py-2 rounded-pill hover:bg-gray-100 transition-colors"
+              className="bg-discovery-yellow text-discovery-black px-8 py-4 rounded-pill hover:bg-discovery-yellow-dark transition-colors font-medium"
             >
               Sign Up
             </Link>

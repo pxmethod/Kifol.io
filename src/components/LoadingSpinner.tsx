@@ -25,7 +25,7 @@ export default function LoadingSpinner({
         aria-label={label}
       />
       {label && (
-        <p className="mt-2 text-sm text-kifolio-text animate-pulse">
+        <p className="mt-2 text-sm text-discovery-grey animate-pulse">
           {label}
         </p>
       )}
