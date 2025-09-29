@@ -45,7 +45,7 @@
 
 /* Input Block */
 .input {
-  @apply w-full px-4 py-3 border border-gray-300 rounded-lg text-base text-kifolio-text bg-white leading-normal transition-all duration-200;
+  @apply w-full px-4 py-3 border border-gray-300 rounded-lg text-base text-discovery-black bg-white leading-normal transition-all duration-200;
   min-height: 2.75rem;
 }
 

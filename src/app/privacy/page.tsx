@@ -8,10 +8,10 @@ export default function PrivacyPolicyPage() {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-discovery-beige-200">
       {/* Header - Matching Marketing Page */}
-      <header className="bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-50">
-        <div className="flex items-center justify-between max-w-6xl mx-auto">
+      <header className="bg-discovery-beige-200 text-white px-9 py-4 top-0 z-50">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center">
             <Link href="/">
               <Image 
@@ -28,7 +28,7 @@ export default function PrivacyPolicyPage() {
             {user ? (
               <Link
                 href="/dashboard"
-                className="bg-kifolio-primary text-white px-6 py-2 rounded-lg hover:bg-kifolio-primary-dark transition-colors font-medium"
+                className="bg-discovery-yellow text-discovery-black px-8 py-4 rounded-pill hover:bg-discovery-yellow-dark transition-colors font-medium"
               >
                 Go to Dashboard
               </Link>
@@ -36,13 +36,13 @@ export default function PrivacyPolicyPage() {
               <>
                 <Link 
                   href="/auth/login"
-                  className="text-gray-700 hover:text-kifolio-primary transition-colors font-medium"
+                  className="text-discovery-black hover:text-discovery-grey transition-colors font-medium"
                 >
                   Log In
                 </Link>
                 <Link 
                   href="/auth/signup"
-                  className="bg-kifolio-primary text-white px-6 py-2 rounded-lg hover:bg-kifolio-primary-dark transition-colors font-medium"
+                  className="bg-discovery-yellow text-discovery-black px-8 py-4 rounded-pill hover:bg-discovery-yellow-dark transition-colors font-medium"
                 >
                   Sign Up
                 </Link>
@@ -53,11 +53,11 @@ export default function PrivacyPolicyPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-12">
+      <main className="max-w-7xl mx-auto px-9 py-12">
         <div className="prose prose-lg max-w-none">
-          <h1 className="text-4xl font-bold text-gray-900 mb-8 text-left">Privacy Policy</h1>
+          <h1 className="text-5xl lg:text-5xl font-medium text-discovery-black mb-8 text-left">Privacy Policy</h1>
           
-          <p className="text-gray-600 mb-8 text-left">
+          <p className="text-lg text-discovery-grey mb-8 text-left leading-relaxed">
             <strong>Last updated:</strong> {new Date().toLocaleDateString('en-US', { 
               year: 'numeric', 
               month: 'long', 
@@ -65,18 +65,18 @@ export default function PrivacyPolicyPage() {
             })}
           </p>
 
-          <div className="space-y-8 text-gray-700">
+          <div className="space-y-8 text-discovery-grey">
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Introduction</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">1. Introduction</h2>
               <p className="leading-relaxed">
                 Welcome to Kifolio ("we," "our," or "us"). We are committed to protecting your privacy and the privacy of your children. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our digital portfolio service for children's achievements and milestones.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Information We Collect</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">2. Information We Collect</h2>
               
-              <h3 className="text-xl font-medium text-gray-900 mb-3">2.1 Personal Information</h3>
+              <h3 className="text-xl font-medium text-discovery-black mb-3">2.1 Personal Information</h3>
               <p className="leading-relaxed mb-4">
                 We may collect the following types of personal information:
               </p>
@@ -87,7 +87,7 @@ export default function PrivacyPolicyPage() {
                 <li>Communication preferences and settings</li>
               </ul>
 
-              <h3 className="text-xl font-medium text-gray-900 mb-3 mt-6">2.2 Usage Information</h3>
+              <h3 className="text-xl font-medium text-discovery-black mb-3 mt-6">2.2 Usage Information</h3>
               <p className="leading-relaxed mb-4">
                 We automatically collect certain information when you use our service:
               </p>
@@ -100,7 +100,7 @@ export default function PrivacyPolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. How We Use Your Information</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">3. How We Use Your Information</h2>
               <p className="leading-relaxed mb-4">
                 We use the information we collect to:
               </p>
@@ -116,9 +116,9 @@ export default function PrivacyPolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">4. Information Sharing and Disclosure</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">4. Information Sharing and Disclosure</h2>
               
-              <h3 className="text-xl font-medium text-gray-900 mb-3">4.1 Portfolio Sharing</h3>
+              <h3 className="text-xl font-medium text-discovery-black mb-3">4.1 Portfolio Sharing</h3>
               <p className="leading-relaxed mb-4">
                 You control who can view your child's portfolio. Portfolios can be:
               </p>
@@ -128,7 +128,7 @@ export default function PrivacyPolicyPage() {
                 <li>Shared with specific individuals through secure links</li>
               </ul>
 
-              <h3 className="text-xl font-medium text-gray-900 mb-3 mt-6">4.2 Third-Party Services</h3>
+              <h3 className="text-xl font-medium text-discovery-black mb-3 mt-6">4.2 Third-Party Services</h3>
               <p className="leading-relaxed mb-4">
                 We may share information with trusted third-party service providers who assist us in:
               </p>
@@ -139,14 +139,14 @@ export default function PrivacyPolicyPage() {
                 <li>Processing payments (if applicable)</li>
               </ul>
 
-              <h3 className="text-xl font-medium text-gray-900 mb-3 mt-6">4.3 Legal Requirements</h3>
+              <h3 className="text-xl font-medium text-discovery-black mb-3 mt-6">4.3 Legal Requirements</h3>
               <p className="leading-relaxed">
                 We may disclose your information if required by law, regulation, or legal process, or to protect the rights, property, or safety of Kifolio, our users, or others.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Children's Privacy (COPPA Compliance)</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">5. Children's Privacy (COPPA Compliance)</h2>
               <p className="leading-relaxed mb-4">
                 We take children's privacy seriously and comply with the Children's Online Privacy Protection Act (COPPA):
               </p>
@@ -160,7 +160,7 @@ export default function PrivacyPolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Data Security</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">6. Data Security</h2>
               <p className="leading-relaxed mb-4">
                 We implement appropriate technical and organizational measures to protect your information:
               </p>
@@ -174,7 +174,7 @@ export default function PrivacyPolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Your Rights and Choices</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">7. Your Rights and Choices</h2>
               <p className="leading-relaxed mb-4">
                 You have the right to:
               </p>
@@ -190,21 +190,21 @@ export default function PrivacyPolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Data Retention</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">8. Data Retention</h2>
               <p className="leading-relaxed">
                 We retain your information for as long as your account is active or as needed to provide our services. We will delete your information upon account closure, except where we are required to retain it for legal, regulatory, or security purposes. You can request deletion of your data at any time through your account settings or by contacting us.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">9. International Data Transfers</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">9. International Data Transfers</h2>
               <p className="leading-relaxed">
                 Your information may be transferred to and processed in countries other than your own. We ensure that such transfers comply with applicable data protection laws and implement appropriate safeguards to protect your information.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Cookies and Tracking Technologies</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">10. Cookies and Tracking Technologies</h2>
               <p className="leading-relaxed mb-4">
                 We use cookies and similar technologies to:
               </p>
@@ -220,14 +220,14 @@ export default function PrivacyPolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. Changes to This Privacy Policy</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">11. Changes to This Privacy Policy</h2>
               <p className="leading-relaxed">
                 We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new Privacy Policy on this page and updating the "Last updated" date. We encourage you to review this Privacy Policy periodically for any changes.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">12. State Privacy Rights</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">12. State Privacy Rights</h2>
               <p className="leading-relaxed mb-4">
                 If you are a resident of California, Virginia, Colorado, or other states with specific privacy laws, you may have additional rights under applicable state privacy laws, including:
               </p>
@@ -241,10 +241,10 @@ export default function PrivacyPolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">13. Contact Information</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">13. Contact Information</h2>
               <p className="leading-relaxed">
                 If you have any questions about this Privacy Policy or our privacy practices, please contact us at{' '}
-                <a href="mailto:john@kifol.io" className="text-kifolio-primary hover:underline">
+                <a href="mailto:john@kifol.io" className="text-discovery-orange font-medium hover:text-discovery-orange-light">
                   john@kifol.io
                 </a>
               </p>
@@ -252,7 +252,7 @@ export default function PrivacyPolicyPage() {
           </div>
 
           <div className="mt-12 text-center">
-            <Link href="/" className="bg-kifolio-primary text-white px-8 py-3 rounded-lg hover:bg-kifolio-primary-dark transition-colors font-medium">
+            <Link href="/" className="bg-discovery-orange text-white px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-orange-light text-center">
               Back to Home
             </Link>
           </div>
@@ -260,7 +260,7 @@ export default function PrivacyPolicyPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-kifolio-header text-white py-12 px-4 mt-12">
+      <footer className="bg-discovery-black text-white py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
@@ -271,24 +271,24 @@ export default function PrivacyPolicyPage() {
                 height={38}
                 className="h-10 w-auto mb-4"
               />
-              <p className="text-white mb-4">
-                Create beautiful portfolios to showcase your children's work, 
+              <p className="text-discovery-white-100 leading-relaxed">
+                Create beautiful portfolios to showcase your children&apos;s work, 
                 milestones, and achievements.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-white">
-                <li><Link href="/auth/signup" className="hover:text-white transition-colors">Sign Up</Link></li>
-                <li><Link href="/auth/login" className="hover:text-white transition-colors">Log In</Link></li>
+              <h4 className="text-2xl lg:text-2xl font-medium text-discovery-yellow mb-2 leading-tight">Product</h4>
+              <ul className="space-y-2 text-discovery-white-100 leading-relaxed">
+                <li><Link href="/auth/signup" className="hover:text-discovery-white-80 transition-colors">Sign Up</Link></li>
+                <li><Link href="/auth/login" className="hover:text-discovery-white-80 transition-colors">Log In</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-white">
-                <li><a href="mailto:john@kifol.io" className="hover:text-white transition-colors">Contact</a></li>
-                <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link></li>
-                <li><Link href="/terms" className="hover:text-white transition-colors">Terms</Link></li>
+              <h4 className="text-2xl lg:text-2xl font-medium text-discovery-yellow mb-2 leading-tight">Company</h4>
+              <ul className="space-y-2 text-discovery-white-100 leading-relaxed">
+                <li><a href="mailto:john@kifol.io" className="hover:text-discovery-white-80 transition-colors">Contact</a></li>
+                <li><Link href="/privacy" className="hover:text-discovery-white-80 transition-colors">Privacy</Link></li>
+                <li><Link href="/terms" className="hover:text-discovery-white-80 transition-colors">Terms</Link></li>
               </ul>
             </div>
           </div>

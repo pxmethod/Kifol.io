@@ -35,6 +35,8 @@ const config: Config = {
           yellow: "#ffe549",       // Main yellow
           "yellow-dark": "#dabe16", // Darker yellow for hovers
           orange: "#ff5938",       // Main orange
+          "orange-light": "#ff7a59", // Lighter orange for hovers
+          "orange-dark": "#e55a2b", // Darker orange for active states
           
           // Blue palette
           blue: {

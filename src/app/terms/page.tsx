@@ -8,10 +8,10 @@ export default function TermsOfUsePage() {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-discovery-beige-200">
       {/* Header - Matching Marketing Page */}
-      <header className="bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-50">
-        <div className="flex items-center justify-between max-w-6xl mx-auto">
+      <header className="bg-discovery-beige-200 text-white px-9 py-4 top-0 z-50">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center">
             <Link href="/">
               <Image 
@@ -28,7 +28,7 @@ export default function TermsOfUsePage() {
             {user ? (
               <Link
                 href="/dashboard"
-                className="bg-kifolio-primary text-white px-6 py-2 rounded-lg hover:bg-kifolio-primary-dark transition-colors font-medium"
+                className="bg-discovery-yellow text-discovery-black px-8 py-4 rounded-pill hover:bg-discovery-yellow-dark transition-colors font-medium"
               >
                 Go to Dashboard
               </Link>
@@ -36,13 +36,13 @@ export default function TermsOfUsePage() {
               <>
                 <Link 
                   href="/auth/login"
-                  className="text-gray-700 hover:text-kifolio-primary transition-colors font-medium"
+                  className="text-discovery-black hover:text-discovery-grey transition-colors font-medium"
                 >
                   Log In
                 </Link>
                 <Link 
                   href="/auth/signup"
-                  className="bg-kifolio-primary text-white px-6 py-2 rounded-lg hover:bg-kifolio-primary-dark transition-colors font-medium"
+                  className="bg-discovery-yellow text-discovery-black px-8 py-4 rounded-pill hover:bg-discovery-yellow-dark transition-colors font-medium"
                 >
                   Sign Up
                 </Link>
@@ -53,11 +53,11 @@ export default function TermsOfUsePage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-12">
+      <main className="max-w-7xl mx-auto px-9 py-12">
         <div className="prose prose-lg max-w-none">
-          <h1 className="text-4xl font-bold text-gray-900 mb-8">Terms of Use</h1>
+          <h1 className="text-5xl lg:text-5xl font-medium text-discovery-black mb-8">Terms of Use</h1>
           
-          <p className="text-gray-600 mb-8">
+          <p className="text-lg text-discovery-grey mb-8 leading-relaxed">
             <strong>Last updated:</strong> {new Date().toLocaleDateString('en-US', { 
               year: 'numeric', 
               month: 'long', 
@@ -65,10 +65,10 @@ export default function TermsOfUsePage() {
             })}
           </p>
 
-          <div className="space-y-8">
+          <div className="space-y-8 text-discovery-grey">
             {/* Section 1 */}
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Acceptance of Terms</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">1. Acceptance of Terms</h2>
               <p className="text-gray-700 leading-relaxed">
                 By accessing and using Kifolio ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
               </p>
@@ -76,7 +76,7 @@ export default function TermsOfUsePage() {
 
             {/* Section 2 */}
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Description of Service</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">2. Description of Service</h2>
               <p className="text-gray-700 leading-relaxed mb-4">
                 Kifolio is a portfolio creation platform that allows users to:
               </p>
@@ -90,7 +90,7 @@ export default function TermsOfUsePage() {
 
             {/* Section 3 */}
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. User Accounts</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">3. User Accounts</h2>
               <p className="text-gray-700 leading-relaxed mb-4">
                 To use certain features of the Service, you must register for an account. You agree to:
               </p>
@@ -104,7 +104,7 @@ export default function TermsOfUsePage() {
 
             {/* Section 4 */}
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">4. User Content</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">4. User Content</h2>
               <p className="text-gray-700 leading-relaxed mb-4">
                 You retain ownership of any content you submit, post, or display on the Service. By using the Service, you grant us a worldwide, non-exclusive license to use, display, and distribute your content solely for the purpose of providing the Service.
               </p>
@@ -115,7 +115,7 @@ export default function TermsOfUsePage() {
 
             {/* Section 5 */}
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Privacy</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">5. Privacy</h2>
               <p className="text-gray-700 leading-relaxed">
                 Your privacy is important to us. We collect and use your information in accordance with our Privacy Policy, which is incorporated into these Terms by reference. By using the Service, you consent to the collection and use of your information as described in our Privacy Policy.
               </p>
@@ -123,7 +123,7 @@ export default function TermsOfUsePage() {
 
             {/* Section 6 */}
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Prohibited Uses</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">6. Prohibited Uses</h2>
               <p className="text-gray-700 leading-relaxed mb-4">
                 You may not use the Service to:
               </p>
@@ -139,7 +139,7 @@ export default function TermsOfUsePage() {
 
             {/* Section 7 */}
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Service Availability</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">7. Service Availability</h2>
               <p className="text-gray-700 leading-relaxed">
                 We strive to maintain high availability of the Service, but we do not guarantee uninterrupted access. The Service may be temporarily unavailable due to maintenance, updates, or technical issues beyond our control.
               </p>
@@ -147,7 +147,7 @@ export default function TermsOfUsePage() {
 
             {/* Section 8 */}
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Limitation of Liability</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">8. Limitation of Liability</h2>
               <p className="text-gray-700 leading-relaxed">
                 The Service is provided "as is" without warranties of any kind. We shall not be liable for any direct, indirect, incidental, special, or consequential damages resulting from your use of the Service.
               </p>
@@ -155,7 +155,7 @@ export default function TermsOfUsePage() {
 
             {/* Section 9 */}
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">9. Termination</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">9. Termination</h2>
               <p className="text-gray-700 leading-relaxed">
                 We may terminate or suspend your account and access to the Service at our sole discretion, without prior notice, for conduct that we believe violates these Terms or is harmful to other users, the Service, or third parties.
               </p>
@@ -163,7 +163,7 @@ export default function TermsOfUsePage() {
 
             {/* Section 10 */}
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Changes to Terms</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">10. Changes to Terms</h2>
               <p className="text-gray-700 leading-relaxed">
                 We reserve the right to modify these Terms at any time. We will notify users of significant changes via email or through the Service. Your continued use of the Service after changes are posted constitutes acceptance of the updated Terms.
               </p>
@@ -171,10 +171,10 @@ export default function TermsOfUsePage() {
 
             {/* Section 11 */}
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. Contact Information</h2>
+              <h2 className="text-2xl font-semibold text-discovery-black mb-4">11. Contact Information</h2>
               <p className="text-gray-700 leading-relaxed">
                 If you have any questions about these Terms of Use, please contact {' '}
-                <a href="mailto:john@kifol.io" className="text-kifolio-cta hover:underline">
+                <a href="mailto:john@kifol.io" className="text-discovery-orange font-medium hover:text-discovery-orange-light">
                   john@kifol.io
                 </a>
               </p>
@@ -183,14 +183,14 @@ export default function TermsOfUsePage() {
 
           {/* Back to Home */}
           <div className="mt-12 text-center">
-            <Link href="/" className="bg-kifolio-primary text-white px-8 py-3 rounded-lg hover:bg-kifolio-primary-dark transition-colors font-medium">
+            <Link href="/" className="bg-discovery-orange text-white px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-orange-light text-center">
               Back to Home
             </Link>
           </div>
         </div>
       </main>
       {/* Footer */}
-      <footer className="bg-kifolio-header text-white py-12 px-4 mt-12">
+      <footer className="bg-discovery-black text-white py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
@@ -201,24 +201,24 @@ export default function TermsOfUsePage() {
                 height={38}
                 className="h-10 w-auto mb-4"
               />
-              <p className="text-white mb-4">
-                Create beautiful portfolios to showcase your children's work, 
+              <p className="text-discovery-white-100 leading-relaxed">
+                Create beautiful portfolios to showcase your children&apos;s work, 
                 milestones, and achievements.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-white">
-                <li><Link href="/auth/signup" className="hover:text-white transition-colors">Sign Up</Link></li>
-                <li><Link href="/auth/login" className="hover:text-white transition-colors">Log In</Link></li>
+              <h4 className="text-2xl lg:text-2xl font-medium text-discovery-yellow mb-2 leading-tight">Product</h4>
+              <ul className="space-y-2 text-discovery-white-100 leading-relaxed">
+                <li><Link href="/auth/signup" className="hover:text-discovery-white-80 transition-colors">Sign Up</Link></li>
+                <li><Link href="/auth/login" className="hover:text-discovery-white-80 transition-colors">Log In</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-white">
-                <li><a href="mailto:john@kifol.io" className="hover:text-white transition-colors">Contact</a></li>
-                <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link></li>
-                <li><Link href="/terms" className="hover:text-white transition-colors">Terms</Link></li>
+              <h4 className="text-2xl lg:text-2xl font-medium text-discovery-yellow mb-2 leading-tight">Company</h4>
+              <ul className="space-y-2 text-discovery-white-100 leading-relaxed">
+                <li><a href="mailto:john@kifol.io" className="hover:text-discovery-white-80 transition-colors">Contact</a></li>
+                <li><Link href="/privacy" className="hover:text-discovery-white-80 transition-colors">Privacy</Link></li>
+                <li><Link href="/terms" className="hover:text-discovery-white-80 transition-colors">Terms</Link></li>
               </ul>
             </div>
           </div>

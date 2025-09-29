@@ -294,17 +294,15 @@ export default function MarketingPage() {
               Why parents choose Kifolio
             </h2>
 
-            <div className="grid md:grid-cols-2 gap-8 md:gap-16">
-              {/* Left Column - Image Placeholder */}
+            <div className="grid md:grid-cols-2 gap-8 md:gap-8">
+              {/* Left Column - Child Photo */}
               <div className="flex items-center justify-center">
-                <div className="w-[307px] h-[405px] bg-discovery-white-100/20 rounded-lg flex items-center justify-center border-2 border-dashed border-discovery-white-100/40">
-                  <div className="text-center">
-                    <svg className="w-16 h-16 text-discovery-white-100/60 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <p className="text-discovery-white-100/80 text-sm font-medium">Image Placeholder</p>
-                    <p className="text-discovery-white-100/60 text-xs mt-1">307w × 405h</p>
-                  </div>
+                <div className="w-[360px] h-[480px] overflow-hidden">
+                  <img 
+                    src="/marketing/child-photo-why.jpg" 
+                    alt="Child showcasing their portfolio and achievements" 
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </div>
               
