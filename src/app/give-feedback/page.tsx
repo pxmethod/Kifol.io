@@ -203,7 +203,7 @@ export default function GiveFeedbackPage() {
 
           {/* Feedback Form or Confirmation */}
           {!isSubmitted ? (
-            <div className="bg-discovery-white-100 rounded-lg shadow-sm border border-discovery-beige-300 p-8">
+            <div className="bg-discovery-white-100 rounded-lg shadow-sm p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Email Field */}
                 <div className="form-field">
