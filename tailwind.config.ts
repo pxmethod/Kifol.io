@@ -47,7 +47,7 @@ const config: Config = {
           
           // Beige palette
           beige: {
-            100: "#f6f5f3",        // Very light beige
+            100: "#E9E8E2",        // Very light beige
             200: "#fcf9eb",        // Light beige
             300: "#dfd6d2",        // Medium beige
             800: "#747271",        // Dark beige

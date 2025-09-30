@@ -44,7 +44,7 @@ export default function CreatePortfolio() {
   // Show loading while checking authentication
   if (loading) {
     return (
-      <div className="min-h-screen bg-kifolio-bg">
+      <div className="min-h-screen bg-discovery-beige-200">
         <Header animateLogo={true} />
         <main className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[60vh]">
@@ -201,7 +201,7 @@ export default function CreatePortfolio() {
   // Show loading while checking authentication
   if (loading) {
     return (
-      <div className="min-h-screen bg-kifolio-bg">
+      <div className="min-h-screen bg-discovery-beige-200">
         <Header />
         <main className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[60vh]">
@@ -215,7 +215,7 @@ export default function CreatePortfolio() {
   // If not authenticated, show nothing (will redirect)
   if (!user) {
     return (
-      <div className="min-h-screen bg-kifolio-bg">
+      <div className="min-h-screen bg-discovery-beige-200">
         <Header />
         <main className="container mx-auto px-4 py-8">
           <div className="text-center">
@@ -231,7 +231,7 @@ export default function CreatePortfolio() {
       <Header />
       
       {/* Action Bar */}
-      <div className="bg-discovery-white-100 border-b border-discovery-beige-300 px-9 py-4">
+      <div className="bg-discovery-white-100 border-b border-discovery-beige-100 px-9 py-4">
         <div className="max-w-7xl mx-auto">
           <button
             onClick={handleBackClick}
@@ -245,13 +245,10 @@ export default function CreatePortfolio() {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-9 py-12">
+      <main className="max-w-7xl mx-auto px-4 py-5">
         <div className="bg-discovery-white-100 rounded-lg shadow-sm overflow-hidden">
-          <div className="px-8 py-6 border-b border-discovery-beige-300">
-            <h1 className="text-5xl lg:text-5xl font-medium text-discovery-black">Create new portfolio</h1>
-            <p className="text-lg text-discovery-grey leading-relaxed mt-2">
-              Set up a beautiful portfolio for your child
-            </p>
+          <div className="px-8 py-4">
+            <h1 className="text-4xl lg:text-4xl font-medium text-discovery-black">Create new portfolio</h1>
           </div>
           <div className="px-8 py-6">
             <form id="portfolioForm" onSubmit={handleSubmit} className="space-y-8">
@@ -265,8 +262,8 @@ export default function CreatePortfolio() {
                 id="childName"
                 value={formData.childName}
                 onChange={(e) => handleInputChange('childName', e.target.value)}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors ${
-                  errors.childName ? 'border-red-500' : 'border-discovery-beige-300'
+                className={`w-full px-4 py-3 border rounded-lg focus:border-transparent transition-colors text-discovery-black ${
+                  errors.childName ? 'border-red-500' : 'border-discovery-grey-300'
                 }`}
                 placeholder="Enter your child's name"
                 maxLength={100}
@@ -289,8 +286,8 @@ export default function CreatePortfolio() {
                 id="portfolioTitle"
                 value={formData.portfolioTitle}
                 onChange={(e) => handleInputChange('portfolioTitle', e.target.value)}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors ${
-                  errors.portfolioTitle ? 'border-red-500' : 'border-discovery-beige-300'
+                className={`w-full px-4 py-3 border rounded-lg focus:border-transparent transition-colors text-discovery-black ${
+                  errors.portfolioTitle ? 'border-red-500' : 'border-discovery-grey-300'
                 }`}
                 placeholder="Enter portfolio title"
                 maxLength={100}
@@ -321,7 +318,7 @@ export default function CreatePortfolio() {
                 />
                 <label
                   htmlFor="photo"
-                  className={`inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer transition-colors ${
+                  className={`inline-flex items-center px-4 py-2 border border-discovery-grey-300 rounded-lg cursor-pointer transition-colors ${
                     uploadingPhoto 
                       ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
                       : 'bg-white hover:bg-gray-50 text-gray-700'
@@ -375,7 +372,7 @@ export default function CreatePortfolio() {
               {errors.photo && (
                 <p className="form-field__error">{errors.photo}</p>
               )}
-              <p className="form-field__help">
+              <p className="form-field__help text-xs">
                 JPEG, PNG, GIF, or SVG. Max size of 50MB
               </p>
             </div>
@@ -385,24 +382,24 @@ export default function CreatePortfolio() {
               <label className="block text-md font-medium text-discovery-black mb-2">
                 Choose a template *
               </label>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3">
                 {templates.map((template) => (
                   <div
                     key={template.id}
-                    className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${
+                    className={`border-2 rounded-lg p-3 cursor-pointer transition-colors ${
                       formData.template === template.id
                         ? 'border-discovery-primary bg-discovery-primary/5'
-                        : 'border-discovery-beige-300 hover:border-discovery-primary/50'
+                        : 'border-discovery-grey-300 hover:border-discovery-primary/50'
                     }`}
                     onClick={() => handleInputChange('template', template.id)}
                   >
                     <div className="text-center">
                       {/* Template Image */}
-                      <div className="mb-3">
+                      <div className="mb-2">
                         <img
                           src={`/marketing/template_${template.id}.png`}
                           alt={`${template.name} template preview`}
-                          className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                          className="w-full h-20 object-cover rounded-lg border border-gray-200"
                         />
                       </div>
                       
@@ -427,13 +424,17 @@ export default function CreatePortfolio() {
                         </button>
                         <button
                           type="button"
-                          className="w-full px-4 py-2 text-sm bg-discovery-primary text-white rounded hover:bg-discovery-primary-light transition-colors"
+                          className={`w-full px-4 py-2 text-sm rounded transition-colors ${
+                            formData.template === template.id
+                              ? 'bg-discovery-primary text-white hover:bg-discovery-primary-light'
+                              : 'bg-discovery-primary text-white hover:bg-discovery-primary-light'
+                          }`}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleInputChange('template', template.id);
                           }}
                         >
-                          Choose
+                          {formData.template === template.id ? 'Selected' : 'Choose'}
                         </button>
                       </div>
                     </div>
@@ -447,21 +448,21 @@ export default function CreatePortfolio() {
 
             {/* Privacy Settings */}
             <div>
-              <label className="block text-md font-medium text-discovery-black mb-2">
+              <label className="block text-3xl font-medium text-discovery-black mb-4">
                 Privacy settings
               </label>
               <div className="space-y-4">
                 {/* Privacy Toggle */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-discovery-black">Private Portfolio</p>
-                    <p className="text-sm text-discovery-grey">Require password to view this portfolio</p>
+                    <p className="text-md font-medium text-discovery-black">Make this portfolio private</p>
+                    <p className="text-sm text-discovery-grey">Require that visitors enter a password to view this portfolio</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, isPrivate: !prev.isPrivate }))}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      formData.isPrivate ? 'bg-discovery-primary' : 'bg-discovery-beige-300'
+                      formData.isPrivate ? 'bg-discovery-orange' : 'bg-discovery-gray-300'
                     }`}
                   >
                     <span
@@ -475,8 +476,8 @@ export default function CreatePortfolio() {
                 {/* Password Input */}
                 {formData.isPrivate && (
                   <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-kifolio-text mb-2">
-                      Portfolio password *
+                    <label htmlFor="password" className="block text-sm font-medium text-discovery-black mb-2">
+                      Enter a password *
                     </label>
                     <div className="relative">
                       <input
@@ -484,8 +485,8 @@ export default function CreatePortfolio() {
                         id="password"
                         value={formData.password}
                         onChange={(e) => handleInputChange('password', e.target.value)}
-                        className={`w-full px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-kifolio-cta ${
-                          errors.password ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full px-4 py-3 border rounded-lg focus:border-transparent transition-colors text-discovery-black ${
+                          errors.password ? 'border-red-500' : 'border-discovery-grey-300'
                         }`}
                         placeholder="Enter portfolio password"
                       />
@@ -528,7 +529,7 @@ export default function CreatePortfolio() {
                 type="submit"
                 disabled={isSubmitting}
                 className={`px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl text-center disabled:opacity-50 disabled:cursor-not-allowed ${
-                  isSubmitting ? 'bg-discovery-primary/70' : 'bg-discovery-primary hover:bg-discovery-primary-light'
+                  isSubmitting ? 'bg-discovery-primary/70' : 'bg-discovery-orange hover:bg-discovery-orange-light'
                 } text-white`}
                 form="portfolioForm"
               >

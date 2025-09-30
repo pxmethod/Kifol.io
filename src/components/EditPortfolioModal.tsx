@@ -269,7 +269,7 @@ export default function EditPortfolioModal({
                 id="editChildName"
                 value={formData.childName}
                 onChange={(e) => handleInputChange('childName', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-kifolio-cta ${
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary text-discovery-black ${
                   errors.childName ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="Enter your child's name"
@@ -293,7 +293,7 @@ export default function EditPortfolioModal({
                 id="editPortfolioTitle"
                 value={formData.portfolioTitle}
                 onChange={(e) => handleInputChange('portfolioTitle', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-kifolio-cta ${
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary text-discovery-black ${
                   errors.portfolioTitle ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="Enter portfolio title"

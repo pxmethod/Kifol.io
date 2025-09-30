@@ -217,7 +217,7 @@ export default function GiveFeedbackPage() {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-discovery-grey-300 rounded-lg focus:border-transparent transition-colors"
+                    className="w-full px-4 py-3 border border-discovery-grey-300 rounded-lg focus:border-transparent transition-colors text-discovery-black"
                     placeholder="your@email.com"
                   />
                 </div>
@@ -295,7 +295,7 @@ export default function GiveFeedbackPage() {
                     onChange={handleInputChange}
                     required
                     rows={6}
-                    className="w-full px-4 py-3 border border-discovery-grey-300 rounded-lg focus:border-transparent transition-colors resize-vertical"
+                    className="w-full px-4 py-3 border border-discovery-grey-300 rounded-lg focus:border-transparent transition-colors resize-vertical text-discovery-black"
                     placeholder="Please share your feedback, suggestions, or describe any issues you've encountered..."
                   />
                 </div>

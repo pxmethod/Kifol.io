@@ -48,20 +48,20 @@ export default function PortfolioPasswordPrompt({
   };
 
   return (
-    <div className="min-h-screen bg-kifolio-bg flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+    <div className="min-h-screen bg-discovery-beige-200 flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-discovery-white-100 rounded-lg shadow-lg p-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-kifolio-primary rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-discovery-primary rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Private Portfolio</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-medium text-discovery-black mb-2">Private Portfolio</h1>
+          <p className="text-lg text-discovery-grey leading-relaxed">
             This portfolio is password protected
           </p>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-discovery-grey mt-2">
             {portfolioTitle}
           </p>
         </div>
@@ -69,7 +69,7 @@ export default function PortfolioPasswordPrompt({
         {/* Password Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="password" className="block text-md font-medium text-discovery-black mb-2">
               Enter Password
             </label>
             <input
@@ -77,7 +77,7 @@ export default function PortfolioPasswordPrompt({
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kifolio-primary focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border border-discovery-beige-300 rounded-lg focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors text-discovery-black"
               placeholder="Enter portfolio password"
               autoComplete="current-password"
               autoFocus
@@ -96,14 +96,14 @@ export default function PortfolioPasswordPrompt({
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              className="flex-1 px-6 py-3 border border-discovery-beige-300 text-discovery-black rounded-lg hover:bg-discovery-beige-100 transition-colors font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isVerifying || !password.trim()}
-              className="flex-1 px-4 py-3 bg-kifolio-primary text-white rounded-lg hover:bg-kifolio-primary-dark transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-8 py-4 bg-discovery-primary text-white rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-primary-light disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isVerifying ? (
                 <span className="flex items-center justify-center">
@@ -122,7 +122,7 @@ export default function PortfolioPasswordPrompt({
 
         {/* Help Text */}
         <div className="mt-6 text-center">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-discovery-grey">
             Contact the portfolio owner if you need the password
           </p>
         </div>

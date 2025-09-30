@@ -38,7 +38,7 @@ export default function Dashboard() {
   // Show loading while checking authentication
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-kifolio-bg">
+      <div className="min-h-screen bg-discovery-beige-200">
         <Header animateLogo={true} />
         <main className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[60vh]">
@@ -57,7 +57,7 @@ export default function Dashboard() {
   // Show loading while portfolios are being fetched
   if (loading) {
     return (
-      <div className="min-h-screen bg-kifolio-bg">
+      <div className="min-h-screen bg-discovery-beige-200">
         <Header animateLogo={true} />
         <main className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[60vh]">
@@ -100,7 +100,7 @@ export default function Dashboard() {
   // Show error state
   if (error) {
     return (
-      <div className="min-h-screen bg-kifolio-bg">
+      <div className="min-h-screen bg-discovery-beige-200">
         <Header animateLogo={true} />
         <main className="container mx-auto px-4 py-8">
                   <ErrorDisplay 
@@ -117,7 +117,7 @@ export default function Dashboard() {
   // Show empty state if no portfolios
   if (!loading && portfolios.length === 0) {
     return (
-      <div className="min-h-screen bg-kifolio-bg">
+      <div className="min-h-screen bg-discovery-beige-200">
         <Header animateLogo={true} />
         <main className="container mx-auto px-4 py-8">
           <EmptyState />

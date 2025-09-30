@@ -54,7 +54,7 @@
 }
 
 .input:focus {
-  @apply outline-none border-kifolio-primary ring-2 ring-kifolio-primary-light;
+  @apply outline-none border-discovery-primary ring-2 ring-discovery-primary-light;
 }
 
 .input:disabled {
