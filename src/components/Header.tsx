@@ -242,17 +242,17 @@ export default function Header({ animateLogo = false }: HeaderProps) {
           ref={mobileMenuRef}
           className="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden mobile-menu-overlay"
         >
-          <div className="fixed inset-y-0 right-0 w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out mobile-menu-slide mobile-menu-z">
+          <div className="fixed inset-y-0 right-0 w-80 bg-discovery-white-100 shadow-xl transform transition-transform duration-300 ease-in-out mobile-menu-slide mobile-menu-z">
             {/* Mobile Menu Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">Menu</h2>
+            <div className="flex items-center justify-between p-6 border-b border-discovery-beige-300">
+              <h2 className="text-xl font-medium text-discovery-black">Menu</h2>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors mobile-menu-close"
+                className="p-2 rounded-lg hover:bg-discovery-beige-100 transition-colors mobile-menu-close"
                 aria-label="Close mobile menu"
               >
                 <svg 
-                  className="w-6 h-6 text-gray-600" 
+                  className="w-6 h-6 text-discovery-grey" 
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -274,7 +274,7 @@ export default function Header({ animateLogo = false }: HeaderProps) {
                 className={`flex items-center px-4 py-3 rounded-lg text-lg font-medium transition-colors mobile-menu-item ${
                   pathname === '/dashboard' 
                     ? 'active' 
-                    : 'text-gray-700 hover:bg-gray-100'
+                    : 'text-discovery-grey hover:bg-discovery-beige-100'
                 }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -290,7 +290,7 @@ export default function Header({ animateLogo = false }: HeaderProps) {
                 className={`flex items-center px-4 py-3 rounded-lg text-lg font-medium transition-colors mobile-menu-item ${
                   pathname === '/give-feedback' 
                     ? 'active' 
-                    : 'text-gray-700 hover:bg-gray-100'
+                    : 'text-discovery-grey hover:bg-discovery-beige-100'
                 }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -302,7 +302,7 @@ export default function Header({ animateLogo = false }: HeaderProps) {
 
               <Link
                 href="/profile"
-                className="flex items-center px-4 py-3 rounded-lg text-lg font-medium text-gray-700 hover:bg-gray-100 transition-colors mobile-menu-item"
+                className="flex items-center px-4 py-3 rounded-lg text-lg font-medium text-discovery-grey hover:bg-discovery-beige-100 transition-colors mobile-menu-item"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -313,7 +313,7 @@ export default function Header({ animateLogo = false }: HeaderProps) {
 
               <button
                 onClick={handleLogout}
-                className="flex items-center w-full px-4 py-3 rounded-lg text-lg font-medium text-gray-700 hover:bg-gray-100 transition-colors text-left mobile-menu-item"
+                className="flex items-center w-full px-4 py-3 rounded-lg text-lg font-medium text-discovery-grey hover:bg-discovery-beige-100 transition-colors text-left mobile-menu-item"
               >
                 <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

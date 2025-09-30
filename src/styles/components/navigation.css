@@ -423,14 +423,14 @@
 
 /* Active state for mobile menu items */
 .mobile-menu-item.active {
-  background: linear-gradient(135deg, #ff6b35 0%, #ea580c 100%);
+  background: linear-gradient(135deg, #ff5938 0%, #e55a2b 100%);
   color: white;
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 89, 56, 0.3);
 }
 
 /* Mobile menu close button hover */
 .mobile-menu-close:hover {
-  background-color: #f3f4f6;
+  background-color: #f6f5f3;
   transform: scale(1.05);
 }
 
