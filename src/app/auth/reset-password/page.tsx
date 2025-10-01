@@ -1,27 +1,52 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useAuth } from '@/contexts/AuthContext';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
-export default function ForgotPasswordPage() {
-  const { resetPassword } = useAuth();
-  const [email, setEmail] = useState('');
+export default function ResetPasswordPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [isValidSession, setIsValidSession] = useState(false);
+
+  useEffect(() => {
+    // Check if we have a valid password reset session
+    const checkSession = async () => {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        setIsValidSession(true);
+      } else {
+        setError('Invalid or expired reset link. Please request a new password reset.');
+      }
+    };
+
+    checkSession();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email.trim()) {
-      setError('Please enter your email address');
+    if (!password.trim()) {
+      setError('Please enter a new password');
       return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Please enter a valid email address');
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
       return;
     }
 
@@ -30,13 +55,18 @@ export default function ForgotPasswordPage() {
     setMessage('');
 
     try {
-      const { error: resetError } = await resetPassword(email);
-      
-      if (resetError) {
-        setError(resetError);
+      const supabase = createClient();
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: password
+      });
+
+      if (updateError) {
+        setError(updateError.message);
       } else {
-        setMessage('Password reset instructions have been sent to your email address.');
-        setEmail('');
+        setMessage('Password updated successfully! You can now log in with your new password.');
+        setTimeout(() => {
+          router.push('/auth/login');
+        }, 2000);
       }
     } catch (error) {
       setError('An unexpected error occurred. Please try again.');
@@ -44,6 +74,17 @@ export default function ForgotPasswordPage() {
       setIsSubmitting(false);
     }
   };
+
+  if (!isValidSession && !error) {
+    return (
+      <div className="min-h-screen bg-discovery-beige-200 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-discovery-primary mx-auto mb-4"></div>
+          <p className="text-discovery-grey">Verifying reset link...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-discovery-beige-200">
@@ -71,10 +112,10 @@ export default function ForgotPasswordPage() {
           {/* Header Section */}
           <div className="text-center mb-8">
             <h1 className="text-5xl lg:text-5xl font-medium text-discovery-black mb-6">
-              Forgot Password
+              Reset Password
             </h1>
             <p className="text-lg text-discovery-grey leading-relaxed">
-              Enter your email address and we'll send you instructions to reset your password.
+              Enter your new password below.
             </p>
           </div>
 
@@ -93,29 +134,47 @@ export default function ForgotPasswordPage() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Email Field */}
+              {/* New Password Field */}
               <div>
-                <label htmlFor="email" className="block text-md font-medium text-discovery-black mb-2">
-                  Email address
+                <label htmlFor="password" className="block text-md font-medium text-discovery-black mb-2">
+                  New Password
                 </label>
                 <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  type="password"
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-4 py-3 border border-discovery-beige-300 rounded-lg focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors text-discovery-black"
-                  placeholder="Enter your email address"
+                  placeholder="Enter your new password"
                   required
+                  minLength={6}
+                />
+              </div>
+
+              {/* Confirm Password Field */}
+              <div>
+                <label htmlFor="confirmPassword" className="block text-md font-medium text-discovery-black mb-2">
+                  Confirm New Password
+                </label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-3 border border-discovery-beige-300 rounded-lg focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors text-discovery-black"
+                  placeholder="Confirm your new password"
+                  required
+                  minLength={6}
                 />
               </div>
 
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isSubmitting || !email.trim()}
+                disabled={isSubmitting || !password.trim() || !confirmPassword.trim()}
                 className="bg-discovery-primary text-white px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-primary-light text-center w-full disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Sending...' : 'Send Reset Instructions'}
+                {isSubmitting ? 'Updating...' : 'Update Password'}
               </button>
             </form>
 

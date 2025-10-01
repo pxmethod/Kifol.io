@@ -3,10 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useAuth } from '@/contexts/AuthContext';
 
-export default function ForgotPasswordPage() {
-  const { resetPassword } = useAuth();
+export default function ForgotUsernamePage() {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
@@ -30,14 +28,10 @@ export default function ForgotPasswordPage() {
     setMessage('');
 
     try {
-      const { error: resetError } = await resetPassword(email);
-      
-      if (resetError) {
-        setError(resetError);
-      } else {
-        setMessage('Password reset instructions have been sent to your email address.');
-        setEmail('');
-      }
+      // For now, we'll show a helpful message since username recovery
+      // would require additional backend functionality
+      setMessage('Your username is typically the part before @ in your email address. If you\'re still having trouble, please contact support.');
+      setEmail('');
     } catch (error) {
       setError('An unexpected error occurred. Please try again.');
     } finally {
@@ -71,18 +65,18 @@ export default function ForgotPasswordPage() {
           {/* Header Section */}
           <div className="text-center mb-8">
             <h1 className="text-5xl lg:text-5xl font-medium text-discovery-black mb-6">
-              Forgot Password
+              Forgot Username
             </h1>
             <p className="text-lg text-discovery-grey leading-relaxed">
-              Enter your email address and we'll send you instructions to reset your password.
+              Enter your email address and we'll help you recover your username.
             </p>
           </div>
 
           {/* Form Card */}
           <div className="bg-discovery-white-100 rounded-lg p-8 shadow-sm">
             {message && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-green-800 text-sm">{message}</p>
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-blue-800 text-sm">{message}</p>
               </div>
             )}
 
@@ -115,7 +109,7 @@ export default function ForgotPasswordPage() {
                 disabled={isSubmitting || !email.trim()}
                 className="bg-discovery-primary text-white px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-primary-light text-center w-full disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Sending...' : 'Send Reset Instructions'}
+                {isSubmitting ? 'Looking up...' : 'Find Username'}
               </button>
             </form>
 

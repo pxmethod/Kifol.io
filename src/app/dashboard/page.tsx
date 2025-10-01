@@ -130,7 +130,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-discovery-beige-200">
       <Header animateLogo={true} />
       
-      <main className="max-w-7xl mx-auto px-9 py-12">
+      <main className="max-w-7xl mx-auto px-4 py-12">
         <div className="space-y-8 portfolio-grid-container">
           {/* Header with Create Button */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 animate-fade-in">

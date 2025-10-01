@@ -73,7 +73,7 @@
 }
 
 .profile-menu__email {
-  @apply text-sm text-white whitespace-nowrap overflow-hidden text-ellipsis text-left;
+  @apply text-base text-white whitespace-nowrap overflow-hidden text-ellipsis text-left;
   max-width: 200px; /* Limit email width to make room for plan badge */
 }
 

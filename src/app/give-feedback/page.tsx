@@ -189,21 +189,21 @@ export default function GiveFeedbackPage() {
   return (
     <div className="min-h-screen bg-discovery-beige-200">
       <Header animateLogo={true} />
-      <main className="max-w-7xl mx-auto px-9 py-12">
+      <main className="max-w-7xl mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           {/* Page Header */}
           <div className="text-center mb-12">
             <h1 className="text-5xl lg:text-5xl font-medium text-discovery-black mb-6">
-              Give Feedback
+              We love feedback!
             </h1>
-            <p className="text-lg text-discovery-grey leading-relaxed">
-              Help us improve Kifolio by sharing your thoughts, suggestions, or reporting any issues you've encountered.
+            <p className="text-md text-discovery-grey leading-relaxed">
+              Help us improve Kifolio by sharing your thoughts, suggestions, or reporting any issues that you've encountered.
             </p>
           </div>
 
           {/* Feedback Form or Confirmation */}
           {!isSubmitted ? (
-            <div className="bg-discovery-white-100 rounded-lg shadow-sm p-8">
+            <div className="bg-discovery-white-100 rounded-lg shadow-sm px-6 py-8">
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Email Field */}
                 <div className="form-field">
