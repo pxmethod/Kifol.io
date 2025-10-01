@@ -92,7 +92,7 @@ export default function AchievementCard({
         ))}
         {hasMore && !showAllThumbnails && (
           <div 
-            className="w-24 h-24 rounded bg-discovery-beige-200 flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-discovery-beige-300 transition-colors"
+            className="w-24 h-24 rounded bg-discovery-beige-100 flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-discovery-beige-300 transition-colors"
             onClick={() => setShowAllThumbnails(true)}
           >
             <span className="text-sm text-discovery-grey font-medium">
@@ -234,7 +234,7 @@ export default function AchievementCard({
 
   return (
     <div
-      className={`bg-discovery-white-100 rounded-lg shadow-md border border-discovery-beige-300 p-4 transition-all duration-200 relative ${
+      className={`bg-discovery-white-100 rounded-lg shadow-sm border border-discovery-beige-100 p-4 transition-all duration-200 relative ${
         isHovered ? 'shadow-md border-discovery-beige-400 bg-discovery-beige-50' : ''
       }`}
       onMouseEnter={() => setIsHovered(true)}
@@ -270,15 +270,15 @@ export default function AchievementCard({
           </p>
         </div>
         
-        {/* Edit Button - Only show on hover */}
+        {/* Edit Button - Always visible on mobile, show on hover for desktop */}
         {onEdit && (
           <button
             onClick={(e) => {
               e.stopPropagation();
               onEdit(achievement);
             }}
-            className={`p-2 text-discovery-grey hover:text-discovery-black hover:bg-discovery-beige-100 rounded-full transition-all duration-200 ${
-              isHovered ? 'opacity-100' : 'opacity-0'
+            className={`p-2 text-discovery-beige-800 hover:text-discovery-beige-300 hover:bg-discovery-beige-100 rounded-full transition-all duration-200 opacity-100 md:opacity-0 ${
+              isHovered ? 'md:opacity-100' : ''
             }`}
             title="Edit highlight"
           >
