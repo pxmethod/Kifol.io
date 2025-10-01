@@ -228,7 +228,7 @@ export default function PortfolioPage() {
       
       
       {/* Action Bar */}
-      <div className="bg-discovery-white-100 border-b border-discovery-beige-100 px-9 py-4">
+      <div className="bg-discovery-white-100 border-b border-discovery-beige-100 px-9 py-3">
         <div className="max-w-7xl mx-auto">
           {/* Mobile: All elements in single row */}
           <div className="flex lg:hidden items-center justify-between w-full">
@@ -246,7 +246,7 @@ export default function PortfolioPage() {
             <div className="flex items-center space-x-2">
               <button
                 onClick={handlePreview}
-                className="px-6 py-3 border border-discovery-beige-300 text-discovery-black rounded-lg hover:bg-discovery-beige-100 transition-colors font-medium"
+                className="px-4 py-2 border border-discovery-beige-300 text-discovery-black rounded-lg hover:bg-discovery-beige-100 transition-colors font-medium text-md"
               >
                 Preview Portfolio
               </button>
@@ -270,7 +270,7 @@ export default function PortfolioPage() {
             <div className="flex items-center">
               <button
                 onClick={handlePreview}
-                className="px-6 py-3 border border-discovery-beige-300 text-discovery-black rounded-lg hover:bg-discovery-beige-100 transition-colors font-medium"
+                className="px-4 py-2 border border-discovery-beige-300 text-discovery-black rounded-lg hover:bg-discovery-beige-100 transition-colors font-medium text-md"
               >
                 Preview Portfolio
               </button>
@@ -356,7 +356,7 @@ export default function PortfolioPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white text-green-800">
+                  <div className="inline-flex items-center px-3 py-1 rounded-full border border-discovery-beige-100 text-sm font-medium bg-white text-green-800">
                     <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -365,15 +365,15 @@ export default function PortfolioPage() {
                 )}
               </div>
               
-              <p className="text-lg text-discovery-grey leading-relaxed mb-2">
+              <p className="text-md text-discovery-grey leading-relaxed mb-2">
                 {portfolio.portfolioTitle}
               </p>
-              <p className="text-sm text-discovery-grey">
+              <p className="text-xs text-discovery-grey">
                 Member since {formatMemberSince(portfolio.createdAt)}
               </p>
 
               {/* Portfolio URL - On its own row */}
-              <div className="mt-6 p-4 bg-discovery-gray-300 rounded-lg">
+              <div className="mt-6 p-4 bg-discovery-beige-100 rounded-lg">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-mono text-discovery-black break-all flex-1 min-w-0">
@@ -419,7 +419,7 @@ export default function PortfolioPage() {
 
           {/* Portfolio Content */}
           <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden mt-8">
-            <div className="px-6 py-4 border-b border-discovery-beige-300">
+            <div className="px-6 py-4 border-b border-discovery-beige-100">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-medium text-discovery-black">Highlights</h2>
                 <button
@@ -523,7 +523,7 @@ export default function PortfolioPage() {
                         )}
                       </div>
                     ) : (
-                      <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white text-green-800">
+                      <div className="inline-flex items-center px-3 py-1 rounded-full border border-discovery-beige-100 text-sm font-medium bg-white text-green-800">
                         <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -532,10 +532,10 @@ export default function PortfolioPage() {
                     )}
                   </div>
                   
-                  <p className="text-lg text-discovery-grey leading-relaxed mb-2">
+                  <p className="text-md text-discovery-grey leading-relaxed mb-2">
                     {portfolio.portfolioTitle}
                   </p>
-                  <p className="text-sm text-discovery-grey">
+                  <p className="text-xs text-discovery-grey">
                     Member since {formatMemberSince(portfolio.createdAt)}
                   </p>
 
@@ -589,7 +589,7 @@ export default function PortfolioPage() {
           {/* Right Column - Scrollable */}
           <div className="flex-1">
             <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden">
-              <div className="px-6 py-4 border-b border-discovery-beige-300">
+              <div className="px-6 py-4 border-b border-discovery-beige-100">
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-medium text-discovery-black">Highlights</h2>
                   <button
