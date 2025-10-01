@@ -246,7 +246,7 @@ export default function CreatePortfolio() {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 py-5">
-        <div className="bg-discovery-white-100 rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden">
           <div className="px-6 py-4">
             <h1 className="text-4xl lg:text-4xl font-medium text-discovery-black">Create new portfolio</h1>
           </div>

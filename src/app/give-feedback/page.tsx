@@ -203,7 +203,7 @@ export default function GiveFeedbackPage() {
 
           {/* Feedback Form or Confirmation */}
           {!isSubmitted ? (
-            <div className="bg-discovery-white-100 rounded-lg shadow-sm px-6 py-8">
+            <div className="bg-discovery-white-100 rounded-lg shadow-md px-6 py-8">
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Email Field */}
                 <div className="form-field">
@@ -325,7 +325,7 @@ export default function GiveFeedbackPage() {
             </div>
           ) : (
             /* Confirmation Message */
-            <div className="bg-discovery-white-100 rounded-lg shadow-sm border border-discovery-beige-300 p-8 text-center">
+            <div className="bg-discovery-white-100 rounded-lg shadow-md border border-discovery-beige-300 p-8 text-center">
               <div className="mb-6">
                 <div className="w-16 h-16 mx-auto mb-4 bg-discovery-beige-100 rounded-full flex items-center justify-center">
                   <svg className="w-8 h-8 text-discovery-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">

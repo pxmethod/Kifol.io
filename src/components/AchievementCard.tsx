@@ -234,7 +234,7 @@ export default function AchievementCard({
 
   return (
     <div
-      className={`bg-white rounded-lg shadow-sm border border-gray-200 p-4 transition-all duration-200 relative ${
+      className={`bg-white rounded-lg shadow-md border border-gray-200 p-4 transition-all duration-200 relative ${
         isHovered ? 'shadow-md border-gray-300 bg-gray-50' : ''
       }`}
       onMouseEnter={() => setIsHovered(true)}

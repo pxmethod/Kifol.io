@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
           </div>
 
           {/* Form Card */}
-          <div className="bg-discovery-white-100 rounded-lg p-8 shadow-sm">
+          <div className="bg-discovery-white-100 rounded-lg p-8 shadow-md">
             {message && (
               <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
                 <p className="text-green-800 text-sm">{message}</p>

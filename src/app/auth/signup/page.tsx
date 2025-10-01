@@ -157,7 +157,7 @@ export default function SignUpPage() {
           </div>
 
           {/* Sign Up Form */}
-          <div className="bg-white rounded-lg p-6 shadow-sm">
+          <div className="bg-white rounded-lg p-6 shadow-md">
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Email Field */}

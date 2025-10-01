@@ -79,7 +79,7 @@ export default function Header({ animateLogo = false }: HeaderProps) {
   };
 
   return (
-    <header className="bg-discovery-primary text-white px-9 py-4 shadow-sm">
+    <header className="bg-discovery-primary text-white px-9 py-4 shadow-md">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         {/* Logo */}
         <Link 

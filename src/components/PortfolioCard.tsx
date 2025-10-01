@@ -84,7 +84,7 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove }: Portfolio
 
   return (
     <div 
-      className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
       onClick={handleCardClick}
     >
       {/* Portfolio Image */}
@@ -92,7 +92,7 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove }: Portfolio
         {/* 3-Dot Menu - positioned absolutely over the image */}
         <div className="absolute top-3 right-3 z-10" ref={menuRef} onMouseLeave={handleMenuMouseLeave}>
           <button
-            className="menu-button bg-white/90 hover:bg-white rounded-lg p-2 shadow-sm transition-colors"
+            className="menu-button bg-white/90 hover:bg-white rounded-lg p-2 shadow-md transition-colors"
             onClick={handleMenuToggle}
           >
             <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">

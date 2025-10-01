@@ -73,7 +73,7 @@ export default function ForgotUsernamePage() {
           </div>
 
           {/* Form Card */}
-          <div className="bg-discovery-white-100 rounded-lg p-8 shadow-sm">
+          <div className="bg-discovery-white-100 rounded-lg p-8 shadow-md">
             {message && (
               <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-blue-800 text-sm">{message}</p>

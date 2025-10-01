@@ -395,7 +395,7 @@ export default function MarketingPage() {
               What parents are saying
             </h2>
             <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-white rounded-lg p-6 shadow-sm">
+              <div className="bg-white rounded-lg p-6 shadow-md">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4">
                     <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100">K</span>
@@ -410,7 +410,7 @@ export default function MarketingPage() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-lg p-6 shadow-sm">
+              <div className="bg-white rounded-lg p-6 shadow-md">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4">
                     <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100">S</span>
@@ -426,7 +426,7 @@ export default function MarketingPage() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-lg p-6 shadow-sm">
+              <div className="bg-white rounded-lg p-6 shadow-md">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4">
                     <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100">R</span>
@@ -442,7 +442,7 @@ export default function MarketingPage() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-lg p-6 shadow-sm">
+              <div className="bg-white rounded-lg p-6 shadow-md">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4">
                     <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100">D</span>
