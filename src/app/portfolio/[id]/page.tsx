@@ -134,7 +134,7 @@ export default function PortfolioPage() {
     return (
       <div className="min-h-screen bg-discovery-beige-200">
         <Header />
-        <main className="max-w-7xl mx-auto px-4 py-8">
+        <main className="max-w-7xl mx-auto px-4 py-5">
           <div className="flex items-center justify-center min-h-[60vh]">
             <LoadingSpinner size="lg" label="Loading..." />
           </div>
@@ -193,7 +193,7 @@ export default function PortfolioPage() {
     return (
       <div className="min-h-screen bg-discovery-beige-200">
         <Header />
-        <main className="max-w-7xl mx-auto px-4 py-8">
+        <main className="max-w-7xl mx-auto px-4 py-5">
           <div className="flex items-center justify-center min-h-[60vh]">
             <LoadingSpinner size="lg" label="Loading portfolio..." />
           </div>
@@ -206,7 +206,7 @@ export default function PortfolioPage() {
     return (
       <div className="min-h-screen bg-discovery-beige-200">
         <Header />
-        <main className="max-w-7xl mx-auto px-4 py-8">
+        <main className="max-w-7xl mx-auto px-4 py-5">
           <ErrorDisplay
             title="Portfolio Not Found"
             message={error || "The portfolio you're looking for doesn't exist or you don't have permission to view it."}
@@ -279,7 +279,7 @@ export default function PortfolioPage() {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-5">
         {/* Mobile Layout - Stacked */}
         <div className="lg:hidden max-w-2xl mx-auto">
           {/* Portfolio Header Card */}
@@ -288,7 +288,7 @@ export default function PortfolioPage() {
             <div className="absolute top-4 right-4 z-10">
               <Link 
                 href={`/portfolio/${portfolio.id}/edit`}
-                className="flex items-center justify-center w-11 h-11 bg-discovery-white-100 hover:bg-discovery-beige-100 rounded-lg transition-colors"
+                className="flex items-center justify-center w-12 h-12 bg-discovery-white-100 hover:bg-discovery-beige-100 rounded-full transition-colors"
               >
                 <svg className="w-6 h-6 text-discovery-grey" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -337,11 +337,11 @@ export default function PortfolioPage() {
               <div className="flex justify-center mb-4 relative">
                 {portfolio.isPrivate ? (
                   <div 
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-discovery-yellow/20 text-discovery-black cursor-help"
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white text-yellow-800 cursor-help"
                     onMouseEnter={() => setShowPrivateTooltip(true)}
                     onMouseLeave={() => setShowPrivateTooltip(false)}
                   >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                     Private
@@ -356,8 +356,8 @@ export default function PortfolioPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-discovery-primary/20 text-discovery-black">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white text-green-800">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     Public
@@ -382,7 +382,7 @@ export default function PortfolioPage() {
                     </span>
                     <button
                       onClick={copyToClipboard}
-                      className="flex items-center justify-center w-8 h-8 bg-discovery-white-100 hover:bg-discovery-beige-200 rounded-lg transition-colors flex-shrink-0"
+                      className="flex items-center justify-center w-10 h-10 bg-discovery-white-100 hover:bg-discovery-beige-200 rounded-full transition-colors flex-shrink-0"
                       title="Copy URL"
                     >
                       <svg className="w-4 h-4 text-discovery-grey" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -425,7 +425,7 @@ export default function PortfolioPage() {
                 <h2 className="text-2xl font-medium text-discovery-black">Highlights</h2>
                 <button
                   onClick={handleAddHighlight}
-                  className="bg-discovery-primary text-white px-6 py-3 rounded-lg hover:bg-discovery-primary-light transition-colors font-medium flex items-center gap-2"
+                  className="bg-discovery-orange text-white px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-orange-light flex items-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -456,7 +456,7 @@ export default function PortfolioPage() {
                 <div className="absolute top-4 right-4 z-10">
                   <Link 
                     href={`/portfolio/${portfolio.id}/edit`}
-                    className="flex items-center justify-center w-11 h-11 bg-discovery-white-100 hover:bg-discovery-beige-100 rounded-lg transition-colors"
+                    className="flex items-center justify-center w-12 h-12 bg-discovery-white-100 hover:bg-discovery-beige-100 rounded-full transition-colors"
                   >
                     <svg className="w-6 h-6 text-discovery-grey" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -505,11 +505,11 @@ export default function PortfolioPage() {
                   <div className="flex justify-center mb-4 relative">
                     {portfolio.isPrivate ? (
                       <div 
-                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-discovery-yellow/20 text-discovery-black cursor-help"
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white text-yellow-800 cursor-help"
                         onMouseEnter={() => setShowPrivateTooltip(true)}
                         onMouseLeave={() => setShowPrivateTooltip(false)}
                       >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
                         Private
@@ -524,8 +524,8 @@ export default function PortfolioPage() {
                         )}
                       </div>
                     ) : (
-                      <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-discovery-primary/20 text-discovery-black">
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white text-green-800">
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         Public
@@ -549,7 +549,7 @@ export default function PortfolioPage() {
                         </span>
                         <button
                           onClick={copyToClipboard}
-                          className="flex items-center justify-center w-8 h-8 bg-discovery-white-100 hover:bg-discovery-beige-200 rounded-lg transition-colors flex-shrink-0"
+                          className="flex items-center justify-center w-10 h-10 bg-discovery-white-100 hover:bg-discovery-beige-200 rounded-full transition-colors flex-shrink-0"
                           title="Copy URL"
                         >
                           <svg className="w-4 h-4 text-discovery-grey" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -595,7 +595,7 @@ export default function PortfolioPage() {
                   <h2 className="text-2xl font-medium text-discovery-black">Highlights</h2>
                   <button
                     onClick={handleAddHighlight}
-                    className="bg-discovery-primary text-white px-6 py-3 rounded-lg hover:bg-discovery-primary-light transition-colors font-medium flex items-center gap-2"
+                    className="bg-discovery-orange text-white px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-orange-light flex items-center gap-2"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
