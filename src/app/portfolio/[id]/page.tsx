@@ -283,7 +283,7 @@ export default function PortfolioPage() {
         {/* Mobile Layout - Stacked */}
         <div className="lg:hidden max-w-2xl mx-auto">
           {/* Portfolio Header Card */}
-          <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden">
+          <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden relative">
             {/* Edit Button */}
             <div className="absolute top-4 right-4 z-10">
               <Link 
@@ -373,11 +373,10 @@ export default function PortfolioPage() {
               </p>
 
               {/* Portfolio URL - On its own row */}
-              <div className="mt-6 p-4 bg-discovery-beige-100 rounded-lg">
+              <div className="mt-6 p-4 bg-discovery-gray-300 rounded-lg">
                 <div className="space-y-2">
-                  <span className="text-sm font-medium text-discovery-black">Portfolio URL:</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono text-discovery-primary break-all flex-1 min-w-0">
+                    <span className="text-xs font-mono text-discovery-black break-all flex-1 min-w-0">
                       {DOMAIN_CONFIG.PORTFOLIO_DOMAIN}/p/{portfolio.short_id || portfolio.id}
                     </span>
                     <button
@@ -451,7 +450,7 @@ export default function PortfolioPage() {
           <div className="w-96 flex-shrink-0">
             <div className="sticky top-8 space-y-8">
               {/* Portfolio Header Card */}
-              <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden">
+              <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden relative">
                 {/* Edit Button */}
                 <div className="absolute top-4 right-4 z-10">
                   <Link 
@@ -544,7 +543,7 @@ export default function PortfolioPage() {
                   <div className="mt-6 p-4 bg-discovery-beige-100 rounded-lg">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-mono text-discovery-primary break-all flex-1 min-w-0">
+                        <span className="text-xs font-mono text-discovery-black break-all flex-1 min-w-0">
                           {DOMAIN_CONFIG.PORTFOLIO_DOMAIN}/p/{portfolio.short_id || portfolio.id}
                         </span>
                         <button
