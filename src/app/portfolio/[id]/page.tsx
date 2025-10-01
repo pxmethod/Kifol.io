@@ -132,9 +132,9 @@ export default function PortfolioPage() {
   // Show loading while checking authentication
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-kifolio-bg">
+      <div className="min-h-screen bg-discovery-beige-200">
         <Header />
-        <main className="container mx-auto px-4 py-8">
+        <main className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[60vh]">
             <LoadingSpinner size="lg" label="Loading..." />
           </div>
@@ -191,9 +191,9 @@ export default function PortfolioPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-kifolio-bg">
+      <div className="min-h-screen bg-discovery-beige-200">
         <Header />
-        <main className="container mx-auto px-4 py-8">
+        <main className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[60vh]">
             <LoadingSpinner size="lg" label="Loading portfolio..." />
           </div>
@@ -204,9 +204,9 @@ export default function PortfolioPage() {
 
   if (!portfolio || error) {
     return (
-      <div className="min-h-screen bg-kifolio-bg">
+      <div className="min-h-screen bg-discovery-beige-200">
         <Header />
-        <main className="container mx-auto px-4 py-8">
+        <main className="max-w-7xl mx-auto px-4 py-8">
           <ErrorDisplay
             title="Portfolio Not Found"
             message={error || "The portfolio you're looking for doesn't exist or you don't have permission to view it."}
@@ -223,29 +223,30 @@ export default function PortfolioPage() {
   }
 
   return (
-    <div className="min-h-screen bg-kifolio-bg">
+    <div className="min-h-screen bg-discovery-beige-200">
       <Header />
       
       
       {/* Action Bar */}
-      <div className="action-bar">
-        <div className="action-bar__container">
+      <div className="bg-discovery-white-100 border-b border-discovery-beige-100 px-9 py-4">
+        <div className="max-w-7xl mx-auto">
           {/* Mobile: All elements in single row */}
           <div className="flex lg:hidden items-center justify-between w-full">
             <button
               onClick={() => router.push('/dashboard')}
-              className="btn btn--ghost btn--icon-only"
+              className="flex items-center text-discovery-grey hover:text-discovery-black transition-colors"
               title="Back to dashboard"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
+              Back
             </button>
             
             <div className="flex items-center space-x-2">
               <button
                 onClick={handlePreview}
-                className="btn btn--secondary"
+                className="px-6 py-3 border border-discovery-beige-300 text-discovery-black rounded-lg hover:bg-discovery-beige-100 transition-colors font-medium"
               >
                 Preview Portfolio
               </button>
@@ -254,10 +255,10 @@ export default function PortfolioPage() {
           
           {/* Desktop: Original two-column layout */}
           <div className="hidden lg:flex items-center justify-between w-full">
-            <div className="action-bar__left">
+            <div className="flex items-center">
               <button
                 onClick={() => router.push('/dashboard')}
-                className="btn--back"
+                className="flex items-center text-discovery-grey hover:text-discovery-black transition-colors font-medium"
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -266,10 +267,10 @@ export default function PortfolioPage() {
               </button>
             </div>
             
-            <div className="action-bar__right">
+            <div className="flex items-center">
               <button
                 onClick={handlePreview}
-                className="btn btn--secondary"
+                className="px-6 py-3 border border-discovery-beige-300 text-discovery-black rounded-lg hover:bg-discovery-beige-100 transition-colors font-medium"
               >
                 Preview Portfolio
               </button>
@@ -278,56 +279,57 @@ export default function PortfolioPage() {
         </div>
       </div>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-8">
         {/* Mobile Layout - Stacked */}
         <div className="lg:hidden max-w-2xl mx-auto">
           {/* Portfolio Header Card */}
-          <div className="card card--profile">
+          <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden">
             {/* Edit Button */}
-            <div className="card__actions">
+            <div className="absolute top-4 right-4 z-10">
               <Link 
                 href={`/portfolio/${portfolio.id}/edit`}
-                className="btn btn--ghost"
-                style={{ width: '2.75rem', height: '2.75rem', padding: '0.5rem' }}
+                className="flex items-center justify-center w-11 h-11 bg-discovery-white-100 hover:bg-discovery-beige-100 rounded-lg transition-colors"
               >
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-discovery-grey" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
               </Link>
             </div>
 
-            <div className="card__body">
+            <div className="px-6 py-8 text-center">
               {/* Avatar */}
-              <div className="card__avatar">
-                {portfolio.photoUrl ? (
-                  portfolio.photoUrl.startsWith('/placeholders/') ? (
-                    <div className="w-full h-full rounded-full overflow-hidden">
+              <div className="flex justify-center mb-6">
+                <div className="w-24 h-24 rounded-full overflow-hidden bg-discovery-beige-100 flex items-center justify-center">
+                  {portfolio.photoUrl ? (
+                    portfolio.photoUrl.startsWith('/placeholders/') ? (
+                      <div className="w-full h-full rounded-full overflow-hidden">
+                        <Image 
+                          src={portfolio.photoUrl} 
+                          alt={portfolio.childName}
+                          width={96}
+                          height={96}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
                       <Image 
                         src={portfolio.photoUrl} 
                         alt={portfolio.childName}
-                        width={120}
-                        height={120}
+                        width={96}
+                        height={96}
                         className="w-full h-full object-cover"
                       />
-                    </div>
+                    )
                   ) : (
-                    <Image 
-                      src={portfolio.photoUrl} 
-                      alt={portfolio.childName}
-                      width={120}
-                      height={120}
-                      className="w-full h-full object-cover"
-                    />
-                  )
-                ) : (
-                  <span className="card__avatar--placeholder">
-                    {portfolio.childName.charAt(0).toUpperCase()}
-                  </span>
-                )}
+                    <span className="text-2xl font-semibold text-discovery-grey">
+                      {portfolio.childName.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                </div>
               </div>
               
               {/* Name and Title */}
-              <h1 className="card__title">
+              <h1 className="text-3xl font-medium text-discovery-black mb-2">
                 {portfolio.childName}
               </h1>
               
@@ -335,7 +337,7 @@ export default function PortfolioPage() {
               <div className="flex justify-center mb-4 relative">
                 {portfolio.isPrivate ? (
                   <div 
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 cursor-help"
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-discovery-yellow/20 text-discovery-black cursor-help"
                     onMouseEnter={() => setShowPrivateTooltip(true)}
                     onMouseLeave={() => setShowPrivateTooltip(false)}
                   >
@@ -346,15 +348,15 @@ export default function PortfolioPage() {
                     
                     {/* Custom Tooltip */}
                     {showPrivateTooltip && (
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap z-10">
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-discovery-black text-discovery-white-100 text-xs rounded-lg whitespace-nowrap z-10">
                         This portfolio is private. Recipients will need the password to view it.
                         {/* Tooltip arrow */}
-                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-discovery-black"></div>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                  <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-discovery-primary/20 text-discovery-black">
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -363,27 +365,27 @@ export default function PortfolioPage() {
                 )}
               </div>
               
-              <p className="card__subtitle">
+              <p className="text-lg text-discovery-grey leading-relaxed mb-2">
                 {portfolio.portfolioTitle}
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-discovery-grey">
                 Member since {formatMemberSince(portfolio.createdAt)}
               </p>
 
               {/* Portfolio URL - On its own row */}
-              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+              <div className="mt-6 p-4 bg-discovery-beige-100 rounded-lg">
                 <div className="space-y-2">
-                  <span className="text-sm font-medium text-gray-700">Portfolio URL:</span>
+                  <span className="text-sm font-medium text-discovery-black">Portfolio URL:</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono text-kifolio-cta break-all flex-1 min-w-0">
+                    <span className="text-xs font-mono text-discovery-primary break-all flex-1 min-w-0">
                       {DOMAIN_CONFIG.PORTFOLIO_DOMAIN}/p/{portfolio.short_id || portfolio.id}
                     </span>
                     <button
                       onClick={copyToClipboard}
-                      className="btn btn--ghost btn--icon-only btn--sm flex-shrink-0"
+                      className="flex items-center justify-center w-8 h-8 bg-discovery-white-100 hover:bg-discovery-beige-200 rounded-lg transition-colors flex-shrink-0"
                       title="Copy URL"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-discovery-grey" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                       </svg>
                     </button>
@@ -394,12 +396,12 @@ export default function PortfolioPage() {
           </div>
 
           {/* Organizations Section */}
-          <div className="card" style={{ marginTop: '2rem' }}>
-            <div className="card__header">
-              <h2 className="card__title">Organizations</h2>
+          <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden mt-8">
+            <div className="px-6 py-4">
+              <h2 className="text-2xl font-medium text-discovery-black">Organizations</h2>
             </div>
 
-            <div className="card__body">
+            <div className="px-6 pb-6">
               {/* Organizations Empty State */}
               <div className="text-center py-12">
                 <div className="mx-auto mb-4">
@@ -410,28 +412,30 @@ export default function PortfolioPage() {
                     style={{ width: '260px', height: '260px' }}
                   />
                 </div>
-                <h3 className="text-lg font-medium text-kifolio-text mb-2">No orgs to show</h3>
-                <p className="text-gray-500">Organizations that your child is a part of will display here.</p>
+                <h3 className="text-lg font-medium text-discovery-black mb-2">No orgs to show</h3>
+                <p className="text-discovery-grey">Organizations that your child is a part of will display here.</p>
               </div>
             </div>
           </div>
 
           {/* Portfolio Content */}
-          <div className="card" style={{ marginTop: '2rem' }}>
-            <div className="card__header">
-              <h2 className="card__title">Highlights</h2>
-              <button
-                onClick={handleAddHighlight}
-                className="btn btn--primary"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                <span>Add highlight</span>
-              </button>
+          <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden mt-8">
+            <div className="px-6 py-4 border-b border-discovery-beige-300">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-medium text-discovery-black">Highlights</h2>
+                <button
+                  onClick={handleAddHighlight}
+                  className="bg-discovery-primary text-white px-6 py-3 rounded-lg hover:bg-discovery-primary-light transition-colors font-medium flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <span>Add highlight</span>
+                </button>
+              </div>
             </div>
 
-            <div className="card__body">
+            <div className="px-6 py-6">
               {/* Highlights Timeline */}
               <HighlightsTimeline
                 highlights={portfolio.achievements || []}
@@ -447,52 +451,53 @@ export default function PortfolioPage() {
           <div className="w-96 flex-shrink-0">
             <div className="sticky top-8 space-y-8">
               {/* Portfolio Header Card */}
-              <div className="card card--profile">
+              <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden">
                 {/* Edit Button */}
-                <div className="card__actions">
+                <div className="absolute top-4 right-4 z-10">
                   <Link 
                     href={`/portfolio/${portfolio.id}/edit`}
-                    className="btn btn--ghost"
-                    style={{ width: '2.75rem', height: '2.75rem', padding: '0.5rem' }}
+                    className="flex items-center justify-center w-11 h-11 bg-discovery-white-100 hover:bg-discovery-beige-100 rounded-lg transition-colors"
                   >
-                    <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-discovery-grey" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </Link>
                 </div>
 
-                <div className="card__body">
+                <div className="px-6 py-8 text-center">
                   {/* Avatar */}
-                  <div className="card__avatar">
-                    {portfolio.photoUrl ? (
-                      portfolio.photoUrl.startsWith('/placeholders/') ? (
-                        <div className="w-full h-full rounded-full overflow-hidden">
+                  <div className="flex justify-center mb-6">
+                    <div className="w-24 h-24 rounded-full overflow-hidden bg-discovery-beige-100 flex items-center justify-center">
+                      {portfolio.photoUrl ? (
+                        portfolio.photoUrl.startsWith('/placeholders/') ? (
+                          <div className="w-full h-full rounded-full overflow-hidden">
+                            <Image 
+                              src={portfolio.photoUrl} 
+                              alt={portfolio.childName}
+                              width={96}
+                              height={96}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
                           <Image 
                             src={portfolio.photoUrl} 
                             alt={portfolio.childName}
-                            width={120}
-                            height={120}
+                            width={96}
+                            height={96}
                             className="w-full h-full object-cover"
                           />
-                        </div>
+                        )
                       ) : (
-                        <Image 
-                          src={portfolio.photoUrl} 
-                          alt={portfolio.childName}
-                          width={120}
-                          height={120}
-                          className="w-full h-full object-cover"
-                        />
-                      )
-                    ) : (
-                      <span className="card__avatar--placeholder">
-                        {portfolio.childName.charAt(0).toUpperCase()}
-                      </span>
-                    )}
+                        <span className="text-2xl font-semibold text-discovery-grey">
+                          {portfolio.childName.charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   
                   {/* Name and Title */}
-                  <h1 className="card__title">
+                  <h1 className="text-3xl font-medium text-discovery-black mb-2">
                     {portfolio.childName}
                   </h1>
                   
@@ -500,7 +505,7 @@ export default function PortfolioPage() {
                   <div className="flex justify-center mb-4 relative">
                     {portfolio.isPrivate ? (
                       <div 
-                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 cursor-help"
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-discovery-yellow/20 text-discovery-black cursor-help"
                         onMouseEnter={() => setShowPrivateTooltip(true)}
                         onMouseLeave={() => setShowPrivateTooltip(false)}
                       >
@@ -511,15 +516,15 @@ export default function PortfolioPage() {
                         
                         {/* Custom Tooltip */}
                         {showPrivateTooltip && (
-                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap z-10">
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-discovery-black text-discovery-white-100 text-xs rounded-lg whitespace-nowrap z-10">
                             This portfolio is private. Recipients will need the password to view it.
                             {/* Tooltip arrow */}
-                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-discovery-black"></div>
                           </div>
                         )}
                       </div>
                     ) : (
-                      <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                      <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-discovery-primary/20 text-discovery-black">
                         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -528,26 +533,26 @@ export default function PortfolioPage() {
                     )}
                   </div>
                   
-                  <p className="card__subtitle">
+                  <p className="text-lg text-discovery-grey leading-relaxed mb-2">
                     {portfolio.portfolioTitle}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-sm text-discovery-grey">
                     Member since {formatMemberSince(portfolio.createdAt)}
                   </p>
 
                   {/* Portfolio URL - On its own row */}
-                  <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                  <div className="mt-6 p-4 bg-discovery-beige-100 rounded-lg">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-mono text-kifolio-cta break-all flex-1 min-w-0">
+                        <span className="text-xs font-mono text-discovery-primary break-all flex-1 min-w-0">
                           {DOMAIN_CONFIG.PORTFOLIO_DOMAIN}/p/{portfolio.short_id || portfolio.id}
                         </span>
                         <button
                           onClick={copyToClipboard}
-                          className="btn btn--ghost btn--icon-only btn--sm flex-shrink-0"
+                          className="flex items-center justify-center w-8 h-8 bg-discovery-white-100 hover:bg-discovery-beige-200 rounded-lg transition-colors flex-shrink-0"
                           title="Copy URL"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 text-discovery-grey" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                           </svg>
                         </button>
@@ -558,12 +563,12 @@ export default function PortfolioPage() {
               </div>
 
               {/* Organizations Section */}
-              <div className="card">
-                <div className="card__header">
-                  <h2 className="card__title">Organizations</h2>
+              <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden">
+                <div className="px-6 py-4">
+                  <h2 className="text-2xl font-medium text-discovery-black">Organizations</h2>
                 </div>
 
-                <div className="card__body">
+                <div className="px-6 pb-6">
                   {/* Organizations Empty State */}
                   <div className="text-center py-12">
                     <div className="mx-auto mb-4">
@@ -574,8 +579,8 @@ export default function PortfolioPage() {
                         style={{ width: '260px', height: '260px' }}
                       />
                     </div>
-                    <h3 className="text-lg font-medium text-kifolio-text mb-2">No orgs to show</h3>
-                    <p className="text-gray-500">Organizations that your child is a part of will display here.</p>
+                    <h3 className="text-lg font-medium text-discovery-black mb-2">No orgs to show</h3>
+                    <p className="text-discovery-grey">Organizations that your child is a part of will display here.</p>
                   </div>
                 </div>
               </div>
@@ -584,21 +589,23 @@ export default function PortfolioPage() {
 
           {/* Right Column - Scrollable */}
           <div className="flex-1">
-            <div className="card">
-              <div className="card__header">
-                <h2 className="card__title">Highlights</h2>
-                <button
-                  onClick={handleAddHighlight}
-                  className="btn btn--primary"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  <span>Add highlight</span>
-                </button>
+            <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden">
+              <div className="px-6 py-4 border-b border-discovery-beige-300">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-medium text-discovery-black">Highlights</h2>
+                  <button
+                    onClick={handleAddHighlight}
+                    className="bg-discovery-primary text-white px-6 py-3 rounded-lg hover:bg-discovery-primary-light transition-colors font-medium flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <span>Add highlight</span>
+                  </button>
+                </div>
               </div>
 
-              <div className="card__body">
+              <div className="px-6 py-6">
                 {/* Highlights Timeline */}
                 <HighlightsTimeline
                   highlights={portfolio.achievements || []}
@@ -612,7 +619,7 @@ export default function PortfolioPage() {
 
       {/* Copy Notification */}
       {showCopyNotification && (
-        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
+        <div className="fixed bottom-4 right-4 bg-discovery-primary text-discovery-white-100 px-4 py-2 rounded-lg shadow-lg z-50">
           URL copied to clipboard!
         </div>
       )}
