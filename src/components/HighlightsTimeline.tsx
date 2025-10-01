@@ -80,8 +80,8 @@ export default function HighlightsTimeline({
             style={{ width: '260px', height: '260px' }}
           />
         </div>
-        <h3 className="text-lg font-medium text-kifolio-text mb-2">No highlights yet</h3>
-        <p className="text-gray-500">Every journey starts with one moment. Add their first highlight—it could be their latest artwork,
+        <h3 className="text-lg font-medium text-discovery-black mb-2">No highlights yet</h3>
+        <p className="text-discovery-grey">Every journey starts with one moment. Add their first highlight—it could be their latest artwork,
             a great report card, a team win, or simply a milestone that made you smile.</p>
       </div>
     );
@@ -93,11 +93,11 @@ export default function HighlightsTimeline({
         <div key={dateKey} className="space-y-4">
           {/* Date Header */}
           <div className="flex items-center space-x-3">
-            <div className="flex-1 border-t border-gray-200"></div>
-            <h3 className="text-sm font-medium text-gray-500 px-3 py-1 bg-gray-50 rounded-full">
+            <div className="flex-1 border-t border-discovery-beige-300"></div>
+            <h3 className="text-sm font-medium text-discovery-grey px-3 py-1 bg-discovery-beige-100 rounded-full">
               {formatGroupDate(dateKey)}
             </h3>
-            <div className="flex-1 border-t border-gray-200"></div>
+            <div className="flex-1 border-t border-discovery-beige-300"></div>
           </div>
           
           {/* Highlights for this date */}

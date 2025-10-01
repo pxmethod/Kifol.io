@@ -66,7 +66,7 @@ export default function AchievementCard({
         {allMedia.slice(0, displayCount).map((media, index) => (
           <div
             key={media.id}
-            className="w-24 h-24 rounded overflow-hidden bg-gray-100 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+            className="w-24 h-24 rounded overflow-hidden bg-discovery-beige-100 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
             onClick={() => handleThumbnailClick(media)}
           >
             {media.type === 'image' && !media.url.includes('.mp4') && !media.url.includes('.mov') && !media.url.includes('.avi') ? (
@@ -78,7 +78,7 @@ export default function AchievementCard({
                 className="w-full h-full object-cover"
               />
             ) : media.type === 'video' || media.url.includes('.mp4') || media.url.includes('.mov') || media.url.includes('.avi') ? (
-              <div className="w-full h-full flex items-center justify-center bg-gray-200 relative">
+              <div className="w-full h-full flex items-center justify-center bg-discovery-beige-200 relative">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-6 h-6 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
                     <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -92,20 +92,20 @@ export default function AchievementCard({
         ))}
         {hasMore && !showAllThumbnails && (
           <div 
-            className="w-24 h-24 rounded bg-gray-200 flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-gray-300 transition-colors"
+            className="w-24 h-24 rounded bg-discovery-beige-200 flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-discovery-beige-300 transition-colors"
             onClick={() => setShowAllThumbnails(true)}
           >
-            <span className="text-sm text-gray-600 font-medium">
+            <span className="text-sm text-discovery-grey font-medium">
               +{allMedia.length - maxDisplay}
             </span>
           </div>
         )}
         {hasMore && showAllThumbnails && (
           <div 
-            className="w-24 h-24 rounded bg-gray-300 flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-gray-400 transition-colors"
+            className="w-24 h-24 rounded bg-discovery-beige-300 flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-discovery-beige-400 transition-colors"
             onClick={() => setShowAllThumbnails(false)}
           >
-            <span className="text-sm text-gray-700 font-medium">
+            <span className="text-sm text-discovery-black font-medium">
               Show Less
             </span>
           </div>
@@ -130,7 +130,7 @@ export default function AchievementCard({
             <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-discovery-grey">
               {achievement.media.filter(m => m.type === 'image').length}
             </span>
           </div>
@@ -140,7 +140,7 @@ export default function AchievementCard({
             <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
             </svg>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-discovery-grey">
               {achievement.media.filter(m => m.type === 'video').length}
             </span>
           </div>
@@ -150,7 +150,7 @@ export default function AchievementCard({
             <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
             </svg>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-discovery-grey">
               {achievement.media.filter(m => m.type === 'audio').length}
             </span>
           </div>
@@ -160,7 +160,7 @@ export default function AchievementCard({
             <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
             </svg>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-discovery-grey">
               {achievement.media.filter(m => m.type === 'pdf').length}
             </span>
           </div>
@@ -234,8 +234,8 @@ export default function AchievementCard({
 
   return (
     <div
-      className={`bg-white rounded-lg shadow-md border border-gray-200 p-4 transition-all duration-200 relative ${
-        isHovered ? 'shadow-md border-gray-300 bg-gray-50' : ''
+      className={`bg-discovery-white-100 rounded-lg shadow-md border border-discovery-beige-300 p-4 transition-all duration-200 relative ${
+        isHovered ? 'shadow-md border-discovery-beige-400 bg-discovery-beige-50' : ''
       }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -245,10 +245,10 @@ export default function AchievementCard({
         <div className="flex-1 min-w-0">
           {/* Desktop Layout - Title and Type Tag on same row */}
           <div className="hidden md:flex items-center gap-2 mb-1">
-            <h3 className="text-lg font-semibold text-kifolio-text truncate">
+            <h3 className="text-lg font-semibold text-discovery-black truncate">
               {achievement.title}
             </h3>
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-kifolio-cta/10 text-kifolio-cta flex-shrink-0">
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-discovery-orange/10 text-discovery-orange flex-shrink-0">
               {typeInfo.icon}
               <span className="ml-1">{typeInfo.name}</span>
             </span>
@@ -256,16 +256,16 @@ export default function AchievementCard({
           
           {/* Mobile Layout - Type Tag below Title */}
           <div className="md:hidden">
-            <h3 className="text-lg font-semibold text-kifolio-text mb-2">
+            <h3 className="text-lg font-semibold text-discovery-black mb-2">
               {achievement.title}
             </h3>
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-kifolio-cta/10 text-kifolio-cta">
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-discovery-orange/10 text-discovery-orange">
               {typeInfo.icon}
               <span className="ml-1">{typeInfo.name}</span>
             </span>
           </div>
           
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-discovery-grey mt-1">
             {formatDate(achievement.date)}
           </p>
         </div>
@@ -277,7 +277,7 @@ export default function AchievementCard({
               e.stopPropagation();
               onEdit(achievement);
             }}
-            className={`p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200 ${
+            className={`p-2 text-discovery-grey hover:text-discovery-black hover:bg-discovery-beige-100 rounded-full transition-all duration-200 ${
               isHovered ? 'opacity-100' : 'opacity-0'
             }`}
             title="Edit highlight"
@@ -292,7 +292,7 @@ export default function AchievementCard({
 
       {/* Description */}
       {achievement.description && (
-        <p className="text-gray-500 text-sm mb-3">
+        <p className="text-discovery-grey text-sm mb-3">
           {achievement.description}
         </p>
       )}
