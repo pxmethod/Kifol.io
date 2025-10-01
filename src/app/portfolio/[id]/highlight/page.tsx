@@ -561,7 +561,7 @@ export default function HighlightForm() {
   // Show loading while checking authentication
   if (loading) {
     return (
-      <div className="min-h-screen bg-kifolio-bg">
+      <div className="min-h-screen bg-discovery-beige-200">
         <Header animateLogo={true} />
         <main className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[60vh]">
@@ -573,56 +573,56 @@ export default function HighlightForm() {
   }
 
   return (
-    <div className="min-h-screen bg-kifolio-bg">
+    <div className="min-h-screen bg-discovery-beige-200">
       <Header />
       
       {/* Action Bar */}
-      <div className="action-bar">
-        <div className="action-bar__container">
+      <div className="bg-discovery-white-100 border-b border-discovery-beige-100 px-9 py-4">
+        <div className="max-w-7xl mx-auto">
           <button
             onClick={handleBackClick}
-            className="btn--back"
+            className="flex items-center text-discovery-grey hover:text-discovery-black transition-colors font-medium"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Go back to portfolio
+            Back to portfolio
           </button>
         </div>
       </div>
       
-      <main className="container mx-auto px-4 py-8 max-w-2xl">
-        <div className="card">
-          <div className="card__header">
-            <h1 className="card__title">
+      <main className="max-w-7xl mx-auto px-4 py-5">
+        <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden max-w-4xl mx-auto">
+          <div className="px-6 py-4">
+            <h1 className="text-4xl lg:text-4xl font-medium text-discovery-black">
               {isEditMode ? 'Edit highlight' : 'Add highlight'}
             </h1>
           </div>
 
-          <div className="card__body">
-            <form onSubmit={handleSubmit} className="form">
+          <div className="px-6 py-6">
+            <form onSubmit={handleSubmit} className="space-y-8">
               {/* Type Selection */}
-              <div className="form-field">
-                <label htmlFor="type" className="form-field__label form-field__label--required">
-                  Type
+              <div>
+                <label htmlFor="type" className="block text-md font-medium text-discovery-black mb-2">
+                  Type *
                 </label>
                 <div className="type-dropdown relative">
                   <button
                     type="button"
                     onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
-                    className={`w-full px-3 py-2 text-left border rounded-lg focus:outline-none focus:ring-2 focus:ring-kifolio-cta input cursor-pointer ${
-                      errors.type ? 'border-red-500' : 'border-gray-300'
-                    } ${isTypeDropdownOpen ? 'ring-2 ring-kifolio-cta' : ''}`}
+                    className={`w-full px-4 py-3 text-left border rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors cursor-pointer text-discovery-black ${
+                      errors.type ? 'border-red-500' : 'border-discovery-grey-300'
+                    } ${isTypeDropdownOpen ? 'ring-2 ring-discovery-primary border-transparent' : ''}`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         {formData.type && getTypeIcon(formData.type as HighlightType)}
-                        <span className={`ml-2 ${formData.type ? 'text-kifolio-text' : 'text-gray-500'}`}>
+                        <span className={`ml-2 ${formData.type ? 'text-discovery-black' : 'text-discovery-grey'}`}>
                           {getSelectedType()?.name || 'Select a type...'}
                         </span>
                       </div>
                       <svg 
-                        className={`w-5 h-5 text-gray-400 transition-transform ${isTypeDropdownOpen ? 'rotate-180' : ''}`}
+                        className={`w-5 h-5 text-discovery-grey transition-transform ${isTypeDropdownOpen ? 'rotate-180' : ''}`}
                         fill="none" 
                         stroke="currentColor" 
                         viewBox="0 0 24 24"
@@ -633,7 +633,7 @@ export default function HighlightForm() {
                   </button>
                   
                   {isTypeDropdownOpen && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
+                    <div className="absolute z-10 w-full mt-1 bg-discovery-white-100 border border-discovery-grey-300 rounded-lg shadow-lg">
                       {HIGHLIGHT_TYPES.map((type) => (
                         <button
                           key={type.id}
@@ -642,13 +642,13 @@ export default function HighlightForm() {
                             handleInputChange('type', type.id);
                             setIsTypeDropdownOpen(false);
                           }}
-                          className="w-full px-3 py-3 text-left hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg flex items-center"
+                          className="w-full px-3 py-3 text-left hover:bg-discovery-beige-100 first:rounded-t-lg last:rounded-b-lg flex items-center transition-colors"
                         >
                           <div className="flex items-center">
                             {getTypeIcon(type.id)}
                             <div className="ml-3">
-                              <div className="text-base font-medium text-kifolio-text">{type.name}</div>
-                              <div className="text-xs text-gray-500">{type.description}</div>
+                              <div className="text-base font-medium text-discovery-black">{type.name}</div>
+                              <div className="text-xs text-discovery-grey">{type.description}</div>
                             </div>
                           </div>
                         </button>
@@ -657,14 +657,14 @@ export default function HighlightForm() {
                   )}
                 </div>
                 {errors.type && (
-                  <p className="form-field__error">{errors.type}</p>
+                  <p className="text-red-500 text-sm mt-1">{errors.type}</p>
                 )}
               </div>
 
               {/* Title */}
-              <div className="form-field">
-                <label htmlFor="title" className="form-field__label form-field__label--required">
-                  Title
+              <div>
+                <label htmlFor="title" className="block text-md font-medium text-discovery-black mb-2">
+                  Title *
                 </label>
                 <input
                   type="text"
@@ -673,36 +673,40 @@ export default function HighlightForm() {
                   onChange={(e) => handleInputChange('title', e.target.value)}
                   placeholder="e.g., First Piano Recital"
                   maxLength={100}
-                  className="input"
+                  className={`w-full px-4 py-3 border rounded-lg focus:border-transparent transition-colors text-discovery-black ${
+                    errors.title ? 'border-red-500' : 'border-discovery-grey-300'
+                  }`}
                 />
                 {errors.title && (
-                  <p className="form-field__error">{errors.title}</p>
+                  <p className="text-red-500 text-sm mt-1">{errors.title}</p>
                 )}
-                <p className="form-field__help">
+                <p className="text-discovery-grey text-sm mt-1">
                   {formData.title.length}/100 characters
                 </p>
               </div>
 
               {/* Date */}
-              <div className="form-field">
-                <label htmlFor="date" className="form-field__label form-field__label--required">
-                  Date
+              <div>
+                <label htmlFor="date" className="block text-md font-medium text-discovery-black mb-2">
+                  Date *
                 </label>
                 <input
                   type="date"
                   id="date"
                   value={formData.date}
                   onChange={(e) => handleInputChange('date', e.target.value)}
-                  className={`input cursor-pointer ${errors.date ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:border-transparent transition-colors text-discovery-black cursor-pointer ${
+                    errors.date ? 'border-red-500' : 'border-discovery-grey-300'
+                  }`}
                 />
                 {errors.date && (
-                  <p className="form-field__error">{errors.date}</p>
+                  <p className="text-red-500 text-sm mt-1">{errors.date}</p>
                 )}
               </div>
 
               {/* Description */}
-              <div className="form-field">
-                <label htmlFor="description" className="form-field__label">
+              <div>
+                <label htmlFor="description" className="block text-md font-medium text-discovery-black mb-2">
                   Description (Optional)
                 </label>
                 <textarea
@@ -712,19 +716,21 @@ export default function HighlightForm() {
                   placeholder="Ex: they practiced for weeks to get this piano piece right—so proud!"
                   rows={4}
                   maxLength={500}
-                  className="input textarea"
+                  className={`w-full px-4 py-3 border rounded-lg focus:border-transparent transition-colors text-discovery-black resize-none ${
+                    errors.description ? 'border-red-500' : 'border-discovery-grey-300'
+                  }`}
                 />
                 {errors.description && (
-                  <p className="form-field__error">{errors.description}</p>
+                  <p className="text-red-500 text-sm mt-1">{errors.description}</p>
                 )}
-                <p className="form-field__help">
+                <p className="text-discovery-grey text-sm mt-1">
                   {formData.description.length}/500 characters
                 </p>
               </div>
 
               {/* Media Upload */}
-              <div className="form-field">
-                <label className="form-field__label">
+              <div>
+                <label className="block text-md font-medium text-discovery-black mb-2">
                   Add Media (Optional)
                 </label>
                 
@@ -741,7 +747,7 @@ export default function HighlightForm() {
                   />
                   <label
                     htmlFor="media"
-                    className={`inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer transition-colors ${
+                    className={`inline-flex items-center px-4 py-2 border border-discovery-grey-300 rounded-lg cursor-pointer transition-colors ${
                       uploadingMedia 
                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
                         : 'bg-white hover:bg-gray-50 text-gray-700'
@@ -754,7 +760,7 @@ export default function HighlightForm() {
                   </label>
                 </div>
                 
-                <p className="form-field__help">
+                <p className="text-discovery-grey text-xs mt-1">
                   Photos, videos, PDFs, and audio files up to 50MB each.
                 </p>
                 
@@ -793,14 +799,14 @@ export default function HighlightForm() {
                 )}
                 
                 {errors.media && (
-                  <p className="form-field__error">{errors.media}</p>
+                  <p className="text-red-500 text-sm mt-1">{errors.media}</p>
                 )}
               </div>
 
           {/* Media Preview */}
           {(formData.media.length > 0 || existingMedia.length > 0) && (
             <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Media Preview</h3>
+              <h3 className="text-md font-medium text-discovery-black mb-2">Media Preview</h3>
               <div className="grid grid-cols-4 gap-3">
                 {/* Existing Media */}
                 {existingMedia.map((media, index) => {
@@ -941,25 +947,25 @@ export default function HighlightForm() {
           )}
 
               {/* Submit Button */}
-              <div className="form-actions">
+              <div className="flex justify-end gap-4 pt-4">
                 <button
                   type="button"
                   onClick={handleBackClick}
-                  className="btn btn--secondary"
+                  className="px-6 py-3 border border-discovery-beige-300 text-discovery-black rounded-lg hover:bg-discovery-beige-100 transition-colors font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting || uploadingMedia}
-                  className="btn btn--primary"
+                  className="px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl text-center disabled:opacity-50 disabled:cursor-not-allowed bg-discovery-orange hover:bg-discovery-orange-light text-white"
                 >
                   {isSubmitting ? 'Saving...' : (isEditMode ? 'Update highlight' : 'Add highlight')}
                 </button>
               </div>
 
               {errors.submit && (
-                <p className="form-field__error text-center">{errors.submit}</p>
+                <p className="text-red-500 text-sm text-center mt-2">{errors.submit}</p>
               )}
             </form>
           </div>
