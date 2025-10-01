@@ -311,7 +311,7 @@ export default function EditPortfolio() {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-9 py-12">
+      <main className="max-w-7xl mx-auto px-4 py-5">
         <div className="bg-discovery-white-100 rounded-lg shadow-sm overflow-hidden max-w-4xl mx-auto">
           <div className="px-6 py-4">
             <h1 className="text-4xl lg:text-4xl font-medium text-discovery-black">Edit portfolio</h1>
@@ -328,8 +328,8 @@ export default function EditPortfolio() {
                   id="childName"
                   value={formData.childName}
                   onChange={(e) => handleInputChange('childName', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors text-discovery-black ${
-                    errors.childName ? 'border-red-500' : 'border-discovery-beige-300'
+                  className={`w-full px-4 py-3 border rounded-lg focus:border-transparent transition-colors text-discovery-black ${
+                    errors.childName ? 'border-red-500' : 'border-discovery-grey-300'
                   }`}
                   placeholder="Enter your child's name"
                   maxLength={100}
@@ -352,8 +352,8 @@ export default function EditPortfolio() {
                   id="portfolioTitle"
                   value={formData.portfolioTitle}
                   onChange={(e) => handleInputChange('portfolioTitle', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors text-discovery-black ${
-                    errors.portfolioTitle ? 'border-red-500' : 'border-discovery-beige-300'
+                  className={`w-full px-4 py-3 border rounded-lg focus:border-transparent transition-colors text-discovery-black ${
+                    errors.portfolioTitle ? 'border-red-500' : 'border-discovery-grey-300'
                   }`}
                   placeholder="Enter portfolio title"
                   maxLength={100}
@@ -384,10 +384,10 @@ export default function EditPortfolio() {
                   />
                   <label
                     htmlFor="photo"
-                    className={`inline-flex items-center px-4 py-3 border rounded-lg cursor-pointer transition-colors ${
+                    className={`inline-flex items-center px-4 py-2 border border-discovery-grey-300 rounded-lg cursor-pointer transition-colors ${
                       uploadingPhoto 
-                        ? 'bg-discovery-beige-100 text-discovery-grey cursor-not-allowed' 
-                        : 'bg-discovery-white-100 hover:bg-discovery-beige-100 text-discovery-black border-discovery-beige-300'
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                        : 'bg-white hover:bg-gray-50 text-gray-700'
                     }`}
                   >
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -399,20 +399,20 @@ export default function EditPortfolio() {
                 
                 {/* Photo Preview */}
                 {selectedFile && (
-                  <div className="mt-3 p-3 bg-discovery-beige-100 rounded-lg border border-discovery-beige-300">
+                  <div className="mt-3 p-3 bg-gray-50 rounded-lg border">
                     <div className="flex items-center space-x-3">
                       <div className="flex-shrink-0">
                         <img
                           src={URL.createObjectURL(selectedFile)}
                           alt="Selected photo preview"
-                          className="w-12 h-12 object-cover rounded-lg border border-discovery-beige-300"
+                          className="w-12 h-12 object-cover rounded-lg border border-gray-200"
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-discovery-black truncate">
+                        <p className="text-sm font-medium text-gray-900 truncate">
                           {selectedFile.name}
                         </p>
-                        <p className="text-sm text-discovery-grey">
+                        <p className="text-sm text-gray-500">
                           {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                         </p>
                       </div>
@@ -424,7 +424,7 @@ export default function EditPortfolio() {
                           const fileInput = document.getElementById('photo') as HTMLInputElement;
                           if (fileInput) fileInput.value = '';
                         }}
-                        className="flex-shrink-0 p-1 text-discovery-grey hover:text-red-500 transition-colors"
+                        className="flex-shrink-0 p-1 text-gray-400 hover:text-red-500 transition-colors"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -436,23 +436,23 @@ export default function EditPortfolio() {
                 
                 {/* Current Photo Display */}
                 {formData.photoUrl && !selectedFile && (
-                  <div className="mt-3 p-3 bg-discovery-beige-100 rounded-lg border border-discovery-beige-300">
+                  <div className="mt-3 p-3 bg-gray-50 rounded-lg border">
                     <div className="flex items-center space-x-3">
                       <div className="flex-shrink-0">
                         <img
                           src={formData.photoUrl}
                           alt="Current portfolio photo"
-                          className="w-12 h-12 object-cover rounded-lg border border-discovery-beige-300"
+                          className="w-12 h-12 object-cover rounded-lg border border-gray-200"
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-discovery-black">Current photo</p>
-                        <p className="text-sm text-discovery-grey">Click "Choose file" to replace</p>
+                        <p className="text-sm font-medium text-gray-900">Current photo</p>
+                        <p className="text-sm text-gray-500">Click "Choose file" to replace</p>
                       </div>
                       <button
                         type="button"
                         onClick={() => setFormData(prev => ({ ...prev, photoUrl: '' }))}
-                        className="flex-shrink-0 p-1 text-discovery-grey hover:text-red-500 transition-colors"
+                        className="flex-shrink-0 p-1 text-gray-400 hover:text-red-500 transition-colors"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -465,13 +465,13 @@ export default function EditPortfolio() {
                 {uploadingPhoto && (
                   <div className="flex items-center mt-2">
                     <LoadingSpinner size="sm" className="mr-2" label="" />
-                    <span className="text-sm text-discovery-grey">Uploading photo...</span>
+                    <span className="text-sm text-kifolio-text">Uploading photo...</span>
                   </div>
                 )}
                 {errors.photoUrl && (
-                  <p className="text-red-500 text-sm mt-1">{errors.photoUrl}</p>
+                  <p className="form-field__error">{errors.photoUrl}</p>
                 )}
-                <p className="text-discovery-grey text-sm mt-1">
+                <p className="form-field__help text-xs">
                   JPEG, PNG, GIF, or SVG. Max size of 50MB
                 </p>
               </div>
@@ -498,7 +498,7 @@ export default function EditPortfolio() {
                           <img
                             src={`/marketing/template_${template.id}.png`}
                             alt={`${template.name} template preview`}
-                            className="w-full h-20 object-cover rounded-lg border border-discovery-beige-300"
+                            className="w-full h-20 object-cover rounded-lg border border-gray-200"
                           />
                         </div>
                         
@@ -506,13 +506,13 @@ export default function EditPortfolio() {
                         <h3 className="font-semibold text-discovery-black">{template.name}</h3>
                         
                         {/* Template Description */}
-                        <p className="text-sm text-discovery-grey mt-1">{template.description}</p>
+                        <p className="text-sm text-discovery-grey mt-1 leading-relaxed">{template.description}</p>
                         
                         {/* Action Buttons */}
                         <div className="mt-3 space-y-2">
                           <button
                             type="button"
-                            className="w-full px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+                            className="w-full px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
                             onClick={(e) => {
                               e.stopPropagation();
                               handlePreviewTemplate(template.id);
@@ -522,7 +522,7 @@ export default function EditPortfolio() {
                           </button>
                           <button
                             type="button"
-                            className={`w-full px-3 py-2 text-sm rounded transition-colors ${
+                            className={`w-full px-4 py-2 text-sm rounded transition-colors ${
                               formData.template === template.id
                                 ? 'bg-discovery-primary text-white hover:bg-discovery-primary-light'
                                 : 'bg-discovery-primary text-white hover:bg-discovery-primary-light'
@@ -546,21 +546,21 @@ export default function EditPortfolio() {
 
               {/* Privacy Settings */}
               <div>
-                <label className="block text-md font-medium text-discovery-black mb-2">
+                <label className="block text-3xl font-medium text-discovery-black mb-4">
                   Privacy settings
                 </label>
                 <div className="space-y-4">
                   {/* Privacy Toggle */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-discovery-black">Private Portfolio</p>
-                      <p className="text-sm text-discovery-grey">Require password to view this portfolio</p>
+                      <p className="text-md font-medium text-discovery-black">Make this portfolio private</p>
+                      <p className="text-sm text-discovery-grey">Require that visitors enter a password to view this portfolio</p>
                     </div>
                     <button
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, isPrivate: !prev.isPrivate }))}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        formData.isPrivate ? 'bg-discovery-primary' : 'bg-discovery-beige-300'
+                        formData.isPrivate ? 'bg-discovery-orange' : 'bg-discovery-gray-300'
                       }`}
                     >
                       <span
@@ -575,7 +575,7 @@ export default function EditPortfolio() {
                   {formData.isPrivate && (
                     <div>
                       <label htmlFor="password" className="block text-sm font-medium text-discovery-black mb-2">
-                        Portfolio password *
+                        Enter a password *
                       </label>
                       <div className="relative">
                         <input
@@ -583,15 +583,15 @@ export default function EditPortfolio() {
                           id="password"
                           value={formData.password}
                           onChange={(e) => handleInputChange('password', e.target.value)}
-                          className={`w-full px-4 py-3 pr-10 border rounded-lg focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors text-discovery-black ${
-                            errors.password ? 'border-red-500' : 'border-discovery-beige-300'
+                          className={`w-full px-4 py-3 border rounded-lg focus:border-transparent transition-colors text-discovery-black ${
+                            errors.password ? 'border-red-500' : 'border-discovery-grey-300'
                           }`}
                           placeholder="Enter portfolio password"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-discovery-grey hover:text-discovery-black"
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
                         >
                           {showPassword ? (
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -615,26 +615,28 @@ export default function EditPortfolio() {
 
             </form>
           </div>
-          <div className="px-6 py-4 border-t border-discovery-beige-300">
+          <div className="px-8 py-6 border-t border-discovery-beige-300">
             <div className="flex justify-end space-x-3">
               <button
                 type="button"
                 onClick={handleBack}
-                className="px-6 py-3 border border-discovery-beige-300 text-discovery-black rounded-lg hover:bg-discovery-beige-100 transition-colors"
+                className="px-6 py-3 border border-discovery-beige-300 text-discovery-black rounded-lg hover:bg-discovery-beige-100 transition-colors font-medium"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting || !hasChanges()}
-                className="px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl text-center disabled:opacity-50 disabled:cursor-not-allowed bg-discovery-primary hover:bg-discovery-primary-light text-white"
+                className={`px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl text-center disabled:opacity-50 disabled:cursor-not-allowed ${
+                  isSubmitting ? 'bg-discovery-primary/70' : 'bg-discovery-orange hover:bg-discovery-orange-light'
+                } text-white`}
                 form="portfolioForm"
               >
                 {isSubmitting ? 'Saving changes...' : 'Save changes'}
               </button>
             </div>
             {errors.general && (
-              <p className="text-red-500 text-sm text-center mt-4">{errors.general}</p>
+              <p className="form-field__error text-center mt-4">{errors.general}</p>
             )}
           </div>
         </div>
