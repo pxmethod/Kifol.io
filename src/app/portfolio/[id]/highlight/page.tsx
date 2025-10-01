@@ -592,7 +592,7 @@ export default function HighlightForm() {
       </div>
       
       <main className="max-w-7xl mx-auto px-4 py-5">
-        <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden max-w-4xl mx-auto">
+        <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden">
           <div className="px-6 py-4">
             <h1 className="text-4xl lg:text-4xl font-medium text-discovery-black">
               {isEditMode ? 'Edit highlight' : 'Add highlight'}
@@ -610,9 +610,13 @@ export default function HighlightForm() {
                   <button
                     type="button"
                     onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
-                    className={`w-full px-4 py-3 text-left border rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors cursor-pointer text-discovery-black ${
-                      errors.type ? 'border-red-500' : 'border-discovery-grey-300'
-                    } ${isTypeDropdownOpen ? 'ring-2 ring-discovery-primary border-transparent' : ''}`}
+                    className={`w-full px-4 py-3 text-left rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-orange focus:border-transparent transition-colors cursor-pointer text-discovery-black ${
+                      errors.type ? 'border border-red-500' : ''
+                    } ${isTypeDropdownOpen ? 'ring-2 ring-discovery-orange border-transparent' : ''}`}
+                    style={!errors.type && !isTypeDropdownOpen ? {
+                      border: '1px solid #DDDDE1',
+                      backgroundColor: '#ffffff'
+                    } : {}}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
@@ -947,7 +951,7 @@ export default function HighlightForm() {
           )}
 
               {/* Submit Button */}
-              <div className="flex justify-end gap-4 pt-4">
+              <div className="flex justify-end px-10 py-6 border-t border-discovery-beige-100">
                 <button
                   type="button"
                   onClick={handleBackClick}
