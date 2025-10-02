@@ -102,7 +102,7 @@ export default function AchievementCard({
         )}
         {hasMore && showAllThumbnails && (
           <div 
-            className="w-24 h-24 rounded bg-discovery-beige-300 flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-discovery-beige-400 transition-colors"
+            className="w-24 h-24 rounded bg-discovery-beige-100 flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-discovery-beige-400 transition-colors"
             onClick={() => setShowAllThumbnails(false)}
           >
             <span className="text-sm text-discovery-black font-medium">

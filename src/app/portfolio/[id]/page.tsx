@@ -373,7 +373,7 @@ export default function PortfolioPage() {
               </p>
 
               {/* Portfolio URL - On its own row */}
-              <div className="mt-6 p-4 bg-discovery-beige-100 rounded-lg">
+              <div className="mt-6 p-4 bg-discovery-beige-200 rounded-lg">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-mono text-discovery-black break-all flex-1 min-w-0">
@@ -540,7 +540,7 @@ export default function PortfolioPage() {
                   </p>
 
                   {/* Portfolio URL - On its own row */}
-                  <div className="mt-6 p-4 bg-discovery-beige-100 rounded-lg">
+                  <div className="mt-6 p-4 bg-discovery-beige-200 rounded-lg">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-mono text-discovery-black break-all flex-1 min-w-0">

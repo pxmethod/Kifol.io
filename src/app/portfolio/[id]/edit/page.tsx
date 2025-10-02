@@ -615,7 +615,7 @@ export default function EditPortfolio() {
 
             </form>
           </div>
-          <div className="px-8 py-6 border-t border-discovery-beige-300">
+          <div className="px-8 py-6 border-t border-discovery-beige-100">
             <div className="flex justify-end space-x-3">
               <button
                 type="button"

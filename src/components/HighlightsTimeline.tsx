@@ -93,11 +93,11 @@ export default function HighlightsTimeline({
         <div key={dateKey} className="space-y-4">
           {/* Date Header */}
           <div className="flex items-center space-x-3">
-            <div className="flex-1 border-t border-discovery-beige-300"></div>
+            <div className="flex-1 border-t border-discovery-beige-100"></div>
             <h3 className="text-sm font-medium text-discovery-grey px-3 py-1 bg-discovery-beige-100 rounded-full">
               {formatGroupDate(dateKey)}
             </h3>
-            <div className="flex-1 border-t border-discovery-beige-300"></div>
+            <div className="flex-1 border-t border-discovery-beige-100"></div>
           </div>
           
           {/* Highlights for this date */}
