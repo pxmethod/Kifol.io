@@ -4,17 +4,17 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Achievement } from '@/types/achievement';
 
-interface AchievementCardProps {
+interface HighlightCardProps {
   achievement: Achievement;
   onView?: (achievement: Achievement) => void;
   onEdit?: (achievement: Achievement) => void;
 }
 
-export default function AchievementCard({
+export default function HighlightCard({
   achievement,
   onView,
   onEdit
-}: AchievementCardProps) {
+}: HighlightCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState('');

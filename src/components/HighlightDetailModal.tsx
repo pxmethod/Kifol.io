@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Achievement } from '@/types/achievement';
 
-interface AchievementDetailModalProps {
+interface HighlightDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   onEdit: (achievement: Achievement) => void;
@@ -12,13 +12,13 @@ interface AchievementDetailModalProps {
   showEditButton?: boolean;
 }
 
-export default function AchievementDetailModal({
+export default function HighlightDetailModal({
   isOpen,
   onClose,
   onEdit,
   achievement,
   showEditButton = true
-}: AchievementDetailModalProps) {
+}: HighlightDetailModalProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   if (!isOpen || !achievement) return null;

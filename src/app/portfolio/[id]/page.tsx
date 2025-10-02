@@ -418,10 +418,10 @@ export default function PortfolioPage() {
           </div>
 
           {/* Portfolio Content */}
-          <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden mt-8">
-            <div className="px-6 py-4 border-b border-discovery-beige-100">
+          <div className="overflow-hidden">
+            <div className="px-6 py-8">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-medium text-discovery-black">Highlights</h2>
+                <h2 className="text-3xl font-medium text-discovery-black">Highlights</h2>
                 <button
                   onClick={handleAddHighlight}
                   className="bg-discovery-orange text-white px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-orange-light flex items-center gap-2"
@@ -588,10 +588,10 @@ export default function PortfolioPage() {
 
           {/* Right Column - Scrollable */}
           <div className="flex-1">
-            <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden">
-              <div className="px-6 py-4 border-b border-discovery-beige-100">
+            <div className="overflow-hidden">
+              <div className="px-6 py-2">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-medium text-discovery-black">Highlights</h2>
+                  <h2 className="text-3xl font-medium text-discovery-black">Highlights</h2>
                   <button
                     onClick={handleAddHighlight}
                     className="bg-discovery-orange text-white px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-orange-light flex items-center gap-2"

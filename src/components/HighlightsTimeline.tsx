@@ -1,7 +1,7 @@
 'use client';
 
 import { Achievement } from '@/types/achievement';
-import AchievementCard from './AchievementCard';
+import HighlightCard from './HighlightCard';
 
 interface HighlightsTimelineProps {
   highlights: Achievement[];
@@ -94,7 +94,7 @@ export default function HighlightsTimeline({
           {/* Date Header */}
           <div className="flex items-center space-x-3">
             <div className="flex-1 border-t border-discovery-beige-100"></div>
-            <h3 className="text-sm font-medium text-discovery-grey px-3 py-1 bg-discovery-beige-100 rounded-full">
+            <h3 className="text-lg font-bold text-discovery-beige-800 px-3 py-1 bg-discovery-beige-400 rounded-full">
               {formatGroupDate(dateKey)}
             </h3>
             <div className="flex-1 border-t border-discovery-beige-100"></div>
@@ -104,7 +104,7 @@ export default function HighlightsTimeline({
           <div className="space-y-4">
             {groupedHighlights[dateKey].map((highlight) => (
               <div key={highlight.id} className="relative">
-                <AchievementCard
+                <HighlightCard
                   achievement={highlight}
                   onView={onView}
                   onEdit={onEdit}

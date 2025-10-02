@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { TemplateConfig, PortfolioTemplateProps } from '@/types/template';
 import { Achievement } from '@/types/achievement';
-import AchievementDetailModal from '@/components/AchievementDetailModal';
-import AchievementCard from '@/components/AchievementCard';
+import HighlightDetailModal from '@/components/HighlightDetailModal';
+import HighlightCard from '@/components/HighlightCard';
 
 interface BaseTemplateProps extends PortfolioTemplateProps {
   config: TemplateConfig;
@@ -190,7 +190,7 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                     {/* Highlights for this date */}
                     <div className="space-y-4">
                       {dateHighlights.map((highlight: Achievement) => (
-                        <AchievementCard
+                        <HighlightCard
                           key={highlight.id}
                           achievement={highlight}
                           onView={handleViewHighlight}
@@ -251,7 +251,7 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
       </footer>
 
       {/* Highlight Detail Modal */}
-      <AchievementDetailModal
+      <HighlightDetailModal
         isOpen={showDetailModal}
         onClose={handleCloseModal}
         onEdit={() => {}} // No edit functionality in public view
