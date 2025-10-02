@@ -418,8 +418,8 @@ export default function PortfolioPage() {
           </div>
 
           {/* Portfolio Content */}
-          <div className="overflow-hidden">
-            <div className="px-6 py-8">
+          <div>
+            <div className="py-8">
               <div className="flex items-center justify-between">
                 <h2 className="text-3xl font-medium text-discovery-black">Highlights</h2>
                 <button
@@ -434,7 +434,7 @@ export default function PortfolioPage() {
               </div>
             </div>
 
-            <div className="px-6 py-6">
+            <div className="py-6">
               {/* Highlights Timeline */}
               <HighlightsTimeline
                 highlights={portfolio.achievements || []}
@@ -588,8 +588,8 @@ export default function PortfolioPage() {
 
           {/* Right Column - Scrollable */}
           <div className="flex-1">
-            <div className="overflow-hidden">
-              <div className="px-6 py-2">
+            <div>
+              <div className="py-2">
                 <div className="flex items-center justify-between">
                   <h2 className="text-3xl font-medium text-discovery-black">Highlights</h2>
                   <button
@@ -604,7 +604,7 @@ export default function PortfolioPage() {
                 </div>
               </div>
 
-              <div className="px-6 py-6">
+              <div className="py-6">
                 {/* Highlights Timeline */}
                 <HighlightsTimeline
                   highlights={portfolio.achievements || []}
