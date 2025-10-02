@@ -232,7 +232,7 @@ export default function GiveFeedbackPage() {
                       type="button"
                       onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
                       className={`w-full px-4 py-3 text-left rounded-lg transition-colors cursor-pointer ${
-                        isTypeDropdownOpen ? 'ring-2 ring-discovery-orange' : ''
+                        isTypeDropdownOpen ? 'ring-2 ring-discovery-primary' : ''
                       }`}
                       style={{
                         border: '1px solid #DDDDE1',

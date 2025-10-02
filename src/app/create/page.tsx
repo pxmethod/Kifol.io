@@ -262,7 +262,7 @@ export default function CreatePortfolio() {
                 id="childName"
                 value={formData.childName}
                 onChange={(e) => handleInputChange('childName', e.target.value)}
-                className={`w-full px-4 py-3 border rounded-lg focus:border-transparent transition-colors text-discovery-black ${
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors text-discovery-black ${
                   errors.childName ? 'border-red-500' : 'border-discovery-grey-300'
                 }`}
                 placeholder="Enter your child's name"
@@ -286,7 +286,7 @@ export default function CreatePortfolio() {
                 id="portfolioTitle"
                 value={formData.portfolioTitle}
                 onChange={(e) => handleInputChange('portfolioTitle', e.target.value)}
-                className={`w-full px-4 py-3 border rounded-lg focus:border-transparent transition-colors text-discovery-black ${
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors text-discovery-black ${
                   errors.portfolioTitle ? 'border-red-500' : 'border-discovery-grey-300'
                 }`}
                 placeholder="Enter portfolio title"
@@ -485,7 +485,7 @@ export default function CreatePortfolio() {
                         id="password"
                         value={formData.password}
                         onChange={(e) => handleInputChange('password', e.target.value)}
-                        className={`w-full px-4 py-3 border rounded-lg focus:border-transparent transition-colors text-discovery-black ${
+                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors text-discovery-black ${
                           errors.password ? 'border-red-500' : 'border-discovery-grey-300'
                         }`}
                         placeholder="Enter portfolio password"

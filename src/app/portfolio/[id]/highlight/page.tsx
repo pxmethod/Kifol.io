@@ -610,9 +610,9 @@ export default function HighlightForm() {
                   <button
                     type="button"
                     onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
-                    className={`w-full px-4 py-3 text-left rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-orange focus:border-transparent transition-colors cursor-pointer text-discovery-black ${
+                    className={`w-full px-4 py-3 text-left rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors cursor-pointer text-discovery-black ${
                       errors.type ? 'border border-red-500' : ''
-                    } ${isTypeDropdownOpen ? 'ring-2 ring-discovery-orange border-transparent' : ''}`}
+                    } ${isTypeDropdownOpen ? 'ring-2 ring-discovery-primary border-transparent' : ''}`}
                     style={!errors.type && !isTypeDropdownOpen ? {
                       border: '1px solid #DDDDE1',
                       backgroundColor: '#ffffff'
@@ -677,7 +677,7 @@ export default function HighlightForm() {
                   onChange={(e) => handleInputChange('title', e.target.value)}
                   placeholder="e.g., First Piano Recital"
                   maxLength={100}
-                  className={`w-full px-4 py-3 border rounded-lg focus:border-transparent transition-colors text-discovery-black ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors text-discovery-black ${
                     errors.title ? 'border-red-500' : 'border-discovery-grey-300'
                   }`}
                 />
@@ -699,7 +699,7 @@ export default function HighlightForm() {
                   id="date"
                   value={formData.date}
                   onChange={(e) => handleInputChange('date', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:border-transparent transition-colors text-discovery-black cursor-pointer ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors text-discovery-black cursor-pointer ${
                     errors.date ? 'border-red-500' : 'border-discovery-grey-300'
                   }`}
                 />
@@ -720,7 +720,7 @@ export default function HighlightForm() {
                   placeholder="Ex: they practiced for weeks to get this piano piece right—so proud!"
                   rows={4}
                   maxLength={500}
-                  className={`w-full px-4 py-3 border rounded-lg focus:border-transparent transition-colors text-discovery-black resize-none ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors text-discovery-black resize-none ${
                     errors.description ? 'border-red-500' : 'border-discovery-grey-300'
                   }`}
                 />

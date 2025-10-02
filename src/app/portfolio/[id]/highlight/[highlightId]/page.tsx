@@ -468,9 +468,9 @@ export default function EditHighlight() {
                   <button
                     type="button"
                     onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
-                    className={`w-full px-3 py-2 text-left border rounded-lg focus:outline-none focus:ring-2 focus:ring-kifolio-cta input cursor-pointer ${
+                    className={`w-full px-3 py-2 text-left border rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary input cursor-pointer ${
                       errors.type ? 'border-red-500' : 'border-gray-100'
-                    } ${isTypeDropdownOpen ? 'ring-2 ring-kifolio-cta' : ''}`}
+                    } ${isTypeDropdownOpen ? 'ring-2 ring-discovery-primary' : ''}`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
