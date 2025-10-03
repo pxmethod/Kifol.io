@@ -30,7 +30,7 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
   // Group highlights by month/year for timeline headers
   const groupedHighlights = sortedHighlights.reduce((groups: { [key: string]: Achievement[] }, highlight) => {
     const date = new Date(highlight.date);
-    const monthYear = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const monthYear = date.toLocaleDateString('en-US',{ month: 'long', year: 'numeric' });
     if (!groups[monthYear]) {
       groups[monthYear] = [];
     }
