@@ -313,18 +313,44 @@ export default function EditHighlight() {
           
           uploadedFiles.push(file);
           
-          // Create preview URL for images
+          // Create preview URL for images using FileReader for better compatibility
           if (file.type.startsWith('image/')) {
-            newPreviews.push({
-              url: URL.createObjectURL(file),
-              file
-            });
+            try {
+              // Use FileReader to create data URL (more reliable than blob URL)
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                if (e.target?.result) {
+                  console.log('Created preview using FileReader for:', file.name);
+                  setMediaPreview(prev => [...prev, {
+                    url: e.target.result as string,
+                    file
+                  }]);
+                }
+              };
+              reader.onerror = (error) => {
+                console.error('FileReader failed for:', file.name, error);
+                // Fallback to blob URL
+                try {
+                  const previewUrl = URL.createObjectURL(file);
+                  console.log('Fallback to blob URL for:', file.name);
+                  setMediaPreview(prev => [...prev, {
+                    url: previewUrl,
+                    file
+                  }]);
+                } catch (blobError) {
+                  console.error('Blob URL also failed for:', file.name, blobError);
+                }
+              };
+              reader.readAsDataURL(file);
+            } catch (previewError) {
+              console.error('Failed to create preview for image:', file.name, previewError);
+            }
           }
         }
       }
 
       setFormData(prev => ({ ...prev, media: [...prev.media, ...uploadedFiles] }));
-      setMediaPreview(prev => [...prev, ...newPreviews]);
+      // Note: mediaPreview is now updated asynchronously via FileReader callbacks
     } catch (error) {
       console.error('Media upload error:', error);
       setErrors(prev => ({ 
@@ -616,22 +642,33 @@ export default function EditHighlight() {
                   Photos, videos, PDFs, and audio files up to 50MB each. 
                 </p>
                 
-                {/* Video Upload Progress */}
-                {(videoUploadState.isUploading || videoUploadState.isCompressing) && (
+                {/* Media Processing Status */}
+                {(uploadingMedia || videoUploadState.isUploading || videoUploadState.isCompressing) && (
                   <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-blue-800">
-                        {videoUploadState.status}
-                      </span>
-                      <span className="text-sm text-blue-600">
-                        {videoUploadState.progress}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-blue-200 rounded-full h-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${videoUploadState.progress}%` }}
-                      />
+                    <div className="flex items-center space-x-3">
+                      <LoadingSpinner size="sm" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-blue-800">
+                          {(uploadingMedia || videoUploadState.status) && (
+                            (uploadingMedia && !videoUploadState.isUploading && !videoUploadState.isCompressing) ? 
+                              'Processing image files...' : 
+                              videoUploadState.status || 'Processing media...'
+                          )}
+                        </p>
+                        {(videoUploadState.progress > 0) && (
+                          <div className="mt-2">
+                            <div className="w-full bg-blue-200 rounded-full h-2">
+                              <div 
+                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${videoUploadState.progress}%` }}
+                              ></div>
+                            </div>
+                            <p className="text-xs text-blue-600 mt-1">
+                              {Math.round(videoUploadState.progress)}% complete
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -711,7 +748,7 @@ export default function EditHighlight() {
                 
                 {/* New Media */}
                 {formData.media.map((file, index) => {
-                  const preview = mediaPreview.find(p => p.file === file);
+                  const preview = mediaPreview[index];
                   return (
                     <div key={index} className="relative">
                       <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">

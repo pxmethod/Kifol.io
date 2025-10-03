@@ -63,8 +63,8 @@ export default function Header({ animateLogo = false }: HeaderProps) {
       await signOut();
       setIsDropdownOpen(false);
       setIsMobileMenuOpen(false);
-      // Redirect to welcome page after logout
-      router.push('/welcome');
+      // Redirect to marketing home page after logout
+      router.push('/');
     } catch (error) {
       console.error('Logout error:', error);
     }

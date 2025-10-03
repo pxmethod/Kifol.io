@@ -17,6 +17,10 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
   useEffect(() => {
     setIsLoaded(true);
   }, []);
+
+  // Determine if background is light or dark for logo selection
+  const isLightBackground = config.colors.background === '#ffffff' || 
+    config.colors.background.toLowerCase().includes('fff');
   
   // Sort highlights by date (newest first)
   const sortedHighlights = [...highlights].sort((a, b) => 
@@ -391,14 +395,24 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
             style={{ color: config.colors.textSecondary, fontFamily: config.fontFamily }}
           >
             <span>Created with</span>
-            <Image
-              src="/kifolio_logo.svg"
-              alt="Kifolio"
-              width={80}
-              height={20}
-              className="inline-block brightness-0 invert opacity-70"
-              style={{ filter: 'brightness(0) invert(1)' }}
-            />
+            {isLightBackground ? (
+              <Image
+                src="/kifolio_logo_dark.svg"
+                alt="Kifolio"
+                width={80}
+                height={20}
+                className="inline-block opacity-70"
+              />
+            ) : (
+              <Image
+                src="/kifolio_logo.svg"
+                alt="Kifolio"
+                width={80}
+                height={20}
+                className="inline-block brightness-0 invert opacity-70"
+                style={{ filter: 'brightness(0) invert(1)' }}
+              />
+            )}
             <span>•</span>
             <span>{new Date().getFullYear()}</span>
           </div>

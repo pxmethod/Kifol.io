@@ -28,12 +28,12 @@ export const templates: TemplateConfig[] = [
       primary: '#9b59b6',
       secondary: '#7d3c98',
       accent: '#af7ac5',
-      background: '#2d1b3d', // Rich purple-black
-      text: '#ffffff',
-      textSecondary: '#c5a3d6',
-      border: 'rgba(255, 255, 255, 0.1)',
-      cardBg: 'rgba(255, 255, 255, 0.05)',
-      dateHeaderBg: 'rgba(155, 89, 182, 0.15)',
+      background: '#ffffff', // Clean white
+      text: '#1f2937',
+      textSecondary: '#6b7280',
+      border: 'rgba(155, 89, 182, 0.15)',
+      cardBg: 'rgba(155, 89, 182, 0.03)',
+      dateHeaderBg: 'rgba(155, 89, 182, 0.1)',
       tagBg: 'rgba(155, 89, 182, 0.9)' // Purple tag
     }
   },

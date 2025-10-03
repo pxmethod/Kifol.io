@@ -12,6 +12,7 @@ import { HighlightService } from '@/lib/database/achievements';
 import { HIGHLIGHT_TYPES, HighlightType, HighlightFormData } from '@/types/achievement';
 import { useVideoUpload } from '@/hooks/useVideoUpload';
 import { Video, FileText, Music, Image } from 'lucide-react';
+import heic2any from 'heic2any';
 
 export default function HighlightForm() {
   const router = useRouter();
@@ -453,15 +454,109 @@ export default function HighlightForm() {
             return;
           }
         } else {
-          // Handle non-video files normally
-          uploadedFiles.push(file);
+          // Handle non-video files - check for HEIC and convert if needed
+          let fileToUpload = file;
           
-          // Create preview URL for images
-          if (file.type.startsWith('image/')) {
-            newPreviews.push({
-              url: URL.createObjectURL(file),
-              file
+          // Detect HEIC files (they might have .jpg extension but be HEIC format)
+          const isLikelyHEIC = file.name.toLowerCase().endsWith('.heic') || 
+                               file.name.toLowerCase().endsWith('.heif') ||
+                               file.type === 'image/heic' ||
+                               file.type === 'image/heif';
+          
+          // Also check the file signature for HEIC (starts with "ftyp" in the header)
+          if (file.type.startsWith('image/') && !isLikelyHEIC) {
+            // Read first few bytes to check for HEIC signature
+            const checkHEIC = new Promise<boolean>((resolve) => {
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                const arr = new Uint8Array(e.target?.result as ArrayBuffer);
+                const header = String.fromCharCode(...arr.slice(4, 8));
+                resolve(header === 'ftyp');
+              };
+              reader.onerror = () => resolve(false);
+              reader.readAsArrayBuffer(file.slice(0, 12));
             });
+            
+            const isHEICBySignature = await checkHEIC;
+            
+            if (isHEICBySignature) {
+              console.log('Detected HEIC file by signature:', file.name);
+              try {
+                setUploadingMedia(true);
+                const convertedBlob = await heic2any({
+                  blob: file,
+                  toType: 'image/jpeg',
+                  quality: 0.9
+                }) as Blob;
+                
+                // Create a new File object from the converted blob
+                const convertedFileName = file.name.replace(/\.(heic|heif|jpg|jpeg)$/i, '.jpg');
+                fileToUpload = new File([convertedBlob], convertedFileName, {
+                  type: 'image/jpeg',
+                  lastModified: Date.now()
+                });
+                console.log('Converted HEIC to JPEG:', convertedFileName);
+              } catch (conversionError) {
+                console.error('HEIC conversion failed:', conversionError);
+                setErrors(prev => ({ 
+                  ...prev, 
+                  media: 'This image format is not supported. Please convert to JPG or PNG first.' 
+                }));
+                setUploadingMedia(false);
+                return;
+              }
+            }
+          } else if (isLikelyHEIC) {
+            // Convert known HEIC files
+            console.log('Converting HEIC file:', file.name);
+            try {
+              setUploadingMedia(true);
+              const convertedBlob = await heic2any({
+                blob: file,
+                toType: 'image/jpeg',
+                quality: 0.9
+              }) as Blob;
+              
+              const convertedFileName = file.name.replace(/\.(heic|heif)$/i, '.jpg');
+              fileToUpload = new File([convertedBlob], convertedFileName, {
+                type: 'image/jpeg',
+                lastModified: Date.now()
+              });
+              console.log('Converted HEIC to JPEG:', convertedFileName);
+            } catch (conversionError) {
+              console.error('HEIC conversion failed:', conversionError);
+              setErrors(prev => ({ 
+                ...prev, 
+                media: 'This image format is not supported. Please convert to JPG or PNG first.' 
+              }));
+              setUploadingMedia(false);
+              return;
+            }
+          }
+          
+          uploadedFiles.push(fileToUpload);
+          
+          // Create preview URL for images using FileReader for better compatibility
+          if (fileToUpload.type.startsWith('image/')) {
+            try {
+              // Use FileReader to create data URL (more reliable than blob URL)
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                if (e.target?.result) {
+                  console.log('Created preview using FileReader for:', fileToUpload.name);
+                  setMediaPreview(prev => [...prev, {
+                    url: e.target.result as string,
+                    file: fileToUpload
+                  }]);
+                }
+              };
+              reader.onerror = (error) => {
+                console.error('FileReader failed for:', fileToUpload.name, error);
+              };
+              reader.readAsDataURL(fileToUpload);
+            } catch (previewError) {
+              console.error('Failed to create preview for image:', fileToUpload.name, previewError);
+            }
           }
         }
       }
@@ -768,16 +863,20 @@ export default function HighlightForm() {
                   Photos, videos, PDFs, and audio files up to 50MB each.
                 </p>
                 
-                {/* Video Upload Progress */}
-                {(videoUploadState.isUploading || videoUploadState.isCompressing) && (
+                {/* Media Processing Status */}
+                {(uploadingMedia || videoUploadState.isUploading || videoUploadState.isCompressing) && (
                   <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <LoadingSpinner size="sm" />
                       <div className="flex-1">
                         <p className="text-sm font-medium text-blue-800">
-                          {videoUploadState.status}
+                          {(uploadingMedia || videoUploadState.status) && (
+                            (uploadingMedia && !videoUploadState.isUploading && !videoUploadState.isCompressing) ? 
+                              'Processing image files...' : 
+                              videoUploadState.status || 'Processing media...'
+                          )}
                         </p>
-                        {videoUploadState.progress > 0 && (
+                        {(videoUploadState.progress > 0) && (
                           <div className="mt-2">
                             <div className="w-full bg-blue-200 rounded-full h-2">
                               <div 
@@ -794,6 +893,7 @@ export default function HighlightForm() {
                     </div>
                   </div>
                 )}
+                
                 
                 {/* Video Upload Error */}
                 {videoUploadState.error && (
@@ -893,7 +993,7 @@ export default function HighlightForm() {
                 
                 {/* New Media */}
                 {formData.media.map((file, index) => {
-                  const preview = mediaPreview.find(p => p.file === file);
+                  const preview = mediaPreview[index];
                   return (
                     <div key={index} className="relative">
                       <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
@@ -902,6 +1002,18 @@ export default function HighlightForm() {
                             src={preview.url} 
                             alt={file.name}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              console.error('Image preview failed to load:', {
+                                fileName: file.name,
+                                fileType: file.type,
+                                fileSize: file.size,
+                                previewUrl: preview.url,
+                                error: e
+                              });
+                            }}
+                            onLoad={() => {
+                              console.log('Image preview loaded successfully:', file.name);
+                            }}
                           />
                         ) : file.type === 'application/pdf' ? (
                           <div className="flex flex-col items-center justify-center text-center p-2">
