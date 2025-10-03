@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Achievement } from '@/types/achievement';
+import { TemplateConfig } from '@/types/template';
 
 interface HighlightDetailModalProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface HighlightDetailModalProps {
   onEdit: (achievement: Achievement) => void;
   achievement: Achievement | null;
   showEditButton?: boolean;
+  config?: TemplateConfig;
 }
 
 export default function HighlightDetailModal({
@@ -17,11 +19,14 @@ export default function HighlightDetailModal({
   onClose,
   onEdit,
   achievement,
-  showEditButton = true
+  showEditButton = true,
+  config
 }: HighlightDetailModalProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   if (!isOpen || !achievement) return null;
+
+  const fontFamily = config?.fontFamily || 'inherit';
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -46,16 +51,59 @@ export default function HighlightDetailModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div 
+      className="fixed inset-0 bg-black flex items-center justify-center z-50 p-4 transition-opacity duration-300"
+      style={{ 
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        opacity: isOpen ? 1 : 0 
+      }}
+    >
+      <style jsx>{`
+        @keyframes scaleIn {
+          0% {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          50% {
+            transform: scale(1.02);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes scaleOut {
+          0% {
+            opacity: 1;
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.02);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+        }
+
+        .modal-content {
+          animation: scaleIn 0.3s ease-out forwards;
+        }
+
+        .modal-content-closing {
+          animation: scaleOut 0.25s ease-in forwards;
+        }
+      `}</style>
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto modal-content">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b sticky top-0 bg-white z-10">
           <div className="flex items-center space-x-2">
-            <h2 className="text-lg font-semibold text-kifolio-text">
+            <h2 className="text-lg font-semibold text-discovery-black" style={{ fontFamily }}>
               Achievement Details
             </h2>
             {achievement.isMilestone && (
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-kifolio-cta/10 text-kifolio-cta">
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-kifolio-cta/10 text-kifolio-cta" style={{ fontFamily }}>
                 Milestone
               </span>
             )}
@@ -74,10 +122,10 @@ export default function HighlightDetailModal({
         <div className="p-4 space-y-6">
           {/* Title and Date */}
           <div>
-            <h1 className="text-2xl font-bold text-kifolio-text mb-2">
+            <h1 className="text-2xl font-bold text-discovery-black mb-2" style={{ fontFamily }}>
               {achievement.title}
             </h1>
-            <p className="text-gray-500">
+            <p className="text-gray-500" style={{ fontFamily }}>
               {formatDate(achievement.date)}
             </p>
           </div>
@@ -85,8 +133,8 @@ export default function HighlightDetailModal({
           {/* Description */}
           {achievement.description && (
             <div>
-              <h3 className="text-sm font-medium text-kifolio-text mb-2">Description</h3>
-              <p className="text-gray-700 leading-relaxed">
+              <h3 className="text-sm font-medium text-discovery-black mb-2" style={{ fontFamily }}>Description</h3>
+              <p className="text-gray-700 leading-relaxed" style={{ fontFamily }}>
                 {achievement.description}
               </p>
             </div>
@@ -95,7 +143,7 @@ export default function HighlightDetailModal({
           {/* Image Gallery */}
           {imageMedia.length > 0 && (
             <div>
-              <h3 className="text-sm font-medium text-kifolio-text mb-3">Photos</h3>
+              <h3 className="text-sm font-medium text-discovery-black mb-3" style={{ fontFamily }}>Photos</h3>
               
               {/* Main Image */}
               <div className="mb-4">
@@ -140,7 +188,7 @@ export default function HighlightDetailModal({
           {/* PDF Documents */}
           {pdfMedia.length > 0 && (
             <div>
-              <h3 className="text-sm font-medium text-kifolio-text mb-3">Documents</h3>
+              <h3 className="text-sm font-medium text-discovery-black mb-3" style={{ fontFamily }}>Documents</h3>
               <div className="space-y-2">
                 {pdfMedia.map((media) => (
                   <div
@@ -154,10 +202,10 @@ export default function HighlightDetailModal({
                         </svg>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-kifolio-text">
+                        <p className="text-sm font-medium text-discovery-black" style={{ fontFamily }}>
                           {media.fileName}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500" style={{ fontFamily }}>
                           {formatFileSize(media.fileSize)}
                         </p>
                       </div>
@@ -167,6 +215,7 @@ export default function HighlightDetailModal({
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-kifolio-cta hover:text-kifolio-cta/80 text-sm font-medium"
+                      style={{ fontFamily }}
                     >
                       View
                     </a>
@@ -179,7 +228,7 @@ export default function HighlightDetailModal({
           {/* Video Media */}
           {videoMedia.length > 0 && (
             <div className="mt-6">
-              <h3 className="text-sm font-medium text-kifolio-text mb-3">Videos</h3>
+              <h3 className="text-sm font-medium text-discovery-black mb-3" style={{ fontFamily }}>Videos</h3>
               <div className="space-y-2">
                 {videoMedia.map((media) => (
                   <div
@@ -193,10 +242,10 @@ export default function HighlightDetailModal({
                         </svg>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-kifolio-text">
+                        <p className="text-sm font-medium text-discovery-black" style={{ fontFamily }}>
                           {media.fileName}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500" style={{ fontFamily }}>
                           Video • {formatFileSize(media.fileSize)}
                         </p>
                       </div>
@@ -206,6 +255,7 @@ export default function HighlightDetailModal({
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-kifolio-cta hover:text-kifolio-cta/80 text-sm font-medium"
+                      style={{ fontFamily }}
                     >
                       View
                     </a>
@@ -223,6 +273,7 @@ export default function HighlightDetailModal({
             <button
               onClick={onClose}
               className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+              style={{ fontFamily }}
             >
               Close
             </button>
@@ -230,6 +281,7 @@ export default function HighlightDetailModal({
               <button
                 onClick={() => onEdit(achievement)}
                 className="bg-kifolio-cta text-white px-6 py-2 rounded-lg font-semibold hover:bg-kifolio-cta/90 transition-colors flex items-center space-x-2"
+                style={{ fontFamily }}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

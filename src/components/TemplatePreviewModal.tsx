@@ -67,7 +67,7 @@ export default function TemplatePreviewModal({
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-xl font-semibold text-kifolio-text">
+          <h2 className="text-xl font-semibold text-discovery-black">
             Template Preview
           </h2>
           <button
@@ -86,7 +86,7 @@ export default function TemplatePreviewModal({
             <div className="space-y-6">
               {/* Template Info */}
               <div className="text-center">
-                <h3 className="text-2xl font-bold text-kifolio-text mb-2">
+                <h3 className="text-2xl font-bold text-discovery-black mb-2">
                   {currentTemplate.name}
                 </h3>
                 <p className="text-gray-600">{currentTemplate.description}</p>
@@ -101,7 +101,7 @@ export default function TemplatePreviewModal({
 
               {/* Template Features */}
               <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="font-semibold text-kifolio-text mb-3">Template Features:</h4>
+                <h4 className="font-semibold text-discovery-black mb-3">Template Features:</h4>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-center">
                     <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -135,7 +135,7 @@ export default function TemplatePreviewModal({
         <div className="flex items-center justify-end space-x-3 p-6 border-t">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+            className="px-6 py-3 border border-discovery-beige-300 text-discovery-black rounded-lg hover:bg-discovery-beige-100 transition-colors font-medium"
           >
             Close
           </button>
@@ -145,7 +145,7 @@ export default function TemplatePreviewModal({
                 onSelect(currentTemplate.id);
                 onClose();
               }}
-              className="px-6 py-2 bg-kifolio-cta text-white rounded-lg hover:bg-kifolio-cta/90"
+              className="px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl text-center bg-discovery-orange hover:bg-discovery-orange-light text-white"
             >
               Select Template
             </button>

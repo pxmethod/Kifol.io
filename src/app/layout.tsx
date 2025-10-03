@@ -15,13 +15,13 @@ const interTight = Inter_Tight({
 
 // Add Google Fonts for templates
 const googleFonts = [
-  'Funnel Sans',
-  'Outfit', 
-  'Newsreader',
-  'Tinos'
+  'Geist:wght@300;400;500;600;700',
+  'Oswald:wght@300;400;500;600;700',
+  'Quicksand:wght@300;400;500;600;700',
+  'Lora:wght@400;500;600;700'
 ].join('&family=');
 
-const googleFontsUrl = `https://fonts.googleapis.com/css2?family=${googleFonts}:wght@300;400;500;600;700&display=swap`;
+const googleFontsUrl = `https://fonts.googleapis.com/css2?family=${googleFonts}&display=swap`;
 
 export const metadata: Metadata = {
   title: "Kifolio - Digital Portfolio Platform for Children | Capture Every Milestone",

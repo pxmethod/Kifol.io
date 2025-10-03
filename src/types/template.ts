@@ -13,6 +13,9 @@ export interface TemplateConfig {
     text: string;
     textSecondary: string;
     border: string;
+    cardBg?: string;
+    dateHeaderBg?: string;
+    tagBg?: string;
   };
 }
 
