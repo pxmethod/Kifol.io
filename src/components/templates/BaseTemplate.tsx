@@ -19,8 +19,31 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
   }, []);
 
   // Determine if background is light or dark for logo selection
-  const isLightBackground = config.colors.background === '#ffffff' || 
-    config.colors.background.toLowerCase().includes('fff');
+  const isLightBackground = () => {
+    const bg = config.colors.background.toLowerCase();
+    
+    // Check for pure white
+    if (bg === '#ffffff' || bg === 'white') return true;
+    
+    // Check for light gradients (containing light colors)
+    if (bg.includes('linear-gradient')) {
+      // Extract colors from gradient and check if they're light
+      const lightColors = ['#f5f7fa', '#c3cfe2', '#ffffff', '#f8f9fa', '#e9ecef', '#dee2e6'];
+      return lightColors.some(color => bg.includes(color));
+    }
+    
+    // Check for light hex colors (high brightness)
+    if (bg.startsWith('#')) {
+      const hex = bg.replace('#', '');
+      const r = parseInt(hex.substr(0, 2), 16);
+      const g = parseInt(hex.substr(2, 2), 16);
+      const b = parseInt(hex.substr(4, 2), 16);
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+      return brightness > 200; // Threshold for "light" background
+    }
+    
+    return false;
+  };
   
   // Sort highlights by date (newest first)
   const sortedHighlights = [...highlights].sort((a, b) => 
@@ -108,7 +131,7 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
     <div 
       className="min-h-screen py-12 px-4 sm:px-6 lg:px-8"
       style={{ 
-        backgroundColor: config.colors.background,
+        background: config.colors.background,
         fontFamily: config.fontFamily,
         color: config.colors.text
       }}
@@ -395,7 +418,7 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
             style={{ color: config.colors.textSecondary, fontFamily: config.fontFamily }}
           >
             <span>Created with</span>
-            {isLightBackground ? (
+            {isLightBackground() ? (
               <Image
                 src="/kifolio_logo_dark.svg"
                 alt="Kifolio"

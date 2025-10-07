@@ -10,13 +10,13 @@ export const templates: TemplateConfig[] = [
       primary: '#4a90e2',
       secondary: '#357abd',
       accent: '#5fa3e8',
-      background: '#1a1f2e', // Deep navy
+      background: 'linear-gradient(135deg,rgb(47, 63, 134) 0%,rgb(56, 19, 91) 100%)',
       text: '#ffffff',
-      textSecondary: '#b0b8c8',
+      textSecondary: '#ffffff',
       border: 'rgba(255, 255, 255, 0.1)',
-      cardBg: 'rgba(255, 255, 255, 0.05)',
-      dateHeaderBg: 'rgba(74, 144, 226, 0.15)',
-      tagBg: 'rgba(74, 144, 226, 0.9)' // Blue tag
+      cardBg: 'rgba(198, 189, 215, 0.1)',
+      dateHeaderBg: 'rgba(255, 255, 255, 0.05)', 
+      tagBg: 'rgba(36, 16, 74, 0.9)' 
     }
   },
   {
@@ -28,13 +28,13 @@ export const templates: TemplateConfig[] = [
       primary: '#9b59b6',
       secondary: '#7d3c98',
       accent: '#af7ac5',
-      background: '#ffffff', // Clean white
+      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
       text: '#1f2937',
       textSecondary: '#6b7280',
       border: 'rgba(155, 89, 182, 0.15)',
-      cardBg: 'rgba(155, 89, 182, 0.03)',
-      dateHeaderBg: 'rgba(155, 89, 182, 0.1)',
-      tagBg: 'rgba(155, 89, 182, 0.9)' // Purple tag
+      cardBg: 'rgba(246, 248, 249, 0.8)',
+      dateHeaderBg: 'rgba(190, 203, 220, 0.1)',
+      tagBg: 'rgba(172, 23, 232, 0.9)' 
     }
   },
   {
@@ -46,13 +46,13 @@ export const templates: TemplateConfig[] = [
       primary: '#e74c3c',
       secondary: '#c0392b',
       accent: '#ec7063',
-      background: '#2c2c2c', // Charcoal grey
+      background: 'linear-gradient(60deg, #29323c 0%, #485563 100%)',
       text: '#ffffff',
-      textSecondary: '#b8b8b8',
+      textSecondary: '#ffffff',
       border: 'rgba(255, 255, 255, 0.1)',
       cardBg: 'rgba(255, 255, 255, 0.05)',
-      dateHeaderBg: '#1d1d1d',
-      tagBg: 'rgba(231, 76, 60, 0.9)' // Red tag
+      dateHeaderBg: 'rgba(0, 0, 0, 0.2)',
+      tagBg: 'rgba(0, 0, 0, 0.4)' 
     }
   },
   {
@@ -64,13 +64,13 @@ export const templates: TemplateConfig[] = [
       primary: '#27ae60',
       secondary: '#1e8449',
       accent: '#52be80',
-      background: '#1a2e1a', // Dark forest green
+      background: 'linear-gradient(to top, #3f51b1 0%, #5a55ae 13%, #7b5fac 25%, #8f6aae 38%, #a86aa4 50%, #cc6b8e 62%, #f18271 75%, #f3a469 87%, #f7c978 100%)',
       text: '#ffffff',
-      textSecondary: '#a8c5a8',
+      textSecondary: '#ffffff',
       border: 'rgba(255, 255, 255, 0.1)',
-      cardBg: 'rgba(255, 255, 255, 0.05)',
-      dateHeaderBg: 'rgba(39, 174, 96, 0.15)',
-      tagBg: 'rgba(39, 174, 96, 0.9)' // Green tag
+      cardBg: 'rgba(255, 255, 255, 0.1)',
+      dateHeaderBg: 'rgba(255, 255, 255, 0.1)',
+      tagBg: 'rgba(255, 255, 255, 0.1)'
     }
   }
 ];
