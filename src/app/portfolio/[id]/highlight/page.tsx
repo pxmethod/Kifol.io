@@ -545,7 +545,7 @@ export default function HighlightForm() {
                 if (e.target?.result) {
                   console.log('Created preview using FileReader for:', fileToUpload.name);
                   setMediaPreview(prev => [...prev, {
-                    url: e.target.result as string,
+                    url: e.target?.result as string,
                     file: fileToUpload
                   }]);
                 }

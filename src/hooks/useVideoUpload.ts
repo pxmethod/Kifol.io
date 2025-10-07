@@ -27,8 +27,7 @@ export const useVideoUpload = () => {
   });
 
   const uploadVideo = useCallback(async (
-    file: File,
-    _options: VideoUploadOptions = {}
+    file: File
   ): Promise<string> => {
 
     // Reset state
