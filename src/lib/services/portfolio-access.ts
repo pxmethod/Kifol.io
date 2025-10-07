@@ -66,7 +66,7 @@ export class PortfolioAccessService {
             accessType: 'password'
           };
         }
-      } catch (authError) {
+      } catch {
         // User is not authenticated, check password access only
         const hasPasswordAccess = this.checkPasswordAccess(portfolioId);
         if (hasPasswordAccess) {

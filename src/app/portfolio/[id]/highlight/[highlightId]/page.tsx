@@ -322,7 +322,7 @@ export default function EditHighlight() {
                 if (e.target?.result) {
                   console.log('Created preview using FileReader for:', file.name);
                   setMediaPreview(prev => [...prev, {
-                    url: e.target.result as string,
+                    url: e.target?.result as string,
                     file
                   }]);
                 }
