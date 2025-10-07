@@ -413,12 +413,7 @@ export default function HighlightForm() {
         if (file.type.startsWith('video/')) {
           try {
             // Upload video with compression
-            const videoUrl = await uploadVideo(file, {
-              maxSizeMB: 25,
-              quality: 28,
-              maxWidth: 1280,
-              maxHeight: 720
-            });
+            const videoUrl = await uploadVideo(file);
             
             // Generate thumbnail for video
             let thumbnailUrl = '';

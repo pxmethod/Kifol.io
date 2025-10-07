@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { portfolioService, achievementService } from '@/lib/database'
+import { portfolioService } from '@/lib/database'
 import { createClient } from '@/lib/supabase/client'
 import { dbPortfolioToLegacy, legacyPortfolioToDb, LegacyPortfolioData } from '@/lib/adapters/portfolio'
 import { storageService } from '@/lib/storage'

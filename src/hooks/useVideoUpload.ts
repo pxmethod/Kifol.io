@@ -2,13 +2,6 @@ import { useState, useCallback } from 'react';
 import { videoCompressionService } from '@/lib/video-compression';
 import { storageService } from '@/lib/storage';
 
-interface VideoUploadOptions {
-  maxSizeMB?: number;
-  quality?: number;
-  maxWidth?: number;
-  maxHeight?: number;
-}
-
 interface VideoUploadState {
   isUploading: boolean;
   isCompressing: boolean;

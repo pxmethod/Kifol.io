@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       return {}
-    } catch (error) {
+    } catch {
       return { error: 'An unexpected error occurred' }
     }
   }
@@ -86,7 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       return {}
-    } catch (error) {
+    } catch {
       return { error: 'An unexpected error occurred' }
     }
   }
@@ -98,8 +98,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       portfolioAccessService.clearAllPasswordAccess();
       
       await supabase.auth.signOut();
-    } catch (error) {
-      console.error('Error signing out:', error);
+    } catch {
+      console.error('Error signing out');
     }
   };
 
@@ -114,7 +114,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       return {}
-    } catch (error) {
+    } catch {
       return { error: 'An unexpected error occurred' }
     }
   }
