@@ -1,20 +1,20 @@
 /* Kifolio Main Stylesheet */
 
-/* Import Tailwind base styles */
-@tailwind base;
-
-/* Import our base styles and design tokens */
+/* Import our base styles and design tokens - must come before @tailwind */
 @import url('./base/index.css');
 
-/* Import component styles */
+/* Import component styles - must come before @tailwind */
 @import url('./components/buttons.css');
 @import url('./components/forms.css');
 @import url('./components/cards.css');
 @import url('./components/navigation.css');
 @import url('./components/modals.css');
 
-/* Import utility classes */
+/* Import utility classes - must come before @tailwind */
 @import url('./utilities/index.css');
+
+/* Import Tailwind base styles */
+@tailwind base;
 
 /* Import Tailwind components and utilities */
 @tailwind components;
