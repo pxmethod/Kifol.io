@@ -154,7 +154,7 @@ export default function MarketingPage() {
           </div>
           {/* Features Section */}
           <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-12">
+            <div className="grid md:grid-cols-2 gap-12 justify-items-center">
               <div className={`text-center ${featureCards.getItemClassName(0)}`}>
                 <div className="mx-auto mb-6" style={{ width: '200px', height: '200px' }}>
                   <img 
@@ -166,6 +166,20 @@ export default function MarketingPage() {
                 <h3 className="text-4xl lg:text-4xl font-medium text-discovery-white-100 mb-3">Academic transitions</h3>
                 <p className="text-discovery-white-80 leading-relaxed">
                   Provide a polished portfolio that complements transcripts and test scores—helping admissions teams see the full story behind the student.
+                </p>
+              </div>
+
+              <div className={`text-center ${featureCards.getItemClassName(0)}`}>
+                <div className="mx-auto mb-6" style={{ width: '200px', height: '200px' }}>
+                  <img 
+                    src="/marketing/academic-transitions.png" 
+                    alt="Academic Transitions" 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <h3 className="text-4xl lg:text-4xl font-medium text-discovery-white-100 mb-3">Athletic development</h3>
+                <p className="text-discovery-white-80 leading-relaxed">
+                Document achievements such as belt promotions, new skills, and training successes to provide a fuller view of the student&apos;s growth.
                 </p>
               </div>
               
@@ -191,9 +205,23 @@ export default function MarketingPage() {
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <h3 className="text-4xl lg:text-4xl font-medium text-discovery-white-100 mb-3">Resume & early opportunities</h3>
+                <h3 className="text-4xl lg:text-4xl font-medium text-discovery-white-100 mb-3">Community service & leadership</h3>
                 <p className="text-discovery-white-80 leading-relaxed">
-                  For internships, summer programs, or specialized schools, Kifolio helps highlight experiences and growth in a clear, organized format.
+                Highlight volunteer work, leadership roles, service hours, and impact projects—building a complete picture of character and contribution.
+                </p>
+              </div>
+
+              <div className={`text-center ${featureCards.getItemClassName(3)}`}>
+                <div className="mx-auto mb-6" style={{ width: '200px', height: '200px' }}>
+                  <img 
+                    src="/marketing/growth-tracking.png" 
+                    alt="Personal Growth Tracking" 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <h3 className="text-4xl lg:text-4xl font-medium text-discovery-white-100 mb-3">Competitions & achievements</h3>
+                <p className="text-discovery-white-80 leading-relaxed">
+                Track awards from science fairs, robotics tournaments, debate teams, coding challenges, art contests, and more in one organized place.
                 </p>
               </div>
 
@@ -210,6 +238,7 @@ export default function MarketingPage() {
                   Beyond academics, Kifolio gives your child a narrative of progress that builds confidence and shows them how far they've come.
                 </p>
               </div>
+              
             </div>
           </div>
         </section>
@@ -439,6 +468,36 @@ export default function MarketingPage() {
                 <p className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight">
                   &ldquo;I started using Kifolio just to keep track of grades and awards, but it’s become so much more. Seeing my daughter’s journey laid out—her creativity,
                   her growth—it's something I'll cherish forever, and I know it will help her when she applies to college.&rdquo;
+                </p>
+              </div>
+
+              <div className="bg-white rounded-lg p-6 shadow-md">
+                <div className="flex items-center mb-4">
+                  <div className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4">
+                    <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100">S</span>
+                  </div>
+                  <div>
+                    <h4 className="text-3xl lg:text-2xl font-medium text-discovery-orange">Steven K.</h4>
+                    <p className="text-discovery-gray-400 leading-relaxed">Parent of an 8-year-old</p>
+                  </div>
+                </div>
+                <p className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight">
+                  &ldquo;My daughter plays club volleyball and it feels like there’s always another tryout or skills evaluation. Kifolio helped us capture her highlights, stats, and videos so we could easily share them with coaches. It gave her a confidence boost—and honestly made the whole process less stressful for us as parents.&rdquo;
+                </p>
+              </div>
+
+              <div className="bg-white rounded-lg p-6 shadow-md">
+                <div className="flex items-center mb-4">
+                  <div className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4">
+                    <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100">C</span>
+                  </div>
+                  <div>
+                    <h4 className="text-3xl lg:text-2xl font-medium text-discovery-orange">Cassandra G.</h4>
+                    <p className="text-discovery-gray-400 leading-relaxed">Parent of a 13-year-old</p>
+                  </div>
+                </div>
+                <p className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight">
+                  &ldquo;My daughter is in martial arts, and keeping track of her belt progress was always scattered between photos on my phone and notes from her coaches. Kifolio has given us a clean timeline of every test, stripe, and achievement. Seeing her growth laid out like that has made her so proud—and honestly, more motivated than ever.&rdquo;
                 </p>
               </div>
 
