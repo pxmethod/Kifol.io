@@ -247,12 +247,9 @@ export default function LoginPage() {
               )}
             </form>
 
-            {/* Forgot Links */}
+            {/* Forgot Password Link */}
             <div className="mt-6 pt-6 border-t border-discovery-beige-300">
-              <div className="flex justify-between">
-                <Link href="/auth/forgot-username" className="text-discovery-orange hover:text-discovery-orange-light text-sm font-medium">
-                  Forgot username?
-                </Link>
+              <div className="flex justify-center">
                 <Link href="/auth/forgot-password" className="text-discovery-orange hover:text-discovery-orange-light text-sm font-medium">
                   Forgot password?
                 </Link>

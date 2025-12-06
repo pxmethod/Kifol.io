@@ -143,9 +143,9 @@ export default function PortfolioPage() {
     );
   }
 
-  // Redirect unauthenticated users to welcome page
+  // Redirect unauthenticated users to marketing home page
   if (!user) {
-    router.push('/welcome');
+    router.push('/');
     return null;
   }
 
