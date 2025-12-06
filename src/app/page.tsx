@@ -120,8 +120,8 @@ export default function MarketingPage() {
               <div className="flex justify-center lg:justify-end lg:flex-1 lg:-ml-16">
                 <div className="max-w-6xl">
                   <img 
-                    src="/marketing/portfolio-ren-web.png" 
-                    alt="Kifolio Portfolio Example" 
+                    src="/marketing/hero-img.png" 
+                    alt="Image of an example child portfolio" 
                     className="w-full h-auto object-contain"
                   />
                 </div>
@@ -172,8 +172,8 @@ export default function MarketingPage() {
               <div className={`text-center ${featureCards.getItemClassName(0)}`}>
                 <div className="mx-auto mb-6" style={{ width: '200px', height: '200px' }}>
                   <img 
-                    src="/marketing/academic-transitions.png" 
-                    alt="Academic Transitions" 
+                    src="/marketing/athletic-dev.png" 
+                    alt="Athletic Development" 
                     className="w-full h-full object-contain"
                   />
                 </div>
@@ -200,8 +200,8 @@ export default function MarketingPage() {
               <div className={`text-center ${featureCards.getItemClassName(2)}`}>
                 <div className="mx-auto mb-6" style={{ width: '200px', height: '200px' }}>
                   <img 
-                    src="/marketing/resume-early-opps.png" 
-                    alt="Resume & Early Opportunities" 
+                    src="/marketing/community.png" 
+                    alt="Community Service & Leadership" 
                     className="w-full h-full object-contain"
                   />
                 </div>
@@ -214,8 +214,8 @@ export default function MarketingPage() {
               <div className={`text-center ${featureCards.getItemClassName(3)}`}>
                 <div className="mx-auto mb-6" style={{ width: '200px', height: '200px' }}>
                   <img 
-                    src="/marketing/growth-tracking.png" 
-                    alt="Personal Growth Tracking" 
+                    src="/marketing/competitions.png" 
+                    alt="Competitions & Achievements" 
                     className="w-full h-full object-contain"
                   />
                 </div>
