@@ -296,7 +296,7 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                           className="text-sm sm:text-base mb-4 leading-relaxed"
                           style={{ color: config.colors.textSecondary, fontFamily: config.fontFamily }}
                         >
-                          {formatTextWithLinks(highlight.description)}
+                          {formatTextWithLinks(highlight.description, config.colors.textSecondary)}
                         </p>
                       )}
 

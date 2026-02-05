@@ -294,7 +294,7 @@ export default function HighlightCard({
       {/* Description */}
       {achievement.description && (
         <p className="text-discovery-grey text-sm mb-3">
-          {formatTextWithLinks(achievement.description)}
+          {formatTextWithLinks(achievement.description, '#2e2e2e')}
         </p>
       )}
 

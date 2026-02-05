@@ -3,9 +3,10 @@ import React from 'react';
 /**
  * Converts URLs in text to clickable links that open in a new tab
  * @param text - The text that may contain URLs
+ * @param linkColor - Optional color for the links (defaults to current text color)
  * @returns JSX elements with clickable links
  */
-export function formatTextWithLinks(text: string): React.ReactNode {
+export function formatTextWithLinks(text: string, linkColor?: string): React.ReactNode {
   // URL regex pattern - matches http, https, and www URLs
   const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi;
   
@@ -27,14 +28,17 @@ export function formatTextWithLinks(text: string): React.ReactNode {
       url = `https://${url}`;
     }
     
-    // Create clickable link
+    // Create clickable link with bold styling and theme-appropriate color
+    const linkStyle: React.CSSProperties = linkColor ? { color: linkColor } : {};
+    
     parts.push(
       <a
         key={match.index}
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-discovery-primary hover:text-discovery-primary-light underline break-all"
+        className="font-bold underline break-all hover:opacity-80"
+        style={linkStyle}
         onClick={(e) => e.stopPropagation()}
       >
         {match[0]}

@@ -136,7 +136,7 @@ export default function HighlightDetailModal({
             <div>
               <h3 className="text-sm font-medium text-discovery-black mb-2" style={{ fontFamily }}>Description</h3>
               <p className="text-gray-700 leading-relaxed" style={{ fontFamily }}>
-                {formatTextWithLinks(achievement.description)}
+                {formatTextWithLinks(achievement.description, '#374151')}
               </p>
             </div>
           )}
