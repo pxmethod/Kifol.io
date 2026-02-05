@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Achievement } from '@/types/achievement';
 import { TemplateConfig } from '@/types/template';
+import { formatTextWithLinks } from '@/utils/text-formatting';
 
 interface HighlightDetailModalProps {
   isOpen: boolean;
@@ -135,7 +136,7 @@ export default function HighlightDetailModal({
             <div>
               <h3 className="text-sm font-medium text-discovery-black mb-2" style={{ fontFamily }}>Description</h3>
               <p className="text-gray-700 leading-relaxed" style={{ fontFamily }}>
-                {achievement.description}
+                {formatTextWithLinks(achievement.description)}
               </p>
             </div>
           )}

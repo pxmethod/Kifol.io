@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Achievement } from '@/types/achievement';
+import { formatTextWithLinks } from '@/utils/text-formatting';
 
 interface HighlightCardProps {
   achievement: Achievement;
@@ -293,7 +294,7 @@ export default function HighlightCard({
       {/* Description */}
       {achievement.description && (
         <p className="text-discovery-grey text-sm mb-3">
-          {achievement.description}
+          {formatTextWithLinks(achievement.description)}
         </p>
       )}
 

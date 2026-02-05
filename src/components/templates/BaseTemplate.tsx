@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { TemplateConfig, PortfolioTemplateProps } from '@/types/template';
 import { Achievement } from '@/types/achievement';
 import HighlightDetailModal from '@/components/HighlightDetailModal';
+import { formatTextWithLinks } from '@/utils/text-formatting';
 
 interface BaseTemplateProps extends PortfolioTemplateProps {
   config: TemplateConfig;
@@ -295,7 +296,7 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                           className="text-sm sm:text-base mb-4 leading-relaxed"
                           style={{ color: config.colors.textSecondary, fontFamily: config.fontFamily }}
                         >
-                          {highlight.description}
+                          {formatTextWithLinks(highlight.description)}
                         </p>
                       )}
 

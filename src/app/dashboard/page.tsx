@@ -69,7 +69,7 @@ export default function Dashboard() {
   }
 
   const handleEditPortfolio = (portfolio: LegacyPortfolioData) => {
-    router.push(`/portfolio/${portfolio.id}`);
+    router.push(`/portfolio/${portfolio.id}/edit`);
   };
 
   const handleRemovePortfolio = (portfolio: LegacyPortfolioData) => {
