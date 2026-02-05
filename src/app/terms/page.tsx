@@ -223,7 +223,7 @@ export default function TermsOfUsePage() {
             </div>
           </div>
           <div className="border-t border-white/20 mt-8 pt-8 text-center text-white">
-            <p>&copy; 2025 Kifolio. All rights reserved.</p>
+            <p>&copy; 2026 Kifolio. All rights reserved.</p>
           </div>
         </div>
       </footer>
