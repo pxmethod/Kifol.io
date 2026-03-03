@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 import { portfolioAccessService } from '@/lib/services/portfolio-access';
+import { getAppUrl } from '@/config/domains';
 
 interface AuthContextType {
   user: User | null
@@ -46,9 +47,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // Use our custom signup API that handles email verification
       // Use relative URL for local development, full URL for production
-      const apiUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
-        ? '/api/auth/signup' 
-        : `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/signup`
+      const apiUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+        ? '/api/auth/signup'
+        : `${getAppUrl()}/api/auth/signup`
       
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -105,12 +106,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const resetPassword = async (email: string) => {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password`
+      const apiUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+        ? '/api/auth/forgot-password'
+        : `${getAppUrl()}/api/auth/forgot-password`
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
       })
 
-      if (error) {
-        return { error: error.message }
+      const data = await response.json()
+
+      if (!response.ok) {
+        return { error: data.error || 'Failed to send reset email' }
       }
 
       return {}

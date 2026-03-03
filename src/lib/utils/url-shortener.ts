@@ -1,4 +1,5 @@
 // URL shortening utilities for portfolio URLs
+import { getAppUrl } from '@/config/domains'
 
 /**
  * Generate a short, user-friendly ID for portfolios
@@ -21,7 +22,7 @@ export function generateShortId(): string {
  * Format: kifol.io/p/ABC123
  */
 export function generateShortPortfolioUrl(portfolioId: string, shortId?: string): string {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://kifol.io';
+  const baseUrl = getAppUrl();
   const shortCode = shortId || generateShortId();
   return `${baseUrl}/p/${shortCode}`;
 }

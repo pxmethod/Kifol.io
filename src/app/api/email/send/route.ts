@@ -26,10 +26,11 @@ export async function POST(request: NextRequest) {
     let result;
 
     switch (type) {
+      // Not used by app UI; forgot-password uses Supabase. Available for custom flows.
       case 'password-reset':
         result = await sendPasswordResetEmail(data as PasswordResetEmailData);
         break;
-        
+      // Not used by app; no caller. Available for future cron/scheduled emails.
       case 'engagement':
         result = await sendEngagementEmail(data as EngagementEmailData);
         break;

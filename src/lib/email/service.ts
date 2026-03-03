@@ -1,4 +1,5 @@
-import { resend, emailConfig, EMAIL_CATEGORIES } from './client';
+import { mailerSend, emailConfig, EMAIL_CATEGORIES, createEmailParams, createTemplateEmailParams } from './client';
+import { getAppUrl } from '@/config/domains';
 import { 
   EmailResult, 
   PasswordResetEmailData,
@@ -14,55 +15,127 @@ import { EmailTemplates } from './template-loader';
  * Base email sending function
  */
 async function sendEmail(
-  to: string | string[], 
-  subject: string, 
+  to: string | string[],
+  subject: string,
   html: string,
   category?: string,
-  tags?: string[]
+  tags?: string[],
+  options?: { replyTo?: string }
 ): Promise<EmailResult> {
-  try {
-    // Convert string tags to Resend Tag format
-    const resendTags = tags?.map(tag => ({ name: tag, value: 'true' })) || [];
-    if (category) {
-      resendTags.push({ name: 'category', value: category });
-    }
-
-    const { data, error } = await resend.emails.send({
-      from: emailConfig.from,
-      to: Array.isArray(to) ? to : [to],
-      subject,
-      html,
-      tags: resendTags,
-    });
-
-    if (error) {
-      console.error('Email send error:', error);
-      return { success: false, error: error.message };
-    }
-
-    console.log('Email sent successfully:', data?.id);
-    return { success: true, messageId: data?.id };
-  } catch (error) {
-    console.error('Email service error:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Unknown error' 
+  if (!mailerSend) {
+    return {
+      success: false,
+      error: 'Email service not configured (MAILERSEND_API_KEY missing)',
     };
+  }
+  try {
+    const emailParams = createEmailParams(to, subject, html, options);
+    const response = await mailerSend.email.send(emailParams) as {
+      headers?: Record<string, string | string[] | undefined>;
+      body?: { message_id?: string };
+    };
+    const messageId =
+      (typeof response?.headers?.['x-message-id'] === 'string'
+        ? response.headers['x-message-id']
+        : Array.isArray(response?.headers?.['x-message-id'])
+          ? response.headers['x-message-id'][0]
+          : undefined) ??
+      response?.body?.message_id;
+
+    if (messageId) {
+      console.log('Email sent successfully:', messageId);
+    }
+    return { success: true, messageId: messageId?.toString() };
+  } catch (error: unknown) {
+    console.error('Email service error:', error);
+    const err = error as { body?: { message?: string; errors?: Record<string, string[]> }; message?: string };
+    const message =
+      err?.body?.message ||
+      (err?.body?.errors && typeof err.body.errors === 'object'
+        ? Object.values(err.body.errors).flat().join('; ')
+        : undefined) ||
+      (err instanceof Error ? err.message : undefined) ||
+      'Unknown error';
+    return { success: false, error: message };
   }
 }
 
+/**
+ * Send email using a MailerSend template (template_id + personalization variables).
+ */
+async function sendEmailWithTemplate(
+  to: string | string[],
+  templateId: string,
+  personalization: { email: string; data: Record<string, string> }[]
+): Promise<EmailResult> {
+  if (!mailerSend) {
+    return {
+      success: false,
+      error: 'Email service not configured (MAILERSEND_API_KEY missing)',
+    };
+  }
+  try {
+    const emailParams = createTemplateEmailParams(to, templateId, personalization);
+    const response = await mailerSend.email.send(emailParams) as {
+      headers?: Record<string, string | string[] | undefined>;
+      body?: { message_id?: string };
+    };
+    const messageId =
+      (typeof response?.headers?.['x-message-id'] === 'string'
+        ? response.headers['x-message-id']
+        : Array.isArray(response?.headers?.['x-message-id'])
+          ? response.headers['x-message-id'][0]
+          : undefined) ??
+      response?.body?.message_id;
+
+    if (messageId) {
+      console.log('Email sent successfully:', messageId);
+    }
+    return { success: true, messageId: messageId?.toString() };
+  } catch (error: unknown) {
+    console.error('Email service error:', error);
+    const err = error as { body?: { message?: string; errors?: Record<string, string[]> }; message?: string };
+    const message =
+      err?.body?.message ||
+      (err?.body?.errors && typeof err.body.errors === 'object'
+        ? Object.values(err.body.errors).flat().join('; ')
+        : undefined) ||
+      (err instanceof Error ? err.message : undefined) ||
+      'Unknown error';
+    return { success: false, error: message };
+  }
+}
 
 /**
- * Send password reset email
+ * Send password reset email.
+ * Uses MailerSend template when MAILERSEND_TEMPLATE_PASSWORD_RESET is set, otherwise falls back to HTML template.
  */
 export async function sendPasswordResetEmail(data: PasswordResetEmailData): Promise<EmailResult> {
+  const templateId = process.env.MAILERSEND_TEMPLATE_PASSWORD_RESET;
+  const toEmail = Array.isArray(data.to) ? data.to[0] : data.to;
+  const expiresAt = data.expiresAt instanceof Date ? data.expiresAt : new Date(data.expiresAt);
+
+  if (templateId) {
+    return sendEmailWithTemplate(
+      data.to,
+      templateId,
+      [
+        {
+          email: toEmail,
+          data: {
+            user_name: data.userName,
+            reset_url: data.resetUrl,
+            expires_at: expiresAt.toLocaleString(),
+            app_url: getAppUrl(),
+          },
+        },
+      ]
+    );
+  }
+
   try {
-    // Ensure expiresAt is a Date object
-    const expiresAt = data.expiresAt instanceof Date ? data.expiresAt : new Date(data.expiresAt);
-    
-    // Load and process the password reset email template
     const html = await EmailTemplates.passwordReset({
-      APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      APP_URL: getAppUrl(),
       USER_NAME: data.userName,
       RESET_URL: data.resetUrl,
       EXPIRES_AT: expiresAt.toLocaleString(),
@@ -77,15 +150,16 @@ export async function sendPasswordResetEmail(data: PasswordResetEmailData): Prom
     );
   } catch (error) {
     console.error('Error sending password reset email:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to send password reset email' 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to send password reset email',
     };
   }
 }
 
 /**
- * Send engagement email
+ * Send engagement email (e.g. "continue building" tips).
+ * Not used by the app: no cron or in-app trigger calls this. Kept for future use (e.g. scheduled emails).
  */
 export async function sendEngagementEmail(data: EngagementEmailData): Promise<EmailResult> {
   try {
@@ -94,7 +168,7 @@ export async function sendEngagementEmail(data: EngagementEmailData): Promise<Em
 
     // Load and process the engagement email template
     const html = await EmailTemplates.engagement({
-      APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      APP_URL: getAppUrl(),
       ENGAGEMENT_TITLE: hasPortfolios 
         ? `Keep building, ${data.userName}! 🚀` 
         : `Ready to start your portfolio, ${data.userName}? ✨`,
@@ -105,7 +179,7 @@ export async function sendEngagementEmail(data: EngagementEmailData): Promise<Em
       TIP_1: hasPortfolios ? "Add new achievements" : "Document your first achievement",
       TIP_2: hasPortfolios ? "Try a new template" : "Customize your design", 
       TIP_3: hasPortfolios ? "Share your portfolio" : "Invite family and friends",
-      CTA_URL: data.ctaUrl || `${process.env.NEXT_PUBLIC_APP_URL}/`,
+      CTA_URL: data.ctaUrl || `${getAppUrl()}/`,
       CTA_TEXT: data.ctaText || (hasPortfolios ? "Continue Building" : "Create Your Portfolio"),
     });
 
@@ -135,7 +209,7 @@ export async function sendInvitationEmail(data: InvitationEmailData): Promise<Em
     
     // Load and process the invitation email template
     const html = await EmailTemplates.invitation({
-      APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      APP_URL: getAppUrl(),
       INVITER_NAME: data.inviterName,
       PERSONAL_MESSAGE: data.personalMessage || '',
       INVITE_URL: data.inviteUrl,
@@ -187,13 +261,47 @@ export async function sendTestEmail(to: string): Promise<EmailResult> {
 }
 
 /**
- * Send email verification email
+ * Send raw HTML email (e.g. feedback form). Use for one-off sends with custom HTML.
+ */
+export async function sendHtmlEmail(
+  to: string | string[],
+  subject: string,
+  html: string,
+  options?: { replyTo?: string }
+): Promise<EmailResult> {
+  return sendEmail(to, subject, html, undefined, undefined, options);
+}
+
+/**
+ * Send email verification (welcome) email.
+ * Uses MailerSend template when MAILERSEND_TEMPLATE_WELCOME is set, otherwise falls back to HTML template.
  */
 export async function sendEmailVerification(data: EmailVerificationData): Promise<EmailResult> {
+  const templateId = process.env.MAILERSEND_TEMPLATE_WELCOME;
+  const toEmail = Array.isArray(data.to) ? data.to[0] : data.to;
+
+  if (templateId) {
+    // Use MailerSend dashboard template; variables must match your template (e.g. {{user_name}}, {{verification_url}})
+    return sendEmailWithTemplate(
+      data.to,
+      templateId,
+      [
+        {
+          email: toEmail,
+          data: {
+            user_name: data.userName,
+            verification_url: data.verificationUrl,
+            support_email: process.env.SUPPORT_EMAIL || 'support@kifol.io',
+            app_url: getAppUrl(),
+          },
+        },
+      ]
+    );
+  }
+
   try {
-    // Load and process the email verification template
     const html = await EmailTemplates.emailVerification({
-      APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      APP_URL: getAppUrl(),
       USER_NAME: data.userName,
       VERIFICATION_URL: data.verificationUrl,
       SUPPORT_EMAIL: process.env.SUPPORT_EMAIL || 'support@kifol.io',
@@ -208,9 +316,9 @@ export async function sendEmailVerification(data: EmailVerificationData): Promis
     );
   } catch (error) {
     console.error('Error sending email verification:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to send email verification' 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to send email verification',
     };
   }
 }

@@ -11,13 +11,23 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 ```
 
-### 2. Email Configuration (Resend)
+### 2. Email Configuration (MailerSend)
 ```bash
-RESEND_API_KEY=your_resend_api_key
+MAILERSEND_API_KEY=your_mailersend_api_key
 EMAIL_FROM=Kifolio <noreply@kifol.io>
 EMAIL_DOMAIN=kifol.io
 SUPPORT_EMAIL=support@kifol.io
+# Optional: where to send feedback form submissions (defaults to SUPPORT_EMAIL or support@kifol.io)
+FEEDBACK_EMAIL=john@kifol.io
+# Optional: MailerSend dashboard template IDs (when set, uses templates instead of app HTML)
+MAILERSEND_TEMPLATE_WELCOME=template_id_for_welcome_signup
+MAILERSEND_TEMPLATE_PASSWORD_RESET=template_id_for_forgot_password
 ```
+See [MailerSend](https://www.mailersend.com) for API keys. Add and verify your sending domain in the MailerSend dashboard.
+
+**Template variable names** (must match your MailerSend templates):
+- **Welcome**: `user_name`, `verification_url`, `support_email`, `app_url`
+- **Password reset**: `user_name`, `reset_url`, `expires_at`, `app_url`
 
 ### 3. Events API Configuration (Ticketmaster)
 ```bash
@@ -29,6 +39,7 @@ NEXT_PUBLIC_TICKETMASTER_API_KEY=your_ticketmaster_api_key
 NEXT_PUBLIC_APP_URL=https://kifol.io
 NEXT_PUBLIC_PORTFOLIO_DOMAIN=my.kifol.io
 ```
+**Important:** Set `NEXT_PUBLIC_APP_URL` to your app origin with **no trailing slash** (e.g. `https://my.kifol.io`). It is used for password-reset links, signup verification links, and invitation emails. In production (e.g. Vercel), set this to your deployed app URL so email links point to the correct domain.
 
 ### 5. Database Configuration
 ```bash

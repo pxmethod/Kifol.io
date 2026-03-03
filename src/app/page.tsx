@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import MarketingNav from '@/components/MarketingNav';
 import { 
   useFadeUpOnLoad, 
   useFadeUpOnScroll, 
@@ -59,35 +60,7 @@ export default function MarketingPage() {
         }}
       />
 
-      {/* Header */}
-      <header className="bg-discovery-beige-200 text-white px-9 py-4 top-0 z-50">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center">
-            <Image 
-              src="/kifolio_logo_dark.svg" 
-              alt="Kifolio Logo" 
-              width={144}
-              height={38}
-              className="h-10 w-auto"
-              priority
-            />
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link 
-              href="/auth/login"
-              className="text-discovery-black hover:text-discovery-grey transition-colors font-medium"
-            >
-              Log In
-            </Link>
-            <Link 
-              href="/auth/signup"
-              className="bg-discovery-yellow text-discovery-black px-8 py-4 rounded-pill hover:bg-discovery-yellow-dark transition-colors font-medium"
-            >
-              Sign Up
-            </Link>
-          </div>
-        </div>
-      </header>
+      <MarketingNav />
 
       {/* Main Content */}
       <main>
@@ -141,6 +114,7 @@ export default function MarketingPage() {
 
         {/* The What Section */}
         <section 
+          id="features"
           ref={whatSection.ref}
           className={`py-20 px-4 bg-discovery-primary ${whatSection.className}`}
         >
@@ -245,6 +219,7 @@ export default function MarketingPage() {
 
         {/* How It Works Section */}
         <section 
+          id="how-it-works"
           ref={howItWorksSection.ref}
           className={`py-20 px-4 bg-discovery-orange ${howItWorksSection.className}`}
         >
@@ -310,6 +285,7 @@ export default function MarketingPage() {
 
         {/* Benefits Section */}
         <section 
+          id="why-kifolio"
           ref={benefitsSection.ref}
           className={`py-20 px-4 relative ${benefitsSection.className}`} 
           style={{ backgroundImage: 'url(/marketing/kifolio_mobile_hand.png)' }}
@@ -415,6 +391,7 @@ export default function MarketingPage() {
 
         {/* Testimonials Section */}
         <section 
+          id="testimonials"
           ref={testimonialsSection.ref}
           className={`py-20 px-4 bg-discovery-beige-200 ${testimonialsSection.className}`} 
           aria-labelledby="testimonials-heading"
@@ -522,6 +499,7 @@ export default function MarketingPage() {
 
         {/* FAQ Section for Featured Snippets */}
         <section 
+          id="faq"
           ref={faqSection.ref}
           className={`py-20 px-4 bg-discovery-yellow ${faqSection.className}`} 
           aria-labelledby="faq-heading"

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/types/database'
+import { getAppUrl } from '@/config/domains'
 
 type User = Database['public']['Tables']['users']['Row']
 type UpdateUser = Database['public']['Tables']['users']['Update']
@@ -289,7 +290,7 @@ export class UserService {
    */
   async resetPassword(email: string) {
     const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password`
+      redirectTo: `${getAppUrl()}/auth/reset-password`
     })
 
     if (error) {

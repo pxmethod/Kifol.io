@@ -11,9 +11,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_production_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_production_supabase_service_role_key
 ```
 
-### 2. Email Configuration (Resend)
+### 2. Email Configuration (MailerSend)
 ```bash
-RESEND_API_KEY=your_production_resend_api_key
+MAILERSEND_API_KEY=your_production_mailersend_api_key
 EMAIL_FROM=Kifolio <noreply@yourdomain.com>
 EMAIL_DOMAIN=yourdomain.com
 SUPPORT_EMAIL=support@yourdomain.com
@@ -39,7 +39,7 @@ NEXT_PUBLIC_APP_URL=https://yourdomain.com
 
 ### Step 2: Email Domain Setup
 1. Purchase/configure your domain
-2. Add domain to Resend dashboard
+2. Add domain to MailerSend dashboard
 3. Configure DNS records (DKIM, SPF, DMARC)
 4. Update EMAIL_FROM and EMAIL_DOMAIN variables
 5. Test email delivery

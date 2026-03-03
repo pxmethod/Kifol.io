@@ -1,10 +1,10 @@
 # Kifolio Email Service Setup
 
-This document provides instructions for setting up and configuring the email service for the Kifolio application using Resend.
+This document provides instructions for setting up and configuring the email service for the Kifolio application using MailerSend.
 
 ## 📧 Email Service Overview
 
-Kifolio uses **Resend** as the email service provider for sending transactional and engagement emails. The email service supports:
+Kifolio uses **MailerSend** as the email service provider for sending transactional and engagement emails. The email service supports:
 
 - ✅ Welcome emails on sign-up
 - ✅ Password reset emails
@@ -15,17 +15,17 @@ Kifolio uses **Resend** as the email service provider for sending transactional 
 
 ## 🚀 Getting Started
 
-### 1. Create Resend Account
+### 1. Create MailerSend Account
 
-1. Visit [resend.com](https://resend.com) and create an account
+1. Visit [mailersend.com](https://www.mailersend.com) and create an account
 2. Verify your email address
 3. Access your dashboard
 
 ### 2. Get API Key
 
-1. Go to your Resend dashboard
-2. Navigate to "API Keys" section
-3. Click "Create API Key"
+1. Go to your MailerSend dashboard
+2. Navigate to "API Tokens" (or Integrations > API)
+3. Create a new token
 4. Give it a name (e.g., "Kifolio Production" or "Kifolio Development")
 5. Copy the generated API key
 
@@ -34,8 +34,8 @@ Kifolio uses **Resend** as the email service provider for sending transactional 
 Create a `.env.local` file in your project root with the following variables:
 
 ```bash
-# Email Configuration (Resend)
-RESEND_API_KEY=re_your_actual_api_key_here
+# Email Configuration (MailerSend)
+MAILERSEND_API_KEY=your_mailersend_api_key_here
 
 # Email Settings
 EMAIL_FROM=Kifolio <noreply@kifolio.com>
@@ -50,12 +50,12 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 For production, you'll need to:
 
-1. **Add your domain to Resend:**
-   - Go to Domains in your Resend dashboard
+1. **Add your domain to MailerSend:**
+   - Go to Domains in your MailerSend dashboard
    - Add your domain (e.g., `kifolio.com`)
    
 2. **Configure DNS records:**
-   - Add the DKIM, SPF, and DMARC records provided by Resend
+   - Add the DKIM, SPF, and DMARC records provided by MailerSend
    - Wait for verification (can take up to 72 hours)
 
 3. **Update environment variables:**
@@ -71,7 +71,7 @@ For production, you'll need to:
 src/
 ├── lib/
 │   └── email/
-│       ├── client.ts              # Resend client configuration
+│       ├── client.ts              # MailerSend client configuration
 │       ├── service.ts             # Email sending functions
 │       ├── types.ts               # TypeScript interfaces
 │       └── templates/
@@ -160,7 +160,7 @@ This opens a browser with live previews of all email templates.
 
 ### Email Analytics
 
-Resend provides built-in analytics for:
+MailerSend provides built-in analytics for:
 - Delivery rates
 - Open rates
 - Click-through rates
@@ -185,14 +185,14 @@ if (!result.success) {
 ## 🔒 Security Best Practices
 
 1. **Environment Variables**: Never commit API keys to version control
-2. **Rate Limiting**: Resend includes built-in rate limiting
+2. **Rate Limiting**: MailerSend includes built-in rate limiting
 3. **Validation**: All email data is validated before sending
 4. **Error Logging**: Failed emails are logged but don't expose sensitive data
 5. **Unsubscribe**: All marketing emails include unsubscribe links
 
 ## 💰 Pricing
 
-### Resend Pricing (2024)
+### MailerSend Pricing
 - **Free Tier**: 3,000 emails/month
 - **Pro Tier**: $20/month for 50,000 emails
 - **Additional**: $1 per 10,000 emails beyond tier limit
@@ -208,7 +208,7 @@ if (!result.success) {
 
 1. **"API key not found"**
    - Check `.env.local` file exists
-   - Verify `RESEND_API_KEY` is set correctly
+   - Verify `MAILERSEND_API_KEY` is set correctly
    - Restart development server
 
 2. **"Domain not verified"**
@@ -228,7 +228,7 @@ if (!result.success) {
 
 ### Support
 
-- **Resend Documentation**: [resend.com/docs](https://resend.com/docs)
+- **MailerSend Documentation**: [developers.mailersend.com](https://developers.mailersend.com)
 - **React Email Docs**: [react.email](https://react.email)
 - **Kifolio Support**: Contact development team
 
@@ -236,7 +236,7 @@ if (!result.success) {
 
 ## ✅ Setup Checklist
 
-- [ ] Resend account created
+- [ ] MailerSend account created
 - [ ] API key generated and added to `.env.local`
 - [ ] Domain configured (production only)
 - [ ] DNS records added (production only)

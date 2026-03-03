@@ -27,9 +27,18 @@ function EmailVerificationContent() {
 
         // Verify the email with Supabase
         if (token === 'verify') {
-          // This is our custom verification flow - no actual verification needed
-          // since we're handling it ourselves
-          console.log('Custom verification successful for:', email);
+          // Custom verification: confirm the user's email in Supabase so login works
+          const confirmRes = await fetch('/api/auth/confirm-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+          });
+          if (!confirmRes.ok) {
+            const err = await confirmRes.json().catch(() => ({}));
+            setStatus('error');
+            setMessage(err.error || 'Could not confirm your email. Please try again or contact support.');
+            return;
+          }
         } else {
           // This is Supabase's verification flow
           const { error } = await supabase.auth.verifyOtp({

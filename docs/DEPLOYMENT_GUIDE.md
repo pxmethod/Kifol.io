@@ -25,7 +25,7 @@ NEXT_PUBLIC_SUPABASE_URL=your_production_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_production_supabase_anon_key
 
 # Email (Production)
-RESEND_API_KEY=your_production_resend_api_key
+MAILERSEND_API_KEY=your_production_mailersend_api_key
 EMAIL_FROM=Kifolio <noreply@yourdomain.com>
 EMAIL_DOMAIN=yourdomain.com
 SUPPORT_EMAIL=support@yourdomain.com
@@ -112,13 +112,13 @@ EMAIL_FROM=Kifolio <noreply@yourdomain.com>
 ### Free Tier (Good for Launch)
 - Vercel: Free for personal projects
 - Supabase: Free tier (500MB database, 50K monthly users)
-- Resend: Free tier (3K emails/month)
+- MailerSend: Free tier (500 emails/month)
 - **Total: $0/month**
 
 ### Paid Tier (Scaling)
 - Vercel Pro: $20/month
 - Supabase Pro: $25/month
-- Resend Pro: $20/month
+- MailerSend: Paid plans from $7/month
 - Custom domain: $10-15/year
 - **Total: ~$65/month + domain**
 
@@ -137,7 +137,7 @@ EMAIL_FROM=Kifolio <noreply@yourdomain.com>
 4. Test API endpoints
 
 ### Email Not Sending
-1. Verify Resend API key
+1. Verify MailerSend API key
 2. Check domain verification
 3. Test from development
 4. Review email service logs
@@ -146,7 +146,7 @@ EMAIL_FROM=Kifolio <noreply@yourdomain.com>
 - [Next.js Deployment Docs](https://nextjs.org/docs/deployment)
 - [Vercel Documentation](https://vercel.com/docs)
 - [Supabase Production Guide](https://supabase.com/docs/guides/platform/going-to-prod)
-- [Resend Documentation](https://resend.com/docs)
+- [MailerSend Documentation](https://developers.mailersend.com)
 
 ---
 

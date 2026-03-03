@@ -30,7 +30,7 @@ export default function ForgotUsernamePage() {
     try {
       // For now, we'll show a helpful message since username recovery
       // would require additional backend functionality
-      setMessage('Your username is typically the part before @ in your email address. If you\'re still having trouble, please contact support.');
+      setMessage('Your login is your email address. Use the part before @ as a reminder of your username. If you still can\'t sign in, use "Forgot password" or contact support.');
       setEmail('');
     } catch (error) {
       setError('An unexpected error occurred. Please try again.');
@@ -65,10 +65,10 @@ export default function ForgotUsernamePage() {
           {/* Header Section */}
           <div className="text-center mb-8">
             <h1 className="text-5xl lg:text-5xl font-medium text-discovery-black mb-6">
-              Forgot Username
+              Login help
             </h1>
             <p className="text-lg text-discovery-grey leading-relaxed">
-              Enter your email address and we'll help you recover your username.
+              We don&apos;t send an email for this. Enter your email and we&apos;ll show a hint to help you sign in.
             </p>
           </div>
 
@@ -109,7 +109,7 @@ export default function ForgotUsernamePage() {
                 disabled={isSubmitting || !email.trim()}
                 className="bg-discovery-primary text-white px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-primary-light text-center w-full disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Looking up...' : 'Find Username'}
+                {isSubmitting ? 'Looking up...' : 'Show hint'}
               </button>
             </form>
 

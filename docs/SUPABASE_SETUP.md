@@ -28,8 +28,8 @@ Create/update your `.env.local` file with these new variables:
 
 ```bash
 # Existing email configuration
-RESEND_API_KEY=your_resend_api_key_here
-EMAIL_FROM=Kifolio <onboarding@resend.dev>
+MAILERSEND_API_KEY=your_mailersend_api_key_here
+EMAIL_FROM=Kifolio <noreply@yourdomain.com>
 EMAIL_DOMAIN=kifol.io
 SUPPORT_EMAIL=john@kifol.io
 NEXT_PUBLIC_APP_URL=http://localhost:3001

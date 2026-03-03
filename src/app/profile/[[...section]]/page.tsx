@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { createClient } from '@/lib/supabase/client';
 import { userService } from '@/lib/database';
+import { getAppUrl } from '@/config/domains';
 
 interface ProfileData {
   email: string;
@@ -181,7 +182,7 @@ export default function ProfilePage() {
             to: invitationData.email,
             inviterName: formData.email.split('@')[0] || 'A Kifolio user', // Use current user's name
             inviteeEmail: invitationData.email,
-            inviteUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/signup?invited=true`,
+            inviteUrl: `${getAppUrl()}/auth/signup?invited=true`,
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
             personalMessage: 'I think you\'d love using Kifolio to showcase your achievements!',
             subject: 'You\'re invited to join Kifolio!'

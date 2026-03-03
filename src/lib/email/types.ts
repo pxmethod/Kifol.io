@@ -13,7 +13,7 @@ export interface BaseEmailData {
 export interface PasswordResetEmailData extends BaseEmailData {
   userName: string;
   resetUrl: string;
-  resetToken: string;
+  resetToken?: string; // Optional; used only when constructing token-based flows
   expiresAt: Date;
 }
 

@@ -152,8 +152,9 @@ export default function GiveFeedbackPage() {
       if (response.ok) {
         setIsSubmitted(true);
       } else {
+        const msg = result.details ? `${result.error}: ${result.details}` : (result.error || 'Unknown error');
         console.error('Feedback API error:', result);
-        setToastMessage(`Failed to send feedback: ${result.error || 'Unknown error'}`);
+        setToastMessage(`Failed to send feedback: ${msg}`);
         setShowToast(true);
       }
     } catch (error) {

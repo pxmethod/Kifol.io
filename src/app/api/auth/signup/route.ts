@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { sendEmailVerification } from '@/lib/email/service'
+import { getAppUrl } from '@/config/domains'
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
       email,
       password,
       options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/verify`,
+        emailRedirectTo: `${getAppUrl()}/auth/verify`,
         data: {
           name: name || email.split('@')[0]
         }
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
     if (data.user) {
       try {
         // Send our custom verification email directly
-        const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/verify?email=${encodeURIComponent(email)}&token=verify`
+        const verificationUrl = `${getAppUrl()}/auth/verify?email=${encodeURIComponent(email)}&token=verify`
         
         console.log('Sending verification email to:', email)
         

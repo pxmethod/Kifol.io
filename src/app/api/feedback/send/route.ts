@@ -1,42 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { sendHtmlEmail } from '@/lib/email/service';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const FEEDBACK_TO =
+  process.env.FEEDBACK_EMAIL || process.env.SUPPORT_EMAIL || 'support@kifol.io';
+
+/** Escape HTML to prevent injection when embedding user content in email. */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('=== FEEDBACK API DEBUG ===');
-    console.log('RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
-    console.log('EMAIL_FROM:', process.env.EMAIL_FROM);
-    
     const { email, type, message } = await request.json();
-    console.log('Received data:', { email, type, messageLength: message?.length });
 
-    // Validate required fields
     if (!email || !type || !message) {
-      console.log('Validation failed - missing fields');
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
-    // Check if Resend is properly configured
-    if (!process.env.RESEND_API_KEY) {
-      console.error('RESEND_API_KEY not configured');
-      return NextResponse.json(
-        { error: 'Email service not configured' },
-        { status: 500 }
-      );
-    }
+    const safeEmail = escapeHtml(String(email).trim());
+    const safeType = escapeHtml(String(type));
+    const safeMessage = escapeHtml(String(message));
 
-    // Send feedback email
-    console.log('Attempting to send email...');
-    const { data, error } = await resend.emails.send({
-      from: 'Kifolio <noreply@kifol.io>',
-      to: ['john@kifol.io'],
-      subject: `Kifolio Feedback: ${type}`,
-      html: `
+    const result = await sendHtmlEmail(
+      FEEDBACK_TO,
+      `Kifolio Feedback: ${type}`,
+      `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background: linear-gradient(135deg, #ff6b9d, #ff8c42); padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px;">
             <h1 style="color: white; margin: 0; font-size: 24px;">New Feedback Received</h1>
@@ -46,18 +42,18 @@ export async function POST(request: NextRequest) {
             <h2 style="color: #333; margin-top: 0; font-size: 18px;">Feedback Details</h2>
             
             <div style="margin-bottom: 15px;">
-              <strong style="color: #555;">From:</strong> ${email}
+              <strong style="color: #555;">From:</strong> ${safeEmail}
             </div>
             
             <div style="margin-bottom: 15px;">
-              <strong style="color: #555;">Type:</strong> ${type}
+              <strong style="color: #555;">Type:</strong> ${safeType}
             </div>
             
             <div style="margin-bottom: 15px;">
               <strong style="color: #555;">Message:</strong>
             </div>
             <div style="background: white; padding: 15px; border-radius: 5px; border-left: 4px solid #ff6b9d; white-space: pre-wrap; line-height: 1.6;">
-              ${message}
+              ${safeMessage}
             </div>
           </div>
           
@@ -67,22 +63,25 @@ export async function POST(request: NextRequest) {
           </div>
         </div>
       `,
-    });
+      { replyTo: String(email).trim() }
+    );
 
-    if (error) {
-      console.error('Resend error:', error);
+    if (!result.success) {
+      console.error('[Feedback API] Email send failed:', result.error);
       return NextResponse.json(
-        { error: 'Failed to send email', details: error },
+        { error: result.error || 'Failed to send email' },
         { status: 500 }
       );
     }
 
-    console.log('Email sent successfully:', data?.id);
-    return NextResponse.json({ success: true, messageId: data?.id });
+    return NextResponse.json({ success: true, messageId: result.messageId });
   } catch (error) {
-    console.error('Feedback API error:', error);
+    console.error('[Feedback API] Unexpected error:', error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
+      {
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
       { status: 500 }
     );
   }
