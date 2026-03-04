@@ -30,8 +30,8 @@ export class StorageService {
         // Provide more specific error messages
         if (error.message.includes('exceeded the maximum allowed size')) {
           throw new Error('File is too large. Please use files under 50MB.')
-        } else if (error.message.includes('Invalid file type')) {
-          throw new Error('File type not supported. Please use JPEG, PNG, GIF, PDF, MP4, MOV, MP3, or WAV files.')
+        } else         if (error.message.includes('Invalid file type')) {
+          throw new Error('File type not supported. Please use JPEG, PNG, PDF, MP3, or WAV files.')
         } else {
           throw new Error(`Failed to upload file: ${error.message}`)
         }
@@ -87,19 +87,16 @@ export class StorageService {
       return { valid: false, error: `File size must be ${maxSizeMB}MB or less` }
     }
 
-    // Check file type
+    // Check file type (photos JPEG/PNG, PDFs, audio - video reserved for paid plan)
     const allowedTypes = [
-      'image/jpeg', 
-      'image/png', 
-      'image/gif', 
+      'image/jpeg',
+      'image/png',
       'application/pdf',
-      'video/mp4',
-      'video/quicktime',
       'audio/mpeg',
       'audio/wav'
     ]
     if (!allowedTypes.includes(file.type)) {
-      return { valid: false, error: 'Please upload JPEG, PNG, GIF, PDF, MP4, MOV, MP3, or WAV files only' }
+      return { valid: false, error: 'Please upload JPEG, PNG, PDF, MP3, or WAV files only' }
     }
 
     return { valid: true }

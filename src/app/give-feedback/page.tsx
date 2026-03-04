@@ -28,8 +28,8 @@ export default function GiveFeedbackPage() {
     type: 'Found a bug',
     message: ''
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
@@ -128,37 +128,43 @@ export default function GiveFeedbackPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.message.trim()) {
       setToastMessage('Please enter your feedback message.');
       setShowToast(true);
       return;
     }
 
+    const formId = process.env.NEXT_PUBLIC_FORMPREE_FEEDBACK_ID;
+    if (!formId) {
+      setToastMessage('Feedback form is not configured. Please add NEXT_PUBLIC_FORMPREE_FEEDBACK_ID to your environment.');
+      setShowToast(true);
+      return;
+    }
+
     setIsSubmitting(true);
-    
     try {
-      const response = await fetch('/api/feedback/send', {
+      const response = await fetch(`https://formspree.io/f/${formId}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          type: formData.type,
+          message: formData.message,
+          _subject: `Kifolio Feedback: ${formData.type}`,
+        }),
       });
 
-      const result = await response.json();
-      console.log('Feedback API response:', result);
-
+      const data = await response.json();
       if (response.ok) {
         setIsSubmitted(true);
       } else {
-        const msg = result.details ? `${result.error}: ${result.details}` : (result.error || 'Unknown error');
-        console.error('Feedback API error:', result);
-        setToastMessage(`Failed to send feedback: ${msg}`);
+        const msg = data.errors?.map((e: { message?: string }) => e.message).join(', ') || data.error || 'Failed to send feedback';
+        setToastMessage(msg);
         setShowToast(true);
       }
     } catch (error) {
-      console.error('Error sending feedback:', error);
+      console.error('Feedback submit error:', error);
       setToastMessage('Failed to send feedback. Please try again.');
       setShowToast(true);
     } finally {
@@ -307,9 +313,7 @@ export default function GiveFeedbackPage() {
                     type="submit"
                     disabled={isSubmitting}
                     className={`px-8 py-4 rounded-pill text-lg font-semibold text-white transition-colors shadow-lg hover:shadow-xl text-center disabled:opacity-50 disabled:cursor-not-allowed ${
-                      isSubmitting
-                        ? 'bg-discovery-beige-300 cursor-not-allowed'
-                        : 'bg-discovery-orange hover:bg-discovery-orange-light'
+                      isSubmitting ? 'bg-discovery-beige-300 cursor-not-allowed' : 'bg-discovery-orange hover:bg-discovery-orange-light'
                     }`}
                   >
                     {isSubmitting ? (
@@ -337,7 +341,7 @@ export default function GiveFeedbackPage() {
                   Thank You!
                 </h2>
                 <p className="text-lg text-discovery-grey leading-relaxed">
-                  Your feedback really matters, so thank you! If necessary, we'll be in touch.
+                  Your feedback has been sent. Thank you! If necessary, we&apos;ll be in touch.
                 </p>
               </div>
               

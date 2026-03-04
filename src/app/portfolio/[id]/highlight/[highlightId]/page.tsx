@@ -9,7 +9,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { storageService } from '@/lib/storage';
 import { HighlightService } from '@/lib/database/achievements';
 import { HIGHLIGHT_TYPES, HighlightType, HighlightFormData } from '@/types/achievement';
-import { useVideoUpload } from '@/hooks/useVideoUpload';
 import { Video, FileText, Music, Image } from 'lucide-react';
 
 export default function EditHighlight() {
@@ -38,7 +37,6 @@ export default function EditHighlight() {
   const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
 
   const highlightService = new HighlightService();
-  const { uploadVideo, ...videoUploadState } = useVideoUpload();
 
   // Utility function to extract filename from URL
   const getFileNameFromUrl = (url: string): string => {
@@ -279,42 +277,18 @@ export default function EditHighlight() {
 
     try {
       const uploadedFiles: File[] = [];
-      const newPreviews: { url: string; file: File }[] = [];
       
       for (const file of files) {
-        // Handle video files with compression
-        if (file.type.startsWith('video/')) {
-          try {
-            const uploadedUrl = await uploadVideo(file);
-            // Create a special file object with the uploaded URL
-            const videoFile = Object.assign(file, { uploadedUrl });
-            uploadedFiles.push(videoFile);
-            
-            // Create preview for video
-            newPreviews.push({
-              url: URL.createObjectURL(file),
-              file: videoFile
-            });
-          } catch (videoError) {
-            console.error('Video upload error:', videoError);
-            setErrors(prev => ({ 
-              ...prev, 
-              media: 'Failed to upload video. Please try again.' 
-            }));
-            continue;
-          }
-        } else {
-          // Validate non-video files
-          const validation = storageService.validateFile(file);
-          if (!validation.valid) {
-            setErrors(prev => ({ ...prev, media: validation.error || 'Invalid file' }));
-            return;
-          }
-          
-          uploadedFiles.push(file);
-          
-          // Create preview URL for images using FileReader for better compatibility
-          if (file.type.startsWith('image/')) {
+        const validation = storageService.validateFile(file);
+        if (!validation.valid) {
+          setErrors(prev => ({ ...prev, media: validation.error || 'Invalid file' }));
+          return;
+        }
+        
+        uploadedFiles.push(file);
+        
+        // Create preview URL for images
+        if (file.type.startsWith('image/')) {
             try {
               // Use FileReader to create data URL (more reliable than blob URL)
               const reader = new FileReader();
@@ -342,11 +316,12 @@ export default function EditHighlight() {
                 }
               };
               reader.readAsDataURL(file);
-            } catch (previewError) {
-              console.error('Failed to create preview for image:', file.name, previewError);
+            } catch {
+              // Preview optional
             }
+          } else {
+            setMediaPreview(prev => [...prev, { url: '', file }]);
           }
-        }
       }
 
       setFormData(prev => ({ ...prev, media: [...prev.media, ...uploadedFiles] }));
@@ -363,9 +338,9 @@ export default function EditHighlight() {
   };
 
   const removeMedia = (index: number) => {
-    // Clean up preview URL if it exists
-    if (mediaPreview[index]) {
-      URL.revokeObjectURL(mediaPreview[index].url);
+    const preview = mediaPreview[index];
+    if (preview?.url && preview.url.startsWith('blob:')) {
+      URL.revokeObjectURL(preview.url);
     }
     
     setFormData(prev => ({
@@ -388,18 +363,10 @@ export default function EditHighlight() {
     setIsSubmitting(true);
 
     try {
-      // Process media files (videos are already uploaded, others need uploading)
       const mediaUrls: string[] = [];
-      
       for (const file of formData.media) {
-        // Check if this is a video that was already uploaded
-        if ((file as any).uploadedUrl) {
-          mediaUrls.push((file as any).uploadedUrl);
-        } else {
-          // Upload non-video files normally
-          const url = await storageService.uploadFile(file, `${formData.title}-${Date.now()}`);
-          mediaUrls.push(url);
-        }
+        const url = await storageService.uploadFile(file, `${formData.title}-${Date.now()}`);
+        mediaUrls.push(url);
       }
 
       // Combine existing media URLs with new ones
@@ -618,7 +585,7 @@ export default function EditHighlight() {
                     type="file"
                     id="media"
                     multiple
-                    accept="image/jpeg,image/png,image/gif,application/pdf,video/mp4,video/quicktime,audio/mpeg,audio/wav"
+                    accept="image/jpeg,image/png,application/pdf,audio/mpeg,audio/wav"
                     onChange={handleMediaUpload}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     disabled={uploadingMedia}
@@ -639,36 +606,14 @@ export default function EditHighlight() {
                 </div>
                 
                 <p className="form-field__help">
-                  Photos, videos, PDFs, and audio files up to 50MB each. 
+                  The Kifolio free plan allows for photos (JPEG and PNG), PDFs, and audio files up to 50MB each.
                 </p>
                 
-                {/* Media Processing Status */}
-                {(uploadingMedia || videoUploadState.isUploading || videoUploadState.isCompressing) && (
+                {uploadingMedia && (
                   <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <LoadingSpinner size="sm" />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-blue-800">
-                          {(uploadingMedia || videoUploadState.status) && (
-                            (uploadingMedia && !videoUploadState.isUploading && !videoUploadState.isCompressing) ? 
-                              'Processing image files...' : 
-                              videoUploadState.status || 'Processing media...'
-                          )}
-                        </p>
-                        {(videoUploadState.progress > 0) && (
-                          <div className="mt-2">
-                            <div className="w-full bg-blue-200 rounded-full h-2">
-                              <div 
-                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                                style={{ width: `${videoUploadState.progress}%` }}
-                              ></div>
-                            </div>
-                            <p className="text-xs text-blue-600 mt-1">
-                              {Math.round(videoUploadState.progress)}% complete
-                            </p>
-                          </div>
-                        )}
-                      </div>
+                      <p className="text-sm font-medium text-blue-800">Processing files...</p>
                     </div>
                   </div>
                 )}
@@ -762,22 +707,6 @@ export default function EditHighlight() {
                           <div className="flex flex-col items-center justify-center text-center p-2">
                             <FileText className="w-8 h-8 text-red-500 mb-1" />
                             <span className="text-xs text-gray-500 truncate">{file.name}</span>
-                          </div>
-                        ) : file.type.startsWith('video/') ? (
-                          <div className="flex flex-col items-center justify-center text-center p-2 w-full h-full">
-                            {/* Video thumbnail frame */}
-                            <div className="w-full h-full bg-gray-200 rounded flex items-center justify-center mb-2">
-                              <Video className="w-8 h-8 text-blue-500" />
-                            </div>
-                            {/* Filename and size below */}
-                            <div className="text-center">
-                              <div className="text-xs text-gray-700 font-medium truncate w-full" title={file.name}>
-                                {file.name}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                {(file.size / (1024 * 1024)).toFixed(1)} MB
-                              </div>
-                            </div>
                           </div>
                         ) : file.type.startsWith('audio/') ? (
                           <div className="flex flex-col items-center justify-center text-center p-2">

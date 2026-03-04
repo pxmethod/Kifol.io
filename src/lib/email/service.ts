@@ -261,18 +261,6 @@ export async function sendTestEmail(to: string): Promise<EmailResult> {
 }
 
 /**
- * Send raw HTML email (e.g. feedback form). Use for one-off sends with custom HTML.
- */
-export async function sendHtmlEmail(
-  to: string | string[],
-  subject: string,
-  html: string,
-  options?: { replyTo?: string }
-): Promise<EmailResult> {
-  return sendEmail(to, subject, html, undefined, undefined, options);
-}
-
-/**
  * Send email verification (welcome) email.
  * Uses MailerSend template when MAILERSEND_TEMPLATE_WELCOME is set, otherwise falls back to HTML template.
  */

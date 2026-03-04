@@ -10,7 +10,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { storageService } from '@/lib/storage';
 import { HighlightService } from '@/lib/database/achievements';
 import { HIGHLIGHT_TYPES, HighlightType, HighlightFormData } from '@/types/achievement';
-import { useVideoUpload } from '@/hooks/useVideoUpload';
 import { Video, FileText, Music, Image } from 'lucide-react';
 import heic2any from 'heic2any';
 
@@ -20,8 +19,6 @@ export default function HighlightForm() {
   const { user, loading } = useAuth();
   const portfolioId = params.id as string;
   const highlightId = params.highlightId as string; // For editing existing highlights
-  const { uploadVideo, generateThumbnail, ...videoUploadState } = useVideoUpload();
-  
   const [formData, setFormData] = useState<HighlightFormData>({
     title: '',
     date: new Date().toISOString().split('T')[0], // Today's date
@@ -399,7 +396,6 @@ export default function HighlightForm() {
 
     try {
       const uploadedFiles: File[] = [];
-      const newPreviews: { url: string; file: File }[] = [];
       
       for (const file of files) {
         // Validate file
@@ -409,47 +405,7 @@ export default function HighlightForm() {
           return;
         }
         
-        // Handle video files with compression
-        if (file.type.startsWith('video/')) {
-          try {
-            // Upload video with compression
-            const videoUrl = await uploadVideo(file);
-            
-            // Generate thumbnail for video
-            let thumbnailUrl = '';
-            try {
-              thumbnailUrl = await generateThumbnail(file);
-            } catch (thumbError) {
-              console.warn('Thumbnail generation failed:', thumbError);
-            }
-            
-            // Create a mock file object for the form data
-            const processedFile = new File([file], file.name, {
-              type: file.type,
-              lastModified: file.lastModified
-            });
-            
-            // Store the uploaded URL in a custom property
-            (processedFile as any).uploadedUrl = videoUrl;
-            (processedFile as any).thumbnailUrl = thumbnailUrl;
-            
-            uploadedFiles.push(processedFile);
-            
-            // Create preview URL for video
-            newPreviews.push({
-              url: URL.createObjectURL(file),
-              file: processedFile
-            });
-          } catch (videoError) {
-            console.error('Video processing failed:', videoError);
-            setErrors(prev => ({ 
-              ...prev, 
-              media: 'Failed to process video. Please try again.' 
-            }));
-            return;
-          }
-        } else {
-          // Handle non-video files - check for HEIC and convert if needed
+        // Handle files - check for HEIC and convert if needed
           let fileToUpload = file;
           
           // Detect HEIC files (they might have .jpg extension but be HEIC format)
@@ -531,33 +487,25 @@ export default function HighlightForm() {
           
           uploadedFiles.push(fileToUpload);
           
-          // Create preview URL for images using FileReader for better compatibility
+          // Build preview in order (await for images to preserve order)
           if (fileToUpload.type.startsWith('image/')) {
             try {
-              // Use FileReader to create data URL (more reliable than blob URL)
-              const reader = new FileReader();
-              reader.onload = (e) => {
-                if (e.target?.result) {
-                  console.log('Created preview using FileReader for:', fileToUpload.name);
-                  setMediaPreview(prev => [...prev, {
-                    url: e.target?.result as string,
-                    file: fileToUpload
-                  }]);
-                }
-              };
-              reader.onerror = (error) => {
-                console.error('FileReader failed for:', fileToUpload.name, error);
-              };
-              reader.readAsDataURL(fileToUpload);
-            } catch (previewError) {
-              console.error('Failed to create preview for image:', fileToUpload.name, previewError);
+              const url = await new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve((e.target?.result as string) || '');
+                reader.onerror = () => resolve('');
+                reader.readAsDataURL(fileToUpload);
+              });
+              setMediaPreview(prev => [...prev, { url, file: fileToUpload }]);
+            } catch {
+              setMediaPreview(prev => [...prev, { url: '', file: fileToUpload }]);
             }
+          } else {
+            setMediaPreview(prev => [...prev, { url: '', file: fileToUpload }]);
           }
-        }
       }
 
       setFormData(prev => ({ ...prev, media: [...prev.media, ...uploadedFiles] }));
-      setMediaPreview(prev => [...prev, ...newPreviews]);
     } catch (error) {
       console.error('Media upload error:', error);
       setErrors(prev => ({ 
@@ -570,9 +518,9 @@ export default function HighlightForm() {
   };
 
   const removeMedia = (index: number) => {
-    // Clean up preview URL if it exists
-    if (mediaPreview[index]) {
-      URL.revokeObjectURL(mediaPreview[index].url);
+    const preview = mediaPreview[index];
+    if (preview?.url && preview.url.startsWith('blob:')) {
+      URL.revokeObjectURL(preview.url);
     }
     
     setFormData(prev => ({
@@ -595,18 +543,11 @@ export default function HighlightForm() {
     setIsSubmitting(true);
 
     try {
-      // Process media files (videos are already uploaded, others need uploading)
+      // Process media files
       const mediaUrls: string[] = [];
-      
       for (const file of formData.media) {
-        // Check if this is a video that was already uploaded
-        if ((file as any).uploadedUrl) {
-          mediaUrls.push((file as any).uploadedUrl);
-        } else {
-          // Upload non-video files normally
-          const url = await storageService.uploadFile(file, `${formData.title}-${Date.now()}`);
-          mediaUrls.push(url);
-        }
+        const url = await storageService.uploadFile(file, `${formData.title}-${Date.now()}`);
+        mediaUrls.push(url);
       }
 
       // Combine existing media URLs with new ones
@@ -834,7 +775,7 @@ export default function HighlightForm() {
                     type="file"
                     id="media"
                     multiple
-                    accept="image/jpeg,image/png,image/gif,application/pdf,video/mp4,video/quicktime,audio/mpeg,audio/wav"
+                    accept="image/jpeg,image/png,application/pdf,audio/mpeg,audio/wav"
                     onChange={handleMediaUpload}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     disabled={uploadingMedia}
@@ -855,45 +796,16 @@ export default function HighlightForm() {
                 </div>
                 
                 <p className="text-discovery-grey text-xs mt-1">
-                  Photos, videos, PDFs, and audio files up to 50MB each.
+                  The Kifolio free plan allows for photos (JPEG and PNG), PDFs, and audio files up to 50MB each.
                 </p>
                 
                 {/* Media Processing Status */}
-                {(uploadingMedia || videoUploadState.isUploading || videoUploadState.isCompressing) && (
+                {uploadingMedia && (
                   <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <LoadingSpinner size="sm" />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-blue-800">
-                          {(uploadingMedia || videoUploadState.status) && (
-                            (uploadingMedia && !videoUploadState.isUploading && !videoUploadState.isCompressing) ? 
-                              'Processing image files...' : 
-                              videoUploadState.status || 'Processing media...'
-                          )}
-                        </p>
-                        {(videoUploadState.progress > 0) && (
-                          <div className="mt-2">
-                            <div className="w-full bg-blue-200 rounded-full h-2">
-                              <div 
-                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                                style={{ width: `${videoUploadState.progress}%` }}
-                              ></div>
-                            </div>
-                            <p className="text-xs text-blue-600 mt-1">
-                              {Math.round(videoUploadState.progress)}% complete
-                            </p>
-                          </div>
-                        )}
-                      </div>
+                      <p className="text-sm font-medium text-blue-800">Processing files...</p>
                     </div>
-                  </div>
-                )}
-                
-                
-                {/* Video Upload Error */}
-                {videoUploadState.error && (
-                  <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-sm text-red-800">{videoUploadState.error}</p>
                   </div>
                 )}
                 
@@ -1014,22 +926,6 @@ export default function HighlightForm() {
                           <div className="flex flex-col items-center justify-center text-center p-2">
                             <FileText className="w-8 h-8 text-red-500 mb-1" />
                             <span className="text-xs text-gray-500 truncate">{file.name}</span>
-                          </div>
-                        ) : file.type.startsWith('video/') ? (
-                          <div className="flex flex-col items-center justify-center text-center p-2 w-full h-full">
-                            {/* Video thumbnail frame */}
-                            <div className="w-full h-full bg-gray-200 rounded flex items-center justify-center mb-2">
-                              <Video className="w-8 h-8 text-blue-500" />
-                            </div>
-                            {/* Filename and size below */}
-                            <div className="text-center">
-                              <div className="text-xs text-gray-700 font-medium truncate w-full" title={file.name}>
-                                {file.name}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                {(file.size / (1024 * 1024)).toFixed(1)} MB
-                              </div>
-                            </div>
                           </div>
                         ) : file.type.startsWith('audio/') ? (
                           <div className="flex flex-col items-center justify-center text-center p-2">

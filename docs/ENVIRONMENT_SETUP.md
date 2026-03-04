@@ -17,8 +17,8 @@ MAILERSEND_API_KEY=your_mailersend_api_key
 EMAIL_FROM=Kifolio <noreply@kifol.io>
 EMAIL_DOMAIN=kifol.io
 SUPPORT_EMAIL=support@kifol.io
-# Optional: where to send feedback form submissions (defaults to SUPPORT_EMAIL or support@kifol.io)
-FEEDBACK_EMAIL=john@kifol.io
+# Optional: Formspree form ID for feedback submissions. Create a form at formspree.io and add your email to receive submissions.
+# NEXT_PUBLIC_FORMPREE_FEEDBACK_ID=your_form_id
 # Optional: MailerSend dashboard template IDs (when set, uses templates instead of app HTML)
 MAILERSEND_TEMPLATE_WELCOME=template_id_for_welcome_signup
 MAILERSEND_TEMPLATE_PASSWORD_RESET=template_id_for_forgot_password
