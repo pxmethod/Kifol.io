@@ -29,24 +29,19 @@ See [MailerSend](https://www.mailersend.com) for API keys. Add and verify your s
 - **Welcome**: `user_name`, `verification_url`, `support_email`, `app_url`
 - **Password reset**: `user_name`, `reset_url`, `expires_at`, `app_url`
 
-### 3. Events API Configuration (Ticketmaster)
-```bash
-NEXT_PUBLIC_TICKETMASTER_API_KEY=your_ticketmaster_api_key
-```
-
-### 4. App URLs and Domains
+### 3. App URLs and Domains
 ```bash
 NEXT_PUBLIC_APP_URL=https://kifol.io
 NEXT_PUBLIC_PORTFOLIO_DOMAIN=my.kifol.io
 ```
 **Important:** Set `NEXT_PUBLIC_APP_URL` to your app origin with **no trailing slash** (e.g. `https://my.kifol.io`). It is used for password-reset links, signup verification links, and invitation emails. In production (e.g. Vercel), set this to your deployed app URL so email links point to the correct domain.
 
-### 5. Database Configuration
+### 4. Database Configuration
 ```bash
 DATABASE_URL=your_database_connection_string
 ```
 
-### 6. Authentication
+### 5. Authentication
 ```bash
 NEXTAUTH_SECRET=your_nextauth_secret
 NEXTAUTH_URL=https://kifol.io

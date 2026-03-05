@@ -266,7 +266,7 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                       key={highlight.id}
                       onClick={() => handleViewHighlight(highlight)}
                       className="rounded-lg p-6 transition-all duration-200 cursor-pointer hover:scale-[1.02]"
-                      style={{ 
+                    style={{ 
                         backgroundColor: config.colors.cardBg || 'rgba(255, 255, 255, 0.05)',
                       }}
                     >
@@ -289,7 +289,7 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                           {getTypeName(highlight.type)}
                         </span>
                     </div>
-                    
+
                       {/* Description */}
                       {highlight.description && (
                         <p 
@@ -299,7 +299,7 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                           {formatTextWithLinks(highlight.description, config.colors.textSecondary)}
                         </p>
                       )}
-
+                      
                       {/* Media Thumbnails */}
                       {highlight.media.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-4">
@@ -310,8 +310,8 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                               style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
                             >
                               {media.type === 'image' && !media.url.includes('.mp4') && !media.url.includes('.mov') && !media.url.includes('.avi') ? (
-                                <Image
-                                  src={media.url}
+                                <Image 
+                                  src={media.url} 
                                   alt=""
                                   width={96}
                                   height={96}
