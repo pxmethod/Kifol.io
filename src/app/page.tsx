@@ -74,7 +74,7 @@ export default function MarketingPage() {
                   Every milestone matters. Capture them all with Kifolio.
                 </h1>
                 <p className="text-lg text-discovery-grey mb-8 leading-relaxed">
-                  Build beautiful portfolios for your children that showcase their work, 
+                  Build beautiful portfolios for your children or students that showcase their work, 
                   milestones, and achievements. Whether it&apos;s artwork, school projects, 
                   sports accomplishments, or personal growth, Kifolio has you covered. 
                   Simple, responsive, and totally free.
@@ -86,7 +86,7 @@ export default function MarketingPage() {
                     Get started for free
                   </Link>
                 </div>
-                <p className="text-discovery-orange text-md font-medium">Create your child&apos;s free portfolio in minutes.</p>
+                <p className="text-discovery-orange text-md font-medium">Create a portfolio in minutes.</p>
               </div>
               
               {/* Right Column - Image */}
