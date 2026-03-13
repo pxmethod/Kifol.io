@@ -227,7 +227,7 @@ export default function MarketingPage() {
             <h2 className="text-5xl lg:text-5xl font-medium text-discovery-yellow mb-12">
               How it works
             </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+            <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 md:gap-12">
               {/* Step 1 */}
               <div className="text-center">
                 <div className="mx-auto mb-6 w-16 h-16 bg-discovery-yellow rounded-full flex items-center justify-center">
@@ -273,7 +273,20 @@ export default function MarketingPage() {
                   <span className="text-2xl font-bold text-discovery-primary">4</span>
                 </div>
                 <h3 className="text-4xl lg:text-3xl font-medium text-discovery-yellow mb-2 leading-tight">
-                   Share it out
+                  Get endorsements
+                </h3>
+                <p className="text-discovery-white-100 leading-relaxed">
+                  Invite instructors, coaches, or mentors to add a comment to a specific achievement—adding trusted recognition and context to your child's milestones.
+                </p>
+              </div>
+
+              {/* Step 5 */}
+              <div className="text-center">
+                <div className="mx-auto mb-6 w-16 h-16 bg-discovery-yellow rounded-full flex items-center justify-center">
+                  <span className="text-2xl font-bold text-discovery-primary">5</span>
+                </div>
+                <h3 className="text-4xl lg:text-3xl font-medium text-discovery-yellow mb-2 leading-tight">
+                  Share it out
                 </h3>
                 <p className="text-discovery-white-100 leading-relaxed">
                   Export a polished record for transcripts, résumés, college and scholarship applications — or simply as a keepsake of their journey.
