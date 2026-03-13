@@ -218,7 +218,13 @@ CREATE TRIGGER on_auth_user_created
 
 4. **Click "Run"** to execute the schema
 
-## ✅ Step 5: Test Connection
+## ⚠️ Step 5: Enable Email Confirmation (Required for signup flow)
+
+1. Go to **Authentication** → **Providers** → **Email**
+2. Ensure **"Confirm email"** is **enabled** (ON)
+3. If disabled, users are auto-logged in after signup with no verification — enable it so users must verify their email before logging in
+
+## ✅ Step 6: Test Connection
 
 Once you've added the environment variables, I'll help you test the connection!
 

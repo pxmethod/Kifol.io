@@ -47,7 +47,7 @@ To prevent duplicate emails (Supabase's default + ours), we use Supabase's **Sen
 
 **Local development:** Use a tunnel (e.g. [ngrok](https://ngrok.com)) so Supabase can reach `http://localhost:3000/api/auth/supabase-email-hook`, or test signup in a deployed preview.
 
-Ensure **"Confirm email"** remains **enabled** in Supabase (Authentication → Providers → Email) so unverified users cannot log in.
+**Critical:** **"Confirm email"** must be **enabled** in Supabase (Authentication → Providers → Email). If disabled, users are auto-logged in after signup with no verification flow. Supabase Dashboard → Authentication → Providers → Email → turn **Confirm email** ON.
 
 ## 🚀 Getting Started
 

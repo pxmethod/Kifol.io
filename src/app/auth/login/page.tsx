@@ -53,12 +53,13 @@ export default function LoginPage() {
     }
   }, []);
 
-  // Redirect if already logged in (but allow them to stay if they just arrived)
+  // Redirect if already logged in (but don't redirect when we have a message/verified param — user should see it)
   useEffect(() => {
-    if (user && !successMessage) {
-      router.push('/dashboard');
-    }
-  }, [user, router, successMessage]);
+    if (!user) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('message') || params.get('verified')) return;
+    router.push('/dashboard');
+  }, [user, router]);
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
