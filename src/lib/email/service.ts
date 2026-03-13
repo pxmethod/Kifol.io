@@ -68,7 +68,8 @@ async function sendEmail(
 async function sendEmailWithTemplate(
   to: string | string[],
   templateId: string,
-  personalization: { email: string; data: Record<string, string> }[]
+  personalization: { email: string; data: Record<string, string> }[],
+  subject: string
 ): Promise<EmailResult> {
   if (!mailerSend) {
     return {
@@ -77,7 +78,7 @@ async function sendEmailWithTemplate(
     };
   }
   try {
-    const emailParams = createTemplateEmailParams(to, templateId, personalization);
+    const emailParams = createTemplateEmailParams(to, templateId, personalization, subject);
     const response = await mailerSend.email.send(emailParams) as {
       headers?: Record<string, string | string[] | undefined>;
       body?: { message_id?: string };
@@ -131,7 +132,8 @@ export async function sendPasswordResetEmail(data: PasswordResetEmailData): Prom
             app_url: getAppUrl(),
           },
         },
-      ]
+      ],
+      data.subject || 'Reset your Kifolio password'
     );
   }
 
@@ -285,7 +287,8 @@ export async function sendEmailVerification(data: EmailVerificationData): Promis
             app_url: getAppUrl(),
           },
         },
-      ]
+      ],
+      data.subject || 'Verify your email - Kifolio'
     );
   }
 

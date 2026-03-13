@@ -65,7 +65,8 @@ export function createEmailParams(
 export function createTemplateEmailParams(
   to: string | string[],
   templateId: string,
-  personalization: TemplatePersonalization[]
+  personalization: TemplatePersonalization[],
+  subject: string
 ): EmailParams {
   const sender = new Sender(emailConfig.fromEmail, emailConfig.fromName);
   const recipients = (Array.isArray(to) ? to : [to]).map(
@@ -74,6 +75,7 @@ export function createTemplateEmailParams(
   return new EmailParams()
     .setFrom(sender)
     .setTo(recipients)
+    .setSubject(subject)
     .setTemplateId(templateId)
     .setPersonalization(personalization);
 }

@@ -30,10 +30,10 @@ To prevent duplicate emails (Supabase's default + ours), we use Supabase's **Sen
 
 1. **Deploy your app** so the hook URL is publicly accessible (e.g. `https://yourdomain.com/api/auth/supabase-email-hook`).
 
-2. **Add the secret to `.env.local`:**
-   ```bash
-   SEND_EMAIL_HOOK_SECRET=v1,whsec_<your_secret>
-   ```
+2. **Add the secret to Vercel** (and `.env.local` for local dev):
+   - Vercel → Project → Settings → Environment Variables
+   - Add `SEND_EMAIL_HOOK_SECRET` = `v1,whsec_<your_secret>` (from Supabase when configuring the hook)
+   - **Required for production** — without it you'll see: `[supabase-email-hook] SEND_EMAIL_HOOK_SECRET not set`
 
 3. **Configure the hook in Supabase:**
    - Go to [Supabase Dashboard](https://supabase.com/dashboard) → your project
