@@ -122,7 +122,7 @@ export default function LoginPage() {
       <header className="bg-discovery-beige-200 text-white px-9 py-4 top-0 z-50">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center">
-            <Link href={user ? "/dashboard" : "/"} className="flex items-center">
+            <Link href="/" className="flex items-center">
               <Image 
                 src="/kifolio_logo_dark.svg" 
                 alt="Kifolio Logo" 
