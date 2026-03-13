@@ -32,10 +32,10 @@ export async function POST(request: NextRequest) {
     })
 
     if (error) {
-      // Supabase rate limit: "email rate limit exceeded" — see docs/EMAIL_SETUP.md
+      // Supabase rate limit: "email rate limit exceeded" — configure at Auth → Rate Limits
       const message =
         error.message?.toLowerCase().includes('rate limit')
-          ? 'Too many signup attempts. Please wait a few minutes and try again.'
+          ? 'Too many signup attempts. Please wait 1–2 minutes and try again.'
           : error.message
       return NextResponse.json({ error: message }, { status: 400 })
     }
