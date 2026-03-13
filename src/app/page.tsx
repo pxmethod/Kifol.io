@@ -276,7 +276,7 @@ export default function MarketingPage() {
                   Request for endorsements
                 </h3>
                 <p className="text-discovery-white-100 leading-relaxed">
-                  Invite instructors, teacherscoaches, or mentors to add a comment to a specific achievement—adding trusted recognition and context to your child's milestones.
+                  Invite instructors, teachers, coaches, or mentors to add a comment to a specific achievement—adding trusted recognition and context to your child's milestones.
                 </p>
               </div>
 
@@ -352,6 +352,15 @@ export default function MarketingPage() {
                   </div>
                   <p className="text-lg text-discovery-grey leading-relaxed">Share with family and friends on any device</p>
                 </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-discovery-yellow rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-discovery-black" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-lg text-discovery-grey leading-relaxed">Request for endorsements from verified teachers/instructors</p>
+                </div>
                 
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 w-6 h-6 bg-discovery-yellow rounded-full flex items-center justify-center mt-0.5">
@@ -386,7 +395,7 @@ export default function MarketingPage() {
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <p className="text-lg text-discovery-grey leading-relaxed">Export and print for physical keepsakes</p>
+                  <p className="text-lg text-discovery-grey leading-relaxed">Export and print for physical keepsakes (coming soon)</p>
                 </div>
                 
                 <div className="flex items-start gap-3">
