@@ -4,14 +4,17 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { createClient } from '@/lib/supabase/client';
 
+/**
+ * Email verification page - uses custom MailerSend template flow only.
+ * Verification links come from our MailerSend email (see /api/auth/signup).
+ * Link format: /auth/verify?email=...&token=verify
+ */
 function EmailVerificationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
   const [message, setMessage] = useState('Verifying your email...');
-  const supabase = createClient();
 
   useEffect(() => {
     const verifyEmail = async () => {
@@ -21,37 +24,29 @@ function EmailVerificationContent() {
 
         if (!token || !email) {
           setStatus('error');
-          setMessage('Invalid verification link. Please try signing up again.');
+          setMessage('Invalid verification link. Please use the link from your verification email, or sign up again.');
           return;
         }
 
-        // Verify the email with Supabase
-        if (token === 'verify') {
-          // Custom verification: confirm the user's email in Supabase so login works
-          const confirmRes = await fetch('/api/auth/confirm-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email }),
-          });
-          if (!confirmRes.ok) {
-            const err = await confirmRes.json().catch(() => ({}));
-            setStatus('error');
-            setMessage(err.error || 'Could not confirm your email. Please try again or contact support.');
-            return;
-          }
-        } else {
-          // This is Supabase's verification flow
-          const { error } = await supabase.auth.verifyOtp({
-            token_hash: token,
-            type: 'email'
-          });
+        // We use only the custom MailerSend verification flow (token=verify)
+        if (token !== 'verify') {
+          setStatus('error');
+          setMessage('This link format is no longer supported. Please use the link from your verification email, or sign up again.');
+          return;
+        }
 
-          if (error) {
-            console.error('Email verification error:', error);
-            setStatus('error');
-            setMessage('Email verification failed. The link may have expired or already been used.');
-            return;
-          }
+        // Confirm the user's email in Supabase via our API
+        const confirmRes = await fetch('/api/auth/confirm-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+
+        if (!confirmRes.ok) {
+          const err = await confirmRes.json().catch(() => ({}));
+          setStatus('error');
+          setMessage(err.error || 'Could not confirm your email. Please try again or contact support.');
+          return;
         }
 
         // Success
@@ -71,7 +66,7 @@ function EmailVerificationContent() {
     };
 
     verifyEmail();
-  }, [searchParams, router, supabase]);
+  }, [searchParams, router]);
 
   return (
     <div className="min-h-screen bg-kifolio-bg flex items-center justify-center px-4">

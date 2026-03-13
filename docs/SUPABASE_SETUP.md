@@ -37,6 +37,9 @@ NEXT_PUBLIC_APP_URL=http://localhost:3001
 # New Supabase configuration
 NEXT_PUBLIC_SUPABASE_URL=your_project_url_here
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
+
+# Send Email Hook (required for signup — see docs/EMAIL_SETUP.md)
+SEND_EMAIL_HOOK_SECRET=v1,whsec_your_signing_secret_here
 ```
 
 **Replace:**

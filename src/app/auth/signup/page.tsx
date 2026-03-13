@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
@@ -21,6 +21,7 @@ interface PasswordRequirements {
 
 export default function SignUpPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signUp } = useAuth();
   const [formData, setFormData] = useState<SignUpFormData>({
     email: '',
@@ -29,6 +30,7 @@ export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
   const [passwordRequirements, setPasswordRequirements] = useState<PasswordRequirements>({
     lowercase: false,
     uppercase: false,
@@ -37,6 +39,8 @@ export default function SignUpPage() {
     length: false
   });
 
+
+  const isInvited = searchParams.get('invited') === 'true';
 
   // Validate password requirements
   useEffect(() => {
@@ -101,14 +105,13 @@ export default function SignUpPage() {
         return;
       }
 
-      // Show success message and redirect to login
-      // setToastMessage('Account created successfully! Please check your email to confirm your account.');
-      // setShowToast(true);
-      
+      // Show explicit success state before redirecting
+      setSignupSuccess(true);
+
       // Redirect to login page after a short delay
       setTimeout(() => {
         router.push('/auth/login?message=Please check your email to confirm your account');
-      }, 2000);
+      }, 2500);
       
     } catch (error) {
       setErrors({ submit: 'An unexpected error occurred. Please try again.' });
@@ -156,9 +159,34 @@ export default function SignUpPage() {
             </p>
           </div>
 
-          {/* Sign Up Form */}
+          {/* Invitation Banner */}
+          {isInvited && (
+            <div className="mb-6 p-4 bg-discovery-primary/10 border border-discovery-primary/20 rounded-lg">
+              <p className="text-discovery-primary font-medium text-center">
+                You&apos;ve been invited to Kifolio! Create your account to get started.
+              </p>
+            </div>
+          )}
+
+          {/* Success State */}
+          {signupSuccess ? (
+            <div className="bg-white rounded-lg p-8 shadow-md text-center">
+              <div className="w-16 h-16 mx-auto mb-6 bg-green-100 rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-medium text-discovery-black mb-2">Account created!</h2>
+              <p className="text-discovery-grey mb-6">
+                Check your email at <span className="font-medium text-discovery-black">{formData.email}</span> to verify your account. We&apos;ll redirect you to log in shortly.
+              </p>
+              <p className="text-sm text-discovery-grey">
+                Redirecting in a few seconds...
+              </p>
+            </div>
+          ) : (
+          /* Sign Up Form */
           <div className="bg-white rounded-lg p-6 shadow-md">
-                
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Email Field */}
                   <div className="form-field">
@@ -284,6 +312,7 @@ export default function SignUpPage() {
               </Link>
             </div>
           </div>
+          )}
         </div>
       </div>
     </div>

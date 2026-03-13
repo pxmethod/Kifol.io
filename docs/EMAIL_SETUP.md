@@ -6,12 +6,48 @@ This document provides instructions for setting up and configuring the email ser
 
 Kifolio uses **MailerSend** as the email service provider for sending transactional and engagement emails. The email service supports:
 
-- ✅ Welcome emails on sign-up
+- ✅ **Email verification on sign-up** (MailerSend templates only — see [Signup Verification](#signup-verification-flow) below)
 - ✅ Password reset emails
 - ✅ Invitation emails
 - ✅ Engagement emails
 - 🔜 Monthly invoice confirmations (future)
 - 🔜 Cancellation confirmations (future)
+
+## Signup Verification Flow
+
+Kifolio uses **MailerSend templates exclusively** for signup verification emails (brand consistency). The flow:
+
+1. User signs up → account created in Supabase (unconfirmed)
+2. Our API sends a branded MailerSend verification email with link: `/auth/verify?email=...&token=verify`
+3. User clicks link → email confirmed via `/api/auth/confirm-email`
+4. User can now log in
+
+### Supabase Send Email Hook (Required)
+
+To prevent duplicate emails (Supabase's default + ours), we use Supabase's **Send Email Hook**. When enabled, Supabase sends auth email payloads to our API instead of sending them itself. Our hook returns 200 without sending for signup (we already sent via MailerSend).
+
+**Setup:**
+
+1. **Deploy your app** so the hook URL is publicly accessible (e.g. `https://yourdomain.com/api/auth/supabase-email-hook`).
+
+2. **Add the secret to `.env.local`:**
+   ```bash
+   SEND_EMAIL_HOOK_SECRET=v1,whsec_<your_secret>
+   ```
+
+3. **Configure the hook in Supabase:**
+   - Go to [Supabase Dashboard](https://supabase.com/dashboard) → your project
+   - **Authentication** → **Hooks** → **Send Email Hook**
+   - Enable the hook
+   - **HTTP Endpoint:** `https://yourdomain.com/api/auth/supabase-email-hook`
+   - **HTTP Headers:** (optional) Add `Content-Type: application/json` if needed
+   - Supabase will generate a **Signing Secret** — copy it (format: `v1,whsec_...`) and set as `SEND_EMAIL_HOOK_SECRET`
+
+4. **Restart your app** after adding the secret.
+
+**Local development:** Use a tunnel (e.g. [ngrok](https://ngrok.com)) so Supabase can reach `http://localhost:3000/api/auth/supabase-email-hook`, or test signup in a deployed preview.
+
+Ensure **"Confirm email"** remains **enabled** in Supabase (Authentication → Providers → Email) so unverified users cannot log in.
 
 ## 🚀 Getting Started
 
@@ -36,6 +72,9 @@ Create a `.env.local` file in your project root with the following variables:
 ```bash
 # Email Configuration (MailerSend)
 MAILERSEND_API_KEY=your_mailersend_api_key_here
+
+# Supabase Send Email Hook (from Auth Hooks when configuring the hook)
+SEND_EMAIL_HOOK_SECRET=v1,whsec_your_signing_secret_here
 
 # Email Settings
 EMAIL_FROM=Kifolio <noreply@kifolio.com>
