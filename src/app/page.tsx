@@ -273,10 +273,10 @@ export default function MarketingPage() {
                   <span className="text-2xl font-bold text-discovery-primary">4</span>
                 </div>
                 <h3 className="text-4xl lg:text-3xl font-medium text-discovery-yellow mb-2 leading-tight">
-                  Get endorsements
+                  Request for endorsements
                 </h3>
                 <p className="text-discovery-white-100 leading-relaxed">
-                  Invite instructors, coaches, or mentors to add a comment to a specific achievement—adding trusted recognition and context to your child's milestones.
+                  Invite instructors, teacherscoaches, or mentors to add a comment to a specific achievement—adding trusted recognition and context to your child's milestones.
                 </p>
               </div>
 
