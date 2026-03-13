@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface SignUpFormData {
   email: string;
@@ -19,7 +20,7 @@ interface PasswordRequirements {
   length: boolean;
 }
 
-export default function SignUpPage() {
+function SignUpContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { signUp } = useAuth();
@@ -316,5 +317,19 @@ export default function SignUpPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-discovery-beige-200 flex items-center justify-center">
+          <LoadingSpinner size="lg" label="Loading..." />
+        </div>
+      }
+    >
+      <SignUpContent />
+    </Suspense>
   );
 }
