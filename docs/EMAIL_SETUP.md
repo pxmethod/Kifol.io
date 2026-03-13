@@ -243,6 +243,19 @@ if (!result.success) {
 
 ## 🚨 Troubleshooting
 
+### "Email rate limit exceeded" on signup
+
+Supabase rate-limits auth endpoints that send emails. Defaults:
+
+- **~30 signups per hour** (combined with password reset, etc.)
+- **60 seconds** between signup attempts per user
+
+**Fix:** Supabase Dashboard → **Authentication** → **Rate Limits** → adjust:
+- "Signup confirmation request" — increase the cooldown if needed
+- Email rate limits — configure or use [custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp) for higher limits
+
+Using the Send Email Hook does not bypass these limits; they apply to the signup flow itself.
+
 ### Verification email not received after signup
 
 If users create an account but never receive the verification email:
