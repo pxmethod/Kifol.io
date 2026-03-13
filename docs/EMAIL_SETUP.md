@@ -243,6 +243,21 @@ if (!result.success) {
 
 ## 🚨 Troubleshooting
 
+### Verification email not received after signup
+
+If users create an account but never receive the verification email:
+
+1. **Check Vercel (or hosting) env vars** — `MAILERSEND_API_KEY` must be set for production. `.env.local` is for local dev only; add the key in Vercel → Project → Settings → Environment Variables.
+
+2. **Check Vercel function logs** — After a signup, look for:
+   - `[signup] hasMailerSendKey: false` → API key missing
+   - `[signup] Failed to send verification email: ...` → MailerSend error (check message)
+   - `[signup] Verification email sent successfully` → Email was sent (check spam/junk)
+
+3. **MailerSend domain** — Ensure your sending domain (e.g. `noreply@kifol.io`) is verified in MailerSend with correct DKIM/SPF.
+
+4. **Spam folder** — Ask users to check spam/junk and add your domain to contacts.
+
 ### Common Issues
 
 1. **"API key not found"**

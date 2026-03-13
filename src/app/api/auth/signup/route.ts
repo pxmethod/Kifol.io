@@ -37,11 +37,23 @@ export async function POST(request: NextRequest) {
 
     // Send our branded MailerSend verification email (sole verification source)
     if (data.user) {
+      const verificationUrl = `${getAppUrl()}/auth/verify?email=${encodeURIComponent(email)}&token=verify`
+
+      // Diagnostic: log config status (no secrets)
+      const hasMailerSendKey = !!process.env.MAILERSEND_API_KEY
+      const hasWelcomeTemplate = !!process.env.MAILERSEND_TEMPLATE_WELCOME
+      console.log('[signup] Email config:', {
+        hasMailerSendKey,
+        hasWelcomeTemplate,
+        appUrl: getAppUrl(),
+        to: email,
+      })
+
+      if (!hasMailerSendKey) {
+        console.error('[signup] MAILERSEND_API_KEY is not set. Verification email will not be sent. Add it to Vercel env vars.')
+      }
+
       try {
-        const verificationUrl = `${getAppUrl()}/auth/verify?email=${encodeURIComponent(email)}&token=verify`
-        
-        console.log('Sending verification email to:', email)
-        
         const emailResult = await sendEmailVerification({
           to: email,
           subject: 'Verify your email - Kifolio',
@@ -50,12 +62,12 @@ export async function POST(request: NextRequest) {
         })
 
         if (!emailResult.success) {
-          console.error('Failed to send verification email:', emailResult.error)
+          console.error('[signup] Failed to send verification email:', emailResult.error)
         } else {
-          console.log('Verification email sent successfully to:', email)
+          console.log('[signup] Verification email sent successfully to:', email, 'messageId:', emailResult.messageId)
         }
       } catch (emailError) {
-        console.error('Failed to send custom verification email:', emailError)
+        console.error('[signup] Exception sending verification email:', emailError)
       }
     }
 
