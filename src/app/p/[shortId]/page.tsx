@@ -79,7 +79,22 @@ export default function ShortPortfolioPage() {
   const loadPortfolioData = async (portfolioId: string, dbPortfolio: any) => {
     try {
       // Get achievements for this portfolio
-              const highlights = await achievementService.getPortfolioHighlights(portfolioId);
+      const highlights = await achievementService.getPortfolioHighlights(portfolioId);
+
+      // Fetch endorsements for all highlights
+      let endorsementsByAchievement: Record<string, Array<{ id: string; instructorName: string; instructorTitle: string | null; organization: string | null; comment: string; submittedAt: string | null }>> = {};
+      try {
+        const base = typeof window !== 'undefined'
+          ? (process.env.NEXT_PUBLIC_APP_URL || window.location.origin)
+          : '';
+        const res = await fetch(`${base}/api/endorsements/portfolio/${portfolioId}`);
+        if (res.ok) {
+          const { endorsements } = await res.json();
+          endorsementsByAchievement = endorsements || {};
+        }
+      } catch {
+        // Non-fatal: portfolio loads without endorsements
+      }
       
       // Transform to legacy format
       const portfolioData: PortfolioData = {
@@ -106,7 +121,8 @@ export default function ShortPortfolioPage() {
           type: highlight.type,
           isMilestone: highlight.type === 'milestone',
           createdAt: highlight.created_at,
-          updatedAt: highlight.updated_at
+          updatedAt: highlight.updated_at,
+          endorsements: endorsementsByAchievement[highlight.id] || []
         }))
       };
       

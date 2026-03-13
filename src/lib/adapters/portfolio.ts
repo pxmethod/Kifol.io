@@ -17,6 +17,7 @@ export interface LegacyPortfolioData {
   password?: string;
   hasUnsavedChanges?: boolean;
   achievements?: Achievement[];
+  endorsementCount?: number;
 }
 
 // Transform database portfolio to legacy format for existing components

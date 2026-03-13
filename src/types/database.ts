@@ -134,6 +134,49 @@ export interface Database {
           updated_at?: string
         }
       }
+      endorsement_requests: {
+        Row: {
+          id: string
+          achievement_id: string
+          instructor_name: string
+          instructor_email: string
+          relationship: string
+          token: string
+          status: 'pending' | 'submitted' | 'expired'
+          comment: string | null
+          instructor_title: string | null
+          organization: string | null
+          created_at: string
+          submitted_at: string | null
+        }
+        Insert: {
+          id?: string
+          achievement_id: string
+          instructor_name: string
+          instructor_email: string
+          relationship: string
+          token: string
+          status?: 'pending' | 'submitted' | 'expired'
+          comment?: string | null
+          instructor_title?: string | null
+          organization?: string | null
+          created_at?: string
+          submitted_at?: string | null
+        }
+        Update: {
+          id?: string
+          achievement_id?: string
+          instructor_name?: string
+          instructor_email?: string
+          relationship?: string
+          token?: string
+          status?: 'pending' | 'submitted' | 'expired'
+          comment?: string | null
+          instructor_title?: string | null
+          organization?: string | null
+          submitted_at?: string | null
+        }
+      }
       invitations: {
         Row: {
           id: string

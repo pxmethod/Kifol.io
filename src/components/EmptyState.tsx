@@ -38,7 +38,7 @@ export default function EmptyState() {
       {user ? (
         <button 
           onClick={() => router.push('/create')}
-          className="bg-kifolio-cta text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-kifolio-cta/90 transition-colors shadow-md"
+          className="bg-kifolio-cta text-white px-8 py-3 rounded-pill font-semibold text-lg hover:bg-kifolio-cta/90 transition-colors shadow-md"
         >
           Create new portfolio
         </button>
@@ -46,7 +46,7 @@ export default function EmptyState() {
         <div className="flex space-x-4">
           <button 
             onClick={() => router.push('/auth/signup')}
-            className="bg-kifolio-cta text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-kifolio-cta/90 transition-colors shadow-md"
+            className="bg-kifolio-cta text-white px-8 py-3 rounded-pill font-semibold text-lg hover:bg-kifolio-cta/90 transition-colors shadow-md"
           >
             Get Started
           </button>

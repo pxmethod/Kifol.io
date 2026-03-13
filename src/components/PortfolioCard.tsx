@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { CircleStar } from 'lucide-react';
 import { Achievement } from '@/types/achievement';
 
 interface PortfolioData {
@@ -16,6 +17,7 @@ interface PortfolioData {
   password?: string;
   hasUnsavedChanges?: boolean;
   achievements?: Achievement[];
+  endorsementCount?: number;
 }
 
 interface PortfolioCardProps {
@@ -30,6 +32,7 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove }: Portfolio
   const menuRef = useRef<HTMLDivElement>(null);
 
   const highlightCount = portfolio.achievements?.length || 0;
+  const endorsementCount = portfolio.endorsementCount ?? 0;
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -184,11 +187,17 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove }: Portfolio
 
 
         {/* Highlights Count */}
-        <div className="flex items-center text-sm font-medium text-discovery-grey">
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-          </svg>
-          {highlightCount} Highlight{highlightCount !== 1 ? 's' : ''}
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center text-sm font-medium text-discovery-grey">
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+            </svg>
+            {highlightCount} Highlight{highlightCount !== 1 ? 's' : ''}
+          </div>
+          <div className="flex items-center text-sm font-medium text-discovery-grey">
+            <CircleStar className="w-4 h-4 mr-2 flex-shrink-0" />
+            {endorsementCount} Endorsement{endorsementCount !== 1 ? 's' : ''}
+          </div>
         </div>
       </div>
     </div>

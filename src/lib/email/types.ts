@@ -45,6 +45,24 @@ export interface EmailVerificationData extends BaseEmailData {
   verificationUrl: string;
 }
 
+// Endorsement request email data
+export interface EndorsementRequestEmailData extends BaseEmailData {
+  instructorName: string;
+  achievementTitle: string;
+  endorseUrl: string;
+}
+
+// Endorsement completed (parent notification) email data
+export interface EndorsementCompletedEmailData extends BaseEmailData {
+  parentName: string;
+  childName: string;
+  achievementTitle: string;
+  instructorName: string;
+  instructorCredentials: string;
+  comment: string;
+  portfolioUrl: string;
+}
+
 // Email send result
 export interface EmailResult {
   success: boolean;

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Toast from '@/components/Toast';
@@ -27,9 +28,9 @@ interface InvitationData {
 const navigationItems = [
   { id: 'general', label: 'General', path: '/profile' },
   { id: 'password', label: 'Password', path: '/profile/password' },
-  { id: 'email-notifications', label: 'Email Notifications', path: '/profile/email-notifications' },
+  { id: 'email-notifications', label: 'Email notifications', path: '/profile/email-notifications' },
   { id: 'invitations', label: 'Invitations', path: '/profile/invitations' },
-  { id: 'delete-account', label: 'Delete Account', path: '/profile/delete-account' }
+  { id: 'delete-account', label: 'Delete account', path: '/profile/delete-account' }
 ];
 
 export default function ProfilePage() {
@@ -103,7 +104,7 @@ export default function ProfilePage() {
   // Show loading while checking authentication
   if (loading) {
     return (
-      <div className="min-h-screen bg-kifolio-bg flex items-center justify-center">
+      <div className="min-h-screen bg-discovery-beige-200 flex items-center justify-center">
         <LoadingSpinner 
           size="lg" 
           label="Loading..." 
@@ -259,21 +260,21 @@ export default function ProfilePage() {
         return (
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-bold text-kifolio-text mb-2">My Profile</h2>
-              <p className="text-gray-600">Update your email and manage your account</p>
+              <h2 className="text-2xl font-medium text-discovery-black mb-2">My profile</h2>
+              <p className="text-discovery-grey">Update your email and manage your account</p>
             </div>
 
             {/* Account Email Section */}
             <div className="form-field">
-              <label htmlFor="email" className="form-field__label">
-                Account Email
+              <label htmlFor="email" className="block text-sm font-medium text-discovery-black mb-1">
+                Account email
               </label>
               <input
                 type="email"
                 id="email"
                 value={formData.email}
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                className="input"
+                className="w-full px-4 py-3 border border-discovery-grey-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent text-discovery-black"
                 placeholder="Enter your email address"
               />
             </div>
@@ -283,7 +284,7 @@ export default function ProfilePage() {
               <div className="form-actions">
                 <button
                   onClick={handleSaveChanges}
-                  className="btn btn--primary"
+                  className="bg-discovery-orange text-white px-6 py-3 rounded-pill font-semibold hover:bg-discovery-orange-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={!hasChanges}
                 >
                   Save changes
@@ -296,14 +297,14 @@ export default function ProfilePage() {
         return (
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-bold text-kifolio-text mb-2">Password</h2>
-              <p className="text-gray-600">Manage your password</p>
+              <h2 className="text-2xl font-medium text-discovery-black mb-2">Password</h2>
+              <p className="text-discovery-grey">Manage your password</p>
             </div>
 
             {/* Password Section */}
             <div className="form-field">
-              <label htmlFor="password" className="form-field__label">
-                New Password
+              <label htmlFor="password" className="block text-sm font-medium text-discovery-black mb-1">
+                New password
               </label>
               <input
                 type="password"
@@ -313,23 +314,23 @@ export default function ProfilePage() {
                   setFormData(prev => ({ ...prev, password: e.target.value }));
                   if (passwordError) setPasswordError('');
                 }}
-                className={`input ${passwordError ? 'input--error' : ''}`}
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent text-discovery-black ${passwordError ? 'border-red-500 ring-2 ring-red-200' : 'border-discovery-grey-300'}`}
                 placeholder="Enter new password"
               />
               {passwordError && (
-                <p className="form-field__error">{passwordError}</p>
+                <p className="text-sm text-red-600 mt-1">{passwordError}</p>
               )}
-              <p className="form-field__help">Minimum 6 characters required</p>
+              <p className="text-sm text-discovery-grey mt-1">Minimum 6 characters required</p>
             </div>
 
             {/* Change Password Button */}
               <div className="form-actions">
                 <button
                   onClick={handlePasswordChange}
-                  className="btn btn--primary"
+                  className="bg-discovery-orange text-white px-6 py-3 rounded-pill font-semibold hover:bg-discovery-orange-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={!formData.password}
                 >
-                  Change Password
+                  Change password
                 </button>
               </div>
           </div>
@@ -339,15 +340,15 @@ export default function ProfilePage() {
         return (
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-bold text-kifolio-text mb-2">Email Notifications</h2>
-              <p className="text-gray-600">Manage your email notification preferences</p>
+              <h2 className="text-2xl font-medium text-discovery-black mb-2">Email notifications</h2>
+              <p className="text-discovery-grey">Manage your email notification preferences</p>
             </div>
 
             {/* Email Notifications Form */}
             <form onSubmit={handleSaveNotificationPreferences} className="space-y-8">
               {/* Alerts & Notifications Section */}
               <div>
-                <h3 className="text-lg font-semibold text-kifolio-text mb-4">Send me:</h3>
+                <h3 className="text-lg font-medium text-discovery-black mb-4">Send me:</h3>
                 <div className="space-y-4">
                   <label className="checkbox">
                     <input
@@ -381,10 +382,10 @@ export default function ProfilePage() {
               <div className="form-actions">
                 <button
                   type="submit"
-                  className="btn btn--primary"
+                  className="bg-discovery-orange text-white px-6 py-3 rounded-pill font-semibold hover:bg-discovery-orange-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={!hasNotificationChanges()}
                 >
-                  Save Preferences
+                  Save preferences
                 </button>
               </div>
             </form>
@@ -395,22 +396,22 @@ export default function ProfilePage() {
         return (
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-bold text-kifolio-text mb-2">Invitations</h2>
-              <p className="text-gray-600">Know someone else who&apos;d like to use Kifolio? Send them an invite.</p>
+              <h2 className="text-2xl font-medium text-discovery-black mb-2">Invitations</h2>
+              <p className="text-discovery-grey">Know someone else who&apos;d like to use Kifolio? Send them an invite.</p>
             </div>
 
             {/* Invitation Form */}
             <form onSubmit={handleSendInvite} className="space-y-6">
               <div className="form-field">
-                <label htmlFor="invite-email" className="form-field__label">
-                  Email Address
+                <label htmlFor="invite-email" className="block text-sm font-medium text-discovery-black mb-1">
+                  Email address
                 </label>
                 <input
                   type="email"
                   id="invite-email"
                   value={invitationData.email}
                   onChange={(e) => setInvitationData(prev => ({ ...prev, email: e.target.value }))}
-                  className="input"
+                  className="w-full px-4 py-3 border border-discovery-grey-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent text-discovery-black"
                   placeholder="Enter email address to invite"
                   required
                 />
@@ -420,10 +421,10 @@ export default function ProfilePage() {
               <div className="form-actions">
                 <button
                   type="submit"
-                  className="btn btn--primary"
+                  className="bg-discovery-orange text-white px-6 py-3 rounded-pill font-semibold hover:bg-discovery-orange-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={!invitationData.email.trim() || isSendingInvite}
                 >
-                  {isSendingInvite ? 'Sending...' : 'Send Invite'}
+                  {isSendingInvite ? 'Sending...' : 'Send invite'}
                 </button>
               </div>
             </form>
@@ -435,24 +436,18 @@ export default function ProfilePage() {
         return (
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-bold text-kifolio-text mb-2">Delete Account</h2>
-              <p className="text-gray-600">This action cannot be undone</p>
+              <h2 className="text-2xl font-medium text-discovery-black mb-2">Delete account</h2>
+              <p className="text-discovery-grey">We're sorry to see you go, but we understand. Please note that this action cannot be undone and by deleting your account, you will lose all your portfolios, achievements, and data.</p>
             </div>
 
             {/* Subtext with Links */}
             <div className="space-y-4">
-              <p className="text-gray-600">
+              <p className="text-discovery-grey">
                 Before you go, consider{' '}
-                <a href="#" className="text-primary hover:underline">submitting feedback</a>
+                <Link href="/give-feedback" className="text-discovery-primary hover:underline">submitting feedback</Link>
                 {' '}or{' '}
-                <a href="#" className="text-primary hover:underline">contacting support</a>
+                <a href="mailto:john@kifol.io" className="text-discovery-primary hover:underline">contacting support</a>
                 {' '}if you&apos;re experiencing issues.
-              </p>
-              <p className="text-gray-600">
-                Need help?{' '}
-                <a href="#" className="text-primary hover:underline">Visit our help center</a>
-                {' '}or{' '}
-                <a href="#" className="text-primary hover:underline">contact our team</a>.
               </p>
             </div>
 
@@ -460,7 +455,7 @@ export default function ProfilePage() {
             <div className="form-actions">
               <button
                 onClick={() => setShowDeleteConfirmation(true)}
-                className="btn btn--danger"
+                className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={isDeleting}
               >
                 {isDeleting ? 'Deleting...' : 'Delete my account'}
@@ -471,7 +466,7 @@ export default function ProfilePage() {
 
       default:
         return (
-          <div className="text-center text-gray-500">
+          <div className="text-center text-discovery-grey">
             Section not found
           </div>
         );
@@ -479,7 +474,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-kifolio-bg">
+    <div className="min-h-screen bg-discovery-beige-200">
       <Header />
       
       {/* Mobile Navigation Dropdown */}
@@ -564,25 +559,25 @@ export default function ProfilePage() {
         {/* Main Content Area */}
         <div className="flex-1 main-content-with-sidebar">
           {/* Action Bar */}
-          <div className="action-bar">
-            <div className="action-bar__container">
-              <div className="action-bar__left">
-                <button
-                  onClick={() => router.push('/dashboard')}
-                  className="btn--back"
-                >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                  Back to my dashboard
-                </button>
-              </div>
+          <div className="bg-discovery-white-100 border-b border-discovery-beige-100 px-4 lg:px-9 py-4">
+            <div className="flex items-center">
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="flex items-center text-discovery-grey hover:text-discovery-black transition-colors font-medium"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to my dashboard
+              </button>
             </div>
           </div>
 
           <div className="p-4 lg:p-8">
             <div className="max-w-4xl mx-auto lg:mx-0">
-              {renderContent()}
+              <div className="bg-discovery-white-100 rounded-lg shadow-md p-6 lg:p-8">
+                {renderContent()}
+              </div>
             </div>
           </div>
         </div>
@@ -600,13 +595,13 @@ export default function ProfilePage() {
       {/* Delete Account Confirmation Modal */}
       {showDeleteConfirmation && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
+          <div className="bg-discovery-white-100 rounded-lg max-w-md w-full p-6">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-red-600">Delete Account</h2>
+              <h2 className="text-xl font-semibold text-red-600">Delete account</h2>
               <button
                 onClick={() => setShowDeleteConfirmation(false)}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-discovery-grey hover:text-discovery-black transition-colors"
                 disabled={isDeleting}
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -622,10 +617,10 @@ export default function ProfilePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-center text-kifolio-text mb-2">
+              <h3 className="text-lg font-medium text-center text-discovery-black mb-2">
                 Are you absolutely sure?
               </h3>
-              <p className="text-gray-600 text-center mb-4">
+              <p className="text-discovery-grey text-center mb-4">
                 This action cannot be undone. This will permanently delete your account and remove all your portfolios, achievements, and data from our servers.
               </p>
               <div className="bg-red-50 border border-red-200 rounded-lg p-3">
@@ -646,7 +641,7 @@ export default function ProfilePage() {
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirmation(false)}
-                className="flex-1 bg-gray-100 text-kifolio-text py-2 px-4 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+                className="flex-1 bg-discovery-beige-100 text-discovery-black py-2 px-4 rounded-lg font-semibold hover:bg-discovery-beige-200 transition-colors"
                 disabled={isDeleting}
               >
                 Cancel

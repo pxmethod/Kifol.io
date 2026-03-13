@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { TemplateConfig, PortfolioTemplateProps } from '@/types/template';
 import { Achievement } from '@/types/achievement';
 import HighlightDetailModal from '@/components/HighlightDetailModal';
+import EndorsementBlock from '@/components/EndorsementBlock';
 import { formatTextWithLinks } from '@/utils/text-formatting';
 
 interface BaseTemplateProps extends PortfolioTemplateProps {
@@ -352,6 +353,20 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
                               </span>
                             </div>
                           )}
+                        </div>
+                      )}
+
+                      {/* Endorsements */}
+                      {highlight.endorsements && highlight.endorsements.length > 0 && (
+                        <div className="mb-4">
+                          <EndorsementBlock
+                            endorsements={highlight.endorsements}
+                            textColor={config.colors.text}
+                            secondaryColor={config.colors.textSecondary}
+                            fontFamily={config.fontFamily}
+                            compact
+                            publicVariant
+                          />
                         </div>
                       )}
 

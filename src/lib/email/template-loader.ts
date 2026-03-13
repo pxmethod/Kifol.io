@@ -127,6 +127,22 @@ export interface TrialEndedVariables extends Record<string, string> {
   TERMS_URL: string;
 }
 
+export interface EndorsementRequestVariables extends Record<string, string> {
+  INSTRUCTOR_NAME: string;
+  ACHIEVEMENT_TITLE: string;
+  ENDORSE_URL: string;
+}
+
+export interface EndorsementCompletedVariables extends Record<string, string> {
+  PARENT_NAME: string;
+  CHILD_NAME: string;
+  ACHIEVEMENT_TITLE: string;
+  INSTRUCTOR_NAME: string;
+  INSTRUCTOR_CREDENTIALS: string;
+  COMMENT: string;
+  PORTFOLIO_URL: string;
+}
+
 /**
  * Pre-configured template loaders with type safety
  */
@@ -152,4 +168,10 @@ export const EmailTemplates = {
     
   trialEnded: (variables: TrialEndedVariables) => 
     loadEmailTemplate('trial-ended', variables),
+    
+  endorsementRequest: (variables: EndorsementRequestVariables) => 
+    loadEmailTemplate('endorsement-request', variables),
+
+  endorsementCompleted: (variables: EndorsementCompletedVariables) =>
+    loadEmailTemplate('endorsement-completed', variables),
 };

@@ -36,7 +36,7 @@
 
   /* Button Components using Tailwind */
   .btn-primary {
-    @apply bg-kifolio-cta text-white px-4 py-3 rounded-lg font-semibold hover:bg-kifolio-cta/90 transition-colors shadow-md flex items-center gap-2;
+    @apply bg-kifolio-cta text-white px-4 py-3 rounded-pill font-semibold hover:bg-kifolio-cta/90 transition-colors shadow-md flex items-center gap-2;
   }
   
   .btn-secondary {

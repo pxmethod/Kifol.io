@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Achievement } from '@/types/achievement';
 import { TemplateConfig } from '@/types/template';
+import EndorsementBlock from '@/components/EndorsementBlock';
 import { formatTextWithLinks } from '@/utils/text-formatting';
 
 interface HighlightDetailModalProps {
@@ -138,6 +139,16 @@ export default function HighlightDetailModal({
               <p className="text-gray-700 leading-relaxed" style={{ fontFamily }}>
                 {formatTextWithLinks(achievement.description, '#374151')}
               </p>
+            </div>
+          )}
+
+          {/* Endorsements */}
+          {achievement.endorsements && achievement.endorsements.length > 0 && (
+            <div>
+              <EndorsementBlock
+                endorsements={achievement.endorsements}
+                compact={false}
+              />
             </div>
           )}
 
@@ -281,7 +292,7 @@ export default function HighlightDetailModal({
             {showEditButton && (
               <button
                 onClick={() => onEdit(achievement)}
-                className="bg-kifolio-cta text-white px-6 py-2 rounded-lg font-semibold hover:bg-kifolio-cta/90 transition-colors flex items-center space-x-2"
+                className="bg-kifolio-cta text-white px-6 py-2 rounded-pill font-semibold hover:bg-kifolio-cta/90 transition-colors flex items-center space-x-2"
                 style={{ fontFamily }}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

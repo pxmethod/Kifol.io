@@ -15,6 +15,7 @@ import { DOMAIN_CONFIG } from '@/config/domains';
 import { Achievement } from '@/types/achievement';
 import Image from 'next/image';
 import HighlightsTimeline from '@/components/HighlightsTimeline';
+import EndorsementRequestModal from '@/components/EndorsementRequestModal';
 
 interface PortfolioData {
   id: string;
@@ -41,31 +42,7 @@ export default function PortfolioPage() {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [showPrivateTooltip, setShowPrivateTooltip] = useState(false);
-
-  // Check if portfolio was just created or highlight was added
-  useEffect(() => {
-    const wasCreated = searchParams.get('created') === 'true';
-    const highlightAdded = searchParams.get('highlightAdded') === 'true';
-    const highlightUpdated = searchParams.get('highlightUpdated') === 'true';
-    
-    if (wasCreated) {
-      setToastMessage('Portfolio created successfully!');
-      setShowToast(true);
-      // Remove the query parameter from URL
-      router.replace(`/portfolio/${params.id}`);
-    } else if (highlightAdded) {
-      setToastMessage('Highlight added successfully!');
-      setShowToast(true);
-      // Remove the query parameter from URL
-      router.replace(`/portfolio/${params.id}`);
-    } else if (highlightUpdated) {
-      setToastMessage('Highlight updated successfully!');
-      setShowToast(true);
-      // Remove the query parameter from URL
-      router.replace(`/portfolio/${params.id}`);
-    }
-  }, [searchParams, params.id, router]);
-
+  const [endorsementModalAchievement, setEndorsementModalAchievement] = useState<Achievement | null>(null);
 
   const loadPortfolio = useCallback(async () => {
     try {
@@ -79,6 +56,21 @@ export default function PortfolioPage() {
       if (dbPortfolio) {
         // Get highlights for this portfolio
         const highlights = await achievementService.getPortfolioHighlights(portfolioId);
+
+        // Fetch endorsements for all highlights
+        let endorsementsByAchievement: Record<string, Array<{ id: string; instructorName: string; instructorTitle: string | null; organization: string | null; comment: string; submittedAt: string | null }>> = {};
+        try {
+          const base = typeof window !== 'undefined'
+            ? (process.env.NEXT_PUBLIC_APP_URL || window.location.origin)
+            : '';
+          const res = await fetch(`${base}/api/endorsements/portfolio/${portfolioId}`);
+          if (res.ok) {
+            const { endorsements } = await res.json();
+            endorsementsByAchievement = endorsements || {};
+          }
+        } catch {
+          // Non-fatal: portfolio loads without endorsements
+        }
         
         // Transform to legacy format
         const portfolioData: PortfolioData = {
@@ -106,7 +98,8 @@ export default function PortfolioPage() {
             type: highlight.type,
             isMilestone: highlight.type === 'milestone',
             createdAt: highlight.created_at,
-            updatedAt: highlight.updated_at
+            updatedAt: highlight.updated_at,
+            endorsements: endorsementsByAchievement[highlight.id] || []
           }))
         };
         
@@ -121,6 +114,30 @@ export default function PortfolioPage() {
       setLoading(false);
     }
   }, [params.id]);
+
+  // Check if portfolio was just created or highlight was added
+  useEffect(() => {
+    const wasCreated = searchParams.get('created') === 'true';
+    const highlightAdded = searchParams.get('highlightAdded') === 'true';
+    const highlightUpdated = searchParams.get('highlightUpdated') === 'true';
+    
+    if (wasCreated) {
+      setToastMessage('Portfolio created successfully!');
+      setShowToast(true);
+      loadPortfolio();
+      router.replace(`/portfolio/${params.id}`);
+    } else if (highlightAdded) {
+      setToastMessage('Highlight added successfully!');
+      setShowToast(true);
+      loadPortfolio();
+      router.replace(`/portfolio/${params.id}`);
+    } else if (highlightUpdated) {
+      setToastMessage('Highlight updated successfully!');
+      setShowToast(true);
+      loadPortfolio();
+      router.replace(`/portfolio/${params.id}`);
+    }
+  }, [searchParams, params.id, router, loadPortfolio]);
 
   // Load portfolio data
   useEffect(() => {
@@ -175,6 +192,10 @@ export default function PortfolioPage() {
 
   const handleEditHighlight = (achievement: Achievement) => {
     router.push(`/portfolio/${portfolio?.id}/highlight/${achievement.id}`);
+  };
+
+  const handleRequestEndorsement = (achievement: Achievement) => {
+    setEndorsementModalAchievement(achievement);
   };
 
   const handleAddHighlight = () => {
@@ -439,6 +460,7 @@ export default function PortfolioPage() {
               <HighlightsTimeline
                 highlights={portfolio.achievements || []}
                 onEdit={handleEditHighlight}
+                onRequestEndorsement={handleRequestEndorsement}
               />
             </div>
           </div>
@@ -609,12 +631,22 @@ export default function PortfolioPage() {
                 <HighlightsTimeline
                   highlights={portfolio.achievements || []}
                   onEdit={handleEditHighlight}
+                  onRequestEndorsement={handleRequestEndorsement}
                 />
               </div>
             </div>
           </div>
         </div>
       </main>
+
+      {/* Endorsement Request Modal */}
+      {endorsementModalAchievement && (
+        <EndorsementRequestModal
+          isOpen={!!endorsementModalAchievement}
+          onClose={() => setEndorsementModalAchievement(null)}
+          achievement={endorsementModalAchievement}
+        />
+      )}
 
       {/* Copy Notification */}
       {showCopyNotification && (

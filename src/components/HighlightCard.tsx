@@ -2,19 +2,23 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { CircleStar } from 'lucide-react';
 import { Achievement } from '@/types/achievement';
+import EndorsementBlock from './EndorsementBlock';
 import { formatTextWithLinks } from '@/utils/text-formatting';
 
 interface HighlightCardProps {
   achievement: Achievement;
   onView?: (achievement: Achievement) => void;
   onEdit?: (achievement: Achievement) => void;
+  onRequestEndorsement?: (achievement: Achievement) => void;
 }
 
 export default function HighlightCard({
   achievement,
   onView,
-  onEdit
+  onEdit,
+  onRequestEndorsement
 }: HighlightCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
@@ -271,23 +275,40 @@ export default function HighlightCard({
           </p>
         </div>
         
-        {/* Edit Button - Always visible on mobile, show on hover for desktop */}
-        {onEdit && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit(achievement);
-            }}
-            className={`p-2 text-discovery-beige-800 hover:text-discovery-beige-300 hover:bg-discovery-beige-100 rounded-full transition-all duration-200 opacity-100 md:opacity-0 ${
-              isHovered ? 'md:opacity-100' : ''
-            }`}
-            title="Edit highlight"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-          </button>
-        )}
+        {/* Action Buttons - Always visible on mobile, show on hover for desktop */}
+        <div className="flex items-center gap-1">
+          {onRequestEndorsement && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onRequestEndorsement(achievement);
+              }}
+              className={`flex items-center justify-center text-discovery-beige-800 hover:text-discovery-beige-300 hover:bg-discovery-beige-200 rounded-lg transition-all duration-200 opacity-100 md:opacity-0 ${
+                isHovered ? 'md:opacity-100' : ''
+              } md:px-3 md:py-1.5 p-2`}
+              title="Request endorsement"
+            >
+              <CircleStar className="w-5 h-5 md:hidden" />
+              <span className="hidden md:inline text-sm font-medium">Request endorsement</span>
+            </button>
+          )}
+          {onEdit && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(achievement);
+              }}
+              className={`p-2 text-discovery-beige-800 hover:text-discovery-beige-300 hover:bg-discovery-beige-100 rounded-full transition-all duration-200 opacity-100 md:opacity-0 ${
+                isHovered ? 'md:opacity-100' : ''
+              }`}
+              title="Edit highlight"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+          )}
+        </div>
 
       </div>
 
@@ -303,6 +324,11 @@ export default function HighlightCard({
 
       {/* Media Icons */}
       {renderMediaIcons()}
+
+      {/* Endorsements */}
+      {achievement.endorsements && achievement.endorsements.length > 0 && (
+        <EndorsementBlock endorsements={achievement.endorsements} compact />
+      )}
 
       {/* Click to view overlay */}
       {onView && (

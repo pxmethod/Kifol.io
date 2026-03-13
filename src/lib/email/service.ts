@@ -5,7 +5,9 @@ import {
   PasswordResetEmailData,
   EngagementEmailData,
   InvitationEmailData,
-  EmailVerificationData
+  EmailVerificationData,
+  EndorsementRequestEmailData,
+  EndorsementCompletedEmailData
 } from './types';
 
 // Import email template loader
@@ -311,5 +313,62 @@ export async function sendEmailVerification(data: EmailVerificationData): Promis
   }
 }
 
+/**
+ * Send instructor endorsement request email.
+ */
+export async function sendEndorsementRequestEmail(data: EndorsementRequestEmailData): Promise<EmailResult> {
+  try {
+    const html = await EmailTemplates.endorsementRequest({
+      INSTRUCTOR_NAME: data.instructorName,
+      ACHIEVEMENT_TITLE: data.achievementTitle,
+      ENDORSE_URL: data.endorseUrl,
+    });
+
+    return await sendEmail(
+      data.to,
+      data.subject || 'Leave a comment about a student achievement - Kifolio',
+      html,
+      EMAIL_CATEGORIES.TRANSACTIONAL,
+      ['endorsement', 'instructor']
+    );
+  } catch (error) {
+    console.error('Error sending endorsement request email:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to send endorsement request email',
+    };
+  }
+}
+
+/**
+ * Send parent notification when an endorsement is completed.
+ */
+export async function sendEndorsementCompletedEmail(data: EndorsementCompletedEmailData): Promise<EmailResult> {
+  try {
+    const html = await EmailTemplates.endorsementCompleted({
+      PARENT_NAME: data.parentName,
+      CHILD_NAME: data.childName,
+      ACHIEVEMENT_TITLE: data.achievementTitle,
+      INSTRUCTOR_NAME: data.instructorName,
+      INSTRUCTOR_CREDENTIALS: data.instructorCredentials,
+      COMMENT: data.comment,
+      PORTFOLIO_URL: data.portfolioUrl,
+    });
+
+    return await sendEmail(
+      data.to,
+      data.subject || 'Someone left an endorsement on your child\'s highlight - Kifolio',
+      html,
+      EMAIL_CATEGORIES.TRANSACTIONAL,
+      ['endorsement', 'parent-notification']
+    );
+  } catch (error) {
+    console.error('Error sending endorsement completed email:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to send endorsement completed email',
+    };
+  }
+}
 
 

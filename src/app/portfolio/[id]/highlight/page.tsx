@@ -35,6 +35,11 @@ export default function HighlightForm() {
   const [existingMedia, setExistingMedia] = useState<Array<{id: string, url: string, fileName: string}>>([]);
   const [mediaPreview, setMediaPreview] = useState<{ url: string; file: File }[]>([]);
   const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
+  const [endorsementData, setEndorsementData] = useState({
+    instructorName: '',
+    instructorEmail: '',
+    relationship: '',
+  });
 
   const highlightService = new HighlightService();
 
@@ -563,13 +568,42 @@ export default function HighlightForm() {
         category: null // We can add category later if needed
       };
 
+      let savedHighlightId: string;
+
       if (isEditMode && highlightId) {
         await highlightService.updateHighlight(highlightId, highlightData);
-        // Redirect back to portfolio with update confirmation
+        savedHighlightId = highlightId;
+      } else {
+        const created = await highlightService.createHighlight(highlightData);
+        savedHighlightId = created.id;
+      }
+
+      // Send endorsement request if fields are filled (before redirect)
+      const hasEndorsement =
+        endorsementData.instructorName.trim() &&
+        endorsementData.instructorEmail.trim() &&
+        endorsementData.relationship.trim();
+      if (hasEndorsement) {
+        try {
+          await fetch('/api/endorsements/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+              achievementId: savedHighlightId,
+              instructorName: endorsementData.instructorName.trim(),
+              instructorEmail: endorsementData.instructorEmail.trim(),
+              relationship: endorsementData.relationship.trim(),
+            }),
+          });
+        } catch (err) {
+          console.error('Endorsement request failed:', err);
+        }
+      }
+
+      if (isEditMode) {
         router.push(`/portfolio/${portfolioId}?highlightUpdated=true`);
       } else {
-        await highlightService.createHighlight(highlightData);
-        // Redirect back to portfolio with add confirmation
         router.push(`/portfolio/${portfolioId}?highlightAdded=true`);
       }
     } catch (error) {
@@ -950,8 +984,59 @@ export default function HighlightForm() {
                   );
                 })}
               </div>
-            </div>
+              </div>
           )}
+
+              {/* Request instructor endorsement (optional) */}
+              <div className="border-t border-discovery-beige-100 pt-8">
+                <h3 className="text-md font-medium text-discovery-black mb-2">
+                  Request instructor endorsement (optional)
+                </h3>
+                <p className="text-discovery-grey text-sm mb-4">
+                  Invite an instructor or teacher to leave a comment about this achievement.
+                </p>
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="instructorName" className="block text-sm font-medium text-discovery-black mb-1">
+                      Instructor name
+                    </label>
+                    <input
+                      type="text"
+                      id="instructorName"
+                      value={endorsementData.instructorName}
+                      onChange={(e) => setEndorsementData((p) => ({ ...p, instructorName: e.target.value }))}
+                      placeholder="e.g. Coach Mike Reynolds"
+                      className="w-full px-4 py-3 border border-discovery-grey-300 rounded-lg focus:ring-2 focus:ring-discovery-primary focus:border-transparent text-discovery-black"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="instructorEmail" className="block text-sm font-medium text-discovery-black mb-1">
+                      Instructor email
+                    </label>
+                    <input
+                      type="email"
+                      id="instructorEmail"
+                      value={endorsementData.instructorEmail}
+                      onChange={(e) => setEndorsementData((p) => ({ ...p, instructorEmail: e.target.value }))}
+                      placeholder="e.g. coach@example.com"
+                      className="w-full px-4 py-3 border border-discovery-grey-300 rounded-lg focus:ring-2 focus:ring-discovery-primary focus:border-transparent text-discovery-black"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="relationship" className="block text-sm font-medium text-discovery-black mb-1">
+                      Relationship
+                    </label>
+                    <input
+                      type="text"
+                      id="relationship"
+                      value={endorsementData.relationship}
+                      onChange={(e) => setEndorsementData((p) => ({ ...p, relationship: e.target.value }))}
+                      placeholder="e.g. BJJ Instructor, Piano Teacher"
+                      className="w-full px-4 py-3 border border-discovery-grey-300 rounded-lg focus:ring-2 focus:ring-discovery-primary focus:border-transparent text-discovery-black"
+                    />
+                  </div>
+                </div>
+              </div>
 
               {/* Submit Button */}
               <div className="flex justify-end px-10 py-6 border-t border-discovery-beige-100">

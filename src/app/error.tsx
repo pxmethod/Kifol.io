@@ -28,7 +28,7 @@ export default function Error({
         <div className="space-y-3">
           <button
             onClick={reset}
-            className="w-full bg-kifolio-cta text-white py-3 px-6 rounded-lg font-semibold hover:bg-kifolio-cta/90"
+            className="w-full bg-kifolio-cta text-white py-3 px-6 rounded-pill font-semibold hover:bg-kifolio-cta/90"
           >
             Try again
           </button>

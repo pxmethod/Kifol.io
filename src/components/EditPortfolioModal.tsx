@@ -412,7 +412,7 @@ export default function EditPortfolioModal({
                         </button>
                         <button
                           type="button"
-                          className="w-full px-4 py-2 text-sm bg-kifolio-cta text-white rounded hover:bg-kifolio-cta/90 transition-colors"
+                          className="w-full px-4 py-2 text-sm bg-kifolio-cta text-white rounded-pill hover:bg-kifolio-cta/90 transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleInputChange('template', template.id);
@@ -504,7 +504,7 @@ export default function EditPortfolioModal({
               <button
                 type="submit"
                 disabled={isSubmitting || !hasChanges()}
-                className="w-full bg-kifolio-cta text-white py-3 px-6 rounded-lg font-semibold hover:bg-kifolio-cta/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-kifolio-cta text-white py-3 px-6 rounded-pill font-semibold hover:bg-kifolio-cta/90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'Saving changes...' : 'Save changes'}
               </button>

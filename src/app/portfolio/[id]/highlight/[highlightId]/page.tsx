@@ -35,6 +35,11 @@ export default function EditHighlight() {
   const [mediaPreview, setMediaPreview] = useState<{ url: string; file: File }[]>([]);
   const [loadingHighlight, setLoadingHighlight] = useState(true);
   const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
+  const [endorsementData, setEndorsementData] = useState({
+    instructorName: '',
+    instructorEmail: '',
+    relationship: '',
+  });
 
   const highlightService = new HighlightService();
 
@@ -383,6 +388,29 @@ export default function EditHighlight() {
       };
 
       await highlightService.updateHighlight(highlightId, highlightData);
+
+      // Send endorsement request if fields are filled
+      const hasEndorsement =
+        endorsementData.instructorName.trim() &&
+        endorsementData.instructorEmail.trim() &&
+        endorsementData.relationship.trim();
+      if (hasEndorsement) {
+        try {
+          await fetch('/api/endorsements/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+              achievementId: highlightId,
+              instructorName: endorsementData.instructorName.trim(),
+              instructorEmail: endorsementData.instructorEmail.trim(),
+              relationship: endorsementData.relationship.trim(),
+            }),
+          });
+        } catch (err) {
+          console.error('Endorsement request failed:', err);
+        }
+      }
 
       // Redirect back to portfolio
       router.push(`/portfolio/${portfolioId}?highlightUpdated=true`);
@@ -733,6 +761,51 @@ export default function EditHighlight() {
               </div>
             </div>
           )}
+
+              {/* Request instructor endorsement (optional) */}
+              <div className="form-field border-t border-gray-200 pt-6 mt-6">
+                <h3 className="form-field__label mb-2">
+                  Request instructor endorsement (optional)
+                </h3>
+                <p className="form-field__help mb-4">
+                  Invite an instructor or teacher to leave a comment about this achievement.
+                </p>
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="instructorName" className="form-field__label">Instructor name</label>
+                    <input
+                      type="text"
+                      id="instructorName"
+                      value={endorsementData.instructorName}
+                      onChange={(e) => setEndorsementData((p) => ({ ...p, instructorName: e.target.value }))}
+                      placeholder="e.g. Coach Mike Reynolds"
+                      className="input"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="instructorEmail" className="form-field__label">Instructor email</label>
+                    <input
+                      type="email"
+                      id="instructorEmail"
+                      value={endorsementData.instructorEmail}
+                      onChange={(e) => setEndorsementData((p) => ({ ...p, instructorEmail: e.target.value }))}
+                      placeholder="e.g. coach@example.com"
+                      className="input"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="relationship" className="form-field__label">Relationship</label>
+                    <input
+                      type="text"
+                      id="relationship"
+                      value={endorsementData.relationship}
+                      onChange={(e) => setEndorsementData((p) => ({ ...p, relationship: e.target.value }))}
+                      placeholder="e.g. BJJ Instructor, Piano Teacher"
+                      className="input"
+                    />
+                  </div>
+                </div>
+              </div>
 
               {/* Form Actions */}
               <div className="form-actions">

@@ -33,8 +33,28 @@ export function usePortfolios() {
       const legacyPortfolios = dbPortfoliosWithAchievements.map((dbPortfolio) => {
         return dbPortfolioToLegacy(dbPortfolio, dbPortfolio.achievements || [])
       })
+
+      // Fetch endorsement counts for each portfolio (in parallel)
+      const base = typeof window !== 'undefined'
+        ? (process.env.NEXT_PUBLIC_APP_URL || window.location.origin)
+        : ''
+      const portfoliosWithCounts = await Promise.all(
+        legacyPortfolios.map(async (portfolio) => {
+          let endorsementCount = 0
+          try {
+            const res = await fetch(`${base}/api/endorsements/portfolio/${portfolio.id}`)
+            if (res.ok) {
+              const { endorsements } = await res.json()
+              endorsementCount = Object.values(endorsements || {}).flat().length
+            }
+          } catch {
+            // Non-fatal
+          }
+          return { ...portfolio, endorsementCount }
+        })
+      )
       
-      setPortfolios(legacyPortfolios)
+      setPortfolios(portfoliosWithCounts)
     } catch (err) {
       console.error('Error loading portfolios:', err)
       setError('Failed to load portfolios')

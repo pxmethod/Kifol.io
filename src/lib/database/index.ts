@@ -12,4 +12,5 @@ export const invitationService = new InvitationService()
 
 // Export classes for type usage
 export { PortfolioService, HighlightService as AchievementService, UserService, InvitationService }
+export { EndorsementService } from './endorsements'
 

@@ -64,6 +64,8 @@ export const HIGHLIGHT_TYPES: HighlightTypeOption[] = [
 // Legacy types for backward compatibility during migration
 export interface Achievement extends Highlight {
   isMilestone: boolean;
+  /** Submitted endorsements for this achievement (when loaded) */
+  endorsements?: { id: string; instructorName: string; instructorTitle: string | null; organization: string | null; comment: string; submittedAt: string | null }[];
 }
 
 // Legacy interface for backward compatibility

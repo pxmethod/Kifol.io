@@ -7,6 +7,7 @@ interface HighlightsTimelineProps {
   highlights: Achievement[];
   onView?: (highlight: Achievement) => void;
   onEdit?: (highlight: Achievement) => void;
+  onRequestEndorsement?: (highlight: Achievement) => void;
 }
 
 interface GroupedHighlights {
@@ -16,7 +17,8 @@ interface GroupedHighlights {
 export default function HighlightsTimeline({
   highlights,
   onView,
-  onEdit
+  onEdit,
+  onRequestEndorsement
 }: HighlightsTimelineProps) {
   const groupHighlightsByDate = (highlights: Achievement[]): GroupedHighlights => {
     const grouped: GroupedHighlights = {};
@@ -108,6 +110,7 @@ export default function HighlightsTimeline({
                   achievement={highlight}
                   onView={onView}
                   onEdit={onEdit}
+                  onRequestEndorsement={onRequestEndorsement}
                 />
               </div>
             ))}
