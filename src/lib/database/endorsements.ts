@@ -150,6 +150,21 @@ export class EndorsementService {
   }
 
   /**
+   * Delete an endorsement by ID. Caller must verify portfolio ownership before calling.
+   */
+  async deleteById(id: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('endorsement_requests')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting endorsement:', error);
+      throw new Error('Failed to delete endorsement');
+    }
+  }
+
+  /**
    * Get submitted endorsements for multiple achievements, grouped by achievement_id.
    */
   async getSubmittedByAchievementIds(

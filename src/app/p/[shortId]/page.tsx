@@ -85,7 +85,7 @@ export default function ShortPortfolioPage() {
       let endorsementsByAchievement: Record<string, Array<{ id: string; instructorName: string; instructorTitle: string | null; organization: string | null; comment: string; submittedAt: string | null }>> = {};
       try {
         const base = typeof window !== 'undefined'
-          ? (process.env.NEXT_PUBLIC_APP_URL || window.location.origin)
+          ? window.location.origin
           : '';
         const res = await fetch(`${base}/api/endorsements/portfolio/${portfolioId}`);
         if (res.ok) {
@@ -111,7 +111,7 @@ export default function ShortPortfolioPage() {
           title: highlight.title,
           date: highlight.date_achieved,
           description: highlight.description || undefined,
-          media: highlight.media_urls.map((url: string, index: number) => ({
+          media: (highlight.media_urls || []).map((url: string, index: number) => ({
             id: `media-${index}`,
             url,
             type: url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',

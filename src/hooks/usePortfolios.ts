@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { portfolioService } from '@/lib/database'
+import { portfolioService, achievementService } from '@/lib/database'
 import { createClient } from '@/lib/supabase/client'
 import { dbPortfolioToLegacy, legacyPortfolioToDb, LegacyPortfolioData } from '@/lib/adapters/portfolio'
 import { storageService } from '@/lib/storage'
@@ -26,29 +26,44 @@ export function usePortfolios() {
         return
       }
 
-      // Get portfolios with achievements in a single optimized query
-      const dbPortfoliosWithAchievements = await portfolioService.getUserPortfoliosWithAchievements()
-      
-      // Transform to legacy format
-      const legacyPortfolios = dbPortfoliosWithAchievements.map((dbPortfolio) => {
-        return dbPortfolioToLegacy(dbPortfolio, dbPortfolio.achievements || [])
-      })
+      // Get portfolios with achievements (try optimized query first, fallback to separate fetches)
+      let legacyPortfolios: LegacyPortfolioData[]
+      try {
+        const dbPortfoliosWithAchievements = await portfolioService.getUserPortfoliosWithAchievements()
+        legacyPortfolios = dbPortfoliosWithAchievements.map((dbPortfolio) => {
+          return dbPortfolioToLegacy(dbPortfolio, dbPortfolio.achievements || [])
+        })
+      } catch (queryErr) {
+        // Fallback: fetch portfolios and highlights separately (e.g. if relation query fails)
+        console.warn('[usePortfolios] Relation query failed, using fallback:', queryErr)
+        const dbPortfolios = await portfolioService.getUserPortfolios()
+        legacyPortfolios = await Promise.all(
+          dbPortfolios.map(async (p) => {
+            const highlights = await achievementService.getPortfolioHighlights(p.id)
+            return dbPortfolioToLegacy(p, highlights)
+          })
+        )
+      }
 
       // Fetch endorsement counts for each portfolio (in parallel)
-      const base = typeof window !== 'undefined'
-        ? (process.env.NEXT_PUBLIC_APP_URL || window.location.origin)
-        : ''
+      // Use current origin in browser so API calls always hit the same server
+      const base = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || '')
       const portfoliosWithCounts = await Promise.all(
         legacyPortfolios.map(async (portfolio) => {
           let endorsementCount = 0
           try {
-            const res = await fetch(`${base}/api/endorsements/portfolio/${portfolio.id}`)
+            const controller = new AbortController()
+            const timeoutId = setTimeout(() => controller.abort(), 5000)
+            const res = await fetch(`${base}/api/endorsements/portfolio/${portfolio.id}`, {
+              signal: controller.signal
+            })
+            clearTimeout(timeoutId)
             if (res.ok) {
               const { endorsements } = await res.json()
               endorsementCount = Object.values(endorsements || {}).flat().length
             }
           } catch {
-            // Non-fatal
+            // Non-fatal: show portfolios without endorsement count
           }
           return { ...portfolio, endorsementCount }
         })

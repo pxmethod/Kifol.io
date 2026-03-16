@@ -60,9 +60,7 @@ export default function PortfolioPage() {
         // Fetch endorsements for all highlights
         let endorsementsByAchievement: Record<string, Array<{ id: string; instructorName: string; instructorTitle: string | null; organization: string | null; comment: string; submittedAt: string | null }>> = {};
         try {
-          const base = typeof window !== 'undefined'
-            ? (process.env.NEXT_PUBLIC_APP_URL || window.location.origin)
-            : '';
+          const base = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || '');
           const res = await fetch(`${base}/api/endorsements/portfolio/${portfolioId}`);
           if (res.ok) {
             const { endorsements } = await res.json();
@@ -88,7 +86,7 @@ export default function PortfolioPage() {
             title: highlight.title,
             date: highlight.date_achieved,
             description: highlight.description || undefined,
-            media: highlight.media_urls.map((url: string, index: number) => ({
+            media: (highlight.media_urls || []).map((url: string, index: number) => ({
               id: `media-${index}`,
               url,
               type: url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
@@ -196,6 +194,18 @@ export default function PortfolioPage() {
 
   const handleRequestEndorsement = (achievement: Achievement) => {
     setEndorsementModalAchievement(achievement);
+  };
+
+  const handleRemoveEndorsement = async (endorsementId: string) => {
+    const base = typeof window !== 'undefined' ? window.location.origin : '';
+    const res = await fetch(`${base}/api/endorsements/delete/${endorsementId}`, { method: 'DELETE' });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || 'Failed to remove endorsement');
+    }
+    await loadPortfolio();
+    setToastMessage('Endorsement removed');
+    setShowToast(true);
   };
 
   const handleAddHighlight = () => {
@@ -461,6 +471,7 @@ export default function PortfolioPage() {
                 highlights={portfolio.achievements || []}
                 onEdit={handleEditHighlight}
                 onRequestEndorsement={handleRequestEndorsement}
+                onRemoveEndorsement={handleRemoveEndorsement}
               />
             </div>
           </div>
@@ -632,6 +643,7 @@ export default function PortfolioPage() {
                   highlights={portfolio.achievements || []}
                   onEdit={handleEditHighlight}
                   onRequestEndorsement={handleRequestEndorsement}
+                  onRemoveEndorsement={handleRemoveEndorsement}
                 />
               </div>
             </div>

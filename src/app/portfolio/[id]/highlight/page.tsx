@@ -240,7 +240,7 @@ export default function HighlightForm() {
         console.log('Highlight data:', highlight);
         console.log('Media URLs:', highlight.media_urls);
         
-        setExistingMedia(highlight.media_urls.map((url, index) => ({
+        setExistingMedia((highlight.media_urls || []).map((url, index) => ({
           id: `existing-${index}`,
           url,
           fileName: getFileNameFromUrl(url)

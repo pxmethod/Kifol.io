@@ -62,7 +62,7 @@ function dbHighlightToLegacy(dbHighlight: DbHighlight): Achievement {
     title: dbHighlight.title,
     date: dbHighlight.date_achieved,
     description: dbHighlight.description || undefined,
-    media: dbHighlight.media_urls.map((url, index) => {
+    media: (dbHighlight.media_urls || []).map((url, index) => {
       const urlLower = url.toLowerCase();
       const filename = url.split('/').pop() || 'file';
       const extension = filename.split('.').pop()?.toLowerCase() || '';

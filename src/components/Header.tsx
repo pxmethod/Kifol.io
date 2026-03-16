@@ -113,7 +113,7 @@ export default function Header({ animateLogo = false }: HeaderProps) {
                   alt="Active page indicator"
                   width={40}
                   height={24}
-                  className="absolute -bottom-3 left-1/2 transform -translate-x-1/2"
+                  className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-10 h-6"
                 />
               )}
             </Link>
@@ -131,7 +131,7 @@ export default function Header({ animateLogo = false }: HeaderProps) {
                   alt="Active page indicator"
                   width={40}
                   height={24}
-                  className="absolute -bottom-3 left-1/2 transform -translate-x-1/2"
+                  className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-10 h-6"
                 />
               )}
             </Link>

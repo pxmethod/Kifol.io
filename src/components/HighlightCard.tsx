@@ -12,13 +12,15 @@ interface HighlightCardProps {
   onView?: (achievement: Achievement) => void;
   onEdit?: (achievement: Achievement) => void;
   onRequestEndorsement?: (achievement: Achievement) => void;
+  onRemoveEndorsement?: (endorsementId: string) => void | Promise<void>;
 }
 
 export default function HighlightCard({
   achievement,
   onView,
   onEdit,
-  onRequestEndorsement
+  onRequestEndorsement,
+  onRemoveEndorsement
 }: HighlightCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
@@ -325,9 +327,15 @@ export default function HighlightCard({
       {/* Media Icons */}
       {renderMediaIcons()}
 
-      {/* Endorsements */}
+      {/* Endorsements - relative z-10 so trash icon stays clickable above view overlay */}
       {achievement.endorsements && achievement.endorsements.length > 0 && (
-        <EndorsementBlock endorsements={achievement.endorsements} compact />
+        <div className={onRemoveEndorsement ? 'relative z-10' : undefined}>
+          <EndorsementBlock
+            endorsements={achievement.endorsements}
+            compact
+            onRemove={onRemoveEndorsement}
+          />
+        </div>
       )}
 
       {/* Click to view overlay */}

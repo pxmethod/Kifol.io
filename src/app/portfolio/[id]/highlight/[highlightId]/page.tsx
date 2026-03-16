@@ -200,7 +200,7 @@ export default function EditHighlight() {
           type: highlight.type as HighlightType,
           media: []
         });
-        setExistingMedia(highlight.media_urls.map((url, index) => ({
+        setExistingMedia((highlight.media_urls || []).map((url, index) => ({
           id: `existing-${index}`,
           url,
           fileName: `Media ${index + 1}`
