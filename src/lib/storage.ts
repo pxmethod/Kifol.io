@@ -30,7 +30,7 @@ export class StorageService {
         // Provide more specific error messages
         if (error.message.includes('exceeded the maximum allowed size')) {
           throw new Error('File is too large. Please use files under 50MB.')
-        } else         if (error.message.includes('Invalid file type')) {
+        } else if (error.message.includes('Invalid file type')) {
           throw new Error('File type not supported. Please use JPEG, PNG, PDF, MP3, or WAV files.')
         } else {
           throw new Error(`Failed to upload file: ${error.message}`)

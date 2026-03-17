@@ -11,7 +11,6 @@ import { storageService } from '@/lib/storage';
 import { HighlightService } from '@/lib/database/achievements';
 import { HIGHLIGHT_TYPES, HighlightType, HighlightFormData } from '@/types/achievement';
 import { Video, FileText, Music, Image } from 'lucide-react';
-import heic2any from 'heic2any';
 
 export default function HighlightForm() {
   const router = useRouter();
@@ -445,6 +444,7 @@ export default function HighlightForm() {
               console.log('Detected HEIC file by signature:', file.name);
               try {
                 setUploadingMedia(true);
+                const heic2any = (await import('heic2any')).default;
                 const convertedBlob = await heic2any({
                   blob: file,
                   toType: 'image/jpeg',
@@ -473,6 +473,7 @@ export default function HighlightForm() {
             console.log('Converting HEIC file:', file.name);
             try {
               setUploadingMedia(true);
+              const heic2any = (await import('heic2any')).default;
               const convertedBlob = await heic2any({
                 blob: file,
                 toType: 'image/jpeg',
@@ -864,17 +865,6 @@ export default function HighlightForm() {
                   const fileType = getFileTypeFromUrl(media.url);
                   const filename = getFileNameFromUrl(media.url);
                   
-                  // Debug info (remove this after testing)
-                  console.log(`Media ${index}:`, {
-                    url: media.url,
-                    filename: filename,
-                    fileType: fileType,
-                    originalFileName: media.fileName,
-                    urlLength: media.url.length,
-                    urlParts: media.url.split('/'),
-                    lastPart: media.url.split('/').pop()
-                  });
-                  
                   // Use the detected file type
                   const displayFileType = fileType;
                   
@@ -890,8 +880,6 @@ export default function HighlightForm() {
                           <div className="flex flex-col items-center justify-center text-center p-2">
                             <Video className="w-8 h-8 text-blue-500 mb-1" />
                             <span className="text-xs text-gray-500 truncate">{filename}</span>
-                            <span className="text-xs text-red-500 mt-1">DEBUG: {fileType}</span>
-                            <span className="text-xs text-blue-500 mt-1">URL: {media.url.substring(0, 30)}...</span>
                           </div>
                         ) : displayFileType === 'audio' ? (
                           <div className="flex flex-col items-center justify-center text-center p-2">
@@ -995,9 +983,9 @@ export default function HighlightForm() {
 
               {/* Request instructor endorsement (optional) */}
               <div className="border-t border-discovery-beige-100 pt-8">
-                <h3 className="text-md font-medium text-discovery-black mb-2">
+                <label className="block text-md font-medium text-discovery-black mb-2">
                   Request instructor endorsement (optional)
-                </h3>
+                </label>
                 <p className="text-discovery-grey text-sm mb-4">
                   Invite an instructor or teacher to leave a comment about this achievement.
                 </p>

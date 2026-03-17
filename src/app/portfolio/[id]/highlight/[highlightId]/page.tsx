@@ -770,9 +770,9 @@ export default function EditHighlight() {
 
               {/* Request instructor endorsement (optional) */}
               <div className="form-field border-t border-gray-200 pt-6 mt-6">
-                <h3 className="form-field__label mb-2">
+                <label className="form-field__label">
                   Request instructor endorsement (optional)
-                </h3>
+                </label>
                 <p className="form-field__help mb-4">
                   Invite an instructor or teacher to leave a comment about this achievement.
                 </p>
