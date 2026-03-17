@@ -1,4 +1,4 @@
-export type HighlightType = 'achievement' | 'creative_work' | 'milestone' | 'activity' | 'reflection_note';
+export type HighlightType = 'achievement' | 'creative_work' | 'milestone' | 'activity' | 'volunteer_work' | 'reflection_note';
 
 export interface Highlight {
   id: string;
@@ -41,7 +41,7 @@ export const HIGHLIGHT_TYPES: HighlightTypeOption[] = [
   },
   {
     id: 'creative_work',
-    name: 'Creative Work',
+    name: 'Creative work',
     description: 'artwork, music, writing, projects'
   },
   {
@@ -53,6 +53,11 @@ export const HIGHLIGHT_TYPES: HighlightTypeOption[] = [
     id: 'activity',
     name: 'Activity',
     description: 'sports games, performances, trips, hobbies'
+  },
+  {
+    id: 'volunteer_work',
+    name: 'Volunteer work',
+    description: 'Serving at foodbank, cleaning parks, walking shelter dogs'
   },
   {
     id: 'reflection_note',

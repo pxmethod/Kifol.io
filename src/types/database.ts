@@ -86,7 +86,7 @@ export interface Database {
           date_achieved: string
           media_urls: string[]
           category: string | null
-          type: 'achievement' | 'creative_work' | 'milestone' | 'activity' | 'reflection_note'
+          type: 'achievement' | 'creative_work' | 'milestone' | 'activity' | 'volunteer_work' | 'reflection_note'
           created_at: string
           updated_at: string
         }
@@ -98,7 +98,7 @@ export interface Database {
           date_achieved: string
           media_urls?: string[]
           category?: string | null
-          type: 'achievement' | 'creative_work' | 'milestone' | 'activity' | 'reflection_note'
+          type: 'achievement' | 'creative_work' | 'milestone' | 'activity' | 'volunteer_work' | 'reflection_note'
           created_at?: string
           updated_at?: string
         }
@@ -110,7 +110,7 @@ export interface Database {
           date_achieved?: string
           media_urls?: string[]
           category?: string | null
-          type?: 'achievement' | 'creative_work' | 'milestone' | 'activity' | 'reflection_note'
+          type?: 'achievement' | 'creative_work' | 'milestone' | 'activity' | 'volunteer_work' | 'reflection_note'
           updated_at?: string
         }
       }

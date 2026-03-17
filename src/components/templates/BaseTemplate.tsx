@@ -89,9 +89,10 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
   const getTypeName = (type: string) => {
     const typeMap: { [key: string]: string } = {
       'achievement': 'Achievement',
-      'creative_work': 'Creative Work',
+      'creative_work': 'Creative work',
       'milestone': 'Milestone',
       'activity': 'Activity',
+      'volunteer_work': 'Volunteer work',
       'reflection_note': 'Reflection/Note'
     };
     return typeMap[type] || 'Achievement';
