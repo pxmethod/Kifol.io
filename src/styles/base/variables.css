@@ -1,9 +1,9 @@
 /* Design Tokens - CSS Custom Properties */
 :root {
-  /* Colors - Primary Palette */
-  --color-primary: #ff6b35;
-  --color-primary-hover: rgba(255, 107, 53, 0.9);
-  --color-primary-light: rgba(255, 107, 53, 0.1);
+  /* Colors - Primary Palette (aligned with Tailwind `discovery.orange` / Add highlight CTA) */
+  --color-primary: #ff5938;
+  --color-primary-hover: #ff7a59;
+  --color-primary-light: rgba(255, 89, 56, 0.1);
   
   /* Colors - Neutral Palette */
   --color-bg: #f0f8f6;

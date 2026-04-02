@@ -74,12 +74,12 @@ const config: Config = {
         kifolio: {
           bg: "#f0f8f6",           // Light green background
           header: "#1a5f5f",       // Dark teal header
-          cta: "#ff6b35",          // Orange CTA
+          cta: "#ff5938",          // Orange CTA (same as discovery.orange)
           text: "#2d5a5a",         // Dark teal text
-          primary: "#ff6b35",      // Primary orange
-          "primary-dark": "#e55a2b", // Darker orange
-          "primary-hover": "rgba(255, 107, 53, 0.9)", // Orange hover
-          "primary-light": "rgba(255, 107, 53, 0.1)", // Light orange
+          primary: "#ff5938",      // Primary orange (same as discovery.orange)
+          "primary-dark": "#e55a2b", // Darker orange (discovery.orange-dark)
+          "primary-hover": "#ff7a59", // Hover (discovery.orange-light)
+          "primary-light": "rgba(255, 89, 56, 0.1)", // Light orange tint
         },
         
         // Shared color system (common colors used across both)

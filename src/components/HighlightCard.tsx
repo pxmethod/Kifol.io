@@ -257,8 +257,8 @@ export default function HighlightCard({
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Header */}
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1 min-w-0">
+      <div className="mb-3">
+        <div className="min-w-0">
           {/* Desktop Layout - Title and Type Tag on same row */}
           <div className="hidden md:flex items-center gap-2 mb-1">
             <h3 className="text-lg font-semibold text-discovery-black truncate">
@@ -285,42 +285,6 @@ export default function HighlightCard({
             {formatDate(achievement.date)}
           </p>
         </div>
-        
-        {/* Action Buttons - Always visible on mobile, show on hover for desktop */}
-        <div className="flex items-center gap-1">
-          {onRequestEndorsement && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onRequestEndorsement(achievement);
-              }}
-              className={`flex items-center justify-center text-discovery-beige-800 hover:text-discovery-beige-300 hover:bg-discovery-beige-200 rounded-lg transition-all duration-200 opacity-100 md:opacity-0 ${
-                isHovered ? 'md:opacity-100' : ''
-              } md:px-3 md:py-1.5 p-2`}
-              title="Request endorsement"
-            >
-              <CircleStar className="w-5 h-5 md:hidden" />
-              <span className="hidden md:inline text-sm font-medium">Request endorsement</span>
-            </button>
-          )}
-          {onEdit && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(achievement);
-              }}
-              className={`p-2 text-discovery-beige-800 hover:text-discovery-beige-300 hover:bg-discovery-beige-100 rounded-full transition-all duration-200 opacity-100 md:opacity-0 ${
-                isHovered ? 'md:opacity-100' : ''
-              }`}
-              title="Edit highlight"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-            </button>
-          )}
-        </div>
-
       </div>
 
       {/* Description */}
@@ -344,6 +308,56 @@ export default function HighlightCard({
             compact
             onRemove={onRemoveEndorsement}
           />
+        </div>
+      )}
+
+      {/* Actions — last content in card; stacked on mobile, row on desktop */}
+      {(onRequestEndorsement || onEdit) && (
+        <div
+          className={`mt-4 space-y-3 ${onView ? 'relative z-10' : ''}`}
+        >
+          <div className="border-t border-discovery-beige-100" aria-hidden />
+          <div className="flex flex-col gap-2 md:flex-row md:gap-3">
+            {onRequestEndorsement && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRequestEndorsement(achievement);
+                }}
+                className="btn btn--primary w-full min-w-0 !whitespace-normal text-center md:flex-1"
+              >
+                <CircleStar className="btn__icon shrink-0" aria-hidden />
+                <span>Request endorsement</span>
+              </button>
+            )}
+            {onEdit && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(achievement);
+                }}
+                className="btn btn--secondary w-full min-w-0 !whitespace-normal text-center md:flex-1"
+              >
+                <svg
+                  className="btn__icon shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+                <span>Edit</span>
+              </button>
+            )}
+          </div>
         </div>
       )}
 
