@@ -81,7 +81,7 @@ export default function MarketingPage() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 mb-6">
                   <Link
-                    href="/auth/signup"
+                    href="/onboarding"
                     className="inline-block bg-discovery-primary text-white px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-primary-light text-center">
                     Get started for free
                   </Link>
@@ -570,7 +570,7 @@ export default function MarketingPage() {
                 </h3>
                 <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
                   <div className="text-lg text-discovery-grey leading-relaxed" itemProp="text">
-                    Getting started is simple! <a href="/auth/signup" className="text-discovery-primary hover:underline">Sign up for free</a>, choose a template, add your child&apos;s information, and start documenting their milestones and achievements. The entire setup takes just minutes.
+                    Getting started is simple! <a href="/onboarding" className="text-discovery-primary hover:underline">Start building your portfolio</a>, then create a free account. You can choose a template, add your child&apos;s information, and start documenting their milestones and achievements in minutes.
                   </div>
                 </div>
               </div>
@@ -599,7 +599,7 @@ export default function MarketingPage() {
             <div>
               <h4 className="text-2xl lg:text-2xl font-medium text-discovery-yellow mb-2 leading-tight">Product</h4>
               <ul className="space-y-2 text-discovery-white-100 leading-relaxed">
-                <li><Link href="/auth/signup" className="hover:text-discovery-white-80 transition-colors">Sign Up</Link></li>
+                <li><Link href="/onboarding" className="hover:text-discovery-white-80 transition-colors">Sign Up</Link></li>
                 <li><Link href="/auth/login" className="hover:text-discovery-white-80 transition-colors">Log In</Link></li>
               </ul>
             </div>

@@ -129,9 +129,9 @@ export default function EditPortfolio() {
     const newErrors: Record<string, string> = {};
 
     if (!formData.childName.trim()) {
-      newErrors.childName = 'Child\'s name is required';
+      newErrors.childName = 'Child or student\'s name is required';
     } else if (formData.childName.length > 100) {
-      newErrors.childName = 'Child\'s name must be 100 characters or less';
+      newErrors.childName = 'Child or student\'s name must be 100 characters or less';
     }
 
     if (!formData.portfolioTitle.trim()) {
@@ -321,7 +321,7 @@ export default function EditPortfolio() {
               {/* Child's Name */}
               <div>
                 <label htmlFor="childName" className="block text-md font-medium text-discovery-black mb-2">
-                  Child&apos;s name *
+                  Child or student&apos;s name *
                 </label>
                 <input
                   type="text"

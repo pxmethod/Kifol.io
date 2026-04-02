@@ -4,8 +4,8 @@ import { PortfolioTemplateProps } from '@/types/template';
 import BaseTemplate from './BaseTemplate';
 import { getTemplateConfig } from '@/config/templates';
 
-export default function MaeveTemplate({ portfolio }: PortfolioTemplateProps) {
+export default function MaeveTemplate({ portfolio, previewMode }: PortfolioTemplateProps) {
   const config = getTemplateConfig('maeve');
-  
-  return <BaseTemplate portfolio={portfolio} config={config} />;
+
+  return <BaseTemplate portfolio={portfolio} config={config} previewMode={previewMode} />;
 } 

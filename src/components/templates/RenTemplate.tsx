@@ -4,8 +4,8 @@ import { PortfolioTemplateProps } from '@/types/template';
 import BaseTemplate from './BaseTemplate';
 import { getTemplateConfig } from '@/config/templates';
 
-export default function RenTemplate({ portfolio }: PortfolioTemplateProps) {
+export default function RenTemplate({ portfolio, previewMode }: PortfolioTemplateProps) {
   const config = getTemplateConfig('ren');
-  
-  return <BaseTemplate portfolio={portfolio} config={config} />;
+
+  return <BaseTemplate portfolio={portfolio} config={config} previewMode={previewMode} />;
 } 

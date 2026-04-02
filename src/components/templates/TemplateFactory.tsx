@@ -6,17 +6,18 @@ import MaeveTemplate from './MaeveTemplate';
 import JackTemplate from './JackTemplate';
 import AdlerTemplate from './AdlerTemplate';
 
-export default function TemplateFactory({ portfolio }: PortfolioTemplateProps) {
+export default function TemplateFactory({ portfolio, previewMode }: PortfolioTemplateProps) {
+  const shared = { portfolio, previewMode };
   switch (portfolio.template) {
     case 'ren':
-      return <RenTemplate portfolio={portfolio} />;
+      return <RenTemplate {...shared} />;
     case 'maeve':
-      return <MaeveTemplate portfolio={portfolio} />;
+      return <MaeveTemplate {...shared} />;
     case 'jack':
-      return <JackTemplate portfolio={portfolio} />;
+      return <JackTemplate {...shared} />;
     case 'adler':
-      return <AdlerTemplate portfolio={portfolio} />;
+      return <AdlerTemplate {...shared} />;
     default:
-      return <RenTemplate portfolio={portfolio} />;
+      return <RenTemplate {...shared} />;
   }
 } 

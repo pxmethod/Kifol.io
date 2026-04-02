@@ -92,9 +92,9 @@ export default function EditPortfolioModal({
     const newErrors: Record<string, string> = {};
 
     if (!formData.childName.trim()) {
-      newErrors.childName = 'Child&apos;s name is required';
+      newErrors.childName = 'Child or student&apos;s name is required';
     } else if (formData.childName.length > 100) {
-      newErrors.childName = 'Child&apos;s name must be 100 characters or less';
+      newErrors.childName = 'Child or student&apos;s name must be 100 characters or less';
     }
 
     if (!formData.portfolioTitle.trim()) {
@@ -262,7 +262,7 @@ export default function EditPortfolioModal({
             {/* Child's Name */}
             <div>
               <label htmlFor="editChildName" className="block text-sm font-medium text-kifolio-text mb-2">
-                Child&apos;s Name *
+                Child or student&apos;s name *
               </label>
               <input
                 type="text"

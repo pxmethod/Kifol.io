@@ -13,6 +13,7 @@ import ErrorDisplay from '@/components/ErrorDisplay';
 import { usePortfolios } from '@/hooks/usePortfolios';
 import { useAuth } from '@/contexts/AuthContext';
 import { LegacyPortfolioData } from '@/lib/adapters/portfolio';
+import { useApplyOnboardingDraft } from '@/hooks/useApplyOnboardingDraft';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -21,8 +22,13 @@ export default function Dashboard() {
     portfolios, 
     loading, 
     error, 
-    deletePortfolio: removePortfolio 
+    deletePortfolio: removePortfolio,
+    createPortfolio,
   } = usePortfolios();
+  const { showBlockingLoader } = useApplyOnboardingDraft({
+    createPortfolio,
+    portfoliosLoading: loading,
+  });
   
   const [deletingPortfolio, setDeletingPortfolio] = useState<LegacyPortfolioData | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -54,14 +60,14 @@ export default function Dashboard() {
     return null; // Will redirect to marketing site
   }
 
-  // Show loading while portfolios are being fetched
-  if (loading) {
+  // Show loading while portfolios are being fetched or onboarding draft is applied
+  if (loading || showBlockingLoader) {
     return (
       <div className="min-h-screen bg-discovery-beige-200">
         <Header animateLogo={true} />
         <main className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[60vh]">
-            <LoadingSpinner size="lg" label="Loading portfolios..." />
+            <LoadingSpinner size="lg" label={showBlockingLoader && !loading ? 'Setting up your portfolio...' : 'Loading portfolios...'} />
           </div>
         </main>
       </div>

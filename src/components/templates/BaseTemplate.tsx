@@ -13,7 +13,7 @@ interface BaseTemplateProps extends PortfolioTemplateProps {
   config: TemplateConfig;
 }
 
-export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
+export default function BaseTemplate({ portfolio, config, previewMode }: BaseTemplateProps) {
   const rawHighlights = portfolio.achievements || [];
   const [highlightTypeFilter, setHighlightTypeFilter] = useState<HighlightType[] | null>(null);
   const highlights = useMemo(
@@ -243,14 +243,16 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
             </div>
               </div>
 
-        <div className={`text-left mb-8 ${isLoaded ? 'animate-fade-in-up' : 'opacity-0'}`}>
-          <HighlightTypeFilter
-            value={highlightTypeFilter}
-            onChange={setHighlightTypeFilter}
-            labelClassName=""
-            labelStyle={{ color: config.colors.text, fontFamily: config.fontFamily }}
-          />
-        </div>
+        {!previewMode && (
+          <div className={`text-left mb-8 ${isLoaded ? 'animate-fade-in-up' : 'opacity-0'}`}>
+            <HighlightTypeFilter
+              value={highlightTypeFilter}
+              onChange={setHighlightTypeFilter}
+              labelClassName=""
+              labelStyle={{ color: config.colors.text, fontFamily: config.fontFamily }}
+            />
+          </div>
+        )}
 
         {/* Highlights Timeline */}
         <div className={`space-y-12 ${isLoaded ? 'animate-fade-in-up' : 'opacity-0'}`}>
@@ -453,7 +455,10 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
           )}
 
       {/* Footer */}
-        <footer className={`mt-16 pt-8 border-t text-center ${isLoaded ? 'animate-fade-in-up' : 'opacity-0'}`} style={{ borderColor: config.colors.border || 'rgba(255, 255, 255, 0.1)' }}>
+        <footer
+          className={`${previewMode ? 'mt-8 pt-6' : 'mt-16 pt-8'} border-t text-center ${isLoaded ? 'animate-fade-in-up' : 'opacity-0'}`}
+          style={{ borderColor: config.colors.border || 'rgba(255, 255, 255, 0.1)' }}
+        >
           <div 
             className="flex items-center justify-center gap-2 text-sm"
             style={{ color: config.colors.textSecondary, fontFamily: config.fontFamily }}

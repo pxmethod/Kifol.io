@@ -227,7 +227,7 @@ export default function Header({ animateLogo = false }: HeaderProps) {
               Login
             </Link>
             <Link 
-              href="/auth/signup"
+              href="/onboarding"
               className="bg-discovery-yellow text-discovery-black px-8 py-4 rounded-pill hover:bg-discovery-yellow-dark transition-colors font-medium"
             >
               Sign Up

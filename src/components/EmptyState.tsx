@@ -45,7 +45,7 @@ export default function EmptyState() {
       ) : (
         <div className="flex space-x-4">
           <button 
-            onClick={() => router.push('/auth/signup')}
+            onClick={() => router.push('/onboarding')}
             className="bg-kifolio-cta text-white px-8 py-3 rounded-pill font-semibold text-lg hover:bg-kifolio-cta/90 transition-colors shadow-md"
           >
             Get Started

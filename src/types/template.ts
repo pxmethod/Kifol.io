@@ -31,4 +31,6 @@ export interface PortfolioTemplateProps {
     password?: string;
     achievements?: Achievement[];
   };
+  /** Onboarding (and similar) embedded previews: hide highlight filter, avoid min-h-screen scroll gap */
+  previewMode?: boolean;
 } 
