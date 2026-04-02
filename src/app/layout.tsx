@@ -24,6 +24,10 @@ const googleFonts = [
 const googleFontsUrl = `https://fonts.googleapis.com/css2?family=${googleFonts}&display=swap`;
 
 export const metadata: Metadata = {
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    shortcut: "/favicon.svg",
+  },
   title: "Kifolio - Digital Portfolio Platform for Children | Capture Every Milestone",
   description: "Create beautiful digital portfolios for your children. Showcase achievements, creativity, and milestones from first drawing to graduation. Start free, no credit card required.",
   keywords: "digital portfolio, children portfolio, achievement tracking, milestone capture, parent tools, child development, creative portfolio, educational portfolio",

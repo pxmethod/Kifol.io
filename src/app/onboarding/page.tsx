@@ -196,7 +196,7 @@ export default function OnboardingPage() {
                     form="onboardingPortfolioForm"
                     className="px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl bg-discovery-orange hover:bg-discovery-orange-light text-white text-center"
                   >
-                    Create
+                    Create for free
                   </button>
                 </div>
               </div>
