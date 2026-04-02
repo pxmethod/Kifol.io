@@ -70,7 +70,7 @@ export default function MarketingNav() {
               href="/onboarding"
               className="bg-discovery-primary text-white px-6 py-3 rounded-full text-[15px] font-semibold hover:bg-discovery-primary-dark transition-all shadow-sm hover:shadow-md"
             >
-              Get started free
+              Get started for free
             </Link>
           </div>
 
@@ -119,7 +119,7 @@ export default function MarketingNav() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="py-3 px-4 text-center bg-discovery-primary text-white font-semibold rounded-full hover:bg-discovery-primary-dark transition-colors"
                 >
-                  Get started free
+                  Get started for free
                 </Link>
               </div>
             </nav>

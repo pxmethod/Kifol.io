@@ -35,14 +35,17 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Allow public access to preview pages, public portfolio pages, endorse links, and home page
-  const isPublicPath = 
+  // Allow public access to marketing, onboarding, preview pages, public portfolio pages, endorse links
+  const isPublicPath =
     request.nextUrl.pathname === '/' ||
+    request.nextUrl.pathname.startsWith('/onboarding') ||
     request.nextUrl.pathname.startsWith('/auth') ||
     request.nextUrl.pathname.startsWith('/api') ||
     request.nextUrl.pathname.startsWith('/preview/') ||
     request.nextUrl.pathname.startsWith('/p/') ||
-    request.nextUrl.pathname.startsWith('/endorse/')
+    request.nextUrl.pathname.startsWith('/endorse/') ||
+    request.nextUrl.pathname.startsWith('/privacy') ||
+    request.nextUrl.pathname.startsWith('/terms')
 
   // Redirect unauthenticated users trying to access protected pages
   if (!user && !isPublicPath) {
