@@ -2,7 +2,7 @@
 
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Header from '@/components/Header';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorDisplay from '@/components/ErrorDisplay';
@@ -12,7 +12,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { portfolioService, achievementService } from '@/lib/database';
 import { createClient } from '@/lib/supabase/client';
 import { DOMAIN_CONFIG } from '@/config/domains';
-import { Achievement } from '@/types/achievement';
+import { Achievement, HighlightType } from '@/types/achievement';
+import HighlightTypeFilter, { filterAchievementsByTypes } from '@/components/HighlightTypeFilter';
 import Image from 'next/image';
 import HighlightsTimeline from '@/components/HighlightsTimeline';
 import EndorsementRequestModal from '@/components/EndorsementRequestModal';
@@ -43,6 +44,7 @@ export default function PortfolioPage() {
   const [toastMessage, setToastMessage] = useState('');
   const [showPrivateTooltip, setShowPrivateTooltip] = useState(false);
   const [endorsementModalAchievement, setEndorsementModalAchievement] = useState<Achievement | null>(null);
+  const [highlightTypeFilter, setHighlightTypeFilter] = useState<HighlightType[] | null>(null);
 
   const loadPortfolio = useCallback(async () => {
     try {
@@ -143,6 +145,17 @@ export default function PortfolioPage() {
       loadPortfolio();
     }
   }, [user, params.id, loadPortfolio]);
+
+  const filteredHighlights = useMemo(
+    () => filterAchievementsByTypes(portfolio?.achievements ?? [], highlightTypeFilter),
+    [portfolio?.achievements, highlightTypeFilter]
+  );
+
+  const totalHighlightCount = portfolio?.achievements?.length ?? 0;
+  const emptyFilterMessage =
+    totalHighlightCount > 0 && filteredHighlights.length === 0
+      ? 'No highlights match this filter.'
+      : undefined;
 
   // Show loading while checking authentication
   if (authLoading) {
@@ -451,24 +464,34 @@ export default function PortfolioPage() {
           {/* Portfolio Content */}
           <div>
             <div className="py-8">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-3">
                 <h2 className="text-3xl font-medium text-discovery-black">Highlights</h2>
-                <button
-                  onClick={handleAddHighlight}
-                  className="bg-discovery-orange text-white px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-orange-light flex items-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  <span>Add highlight</span>
-                </button>
+                <div className="flex items-center justify-between gap-2 sm:gap-3">
+                  <div className="min-w-0 flex-1">
+                    <HighlightTypeFilter
+                      value={highlightTypeFilter}
+                      onChange={setHighlightTypeFilter}
+                      className="justify-start w-full max-w-full"
+                    />
+                  </div>
+                  <button
+                    onClick={handleAddHighlight}
+                    className="bg-discovery-orange text-white px-4 py-3 sm:px-8 sm:py-4 rounded-pill text-base sm:text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-orange-light flex items-center gap-2 shrink-0"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <span>Add highlight</span>
+                  </button>
+                </div>
               </div>
             </div>
 
             <div className="py-6">
               {/* Highlights Timeline */}
               <HighlightsTimeline
-                highlights={portfolio.achievements || []}
+                highlights={filteredHighlights}
+                emptyFilterMessage={emptyFilterMessage}
                 onEdit={handleEditHighlight}
                 onRequestEndorsement={handleRequestEndorsement}
                 onRemoveEndorsement={handleRemoveEndorsement}
@@ -623,24 +646,34 @@ export default function PortfolioPage() {
           <div className="flex-1">
             <div>
               <div className="py-2">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-3xl font-medium text-discovery-black">Highlights</h2>
-                  <button
-                    onClick={handleAddHighlight}
-                    className="bg-discovery-orange text-white px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-orange-light flex items-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    <span>Add highlight</span>
-                  </button>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+                  <h2 className="text-3xl font-medium text-discovery-black shrink-0 min-w-0">
+                    Highlights
+                  </h2>
+                  <div className="flex flex-wrap items-center gap-3 ml-auto justify-end min-w-0">
+                    <HighlightTypeFilter
+                      value={highlightTypeFilter}
+                      onChange={setHighlightTypeFilter}
+                      className="justify-end shrink min-w-0 max-w-[min(100%,20rem)] sm:max-w-md"
+                    />
+                    <button
+                      onClick={handleAddHighlight}
+                      className="bg-discovery-orange text-white px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-orange-light flex items-center gap-2 shrink-0"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      <span>Add highlight</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
               <div className="py-6">
                 {/* Highlights Timeline */}
                 <HighlightsTimeline
-                  highlights={portfolio.achievements || []}
+                  highlights={filteredHighlights}
+                  emptyFilterMessage={emptyFilterMessage}
                   onEdit={handleEditHighlight}
                   onRequestEndorsement={handleRequestEndorsement}
                   onRemoveEndorsement={handleRemoveEndorsement}

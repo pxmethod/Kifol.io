@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { TemplateConfig, PortfolioTemplateProps } from '@/types/template';
-import { Achievement } from '@/types/achievement';
+import { Achievement, HighlightType } from '@/types/achievement';
 import HighlightDetailModal from '@/components/HighlightDetailModal';
 import EndorsementBlock from '@/components/EndorsementBlock';
+import HighlightTypeFilter, { filterAchievementsByTypes } from '@/components/HighlightTypeFilter';
 import { formatTextWithLinks } from '@/utils/text-formatting';
 
 interface BaseTemplateProps extends PortfolioTemplateProps {
@@ -13,7 +14,12 @@ interface BaseTemplateProps extends PortfolioTemplateProps {
 }
 
 export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
-  const highlights = portfolio.achievements || [];
+  const rawHighlights = portfolio.achievements || [];
+  const [highlightTypeFilter, setHighlightTypeFilter] = useState<HighlightType[] | null>(null);
+  const highlights = useMemo(
+    () => filterAchievementsByTypes(rawHighlights, highlightTypeFilter),
+    [rawHighlights, highlightTypeFilter]
+  );
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -237,8 +243,27 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
             </div>
               </div>
 
+        <div className={`text-left mb-8 ${isLoaded ? 'animate-fade-in-up' : 'opacity-0'}`}>
+          <HighlightTypeFilter
+            value={highlightTypeFilter}
+            onChange={setHighlightTypeFilter}
+            labelClassName=""
+            labelStyle={{ color: config.colors.text, fontFamily: config.fontFamily }}
+          />
+        </div>
+
         {/* Highlights Timeline */}
         <div className={`space-y-12 ${isLoaded ? 'animate-fade-in-up' : 'opacity-0'}`}>
+          {rawHighlights.length > 0 && highlights.length === 0 && (
+            <div className="text-center py-16">
+              <p
+                className="text-lg"
+                style={{ color: config.colors.textSecondary, fontFamily: config.fontFamily }}
+              >
+                No highlights match this filter.
+              </p>
+            </div>
+          )}
           {Object.entries(groupedHighlights).map(([dateHeader, dateHighlights]) => (
             <div key={dateHeader} className="space-y-6">
               
@@ -416,8 +441,7 @@ export default function BaseTemplate({ portfolio, config }: BaseTemplateProps) {
           ))}
         </div>
 
-          {/* Empty State */}
-          {highlights.length === 0 && (
+          {rawHighlights.length === 0 && (
             <div className={`text-center py-16 ${isLoaded ? 'animate-fade-in-up' : 'opacity-0'}`}>
             <p 
               className="text-lg"

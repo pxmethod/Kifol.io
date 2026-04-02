@@ -5,6 +5,8 @@ import HighlightCard from './HighlightCard';
 
 interface HighlightsTimelineProps {
   highlights: Achievement[];
+  /** When the list is empty only because of a type filter, show this instead of the default empty state. */
+  emptyFilterMessage?: string;
   onView?: (highlight: Achievement) => void;
   onEdit?: (highlight: Achievement) => void;
   onRequestEndorsement?: (highlight: Achievement) => void;
@@ -17,6 +19,7 @@ interface GroupedHighlights {
 
 export default function HighlightsTimeline({
   highlights,
+  emptyFilterMessage,
   onView,
   onEdit,
   onRequestEndorsement,
@@ -74,6 +77,13 @@ export default function HighlightsTimeline({
   });
 
   if (highlights.length === 0) {
+    if (emptyFilterMessage) {
+      return (
+        <div className="text-center py-12">
+          <p className="text-discovery-grey">{emptyFilterMessage}</p>
+        </div>
+      );
+    }
     return (
       <div className="text-center py-12">
         <div className="mx-auto mb-4">
