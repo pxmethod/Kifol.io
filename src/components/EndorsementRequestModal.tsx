@@ -159,7 +159,7 @@ export default function EndorsementRequestModal({
                   <button
                     type="button"
                     onClick={handleClose}
-                    className="flex-1 py-3 border border-discovery-grey-300 text-discovery-black rounded-lg font-medium hover:bg-discovery-beige-100"
+                    className="flex-1 border border-discovery-beige-300 px-6 py-3 text-discovery-black rounded-pill font-medium transition-colors hover:bg-discovery-beige-100"
                   >
                     Cancel
                   </button>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
-import ConfirmNavigationModal from '@/components/ConfirmNavigationModal';
+import ConfirmDialog from '@/components/ConfirmDialog';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useAuth } from '@/contexts/AuthContext';
 import { storageService } from '@/lib/storage';
@@ -993,21 +993,21 @@ export default function HighlightForm() {
                 </div>
               </div>
 
-              {/* Submit Button */}
-              <div className="flex justify-end px-10 py-6 border-t border-discovery-beige-100">
-                <button
-                  type="button"
-                  onClick={handleBackClick}
-                  className="px-6 py-3 border border-discovery-beige-300 text-discovery-black rounded-lg hover:bg-discovery-beige-100 transition-colors font-medium"
-                >
-                  Cancel
-                </button>
+              {/* Submit Button — mobile: stacked primary then Cancel; md+: row, Cancel then primary */}
+              <div className="flex flex-col gap-3 px-10 py-6 border-t border-discovery-beige-100 md:flex-row md:flex-wrap md:justify-end md:items-center">
                 <button
                   type="submit"
                   disabled={isSubmitting || uploadingMedia}
-                  className="px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl text-center disabled:opacity-50 disabled:cursor-not-allowed bg-discovery-orange hover:bg-discovery-orange-light text-white"
+                  className="w-full px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl text-center disabled:opacity-50 disabled:cursor-not-allowed bg-discovery-orange hover:bg-discovery-orange-light text-white md:order-2 md:w-auto"
                 >
                   {isSubmitting ? 'Saving...' : (isEditMode ? 'Update highlight' : 'Add highlight')}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleBackClick}
+                  className="w-full px-8 py-4 border border-discovery-beige-300 text-discovery-black rounded-pill hover:bg-discovery-beige-100 transition-colors font-medium md:order-1 md:w-auto"
+                >
+                  Cancel
                 </button>
               </div>
 
@@ -1020,12 +1020,13 @@ export default function HighlightForm() {
       </main>
 
       {/* Confirmation Modal */}
-      <ConfirmNavigationModal
+      <ConfirmDialog
         isOpen={showConfirmModal}
         onCancel={() => setShowConfirmModal(false)}
         onConfirm={handleConfirmNavigation}
-        title="Discard Changes?"
+        title="Discard changes?"
         message="You have unsaved changes. Are you sure you want to leave without saving?"
+        confirmLabel="Discard changes"
       />
     </div>
   );

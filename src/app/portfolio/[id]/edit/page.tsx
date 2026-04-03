@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Header from '@/components/Header';
-import ConfirmNavigationModal from '@/components/ConfirmNavigationModal';
+import ConfirmDialog from '@/components/ConfirmDialog';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { getRandomPlaceholder } from '@/utils/placeholders';
 import { usePortfolios } from '@/hooks/usePortfolios';
@@ -605,14 +605,14 @@ export default function EditPortfolio() {
         </div>
       </main>
 
-      {/* Confirm Navigation Modal */}
       {showConfirmModal && (
-        <ConfirmNavigationModal
+        <ConfirmDialog
           isOpen={showConfirmModal}
           onCancel={handleCancelLeave}
           onConfirm={handleConfirmLeave}
           title="Unsaved changes"
           message="You have unsaved changes. Are you sure you want to leave without saving?"
+          confirmLabel="Discard changes"
         />
       )}
     </div>

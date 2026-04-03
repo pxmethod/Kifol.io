@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import CreatePortfolioFormFields from '@/components/portfolio/CreatePortfolioFormFields';
-import ConfirmNavigationModal from '@/components/ConfirmNavigationModal';
+import ConfirmDialog from '@/components/ConfirmDialog';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { getRandomPlaceholder } from '@/utils/placeholders';
 import { usePortfolios } from '@/hooks/usePortfolios';
@@ -239,12 +239,13 @@ export default function CreatePortfolio() {
         </div>
       </main>
 
-      <ConfirmNavigationModal
+      <ConfirmDialog
         isOpen={showConfirmModal}
         onConfirm={handleConfirmNavigation}
         onCancel={handleCancelNavigation}
-        title="Discard Changes?"
+        title="Discard changes?"
         message="You will lose any changes you've made if you go back."
+        confirmLabel="Discard changes"
       />
     </div>
   );

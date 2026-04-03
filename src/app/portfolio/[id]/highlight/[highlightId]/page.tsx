@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Header from '@/components/Header';
-import ConfirmNavigationModal from '@/components/ConfirmNavigationModal';
+import ConfirmDialog from '@/components/ConfirmDialog';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useAuth } from '@/contexts/AuthContext';
 import { storageService } from '@/lib/storage';
@@ -165,7 +165,7 @@ export default function EditHighlight() {
         setExistingMedia((highlight.media_urls || []).map((url, index) => ({
           id: `existing-${index}`,
           url,
-          fileName: `Media ${index + 1}`
+          fileName: getFileNameFromUrl(url),
         })));
       } else {
         // Highlight not found, redirect back
@@ -404,8 +404,7 @@ export default function EditHighlight() {
     setShowDeleteModal(false);
   };
 
-  // Show loading while checking authentication or loading highlight
-  if (loading || loadingHighlight) {
+  if (loading) {
     return <LoadingSpinner />;
   }
 
@@ -413,73 +412,85 @@ export default function EditHighlight() {
     return null; // Will redirect
   }
 
+  if (loadingHighlight) {
+    return (
+      <div className="min-h-screen bg-discovery-beige-200">
+        <Header animateLogo={true} />
+        <main className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <LoadingSpinner size="lg" label="Loading..." />
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-kifolio-bg">
+    <div className="min-h-screen bg-discovery-beige-200">
       <Header />
-      
+
       {/* Action Bar */}
-      <div className="action-bar">
-        <div className="action-bar__container">
+      <div className="bg-discovery-white-100 border-b border-discovery-beige-100 px-9 py-4">
+        <div className="max-w-7xl mx-auto">
           <button
             onClick={handleBackClick}
-            className="btn--back"
+            className="flex items-center text-discovery-grey hover:text-discovery-black transition-colors font-medium"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back to Portfolio
+            Back to portfolio
           </button>
         </div>
       </div>
-      
-      <main className="container mx-auto px-4 py-8 max-w-2xl">
-        <div className="card">
-          <div className="card__header">
-            <h1 className="card__title">
-              Edit Highlight
-            </h1>
+
+      <main className="max-w-7xl mx-auto px-4 py-5">
+        <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden">
+          <div className="px-6 py-4">
+            <h1 className="text-4xl lg:text-4xl font-medium text-discovery-black">Edit highlight</h1>
           </div>
 
-          <div className="card__body">
-            <form onSubmit={handleSubmit} className="form">
+          <div className="px-6 py-6">
+            <form onSubmit={handleSubmit} className="space-y-8">
               {/* Type Selection */}
-              <div className="form-field">
-                <label htmlFor="type" className="form-field__label form-field__label--required">
-                  Type
+              <div>
+                <label htmlFor="type" className="block text-md font-medium text-discovery-black mb-2">
+                  Type *
                 </label>
                 <div className="type-dropdown relative">
                   <button
                     type="button"
                     onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
-                    className={`w-full px-3 py-2 text-left border rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary input cursor-pointer ${
-                      errors.type ? 'border-red-500' : 'border-gray-100'
-                    } ${isTypeDropdownOpen ? 'ring-2 ring-discovery-primary' : ''}`}
+                    className={`w-full px-4 py-3 text-left rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors cursor-pointer text-discovery-black ${
+                      errors.type ? 'border border-red-500' : ''
+                    } ${isTypeDropdownOpen ? 'ring-2 ring-discovery-primary border-transparent' : ''}`}
+                    style={!errors.type && !isTypeDropdownOpen ? { border: '1px solid #DDDDE1', backgroundColor: '#ffffff' } : {}}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         {formData.type ? (
                           <HighlightTypeIcon
                             type={formData.type as HighlightType}
-                            className="w-5 h-5 shrink-0 text-gray-900"
+                            className="w-5 h-5 shrink-0 text-discovery-black"
                           />
                         ) : null}
-                        <span className={`ml-2 ${formData.type ? 'text-gray-900' : 'text-gray-500'}`}>
+                        <span className={`ml-2 ${formData.type ? 'text-discovery-black' : 'text-discovery-grey'}`}>
                           {getSelectedType()?.name || 'Select a type...'}
                         </span>
                       </div>
-                      <svg 
-                        className={`w-5 h-5 text-gray-400 transition-transform ${isTypeDropdownOpen ? 'rotate-180' : ''}`}
-                        fill="none" 
-                        stroke="currentColor" 
+                      <svg
+                        className={`w-5 h-5 text-discovery-grey transition-transform ${isTypeDropdownOpen ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
                         viewBox="0 0 24 24"
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </div>
                   </button>
-                  
+
                   {isTypeDropdownOpen && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
+                    <div className="absolute z-10 w-full mt-1 bg-discovery-white-100 border border-discovery-grey-300 rounded-lg shadow-lg">
                       {HIGHLIGHT_TYPES.map((type) => (
                         <button
                           key={type.id}
@@ -488,13 +499,13 @@ export default function EditHighlight() {
                             handleInputChange('type', type.id);
                             setIsTypeDropdownOpen(false);
                           }}
-                          className="w-full px-3 py-3 text-left hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg flex items-center"
+                          className="w-full px-3 py-3 text-left hover:bg-discovery-beige-100 first:rounded-t-lg last:rounded-b-lg flex items-center transition-colors"
                         >
                           <div className="flex items-center">
-                            <HighlightTypeIcon type={type.id} className="w-5 h-5 shrink-0 text-gray-900" />
+                            <HighlightTypeIcon type={type.id} className="w-5 h-5 shrink-0 text-discovery-black" />
                             <div className="ml-3">
-                              <div className="text-sm font-medium text-gray-900">{type.name}</div>
-                              <div className="text-xs text-gray-500">{type.description}</div>
+                              <div className="text-base font-medium text-discovery-black">{type.name}</div>
+                              <div className="text-xs text-discovery-grey">{type.description}</div>
                             </div>
                           </div>
                         </button>
@@ -502,15 +513,13 @@ export default function EditHighlight() {
                     </div>
                   )}
                 </div>
-                {errors.type && (
-                  <p className="form-field__error">{errors.type}</p>
-                )}
+                {errors.type && <p className="text-red-500 text-sm mt-1">{errors.type}</p>}
               </div>
 
               {/* Title */}
-              <div className="form-field">
-                <label htmlFor="title" className="form-field__label form-field__label--required">
-                  Title
+              <div>
+                <label htmlFor="title" className="block text-md font-medium text-discovery-black mb-2">
+                  Title *
                 </label>
                 <input
                   type="text"
@@ -519,36 +528,34 @@ export default function EditHighlight() {
                   onChange={(e) => handleInputChange('title', e.target.value)}
                   placeholder="e.g., First Piano Recital"
                   maxLength={100}
-                  className="input"
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors text-discovery-black ${
+                    errors.title ? 'border-red-500' : 'border-discovery-grey-300'
+                  }`}
                 />
-                {errors.title && (
-                  <p className="form-field__error">{errors.title}</p>
-                )}
-                <p className="form-field__help">
-                  {formData.title.length}/100 characters
-                </p>
+                {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
+                <p className="text-discovery-grey text-sm mt-1">{formData.title.length}/100 characters</p>
               </div>
 
               {/* Date */}
-              <div className="form-field">
-                <label htmlFor="date" className="form-field__label form-field__label--required">
-                  Date
+              <div>
+                <label htmlFor="date" className="block text-md font-medium text-discovery-black mb-2">
+                  Date *
                 </label>
                 <input
                   type="date"
                   id="date"
                   value={formData.date}
                   onChange={(e) => handleInputChange('date', e.target.value)}
-                  className="input cursor-pointer"
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors text-discovery-black cursor-pointer ${
+                    errors.date ? 'border-red-500' : 'border-discovery-grey-300'
+                  }`}
                 />
-                {errors.date && (
-                  <p className="form-field__error">{errors.date}</p>
-                )}
+                {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date}</p>}
               </div>
 
               {/* Description */}
-              <div className="form-field">
-                <label htmlFor="description" className="form-field__label">
+              <div>
+                <label htmlFor="description" className="block text-md font-medium text-discovery-black mb-2">
                   Description (Optional)
                 </label>
                 <textarea
@@ -558,23 +565,18 @@ export default function EditHighlight() {
                   placeholder="Ex: they practiced for weeks to get this piano piece right—so proud!"
                   rows={4}
                   maxLength={500}
-                  className="input textarea"
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors text-discovery-black resize-none ${
+                    errors.description ? 'border-red-500' : 'border-discovery-grey-300'
+                  }`}
                 />
-                {errors.description && (
-                  <p className="form-field__error">{errors.description}</p>
-                )}
-                <p className="form-field__help">
-                  {formData.description.length}/500 characters
-                </p>
+                {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+                <p className="text-discovery-grey text-sm mt-1">{formData.description.length}/500 characters</p>
               </div>
 
               {/* Media Upload */}
-              <div className="form-field">
-                <label className="form-field__label">
-                  Add Media (Optional)
-                </label>
-                
-                {/* File Input */}
+              <div>
+                <label className="block text-md font-medium text-discovery-black mb-2">Add Media (Optional)</label>
+
                 <div className="relative">
                   <input
                     type="file"
@@ -587,23 +589,26 @@ export default function EditHighlight() {
                   />
                   <label
                     htmlFor="media"
-                    className={`inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer transition-colors ${
-                      uploadingMedia 
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                        : 'bg-white hover:bg-gray-50 text-gray-700'
+                    className={`inline-flex items-center px-4 py-2 border border-discovery-grey-300 rounded-lg cursor-pointer transition-colors ${
+                      uploadingMedia ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white hover:bg-gray-50 text-gray-700'
                     }`}
                   >
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                      />
                     </svg>
                     Choose files
                   </label>
                 </div>
-                
-                <p className="form-field__help">
+
+                <p className="text-discovery-grey text-xs mt-1">
                   The Kifolio free plan allows for photos (JPEG and PNG), PDFs, and audio files up to 50MB each.
                 </p>
-                
+
                 {uploadingMedia && (
                   <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <div className="flex items-center space-x-3">
@@ -612,52 +617,49 @@ export default function EditHighlight() {
                     </div>
                   </div>
                 )}
-                
-                {errors.media && (
-                  <p className="form-field__error">{errors.media}</p>
-                )}
+
+                {errors.media && <p className="text-red-500 text-sm mt-1">{errors.media}</p>}
               </div>
 
-          {/* Media Preview */}
-          {(formData.media.length > 0 || existingMedia.length > 0) && (
-            <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Media Preview</h3>
-              <div className="grid grid-cols-4 gap-3">
-                {/* Existing Media */}
-                {existingMedia.map((media, index) => {
-                  const fileType = getFileTypeFromUrl(media.url);
-                  const filename = getFileNameFromUrl(media.url);
-                  
-                  return (
-                    <div key={media.id} className="relative">
-                      <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                        {fileType === 'pdf' ? (
-                          <div className="flex flex-col items-center justify-center text-center p-2">
-                            <FileText className="w-8 h-8 text-red-500 mb-1" />
-                            <span className="text-xs text-gray-500 truncate">{filename}</span>
-                          </div>
-                        ) : fileType === 'video' ? (
-                          <div className="flex flex-col items-center justify-center text-center p-2">
-                            <Video className="w-8 h-8 text-blue-500 mb-1" />
-                            <span className="text-xs text-gray-500 truncate">{filename}</span>
-                          </div>
-                        ) : fileType === 'audio' ? (
-                          <div className="flex flex-col items-center justify-center text-center p-2">
-                            <Music className="w-8 h-8 text-green-500 mb-1" />
-                            <span className="text-xs text-gray-500 truncate">{filename}</span>
-                          </div>
-                        ) : fileType === 'image' ? (
-                          <img 
-                            src={media.url} 
-                            alt={filename}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              // Fallback to icon if image fails to load
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                              const parent = target.parentElement;
-                              if (parent) {
-                                parent.innerHTML = `
+              {/* Media Preview */}
+              {(formData.media.length > 0 || existingMedia.length > 0) && (
+                <div>
+                  <h3 className="text-md font-medium text-discovery-black mb-2">Media Preview</h3>
+                  <div className="grid grid-cols-4 gap-3">
+                    {existingMedia.map((media, index) => {
+                      const fileType = getFileTypeFromUrl(media.url);
+                      const filename = getFileNameFromUrl(media.url);
+                      const displayFileType = fileType;
+
+                      return (
+                        <div key={media.id} className="relative">
+                          <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                            {displayFileType === 'pdf' ? (
+                              <div className="flex flex-col items-center justify-center text-center p-2">
+                                <FileText className="w-8 h-8 text-red-500 mb-1" />
+                                <span className="text-xs text-gray-500 truncate">{filename}</span>
+                              </div>
+                            ) : displayFileType === 'video' ? (
+                              <div className="flex flex-col items-center justify-center text-center p-2">
+                                <Video className="w-8 h-8 text-blue-500 mb-1" />
+                                <span className="text-xs text-gray-500 truncate">{filename}</span>
+                              </div>
+                            ) : displayFileType === 'audio' ? (
+                              <div className="flex flex-col items-center justify-center text-center p-2">
+                                <Music className="w-8 h-8 text-green-500 mb-1" />
+                                <span className="text-xs text-gray-500 truncate">{filename}</span>
+                              </div>
+                            ) : displayFileType === 'image' ? (
+                              <img
+                                src={media.url}
+                                alt={filename}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  const parent = target.parentElement;
+                                  if (parent) {
+                                    parent.innerHTML = `
                                   <div class="flex flex-col items-center justify-center text-center p-2">
                                     <svg class="w-8 h-8 text-gray-500 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -665,168 +667,181 @@ export default function EditHighlight() {
                                     <span class="text-xs text-gray-500 truncate">${filename}</span>
                                   </div>
                                 `;
-                              }
-                            }}
-                          />
-                        ) : (
-                          <div className="flex flex-col items-center justify-center text-center p-2">
-                            <Image className="w-8 h-8 text-gray-500 mb-1" />
-                            <span className="text-xs text-gray-500 truncate">{filename}</span>
+                                  }
+                                }}
+                              />
+                            ) : (
+                              <div className="flex flex-col items-center justify-center text-center p-2">
+                                <Image className="w-8 h-8 text-gray-500 mb-1" />
+                                <span className="text-xs text-gray-500 truncate">{filename}</span>
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeExistingMedia(index)}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  );
-                })}
-                
-                {/* New Media */}
-                {formData.media.map((file, index) => {
-                  const preview = mediaPreview[index];
-                  return (
-                    <div key={index} className="relative">
-                      <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                        {file.type.startsWith('image/') && preview ? (
-                          <img 
-                            src={preview.url} 
-                            alt={file.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : file.type === 'application/pdf' ? (
-                          <div className="flex flex-col items-center justify-center text-center p-2">
-                            <FileText className="w-8 h-8 text-red-500 mb-1" />
-                            <span className="text-xs text-gray-500 truncate">{file.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeExistingMedia(index)}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      );
+                    })}
+
+                    {formData.media.map((file, index) => {
+                      const preview = mediaPreview[index];
+                      return (
+                        <div key={index} className="relative">
+                          <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                            {file.type.startsWith('image/') && preview ? (
+                              <img
+                                src={preview.url}
+                                alt={file.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  console.error('Image preview failed to load:', {
+                                    fileName: file.name,
+                                    fileType: file.type,
+                                    fileSize: file.size,
+                                    previewUrl: preview.url,
+                                    error: e,
+                                  });
+                                }}
+                                onLoad={() => {
+                                  console.log('Image preview loaded successfully:', file.name);
+                                }}
+                              />
+                            ) : file.type === 'application/pdf' ? (
+                              <div className="flex flex-col items-center justify-center text-center p-2">
+                                <FileText className="w-8 h-8 text-red-500 mb-1" />
+                                <span className="text-xs text-gray-500 truncate">{file.name}</span>
+                              </div>
+                            ) : file.type.startsWith('audio/') ? (
+                              <div className="flex flex-col items-center justify-center text-center p-2">
+                                <Music className="w-8 h-8 text-green-500 mb-1" />
+                                <span className="text-xs text-gray-500 truncate">{file.name}</span>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col items-center justify-center text-center p-2">
+                                <Image className="w-8 h-8 text-gray-500 mb-1" />
+                                <span className="text-xs text-gray-500 truncate">{file.name}</span>
+                              </div>
+                            )}
                           </div>
-                        ) : file.type.startsWith('audio/') ? (
-                          <div className="flex flex-col items-center justify-center text-center p-2">
-                            <Music className="w-8 h-8 text-green-500 mb-1" />
-                            <span className="text-xs text-gray-500 truncate">{file.name}</span>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center justify-center text-center p-2">
-                            <Image className="w-8 h-8 text-gray-500 mb-1" />
-                            <span className="text-xs text-gray-500 truncate">{file.name}</span>
-                          </div>
-                        )}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeMedia(index)}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+                          <button
+                            type="button"
+                            onClick={() => removeMedia(index)}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* Request instructor endorsement (optional) */}
-              <div className="form-field border-t border-gray-200 pt-6 mt-6">
-                <label className="form-field__label">
+              <div className="border-t border-discovery-beige-100 pt-8">
+                <label className="block text-md font-medium text-discovery-black mb-2">
                   Request instructor endorsement (optional)
                 </label>
-                <p className="form-field__help mb-4">
+                <p className="text-discovery-grey text-sm mb-4">
                   Invite an instructor or teacher to leave a comment about this achievement.
                 </p>
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="instructorName" className="form-field__label">Instructor name</label>
+                    <label htmlFor="instructorName" className="block text-sm font-medium text-discovery-black mb-1">
+                      Instructor name
+                    </label>
                     <input
                       type="text"
                       id="instructorName"
                       value={endorsementData.instructorName}
                       onChange={(e) => setEndorsementData((p) => ({ ...p, instructorName: e.target.value }))}
                       placeholder="e.g. Coach Mike Reynolds"
-                      className="input"
+                      className="w-full px-4 py-3 border border-discovery-grey-300 rounded-lg focus:ring-2 focus:ring-discovery-primary focus:border-transparent text-discovery-black"
                     />
                   </div>
                   <div>
-                    <label htmlFor="instructorEmail" className="form-field__label">Instructor email</label>
+                    <label htmlFor="instructorEmail" className="block text-sm font-medium text-discovery-black mb-1">
+                      Instructor email
+                    </label>
                     <input
                       type="email"
                       id="instructorEmail"
                       value={endorsementData.instructorEmail}
                       onChange={(e) => setEndorsementData((p) => ({ ...p, instructorEmail: e.target.value }))}
                       placeholder="e.g. coach@example.com"
-                      className="input"
+                      className="w-full px-4 py-3 border border-discovery-grey-300 rounded-lg focus:ring-2 focus:ring-discovery-primary focus:border-transparent text-discovery-black"
                     />
                   </div>
                   <div>
-                    <label htmlFor="relationship" className="form-field__label">Relationship</label>
+                    <label htmlFor="relationship" className="block text-sm font-medium text-discovery-black mb-1">
+                      Relationship
+                    </label>
                     <input
                       type="text"
                       id="relationship"
                       value={endorsementData.relationship}
                       onChange={(e) => setEndorsementData((p) => ({ ...p, relationship: e.target.value }))}
                       placeholder="e.g. BJJ Instructor, Piano Teacher"
-                      className="input"
+                      className="w-full px-4 py-3 border border-discovery-grey-300 rounded-lg focus:ring-2 focus:ring-discovery-primary focus:border-transparent text-discovery-black"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Form Actions */}
-              <div className="form-actions">
-                <div className="flex justify-between items-center w-full">
+              {/* Delete + Cancel + Update — mobile: stacked Update, Cancel, Delete; md+: Delete left, Cancel+Update right */}
+              <div className="flex flex-col gap-3 px-10 py-6 border-t border-discovery-beige-100 md:flex-row md:flex-wrap md:justify-between md:items-center">
+                <div className="flex w-full flex-col gap-3 md:order-2 md:w-auto md:flex-row md:gap-3">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting || uploadingMedia}
+                    className="w-full px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl text-center disabled:opacity-50 disabled:cursor-not-allowed bg-discovery-orange hover:bg-discovery-orange-light text-white md:w-auto"
+                  >
+                    {isSubmitting ? 'Saving...' : 'Update highlight'}
+                  </button>
                   <button
                     type="button"
-                    onClick={handleDelete}
-                    className="btn btn--danger"
+                    onClick={handleBackClick}
+                    className="w-full px-8 py-4 border border-discovery-beige-300 text-discovery-black rounded-pill hover:bg-discovery-beige-100 transition-colors font-medium md:w-auto"
                   >
-                    Delete Highlight
+                    Cancel
                   </button>
-                  <div className="flex space-x-3">
-                    <button
-                      type="button"
-                      onClick={handleBackClick}
-                      className="btn btn--secondary"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isSubmitting || uploadingMedia}
-                      className="btn btn--primary"
-                    >
-                      {isSubmitting ? 'Updating...' : 'Update Highlight'}
-                    </button>
-                  </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  className="w-full px-2 py-3 text-center text-sm font-semibold text-red-600 hover:text-red-700 rounded-lg hover:bg-red-50 transition-colors md:order-1 md:w-auto md:self-center md:px-2 md:py-2 md:text-left"
+                >
+                  Delete Highlight
+                </button>
               </div>
 
-              {errors.submit && (
-                <p className="form-field__error text-center">{errors.submit}</p>
-              )}
+              {errors.submit && <p className="text-red-500 text-sm text-center mt-2">{errors.submit}</p>}
             </form>
           </div>
         </div>
       </main>
 
-      {/* Confirmation Modal */}
-      <ConfirmNavigationModal
+      <ConfirmDialog
         isOpen={showConfirmModal}
         onCancel={() => setShowConfirmModal(false)}
         onConfirm={handleConfirmNavigation}
-        title="Discard Changes?"
+        title="Discard changes?"
         message="You have unsaved changes. Are you sure you want to leave without saving?"
+        confirmLabel="Discard changes"
       />
 
-      {/* Delete Confirmation Modal */}
-      <ConfirmNavigationModal
+      <ConfirmDialog
         isOpen={showDeleteModal}
         onCancel={handleCancelDelete}
         onConfirm={handleConfirmDelete}
-        title="Delete Highlight?"
+        title="Delete highlight?"
         message="Are you sure you want to delete this highlight? This action cannot be undone."
+        confirmLabel="Delete highlight"
       />
     </div>
   );
