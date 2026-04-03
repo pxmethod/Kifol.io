@@ -12,9 +12,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { portfolioService, achievementService } from '@/lib/database';
 import { createClient } from '@/lib/supabase/client';
 import { DOMAIN_CONFIG } from '@/config/domains';
-import { Achievement, HighlightType } from '@/types/achievement';
+import { Achievement, HighlightType, HIGHLIGHT_TYPES } from '@/types/achievement';
 import HighlightTypeFilter, { filterAchievementsByTypes } from '@/components/HighlightTypeFilter';
 import Image from 'next/image';
+import { HighlightTypeIcon } from '@/lib/highlightTypeIcons';
 import HighlightsTimeline from '@/components/HighlightsTimeline';
 import EndorsementRequestModal from '@/components/EndorsementRequestModal';
 
@@ -29,6 +30,86 @@ interface PortfolioData {
   password?: string;
   short_id?: string;
   achievements?: Achievement[];
+}
+
+function PortfolioStatsSection({
+  total,
+  endorsementCount,
+  byType,
+  className = '',
+}: {
+  total: number;
+  endorsementCount: number;
+  byType: { id: HighlightType; name: string; count: number }[];
+  className?: string;
+}) {
+  return (
+    <div className={`bg-discovery-white-100 rounded-lg shadow-md overflow-hidden ${className}`}>
+      <div className="px-6 py-4">
+        <h2 className="text-2xl font-medium text-discovery-black">Stats</h2>
+      </div>
+
+      <div className="px-6 pb-6">
+        {total === 0 ? (
+          <div className="text-center py-12">
+            <div className="mx-auto mb-4">
+              <img
+                src="/marketing/no-orgs.png"
+                alt=""
+                className="mx-auto"
+                style={{ width: '260px', height: '260px' }}
+              />
+            </div>
+            <h3 className="text-lg font-medium text-discovery-black mb-2">No stats...yet</h3>
+            <p className="text-discovery-grey">
+              Add highlights to see your total count and a breakdown by type here.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="mb-8 grid grid-cols-2 gap-4 sm:gap-6">
+              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 min-w-0">
+                <span className="text-4xl lg:text-5xl font-medium text-discovery-black tabular-nums leading-none">
+                  {total}
+                </span>
+                <span className="text-sm text-gray-500">Total highlights</span>
+              </div>
+              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 min-w-0">
+                <span className="text-4xl lg:text-5xl font-medium text-discovery-black tabular-nums leading-none">
+                  {endorsementCount}
+                </span>
+                <span className="text-sm text-gray-500">Endorsements</span>
+              </div>
+            </div>
+            {byType.length > 0 && (
+              <ul className="space-y-2 list-none p-0 m-0">
+                {byType.map((row) => {
+                  return (
+                    <li
+                      key={row.id}
+                      className="flex items-center justify-between gap-3 text-sm border-b border-discovery-beige-100 last:border-0 pb-2 last:pb-0"
+                    >
+                      <span className="flex items-center gap-2.5 min-w-0 text-discovery-grey">
+                        <HighlightTypeIcon
+                          type={row.id}
+                          className="w-4 h-4 shrink-0 text-discovery-grey/75"
+                          strokeWidth={1.75}
+                        />
+                        <span>{row.name}</span>
+                      </span>
+                      <span className="font-medium text-discovery-black tabular-nums shrink-0">
+                        {row.count}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default function PortfolioPage() {
@@ -150,6 +231,25 @@ export default function PortfolioPage() {
     () => filterAchievementsByTypes(portfolio?.achievements ?? [], highlightTypeFilter),
     [portfolio?.achievements, highlightTypeFilter]
   );
+
+  const highlightStats = useMemo(() => {
+    const achievements = portfolio?.achievements ?? [];
+    const total = achievements.length;
+    const endorsementCount = achievements.reduce(
+      (sum, a) => sum + (a.endorsements?.length ?? 0),
+      0
+    );
+    const counts = new Map<HighlightType, number>();
+    for (const a of achievements) {
+      counts.set(a.type, (counts.get(a.type) ?? 0) + 1);
+    }
+    const byType = HIGHLIGHT_TYPES.map((opt) => ({
+      id: opt.id,
+      name: opt.name,
+      count: counts.get(opt.id) ?? 0,
+    })).filter((row) => row.count > 0);
+    return { total, endorsementCount, byType };
+  }, [portfolio?.achievements]);
 
   const totalHighlightCount = portfolio?.achievements?.length ?? 0;
   const emptyFilterMessage =
@@ -438,28 +538,12 @@ export default function PortfolioPage() {
             </div>
           </div>
 
-          {/* Organizations Section */}
-          <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden mt-8">
-            <div className="px-6 py-4">
-              <h2 className="text-2xl font-medium text-discovery-black">Organizations</h2>
-            </div>
-
-            <div className="px-6 pb-6">
-              {/* Organizations Empty State */}
-              <div className="text-center py-12">
-                <div className="mx-auto mb-4">
-                  <img 
-                    src="/marketing/no-orgs.png" 
-                    alt="No organizations yet" 
-                    className="mx-auto"
-                    style={{ width: '260px', height: '260px' }}
-                  />
-                </div>
-                <h3 className="text-lg font-medium text-discovery-black mb-2">No orgs to show</h3>
-                <p className="text-discovery-grey">Organizations that your child is a part of will display here.</p>
-              </div>
-            </div>
-          </div>
+          <PortfolioStatsSection
+            total={highlightStats.total}
+            endorsementCount={highlightStats.endorsementCount}
+            byType={highlightStats.byType}
+            className="mt-8"
+          />
 
           {/* Portfolio Content */}
           <div>
@@ -617,28 +701,11 @@ export default function PortfolioPage() {
                 </div>
               </div>
 
-              {/* Organizations Section */}
-              <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden">
-                <div className="px-6 py-4">
-                  <h2 className="text-2xl font-medium text-discovery-black">Organizations</h2>
-                </div>
-
-                <div className="px-6 pb-6">
-                  {/* Organizations Empty State */}
-                  <div className="text-center py-12">
-                    <div className="mx-auto mb-4">
-                      <img 
-                        src="/marketing/no-orgs.png" 
-                        alt="No organizations yet" 
-                        className="mx-auto"
-                        style={{ width: '260px', height: '260px' }}
-                      />
-                    </div>
-                    <h3 className="text-lg font-medium text-discovery-black mb-2">No orgs to show</h3>
-                    <p className="text-discovery-grey">Organizations that your child is a part of will display here.</p>
-                  </div>
-                </div>
-              </div>
+              <PortfolioStatsSection
+                total={highlightStats.total}
+                endorsementCount={highlightStats.endorsementCount}
+                byType={highlightStats.byType}
+              />
             </div>
           </div>
 

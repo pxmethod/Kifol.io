@@ -1,9 +1,7 @@
-export const PORTFOLIO_TEMPLATES = [
-  { id: 'ren', name: 'Ren', description: 'Clean and modern design' },
-  { id: 'maeve', name: 'Maeve', description: 'Elegant and sophisticated' },
-  { id: 'jack', name: 'Jack', description: 'Bold and dynamic' },
-  { id: 'adler', name: 'Adler', description: 'Classic and timeless' },
-] as const;
+import { templates } from '@/config/templates';
+
+/** Same order and data as `templates` — used for create / onboarding template pickers. */
+export const PORTFOLIO_TEMPLATES = templates;
 
 export type PortfolioFormState = {
   childName: string;
@@ -30,7 +28,7 @@ export function validatePortfolioForm(formData: PortfolioFormState): Record<stri
   }
 
   if (!formData.template) {
-    newErrors.template = 'Please select a template';
+    newErrors.template = 'Please select a theme';
   }
 
   if (formData.isPrivate && !formData.password.trim()) {

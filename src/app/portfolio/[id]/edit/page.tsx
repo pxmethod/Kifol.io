@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Header from '@/components/Header';
-import TemplatePreviewModal from '@/components/TemplatePreviewModal';
 import ConfirmNavigationModal from '@/components/ConfirmNavigationModal';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { getRandomPlaceholder } from '@/utils/placeholders';
@@ -11,6 +10,7 @@ import { usePortfolios } from '@/hooks/usePortfolios';
 import { useAuth } from '@/contexts/AuthContext';
 import { storageService } from '@/lib/storage';
 import { portfolioService } from '@/lib/database';
+import { templates } from '@/config/templates';
 
 interface PortfolioData {
   id: string;
@@ -50,20 +50,11 @@ export default function EditPortfolio() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showTemplateModal, setShowTemplateModal] = useState(false);
-  const [selectedTemplateForPreview, setSelectedTemplateForPreview] = useState<string>('');
   const [showPassword, setShowPassword] = useState(true);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loadingPortfolio, setLoadingPortfolio] = useState(true);
-
-  const templates = [
-    { id: 'ren', name: 'Ren', description: 'Clean and modern design' },
-    { id: 'maeve', name: 'Maeve', description: 'Elegant and sophisticated' },
-    { id: 'jack', name: 'Jack', description: 'Bold and dynamic' },
-    { id: 'adler', name: 'Adler', description: 'Classic and timeless' }
-  ];
 
   // Load portfolio data
   useEffect(() => {
@@ -141,7 +132,7 @@ export default function EditPortfolio() {
     }
 
     if (!formData.template) {
-      newErrors.template = 'Please select a template';
+      newErrors.template = 'Please select a theme';
     }
 
     if (formData.isPrivate && !formData.password.trim()) {
@@ -205,13 +196,7 @@ export default function EditPortfolio() {
   };
 
   const handleTemplateSelect = (templateId: string) => {
-    setFormData(prev => ({ ...prev, template: templateId }));
-    setShowTemplateModal(false);
-  };
-
-  const handlePreviewTemplate = (templateId: string) => {
-    setSelectedTemplateForPreview(templateId);
-    setShowTemplateModal(true);
+    setFormData((prev) => ({ ...prev, template: templateId }));
   };
 
   const handleSave = async () => {
@@ -476,68 +461,46 @@ export default function EditPortfolio() {
                 </p>
               </div>
 
-              {/* Template Selection */}
+              {/* Theme selection */}
               <div>
                 <label className="block text-md font-medium text-discovery-black mb-2">
-                  Choose a template *
+                  Choose a theme *
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                  {templates.map((template) => (
-                    <div
-                      key={template.id}
-                      className={`border-2 rounded-lg p-3 cursor-pointer transition-colors ${
-                        formData.template === template.id
-                          ? 'border-discovery-primary bg-discovery-primary/5'
-                          : 'border-discovery-grey-300 hover:border-discovery-primary/50'
-                      }`}
-                      onClick={() => handleTemplateSelect(template.id)}
-                    >
-                      <div className="text-center">
-                        {/* Template Image */}
-                        <div className="mb-2">
-                          <img
-                            src={`/marketing/template_${template.id}.png`}
-                            alt={`${template.name} template preview`}
-                            className="w-full h-20 object-cover rounded-lg border border-gray-200"
+                  {templates.map((template) => {
+                    const selected = formData.template === template.id;
+                    return (
+                      <div
+                        key={template.id}
+                        role="button"
+                        tabIndex={0}
+                        aria-pressed={selected}
+                        aria-label={`${template.name} theme${selected ? ', selected' : ''}`}
+                        className={`border-2 rounded-lg p-3 cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-discovery-primary focus-visible:ring-offset-2 ${
+                          selected
+                            ? 'border-discovery-primary bg-discovery-primary/5'
+                            : 'border-discovery-grey-300 hover:border-discovery-primary/50'
+                        }`}
+                        onClick={() => handleTemplateSelect(template.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleTemplateSelect(template.id);
+                          }
+                        }}
+                      >
+                        <div className="text-center">
+                          <div
+                            className="mb-2 w-full h-20 rounded-lg border border-gray-200 shadow-inner"
+                            style={{ background: template.pageBackground }}
+                            aria-hidden
                           />
-                        </div>
-                        
-                        {/* Template Name */}
-                        <h3 className="font-semibold text-discovery-black">{template.name}</h3>
-                        
-                        {/* Template Description */}
-                        <p className="text-sm text-discovery-grey mt-1 leading-relaxed">{template.description}</p>
-                        
-                        {/* Action Buttons */}
-                        <div className="mt-3 space-y-2">
-                          <button
-                            type="button"
-                            className="w-full px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handlePreviewTemplate(template.id);
-                            }}
-                          >
-                            Preview
-                          </button>
-                          <button
-                            type="button"
-                            className={`w-full px-4 py-2 text-sm rounded transition-colors ${
-                              formData.template === template.id
-                                ? 'bg-discovery-primary text-white hover:bg-discovery-primary-light'
-                                : 'bg-discovery-primary text-white hover:bg-discovery-primary-light'
-                            }`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleTemplateSelect(template.id);
-                            }}
-                          >
-                            {formData.template === template.id ? 'Selected' : 'Choose'}
-                          </button>
+
+                          <h3 className="font-semibold text-discovery-black">{template.name}</h3>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 {errors.template && (
                   <p className="text-red-500 text-sm mt-1">{errors.template}</p>
@@ -641,16 +604,6 @@ export default function EditPortfolio() {
           </div>
         </div>
       </main>
-
-      {/* Template Preview Modal */}
-      {showTemplateModal && (
-        <TemplatePreviewModal
-          isOpen={showTemplateModal}
-          onClose={() => setShowTemplateModal(false)}
-          onSelect={handleTemplateSelect}
-          selectedTemplate={selectedTemplateForPreview}
-        />
-      )}
 
       {/* Confirm Navigation Modal */}
       {showConfirmModal && (

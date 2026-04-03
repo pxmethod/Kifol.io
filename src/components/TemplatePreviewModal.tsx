@@ -1,6 +1,6 @@
 'use client';
 
-import { getTemplateConfig } from '@/config/templates';
+import { templates } from '@/config/templates';
 import TemplateFactory from './templates/TemplateFactory';
 import { HighlightType } from '@/types/achievement';
 
@@ -19,14 +19,7 @@ export default function TemplatePreviewModal({
 }: TemplatePreviewModalProps) {
   if (!isOpen) return null;
 
-  const templates = [
-    { id: 'ren', name: 'Ren', description: 'Clean and modern design' },
-    { id: 'maeve', name: 'Maeve', description: 'Elegant and sophisticated' },
-    { id: 'jack', name: 'Jack', description: 'Bold and dynamic' },
-    { id: 'adler', name: 'Adler', description: 'Classic and timeless' }
-  ];
-
-  const currentTemplate = templates.find(t => t.id === selectedTemplate);
+  const currentTemplate = templates.find((t) => t.id === selectedTemplate);
   
   // Sample portfolio data for preview
   const samplePortfolio = {
@@ -34,7 +27,7 @@ export default function TemplatePreviewModal({
     childName: 'Alex Johnson',
     portfolioTitle: 'My Learning Journey',
     photoUrl: '',
-    template: selectedTemplate || 'ren',
+    template: selectedTemplate || 'adler',
     createdAt: new Date().toISOString(),
     achievements: [
       {
@@ -126,7 +119,7 @@ export default function TemplatePreviewModal({
             </div>
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-600">Please select a template to preview</p>
+              <p className="text-gray-600">Please select a theme to preview</p>
             </div>
           )}
         </div>

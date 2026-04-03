@@ -82,7 +82,7 @@ export default function MarketingPage() {
                 <div className="flex flex-col sm:flex-row gap-4 mb-6">
                   <Link
                     href="/onboarding"
-                    className="inline-block bg-discovery-primary text-white px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-primary-light text-center">
+                    className="inline-block bg-discovery-orange text-white px-8 py-4 rounded-pill text-lg font-semibold transition-colors shadow-lg hover:shadow-xl hover:bg-discovery-orange-light text-center">
                     Get started for free
                   </Link>
                 </div>

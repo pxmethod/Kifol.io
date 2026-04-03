@@ -16,3 +16,4 @@ Allow: /
 Allow: /auth/login
 Allow: /auth/signup
 Allow: /preview/
+Allow: /blog

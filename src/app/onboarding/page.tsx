@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -35,6 +35,11 @@ function readFileAsDataUrl(file: File): Promise<string> {
   });
 }
 
+function suggestedPortfolioTitle(childName: string): string {
+  const t = childName.trim();
+  return t ? `${t}'s Portfolio` : '';
+}
+
 export default function OnboardingPage() {
   const router = useRouter();
   const [formData, setFormData] = useState<PortfolioFormState>({
@@ -49,11 +54,37 @@ export default function OnboardingPage() {
   const [showPassword, setShowPassword] = useState(true);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewObjectUrl, setPreviewObjectUrl] = useState<string | null>(null);
+  /** When true, child name changes no longer overwrite the portfolio title. */
+  const portfolioTitleManuallyEdited = useRef(false);
+
+  useEffect(() => {
+    if (portfolioTitleManuallyEdited.current) return;
+    const suggested = suggestedPortfolioTitle(formData.childName);
+    setFormData((prev) => {
+      if (prev.portfolioTitle === suggested) return prev;
+      return { ...prev, portfolioTitle: suggested };
+    });
+  }, [formData.childName]);
 
   const handleInputChange = useCallback((field: keyof PortfolioFormState, value: string) => {
+    if (field === 'portfolioTitle') {
+      const suggested = suggestedPortfolioTitle(formData.childName);
+      if (value === '') {
+        portfolioTitleManuallyEdited.current = false;
+        setFormData((prev) => ({
+          ...prev,
+          portfolioTitle: suggestedPortfolioTitle(prev.childName),
+        }));
+      } else {
+        portfolioTitleManuallyEdited.current = value !== suggested;
+        setFormData((prev) => ({ ...prev, portfolioTitle: value }));
+      }
+      setErrors((prev) => (prev.portfolioTitle ? { ...prev, portfolioTitle: '' } : prev));
+      return;
+    }
     setFormData((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => (prev[field] ? { ...prev, [field]: '' } : prev));
-  }, []);
+  }, [formData.childName]);
 
   useEffect(() => {
     return () => {
@@ -158,9 +189,9 @@ export default function OnboardingPage() {
               <h1 className="text-4xl lg:text-5xl font-medium text-discovery-black mb-4">
                 Create your first portfolio
               </h1>
-              <p className="text-lg text-discovery-grey leading-relaxed max-w-xl">
-                Set up how the portfolio will look. You can add more portfolios later and everything you add here will be saved and can be updated
-                at anytime after you create your account.
+              <p className="text-md text-discovery-grey leading-relaxed max-w-xl">
+                You can add more portfolios later. Everything you add here will be saved after signing up and can be updated
+                at anytime.
               </p>
             </div>
 

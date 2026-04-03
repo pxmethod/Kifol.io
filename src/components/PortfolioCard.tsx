@@ -150,16 +150,16 @@ export default function PortfolioCard({ portfolio, onEdit, onRemove }: Portfolio
             <Image
               src={portfolio.photoUrl}
               alt={portfolio.childName}
-              width={192}
-              height={192}
+              width={300}
+              height={300}
               className="w-full h-full object-cover"
             />
           ) : (
             <Image
               src={portfolio.photoUrl}
               alt={portfolio.childName}
-              width={192}
-              height={192}
+              width={300}
+              height={300}
               className="w-full h-full object-cover"
             />
           )

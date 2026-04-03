@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { storageService } from '@/lib/storage';
+import { templates } from '@/config/templates';
 
 interface PortfolioData {
   id: string;
@@ -54,13 +55,6 @@ export default function EditPortfolioModal({
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [modalMode, setModalMode] = useState<'form' | 'delete-confirmation'>('form');
 
-  const templates = [
-    { id: 'ren', name: 'Ren', description: 'Clean and modern design' },
-    { id: 'maeve', name: 'Maeve', description: 'Elegant and sophisticated' },
-    { id: 'jack', name: 'Jack', description: 'Bold and dynamic' },
-    { id: 'adler', name: 'Adler', description: 'Classic and timeless' }
-  ];
-
   // Populate form data when portfolio changes
   useEffect(() => {
     if (portfolio) {
@@ -104,7 +98,7 @@ export default function EditPortfolioModal({
     }
 
     if (!formData.template) {
-      newErrors.template = 'Please select a template';
+      newErrors.template = 'Please select a theme';
     }
 
     if (formData.isPrivate && !formData.password.trim()) {
@@ -366,64 +360,46 @@ export default function EditPortfolioModal({
               </p>
             </div>
 
-            {/* Template Selection */}
+            {/* Theme selection */}
             <div>
               <label className="block text-sm font-medium text-kifolio-text mb-2">
-                Portfolio Template *
+                Choose a theme *
               </label>
               <div className="grid grid-cols-2 gap-4">
-                {templates.map((template) => (
-                  <div
-                    key={template.id}
-                    className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${
-                      formData.template === template.id
-                        ? 'border-kifolio-cta bg-kifolio-cta/5'
-                        : 'border-gray-300 hover:border-kifolio-cta/50'
-                    }`}
-                    onClick={() => handleInputChange('template', template.id)}
-                  >
-                    <div className="text-center">
-                      {/* Template Image */}
-                      <div className="mb-3">
-                        <img
-                          src={`/marketing/template_${template.id}.png`}
-                          alt={`${template.name} template preview`}
-                          className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                {templates.map((template) => {
+                  const selected = formData.template === template.id;
+                  return (
+                    <div
+                      key={template.id}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={selected}
+                      aria-label={`${template.name} theme${selected ? ', selected' : ''}`}
+                      className={`border-2 rounded-lg p-3 cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-kifolio-cta focus-visible:ring-offset-2 ${
+                        selected
+                          ? 'border-kifolio-cta bg-kifolio-cta/5'
+                          : 'border-gray-300 hover:border-kifolio-cta/50'
+                      }`}
+                      onClick={() => handleInputChange('template', template.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleInputChange('template', template.id);
+                        }
+                      }}
+                    >
+                      <div className="text-center">
+                        <div
+                          className="mb-2 w-full h-20 rounded-lg border border-gray-200 shadow-inner"
+                          style={{ background: template.pageBackground }}
+                          aria-hidden
                         />
-                      </div>
-                      
-                      {/* Template Name */}
-                      <h3 className="font-semibold text-kifolio-text">{template.name}</h3>
-                      
-                      {/* Template Description */}
-                      <p className="text-sm text-gray-600 mt-1">{template.description}</p>
-                      
-                      {/* Action Buttons */}
-                      <div className="mt-3 space-y-2">
-                        <button
-                          type="button"
-                          className="w-full px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // Note: Preview functionality would need to be added to EditPortfolioModal
-                          }}
-                        >
-                          Preview
-                        </button>
-                        <button
-                          type="button"
-                          className="w-full px-4 py-2 text-sm bg-kifolio-cta text-white rounded-pill hover:bg-kifolio-cta/90 transition-colors"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleInputChange('template', template.id);
-                          }}
-                        >
-                          Choose
-                        </button>
+
+                        <h3 className="font-semibold text-kifolio-text">{template.name}</h3>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               {errors.template && (
                 <p className="text-red-500 text-sm mt-1">{errors.template}</p>

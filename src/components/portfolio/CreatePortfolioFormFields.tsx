@@ -168,9 +168,9 @@ export default function CreatePortfolioFormFields({
           <p className="form-field__help text-xs">JPEG, PNG, GIF, or SVG. Max size of 50MB</p>
         </div>
 
-        {/* Template Selection */}
+        {/* Theme selection */}
         <div>
-          <label className="block text-md font-medium text-discovery-black mb-2">Choose a template *</label>
+          <label className="block text-md font-medium text-discovery-black mb-2">Choose a theme *</label>
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3">
             {PORTFOLIO_TEMPLATES.map((template) => {
               const selected = formData.template === template.id;
@@ -180,7 +180,7 @@ export default function CreatePortfolioFormFields({
                   role="button"
                   tabIndex={0}
                   aria-pressed={selected}
-                  aria-label={`${template.name} template${selected ? ', selected' : ''}`}
+                  aria-label={`${template.name} theme${selected ? ', selected' : ''}`}
                   className={`border-2 rounded-lg p-3 cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-discovery-primary focus-visible:ring-offset-2 ${
                     selected
                       ? 'border-discovery-primary bg-discovery-primary/5'
@@ -195,17 +195,13 @@ export default function CreatePortfolioFormFields({
                   }}
                 >
                   <div className="text-center">
-                    <div className="mb-2">
-                      <img
-                        src={`/marketing/template_${template.id}.png`}
-                        alt=""
-                        className="w-full h-20 object-cover rounded-lg border border-gray-200"
-                      />
-                    </div>
+                    <div
+                      className="mb-2 w-full h-20 rounded-lg border border-gray-200 shadow-inner"
+                      style={{ background: template.pageBackground }}
+                      aria-hidden
+                    />
 
                     <h3 className="font-semibold text-discovery-black">{template.name}</h3>
-
-                    <p className="text-sm text-discovery-grey mt-1 leading-relaxed">{template.description}</p>
                   </div>
                 </div>
               );

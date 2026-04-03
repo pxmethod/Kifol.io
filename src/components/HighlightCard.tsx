@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { CircleStar } from 'lucide-react';
-import { Achievement } from '@/types/achievement';
+import { Achievement, HIGHLIGHT_TYPES, type HighlightType } from '@/types/achievement';
+import { HighlightTypeIcon } from '@/lib/highlightTypeIcons';
 import EndorsementBlock from './EndorsementBlock';
 import { formatTextWithLinks } from '@/utils/text-formatting';
 
@@ -176,77 +177,9 @@ export default function HighlightCard({
     );
   };
 
-  // Get type icon and display name
-  const getTypeInfo = (type: string) => {
-    switch (type) {
-      case 'achievement':
-        return {
-          icon: (
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-            </svg>
-          ),
-          name: 'Achievement'
-        };
-      case 'creative_work':
-        return {
-          icon: (
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
-            </svg>
-          ),
-          name: 'Creative work'
-        };
-      case 'milestone':
-        return {
-          icon: (
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          ),
-          name: 'Milestone'
-        };
-      case 'activity':
-        return {
-          icon: (
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          ),
-          name: 'Activity'
-        };
-      case 'volunteer_work':
-        return {
-          icon: (
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          ),
-          name: 'Volunteer work'
-        };
-      case 'reflection_note':
-        return {
-          icon: (
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-          ),
-          name: 'Reflection/Note'
-        };
-      default:
-        return {
-          icon: (
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-            </svg>
-          ),
-          name: 'Achievement'
-        };
-    }
-  };
-
-  const typeInfo = getTypeInfo(achievement.type);
+  const highlightType = achievement.type as HighlightType;
+  const typeLabel =
+    HIGHLIGHT_TYPES.find((t) => t.id === highlightType)?.name ?? 'Achievement';
 
   return (
     <div
@@ -264,9 +197,13 @@ export default function HighlightCard({
             <h3 className="text-lg font-semibold text-discovery-black truncate">
               {achievement.title}
             </h3>
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-discovery-orange/10 text-discovery-orange flex-shrink-0">
-              {typeInfo.icon}
-              <span className="ml-1">{typeInfo.name}</span>
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-discovery-orange/10 text-discovery-orange flex-shrink-0">
+              <HighlightTypeIcon
+                type={highlightType}
+                className="w-3.5 h-3.5 shrink-0"
+                strokeWidth={2}
+              />
+              <span>{typeLabel}</span>
             </span>
           </div>
           
@@ -275,9 +212,13 @@ export default function HighlightCard({
             <h3 className="text-lg font-semibold text-discovery-black mb-2">
               {achievement.title}
             </h3>
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-discovery-orange/10 text-discovery-orange">
-              {typeInfo.icon}
-              <span className="ml-1">{typeInfo.name}</span>
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-discovery-orange/10 text-discovery-orange">
+              <HighlightTypeIcon
+                type={highlightType}
+                className="w-3.5 h-3.5 shrink-0"
+                strokeWidth={2}
+              />
+              <span>{typeLabel}</span>
             </span>
           </div>
           

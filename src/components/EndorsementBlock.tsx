@@ -129,18 +129,51 @@ export default function EndorsementBlock({
   };
 
   if (compact) {
-    const containerClass = publicVariant
-      ? 'mt-3 p-4 rounded-xl'
-      : 'mt-3 p-4 rounded-xl bg-gray-100';
-    const containerStyle = publicVariant
-      ? { backgroundColor: 'rgba(255, 255, 255, 0.15)' }
-      : undefined;
+    if (publicVariant) {
+      const shown = endorsements.slice(0, 2);
+      return (
+        <>
+          <div className="mt-4 w-full min-w-0">
+            <div className="w-full border-t border-[#e5e7eb]" aria-hidden />
+            <div className="flex items-center gap-2 pt-4">
+              <CircleStar className="h-4 w-4 flex-shrink-0 text-discovery-orange" />
+              <span className="text-sm font-medium text-discovery-orange" style={{ fontFamily }}>
+                Instructor endorsement{endorsements.length > 1 ? 's' : ''}
+              </span>
+            </div>
+            {shown.map((e, i) => (
+              <div key={e.id}>
+                {i > 0 && <div className="mt-4 w-full border-t border-[#e5e7eb]" aria-hidden />}
+                <div className="flex items-start justify-between gap-2 pt-4 text-sm">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium" style={{ color: textColor, fontFamily }}>
+                      {e.instructorName}
+                      {formatCredentials(e)}
+                    </p>
+                    <p className="line-clamp-2" style={{ color: secondaryColor, fontFamily }}>
+                      {formatTextWithLinks(e.comment, secondaryColor)}
+                    </p>
+                  </div>
+                  <RemoveButton endorsementId={e.id} />
+                </div>
+              </div>
+            ))}
+            {endorsements.length > 2 && (
+              <p className="pt-2 text-xs" style={{ color: secondaryColor, fontFamily }}>
+                +{endorsements.length - 2} more
+              </p>
+            )}
+          </div>
+          <RemoveModal />
+        </>
+      );
+    }
 
     return (
       <>
-        <div className={containerClass} style={containerStyle}>
-          <div className="flex items-center gap-2 mb-2">
-            <CircleStar className="w-4 h-4 text-discovery-orange flex-shrink-0" />
+        <div className="mt-3 rounded-xl bg-gray-100 p-4">
+          <div className="mb-2 flex items-center gap-2">
+            <CircleStar className="h-4 w-4 flex-shrink-0 text-discovery-orange" />
             <span className="text-sm font-medium" style={{ color: textColor, fontFamily }}>
               Instructor endorsement{endorsements.length > 1 ? 's' : ''}
             </span>
@@ -150,7 +183,8 @@ export default function EndorsementBlock({
               <div key={e.id} className="flex items-start justify-between gap-2 text-sm">
                 <div className="min-w-0 flex-1">
                   <p className="font-medium" style={{ color: textColor, fontFamily }}>
-                    {e.instructorName}{formatCredentials(e)}
+                    {e.instructorName}
+                    {formatCredentials(e)}
                   </p>
                   <p className="line-clamp-2" style={{ color: secondaryColor, fontFamily }}>
                     {formatTextWithLinks(e.comment, secondaryColor)}

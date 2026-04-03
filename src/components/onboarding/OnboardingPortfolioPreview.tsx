@@ -2,33 +2,85 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import TemplateFactory from '@/components/templates/TemplateFactory';
-import { HighlightType } from '@/types/achievement';
+import type { Achievement, HighlightMedia } from '@/types/achievement';
 import { getRandomPlaceholder } from '@/utils/placeholders';
 
-const SAMPLE_ACHIEVEMENTS = [
+/** Swap these paths for real images under `public/` when you have assets. */
+const PREVIEW_THUMB_URLS = {
+  first: ['/placeholders/placeholder-1.svg', '/placeholders/placeholder-2.svg'],
+  second: ['/placeholders/placeholder-3.svg', '/placeholders/placeholder-4.svg'],
+} as const;
+
+function previewImageMedia(urls: readonly string[], highlightId: string): HighlightMedia[] {
+  return urls.map((url, i) => ({
+    id: `${highlightId}-img-${i}`,
+    url,
+    type: 'image' as const,
+    fileName: url.split('/').pop() ?? 'image',
+    fileSize: 0,
+  }));
+}
+
+/** Placeholder endorsements for onboarding preview — replace copy as needed. */
+const PREVIEW_ENDORSEMENTS_HIGHLIGHT_1 = [
+  {
+    id: 'preview-1-e1',
+    instructorName: 'Sammy George',
+    instructorTitle: 'Head Instructor',
+    organization: 'Kickya Karate',
+    comment: 'Well deserved promotion. Keep up the good work!',
+    submittedAt: '2024-01-16T12:00:00Z',
+  },
+  {
+    id: 'preview-1-e2',
+    instructorName: 'Steve Johnson',
+    instructorTitle: null,
+    organization: null,
+    comment: 'Congrats! Looking forward to your next promotion.',
+    submittedAt: '2024-01-17T12:00:00Z',
+  },
+];
+
+const PREVIEW_ENDORSEMENTS_HIGHLIGHT_2 = [
+  {
+    id: 'preview-2-e1',
+    instructorName: 'Franz Fisher',
+    instructorTitle: 'Manager',
+    organization: 'Atlanta Community Food Bank',
+    comment: 'Thank you so much! You did a great job!',
+    submittedAt: '2024-02-21T12:00:00Z',
+  },
+];
+
+const SAMPLE_ACHIEVEMENTS: Achievement[] = [
   {
     id: '1',
-    title: 'First Steps',
+    title: 'Yellow belt promotion!',
     date: '2024-01-15',
-    description: 'Took my first steps independently',
-    media: [],
-    type: 'milestone' as HighlightType,
+    description: 'I earned my yellow belt in karate!',
+    media: previewImageMedia(PREVIEW_THUMB_URLS.first, '1'),
+    type: 'milestone',
     isMilestone: true,
     createdAt: '2024-01-15T10:00:00Z',
     updatedAt: '2024-01-15T10:00:00Z',
+    endorsements: PREVIEW_ENDORSEMENTS_HIGHLIGHT_1,
   },
   {
     id: '2',
-    title: 'First Words',
+    title: 'Voluneered at the local food bank - 2 hours',
     date: '2024-02-20',
-    description: 'Said my first words clearly',
-    media: [],
-    type: 'milestone' as HighlightType,
+    description: 'I helped pack food bags for families in need at our local food bank.',
+    media: previewImageMedia(PREVIEW_THUMB_URLS.second, '2'),
+    type: 'volunteer_work',
     isMilestone: false,
     createdAt: '2024-02-20T14:30:00Z',
     updatedAt: '2024-02-20T14:30:00Z',
+    endorsements: PREVIEW_ENDORSEMENTS_HIGHLIGHT_2,
   },
 ];
+
+/** Matches BaseTemplate `mainShellClass` radius so the clip aligns with the portfolio card. */
+const PREVIEW_RADIUS_CLASS = 'rounded-[1.75rem]';
 
 export interface OnboardingPortfolioPreviewProps {
   childName: string;
@@ -50,8 +102,8 @@ export default function OnboardingPortfolioPreview({
     setMounted(true);
   }, []);
 
-  const displayName = childName.trim() || 'Your child';
-  const displayTitle = portfolioTitle.trim() || 'Your portfolio';
+  const displayName = childName.trim() || 'Maeve';
+  const displayTitle = portfolioTitle.trim() || 'Maeve\'s Portfolio';
   const tpl = template || 'adler';
 
   const photoUrl = useMemo(() => {
@@ -73,44 +125,20 @@ export default function OnboardingPortfolioPreview({
   );
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-[420px] lg:min-h-[560px]">
-      {/* Decorative background */}
+    <div className="flex flex-col items-center justify-center min-h-[420px] lg:min-h-[560px] lg:mt-[50px]">
+      {/* Single clip: theme + portfolio; scroll inside; no outer frame or shadow */}
       <div
-        className="absolute inset-0 -z-10 rounded-[2.5rem] opacity-90"
-        style={{
-          background:
-            'radial-gradient(ellipse 80% 60% at 70% 20%, rgba(255, 183, 77, 0.25), transparent 50%), radial-gradient(ellipse 60% 50% at 20% 80%, rgba(46, 125, 120, 0.12), transparent 45%)',
-        }}
-      />
-
-      {/* Glass preview frame (no phone chrome) */}
-      <div
-        className={`relative lg:mt-[50px] w-[min(100%,384px)] transition-transform duration-500 ease-out ${
-          mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+        className={`w-full max-w-[390px] lg:max-w-[560px] ${PREVIEW_RADIUS_CLASS} shadow-xl overflow-hidden min-h-0 transition-opacity duration-500 h-[min(69.6vh,624px)] ${
+          mounted ? 'opacity-100' : 'opacity-0'
         }`}
       >
         <div
-          className="
-            rounded-[1.75rem] overflow-hidden
-            bg-gradient-to-br from-white/45 via-white/25 to-white/10
-            backdrop-blur-2xl
-            border border-white/55
-            shadow-[0_28px_64px_-12px_rgba(27,27,27,0.28),0_12px_32px_-8px_rgba(0,100,78,0.12),inset_0_1px_0_0_rgba(255,255,255,0.65)]
-            ring-1 ring-white/35
-          "
+          key={`${tpl}-${displayName}-${displayTitle}-${localPhotoUrl ? 'custom' : 'ph'}`}
+          className="h-full w-full min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-auto animate-onboarding-preview-in [scrollbar-gutter:stable]"
         >
-          <div
-            className="bg-white/90 backdrop-blur-sm overflow-hidden relative rounded-[1.5rem] m-1.5"
-            style={{ height: 'min(69.6vh, 624px)' }}
-          >
-            <div
-              key={`${tpl}-${displayName}-${displayTitle}-${localPhotoUrl ? 'custom' : 'ph'}`}
-              className="h-full overflow-y-auto overflow-x-hidden animate-onboarding-preview-in"
-            >
-              <div className="origin-top scale-[0.92] sm:scale-95 w-[108%] -ml-[4%]">
-                <TemplateFactory portfolio={portfolio} previewMode />
-              </div>
-            </div>
+          {/* Scroll-only: block clicks on template content; wheel/touch scroll still hits this parent */}
+          <div className="pointer-events-none min-h-full w-full">
+            <TemplateFactory portfolio={portfolio} previewMode />
           </div>
         </div>
       </div>

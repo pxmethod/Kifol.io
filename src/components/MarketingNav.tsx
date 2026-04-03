@@ -4,12 +4,14 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
+/** Hash links use `/#…` so they work from any page (e.g. /blog). */
 const NAV_LINKS = [
-  { label: 'Features', href: '#features' },
-  { label: 'How it works', href: '#how-it-works' },
-  { label: 'Why Kifolio', href: '#why-kifolio' },
-  { label: 'Testimonials', href: '#testimonials' },
-  { label: 'FAQ', href: '#faq' },
+  { label: 'Features', href: '/#features' },
+  { label: 'How it works', href: '/#how-it-works' },
+  { label: 'Why Kifolio', href: '/#why-kifolio' },
+  { label: 'Testimonials', href: '/#testimonials' },
+  { label: 'Blog', href: '/blog' },
+  { label: 'FAQ', href: '/#faq' },
 ];
 
 export default function MarketingNav() {
@@ -48,13 +50,13 @@ export default function MarketingNav() {
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-8">
             {NAV_LINKS.map((link) => (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
                 className="text-discovery-black/80 hover:text-discovery-primary text-[15px] font-medium transition-colors"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </nav>
 
@@ -68,7 +70,7 @@ export default function MarketingNav() {
             </Link>
             <Link
               href="/onboarding"
-              className="bg-discovery-primary text-white px-6 py-3 rounded-full text-[15px] font-semibold hover:bg-discovery-primary-dark transition-all shadow-sm hover:shadow-md"
+              className="bg-discovery-orange text-white px-6 py-3 rounded-full text-[15px] font-semibold hover:bg-discovery-orange-light transition-all shadow-sm hover:shadow-md"
             >
               Get started for free
             </Link>
@@ -97,14 +99,14 @@ export default function MarketingNav() {
         <div className="lg:hidden mx-auto max-w-[1200px] mt-3 px-4 py-4 rounded-2xl bg-[#f5faf8]/75 backdrop-blur-[16px] border border-discovery-beige-300/50">
             <nav className="flex flex-col gap-1">
               {NAV_LINKS.map((link) => (
-                <a
+                <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="py-3 px-4 text-discovery-black font-medium rounded-lg hover:bg-discovery-beige-100 transition-colors"
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
               <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-discovery-beige-300">
                 <Link
@@ -117,7 +119,7 @@ export default function MarketingNav() {
                 <Link
                   href="/onboarding"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="py-3 px-4 text-center bg-discovery-primary text-white font-semibold rounded-full hover:bg-discovery-primary-dark transition-colors"
+                  className="py-3 px-4 text-center bg-discovery-orange text-white font-semibold rounded-full hover:bg-discovery-orange-light transition-colors"
                 >
                   Get started for free
                 </Link>

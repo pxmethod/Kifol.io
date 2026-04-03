@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { storageService } from '@/lib/storage';
 import { HighlightService } from '@/lib/database/achievements';
 import { HIGHLIGHT_TYPES, HighlightType, HighlightFormData } from '@/types/achievement';
+import { HighlightTypeIcon } from '@/lib/highlightTypeIcons';
 import { Video, FileText, Music, Image } from 'lucide-react';
 
 export default function EditHighlight() {
@@ -102,51 +103,6 @@ export default function EditHighlight() {
     }
     
     return 'image'; // fallback
-  };
-
-  // Icon mapping for highlight types
-  const getTypeIcon = (type: HighlightType) => {
-    switch (type) {
-      case 'achievement':
-        return (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-          </svg>
-        );
-      case 'creative_work':
-        return (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
-          </svg>
-        );
-      case 'milestone':
-        return (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-        );
-      case 'activity':
-        return (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        );
-      case 'volunteer_work':
-        return (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
-        );
-      case 'reflection_note':
-        return (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-        );
-      default:
-        return null;
-    }
   };
 
   const getSelectedType = () => {
@@ -501,7 +457,12 @@ export default function EditHighlight() {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
-                        {formData.type && getTypeIcon(formData.type as HighlightType)}
+                        {formData.type ? (
+                          <HighlightTypeIcon
+                            type={formData.type as HighlightType}
+                            className="w-5 h-5 shrink-0 text-gray-900"
+                          />
+                        ) : null}
                         <span className={`ml-2 ${formData.type ? 'text-gray-900' : 'text-gray-500'}`}>
                           {getSelectedType()?.name || 'Select a type...'}
                         </span>
@@ -530,7 +491,7 @@ export default function EditHighlight() {
                           className="w-full px-3 py-3 text-left hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg flex items-center"
                         >
                           <div className="flex items-center">
-                            {getTypeIcon(type.id)}
+                            <HighlightTypeIcon type={type.id} className="w-5 h-5 shrink-0 text-gray-900" />
                             <div className="ml-3">
                               <div className="text-sm font-medium text-gray-900">{type.name}</div>
                               <div className="text-xs text-gray-500">{type.description}</div>

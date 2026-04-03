@@ -1,22 +1,14 @@
 import { Achievement } from './achievement';
 
+/** Public portfolio theme: page backdrop + body font only; shell/cards stay neutral. */
 export interface TemplateConfig {
   id: string;
   name: string;
   description: string;
-  fontFamily: string;
-  colors: {
-    primary: string;
-    secondary: string;
-    accent: string;
-    background: string;
-    text: string;
-    textSecondary: string;
-    border: string;
-    cardBg?: string;
-    dateHeaderBg?: string;
-    tagBg?: string;
-  };
+  /** CSS background for the page (gradient). */
+  pageBackground: string;
+  /** Shown in template pickers (matches `getTemplateNextFont`). */
+  fontLabel: string;
 }
 
 export interface PortfolioTemplateProps {
@@ -33,4 +25,4 @@ export interface PortfolioTemplateProps {
   };
   /** Onboarding (and similar) embedded previews: hide highlight filter, avoid min-h-screen scroll gap */
   previewMode?: boolean;
-} 
+}

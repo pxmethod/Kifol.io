@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Achievement } from '@/types/achievement';
-import { TemplateConfig } from '@/types/template';
 import EndorsementBlock from '@/components/EndorsementBlock';
 import { formatTextWithLinks } from '@/utils/text-formatting';
 
@@ -13,7 +12,8 @@ interface HighlightDetailModalProps {
   onEdit: (achievement: Achievement) => void;
   achievement: Achievement | null;
   showEditButton?: boolean;
-  config?: TemplateConfig;
+  /** Body font for modal copy (e.g. next/font from public portfolio template). */
+  fontFamily?: string;
 }
 
 export default function HighlightDetailModal({
@@ -22,13 +22,13 @@ export default function HighlightDetailModal({
   onEdit,
   achievement,
   showEditButton = true,
-  config
+  fontFamily: fontFamilyProp,
 }: HighlightDetailModalProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   if (!isOpen || !achievement) return null;
 
-  const fontFamily = config?.fontFamily || 'inherit';
+  const fontFamily = fontFamilyProp || 'inherit';
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

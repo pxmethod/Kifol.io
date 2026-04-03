@@ -13,16 +13,6 @@ const interTight = Inter_Tight({
   subsets: ["latin"],
 });
 
-// Add Google Fonts for templates
-const googleFonts = [
-  'Geist:wght@300;400;500;600;700',
-  'Oswald:wght@300;400;500;600;700',
-  'Quicksand:wght@300;400;500;600;700',
-  'Lora:wght@400;500;600;700'
-].join('&family=');
-
-const googleFontsUrl = `https://fonts.googleapis.com/css2?family=${googleFonts}&display=swap`;
-
 export const metadata: Metadata = {
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
@@ -72,11 +62,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href={googleFontsUrl} rel="stylesheet" />
-      </head>
       <body
         className={`${inter.variable} ${interTight.variable} font-sans antialiased`}
       >

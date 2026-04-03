@@ -54,14 +54,7 @@ body {
   padding-right: 0; /* Prevent right padding compensation */
 }
 
-/* Remove default button styles */
-button {
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: inherit;
-}
+/* Button reset omitted: unlayered rules here overrode Tailwind utilities on <button>; preflight covers resets. */
 
 /* Remove default input styles */
 input,

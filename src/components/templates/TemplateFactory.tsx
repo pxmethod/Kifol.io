@@ -18,6 +18,6 @@ export default function TemplateFactory({ portfolio, previewMode }: PortfolioTem
     case 'adler':
       return <AdlerTemplate {...shared} />;
     default:
-      return <RenTemplate {...shared} />;
+      return <AdlerTemplate {...shared} />;
   }
 } 

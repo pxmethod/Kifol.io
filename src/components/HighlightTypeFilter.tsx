@@ -3,8 +3,14 @@
 import { useState, useEffect, useLayoutEffect, useRef, useCallback, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { HIGHLIGHT_TYPES, HighlightType } from '@/types/achievement';
+import { HighlightTypeIcon } from '@/lib/highlightTypeIcons';
 
 const ALL_IDS = HIGHLIGHT_TYPES.map((t) => t.id);
+
+/** Same bg/shadow as highlight cards; 1px stroke #e5e7eb (Tailwind neutral-200). */
+const CARD_PANEL_BASE =
+  'border border-[#e5e7eb] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-shadow duration-200';
+const CARD_PANEL_CLASS = `rounded-2xl ${CARD_PANEL_BASE}`;
 
 /** Matches Tailwind `lg:` — mobile / tablet portrait uses modal instead of dropdown. */
 function useIsBelowLg() {
@@ -50,16 +56,23 @@ export interface HighlightTypeFilterProps {
   labelClassName?: string;
   labelStyle?: CSSProperties;
   className?: string;
+  /**
+   * `card` — trigger uses the same border/shadow/radius tokens as BaseTemplate highlight cards (same layout size as default).
+   */
+  surfaceVariant?: 'default' | 'card';
 }
 
 function TypeCheckboxList({
   draft,
   toggleType,
   onToggleAll,
+  cardSurface,
 }: {
   draft: Set<HighlightType>;
   toggleType: (id: HighlightType) => void;
   onToggleAll: () => void;
+  /** Match BaseTemplate highlight card neutrals */
+  cardSurface?: boolean;
 }) {
   const allSelected = ALL_IDS.every((id) => draft.has(id));
   const someSelected = draft.size > 0 && !allSelected;
@@ -70,8 +83,9 @@ function TypeCheckboxList({
     if (el) el.indeterminate = someSelected;
   }, [someSelected]);
 
-  const rowClass =
-    'checkbox items-center px-3 py-2.5 rounded-lg hover:bg-discovery-beige-100 transition-colors';
+  const rowClass = cardSurface
+    ? 'checkbox items-center px-3 py-2.5 rounded-lg hover:bg-neutral-100 transition-colors text-neutral-900'
+    : 'checkbox items-center px-3 py-2.5 rounded-lg hover:bg-discovery-beige-100 transition-colors';
 
   return (
     <>
@@ -95,7 +109,14 @@ function TypeCheckboxList({
               onChange={() => toggleType(type.id)}
               className="checkbox__input mt-0"
             />
-            <span className="checkbox__label font-medium">{type.name}</span>
+            <span className="checkbox__label font-medium flex items-center gap-2 min-w-0">
+              <HighlightTypeIcon
+                type={type.id}
+                className={`w-4 h-4 shrink-0 ${cardSurface ? 'text-neutral-500' : 'text-discovery-grey/80'}`}
+                strokeWidth={1.75}
+              />
+              {type.name}
+            </span>
           </label>
         );
       })}
@@ -109,7 +130,9 @@ export default function HighlightTypeFilter({
   labelClassName = 'text-discovery-black',
   labelStyle,
   className = '',
+  surfaceVariant = 'default',
 }: HighlightTypeFilterProps) {
+  const isCard = surfaceVariant === 'card';
   const isMobile = useIsBelowLg();
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
@@ -135,7 +158,10 @@ export default function HighlightTypeFilter({
     const margin = 4;
     const pad = 8;
     const minW = 260;
-    const width = Math.min(Math.max(r.width, minW), window.innerWidth - pad * 2);
+    // Card (public template): dropdown matches trigger width exactly for full-width control.
+    const width = isCard
+      ? Math.min(r.width, window.innerWidth - pad * 2)
+      : Math.min(Math.max(r.width, minW), window.innerWidth - pad * 2);
     let left = r.left;
     if (left + width > window.innerWidth - pad) {
       left = Math.max(pad, window.innerWidth - width - pad);
@@ -149,7 +175,7 @@ export default function HighlightTypeFilter({
       width,
       maxHeight,
     });
-  }, []);
+  }, [isCard]);
 
   useLayoutEffect(() => {
     if (!open || isMobile) {
@@ -235,33 +261,52 @@ export default function HighlightTypeFilter({
   const label = formatHighlightTypeFilterLabel(value);
 
   return (
-    <div ref={rootRef} className={`highlight-type-filter relative flex flex-wrap items-center gap-2 ${className}`}>
+    <div
+      ref={rootRef}
+      className={`highlight-type-filter relative flex flex-wrap gap-2 ${
+        isCard ? 'w-full items-center justify-start text-left' : 'items-center'
+      } ${className}`}
+    >
       <span className={`text-md font-medium ${labelClassName}`} style={labelStyle}>
         Show:
       </span>
-      <div className="relative min-w-[10rem] max-w-full flex-1 sm:flex-initial sm:max-w-md">
+      <div
+        className={
+          isCard
+            ? 'relative min-w-0 w-full max-w-full flex-1'
+            : 'relative min-w-[10rem] max-w-full flex-1 sm:flex-initial sm:max-w-md'
+        }
+      >
         <button
           ref={triggerRef}
           type="button"
           onClick={() => setOpen(!open)}
-          className={`w-full px-4 py-3 text-left rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors cursor-pointer text-discovery-black ${
-            open ? 'ring-2 ring-discovery-primary border-transparent' : ''
-          }`}
+          className={
+            isCard
+              ? `w-full px-4 py-3 text-left text-neutral-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-300/60 cursor-pointer ${CARD_PANEL_CLASS} hover:shadow-md ${
+                  open ? 'border-[#e5e7eb] ring-2 ring-neutral-300/45 shadow-md' : ''
+                }`
+              : `w-full px-4 py-3 text-left rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors cursor-pointer text-discovery-black ${
+                  open ? 'ring-2 ring-discovery-primary border-transparent' : ''
+                }`
+          }
           style={
-            !open
-              ? {
-                  border: '1px solid #DDDDE1',
-                  backgroundColor: '#ffffff',
-                }
-              : {}
+            isCard
+              ? undefined
+              : open
+                ? undefined
+                : {
+                    border: '1px solid #DDDDE1',
+                    backgroundColor: '#ffffff',
+                  }
           }
           aria-expanded={open}
           aria-haspopup={isMobile ? 'dialog' : 'listbox'}
         >
           <div className="flex items-center justify-between gap-2">
-            <span className="truncate text-discovery-black">{label}</span>
+            <span className={`truncate ${isCard ? 'text-neutral-900' : 'text-discovery-black'}`}>{label}</span>
             <svg
-              className={`w-5 h-5 shrink-0 text-discovery-grey transition-transform ${open ? 'rotate-180' : ''}`}
+              className={`w-5 h-5 shrink-0 transition-transform ${isCard ? 'text-neutral-500' : 'text-discovery-grey'} ${open ? 'rotate-180' : ''}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -280,22 +325,38 @@ export default function HighlightTypeFilter({
         createPortal(
           <div
             ref={desktopDropdownRef}
-            className="fixed z-[100] flex min-h-0 flex-col overflow-hidden rounded-lg border border-discovery-grey-300 bg-discovery-white-100 shadow-lg"
+            className={`fixed z-[100] flex min-h-0 flex-col overflow-hidden ${
+              isCard
+                ? 'rounded-2xl bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-shadow duration-200 hover:shadow-md'
+                : 'rounded-lg border border-discovery-grey-300 bg-discovery-white-100 shadow-lg'
+            }`}
             style={{
               top: desktopDropdownBox.top,
               left: desktopDropdownBox.left,
               width: desktopDropdownBox.width,
               maxHeight: desktopDropdownBox.maxHeight,
+              ...(isCard ? { border: '1px solid #e5e7eb' } : {}),
             }}
           >
             <div className="min-h-0 flex-1 overflow-y-auto p-1">
-              <TypeCheckboxList draft={draft} toggleType={toggleType} onToggleAll={toggleAll} />
+              <TypeCheckboxList
+                draft={draft}
+                toggleType={toggleType}
+                onToggleAll={toggleAll}
+                cardSurface={isCard}
+              />
             </div>
-            <div className="flex-shrink-0 border-t border-discovery-beige-100 bg-discovery-beige-200/50 p-3">
+            <div
+              className={`flex-shrink-0 border-t p-3 ${isCard ? 'border-[#e5e7eb] bg-white' : 'border-discovery-beige-100 bg-discovery-beige-200/50'}`}
+            >
               <button
                 type="button"
                 onClick={handleApply}
-                className="w-full rounded-lg bg-discovery-orange px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-discovery-orange-light"
+                className={
+                  isCard
+                    ? 'w-full rounded-xl bg-neutral-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-neutral-800'
+                    : 'w-full rounded-lg bg-discovery-orange px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-discovery-orange-light'
+                }
               >
                 Apply
               </button>
@@ -321,32 +382,56 @@ export default function HighlightTypeFilter({
               onClick={handleCancel}
             />
             <div
-              className="relative w-full max-w-lg rounded-t-2xl sm:rounded-2xl bg-discovery-white-100 shadow-xl border border-discovery-grey-300 max-h-[85vh] flex flex-col mt-auto sm:mt-0"
+              className={`relative w-full max-w-lg max-h-[85vh] flex flex-col mt-auto sm:mt-0 ${
+                isCard
+                  ? `rounded-t-2xl sm:rounded-2xl ${CARD_PANEL_BASE} hover:shadow-md`
+                  : 'rounded-t-2xl sm:rounded-2xl bg-discovery-white-100 border border-discovery-grey-300 shadow-xl'
+              }`}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="px-4 pt-4 pb-2 border-b border-discovery-beige-100">
-                <h2 id="highlight-type-filter-title" className="text-lg font-semibold text-discovery-black">
+              <div
+                className={`px-4 pt-4 pb-2 border-b ${isCard ? 'border-[#e5e7eb]' : 'border-discovery-beige-100'}`}
+              >
+                <h2
+                  id="highlight-type-filter-title"
+                  className={`text-lg font-semibold ${isCard ? 'text-neutral-900' : 'text-discovery-black'}`}
+                >
                   Highlight types
                 </h2>
               </div>
               <div className="overflow-y-auto flex-1 p-2 min-h-0">
-                <TypeCheckboxList draft={draft} toggleType={toggleType} onToggleAll={toggleAll} />
+                <TypeCheckboxList
+                  draft={draft}
+                  toggleType={toggleType}
+                  onToggleAll={toggleAll}
+                  cardSurface={isCard}
+                />
               </div>
               <div
-                className="flex gap-3 p-4 border-t border-discovery-beige-100 bg-discovery-beige-200/50"
+                className={`flex gap-3 p-4 border-t ${
+                  isCard ? 'border-[#e5e7eb] bg-white' : 'border-discovery-beige-100 bg-discovery-beige-200/50'
+                }`}
                 style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 0px))' }}
               >
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="flex-1 px-4 py-3 rounded-lg text-sm font-semibold border border-discovery-beige-300 bg-discovery-white-100 text-discovery-black hover:bg-discovery-beige-100 transition-colors"
+                  className={
+                    isCard
+                      ? 'flex-1 px-4 py-3 rounded-xl text-sm font-semibold border border-[#e5e7eb] bg-white text-neutral-900 hover:bg-neutral-50 transition-colors'
+                      : 'flex-1 px-4 py-3 rounded-lg text-sm font-semibold border border-discovery-beige-300 bg-discovery-white-100 text-discovery-black hover:bg-discovery-beige-100 transition-colors'
+                  }
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleApply}
-                  className="flex-1 bg-discovery-orange text-white px-4 py-3 rounded-lg text-sm font-semibold transition-colors hover:bg-discovery-orange-light shadow-sm"
+                  className={
+                    isCard
+                      ? 'flex-1 bg-neutral-900 text-white px-4 py-3 rounded-xl text-sm font-semibold transition-colors hover:bg-neutral-800 shadow-sm'
+                      : 'flex-1 bg-discovery-orange text-white px-4 py-3 rounded-lg text-sm font-semibold transition-colors hover:bg-discovery-orange-light shadow-sm'
+                  }
                 >
                   Apply
                 </button>
