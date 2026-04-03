@@ -237,14 +237,14 @@ export default function EditPortfolioModal({
                 <button
                   type="button"
                   onClick={handleCancelDelete}
-                  className="flex-1 bg-gray-100 text-kifolio-text py-2 px-4 rounded-lg font-semibold hover:bg-gray-200"
+                  className="flex-1 bg-gray-100 text-kifolio-text py-3 px-6 rounded-pill font-semibold hover:bg-gray-200"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleDeletePortfolio}
-                  className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700"
+                  className="flex-1 bg-red-600 text-white py-3 px-6 rounded-pill font-semibold hover:bg-red-700"
                 >
                   Delete portfolio
                 </button>
@@ -495,7 +495,7 @@ export default function EditPortfolioModal({
                 <button
                   type="button"
                   onClick={handleShowDeleteConfirmation}
-                  className="w-full bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                  className="w-full bg-red-600 text-white py-3 px-6 rounded-pill font-semibold hover:bg-red-700 transition-colors"
                 >
                   Delete portfolio
                 </button>

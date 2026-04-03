@@ -34,7 +34,7 @@ export default function Error({
           </button>
           <button
             onClick={() => window.location.href = '/'}
-            className="w-full bg-gray-100 text-kifolio-text py-3 px-6 rounded-lg font-semibold hover:bg-gray-200"
+            className="w-full bg-gray-100 text-kifolio-text py-3 px-6 rounded-pill font-semibold hover:bg-gray-200"
           >
             Go to homepage
           </button>

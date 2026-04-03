@@ -455,7 +455,7 @@ export default function ProfilePage() {
             <div className="form-actions">
               <button
                 onClick={() => setShowDeleteConfirmation(true)}
-                className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-red-600 text-white px-6 py-3 rounded-pill font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={isDeleting}
               >
                 {isDeleting ? 'Deleting...' : 'Delete my account'}
@@ -641,7 +641,7 @@ export default function ProfilePage() {
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirmation(false)}
-                className="flex-1 bg-discovery-beige-100 text-discovery-black py-2 px-4 rounded-lg font-semibold hover:bg-discovery-beige-200 transition-colors"
+                className="flex-1 bg-discovery-beige-100 text-discovery-black py-3 px-6 rounded-pill font-semibold hover:bg-discovery-beige-200 transition-colors"
                 disabled={isDeleting}
               >
                 Cancel
@@ -649,7 +649,7 @@ export default function ProfilePage() {
               <button
                 type="button"
                 onClick={handleDeleteAccount}
-                className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                className="flex-1 bg-red-600 text-white py-3 px-6 rounded-pill font-semibold hover:bg-red-700 transition-colors"
                 disabled={isDeleting}
               >
                 {isDeleting ? 'Deleting...' : 'Yes, delete my account'}

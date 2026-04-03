@@ -355,7 +355,7 @@ export default function HighlightTypeFilter({
                 className={
                   isCard
                     ? 'w-full rounded-xl bg-neutral-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-neutral-800'
-                    : 'w-full rounded-lg bg-discovery-orange px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-discovery-orange-light'
+                    : 'w-full rounded-pill bg-discovery-orange px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-discovery-orange-light'
                 }
               >
                 Apply
@@ -419,7 +419,7 @@ export default function HighlightTypeFilter({
                   className={
                     isCard
                       ? 'flex-1 px-4 py-3 rounded-xl text-sm font-semibold border border-[#e5e7eb] bg-white text-neutral-900 hover:bg-neutral-50 transition-colors'
-                      : 'flex-1 px-4 py-3 rounded-lg text-sm font-semibold border border-discovery-beige-300 bg-discovery-white-100 text-discovery-black hover:bg-discovery-beige-100 transition-colors'
+                      : 'flex-1 px-4 py-3 rounded-pill text-sm font-semibold border border-discovery-beige-300 bg-discovery-white-100 text-discovery-black hover:bg-discovery-beige-100 transition-colors'
                   }
                 >
                   Cancel
@@ -430,7 +430,7 @@ export default function HighlightTypeFilter({
                   className={
                     isCard
                       ? 'flex-1 bg-neutral-900 text-white px-4 py-3 rounded-xl text-sm font-semibold transition-colors hover:bg-neutral-800 shadow-sm'
-                      : 'flex-1 bg-discovery-orange text-white px-4 py-3 rounded-lg text-sm font-semibold transition-colors hover:bg-discovery-orange-light shadow-sm'
+                      : 'flex-1 bg-discovery-orange text-white px-4 py-3 rounded-pill text-sm font-semibold transition-colors hover:bg-discovery-orange-light shadow-sm'
                   }
                 >
                   Apply

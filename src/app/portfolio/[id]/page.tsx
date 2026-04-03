@@ -390,7 +390,7 @@ export default function PortfolioPage() {
             <div className="flex items-center space-x-2">
               <button
                 onClick={handlePreview}
-                className="px-4 py-2 border border-discovery-beige-300 text-discovery-black rounded-lg hover:bg-discovery-beige-100 transition-colors font-medium text-md"
+                className="px-6 py-3 border border-discovery-beige-300 text-discovery-black rounded-pill hover:bg-discovery-beige-100 transition-colors font-medium text-md"
               >
                 Preview Portfolio
               </button>
@@ -414,7 +414,7 @@ export default function PortfolioPage() {
             <div className="flex items-center">
               <button
                 onClick={handlePreview}
-                className="px-4 py-2 border border-discovery-beige-300 text-discovery-black rounded-lg hover:bg-discovery-beige-100 transition-colors font-medium text-md"
+                className="px-6 py-3 border border-discovery-beige-300 text-discovery-black rounded-pill hover:bg-discovery-beige-100 transition-colors font-medium text-md"
               >
                 Preview Portfolio
               </button>

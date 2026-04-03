@@ -96,7 +96,7 @@ export default function PortfolioPasswordPrompt({
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 px-6 py-3 border border-discovery-beige-300 text-discovery-black rounded-lg hover:bg-discovery-beige-100 transition-colors font-medium"
+              className="flex-1 px-6 py-3 border border-discovery-beige-300 text-discovery-black rounded-pill hover:bg-discovery-beige-100 transition-colors font-medium"
             >
               Cancel
             </button>

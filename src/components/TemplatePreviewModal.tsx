@@ -128,7 +128,7 @@ export default function TemplatePreviewModal({
         <div className="flex items-center justify-end space-x-3 p-6 border-t">
           <button
             onClick={onClose}
-            className="px-6 py-3 border border-discovery-beige-300 text-discovery-black rounded-lg hover:bg-discovery-beige-100 transition-colors font-medium"
+            className="px-6 py-3 border border-discovery-beige-300 text-discovery-black rounded-pill hover:bg-discovery-beige-100 transition-colors font-medium"
           >
             Close
           </button>

@@ -55,13 +55,13 @@ export default function DeletePortfolioModal({ isOpen, portfolio, onConfirm, onC
         <div className="flex space-x-3">
           <button
             onClick={onCancel}
-            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-pill hover:bg-gray-50 transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            className="flex-1 px-6 py-3 bg-red-600 text-white rounded-pill hover:bg-red-700 transition-colors"
           >
             Delete Portfolio
           </button>

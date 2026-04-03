@@ -52,7 +52,7 @@ export default function EmptyState() {
           </button>
           <button 
             onClick={() => router.push('/auth/login')}
-            className="border-2 border-kifolio-cta text-kifolio-cta px-8 py-3 rounded-lg font-semibold text-lg hover:bg-kifolio-cta hover:text-white transition-colors"
+            className="border-2 border-kifolio-cta text-kifolio-cta px-8 py-3 rounded-pill font-semibold text-lg hover:bg-kifolio-cta hover:text-white transition-colors"
           >
             Login
           </button>

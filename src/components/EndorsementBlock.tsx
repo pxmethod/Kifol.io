@@ -108,7 +108,7 @@ export default function EndorsementBlock({
             <button
               type="button"
               onClick={() => setEndorsementToRemove(null)}
-              className="flex-1 bg-discovery-beige-100 text-discovery-black py-2 px-4 rounded-lg font-semibold hover:bg-discovery-beige-200 transition-colors"
+              className="flex-1 bg-discovery-beige-100 text-discovery-black py-3 px-6 rounded-pill font-semibold hover:bg-discovery-beige-200 transition-colors"
               disabled={isRemoving}
             >
               Cancel
@@ -116,7 +116,7 @@ export default function EndorsementBlock({
             <button
               type="button"
               onClick={handleConfirmRemove}
-              className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+              className="flex-1 bg-red-600 text-white py-3 px-6 rounded-pill font-semibold hover:bg-red-700 transition-colors"
               disabled={isRemoving}
             >
               {isRemoving ? 'Removing...' : 'Yes, remove'}
