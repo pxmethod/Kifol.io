@@ -219,7 +219,7 @@ export default function CreatePortfolio() {
               <button
                 type="button"
                 onClick={handleBackClick}
-                className="px-6 py-3 border border-discovery-beige-300 text-discovery-black rounded-lg hover:bg-discovery-beige-100 transition-colors font-medium"
+                className="px-6 py-3 border border-discovery-beige-300 text-discovery-black rounded-pill hover:bg-discovery-beige-100 transition-colors font-medium"
               >
                 Cancel
               </button>
