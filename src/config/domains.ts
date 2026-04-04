@@ -30,5 +30,15 @@ export const DOMAIN_CONFIG = {
   // Check if current host is portfolio domain
   isPortfolioDomain: (host: string) => {
     return host === DOMAIN_CONFIG.PORTFOLIO_DOMAIN;
-  }
+  },
 };
+
+/**
+ * Canonical URL for shared short links (`/p/{shortId}`). Production uses the portfolio subdomain.
+ */
+export function getPortfolioShortLinkUrl(shortId: string): string {
+  if (process.env.NODE_ENV === 'production') {
+    return `https://${DOMAIN_CONFIG.PORTFOLIO_DOMAIN}/p/${shortId}`;
+  }
+  return `${getAppUrl()}/p/${shortId}`;
+}
