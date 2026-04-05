@@ -5,6 +5,11 @@ import { Achievement } from '@/types/achievement';
 
 type SubmitOutcome = 'idle' | 'email' | 'copy_link' | 'skipped';
 
+function isMissingMailerSendKeyMessage(reason: string): boolean {
+  const t = reason.toLowerCase();
+  return t.includes('mailersend_api_key') || t.includes('not configured') || t.includes('api key missing');
+}
+
 interface EndorsementRequestModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -29,6 +34,7 @@ export default function EndorsementRequestModal({
   const [outcome, setOutcome] = useState<SubmitOutcome>('idle');
   const [endorseUrl, setEndorseUrl] = useState('');
   const [copyFeedback, setCopyFeedback] = useState(false);
+  const [emailFailureReason, setEmailFailureReason] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +42,7 @@ export default function EndorsementRequestModal({
 
     setIsSubmitting(true);
     setError('');
+    setEmailFailureReason('');
 
     try {
       const base = typeof window !== 'undefined' ? window.location.origin : '';
@@ -53,7 +60,14 @@ export default function EndorsementRequestModal({
         }),
       });
 
-      const data = await res.json();
+      const data = (await res.json()) as {
+        success?: boolean;
+        error?: string;
+        emailSent?: boolean;
+        emailSkipped?: boolean;
+        endorseUrl?: string;
+        emailError?: string;
+      };
 
       if (!res.ok) {
         setError(data.error || 'Failed to send endorsement request');
@@ -73,6 +87,9 @@ export default function EndorsementRequestModal({
       } else {
         setOutcome('copy_link');
         if (data.endorseUrl) setEndorseUrl(String(data.endorseUrl));
+        setEmailFailureReason(
+          typeof data.emailError === 'string' && data.emailError.trim() ? data.emailError.trim() : ''
+        );
       }
       onSuccess?.();
     } catch {
@@ -90,6 +107,7 @@ export default function EndorsementRequestModal({
     setOutcome('idle');
     setEndorseUrl('');
     setCopyFeedback(false);
+    setEmailFailureReason('');
     onClose();
   };
 
@@ -144,11 +162,31 @@ export default function EndorsementRequestModal({
                   so they can leave an endorsement about &ldquo;{achievement.title}&rdquo;.
                 </p>
               ) : (
-                <p className="text-discovery-grey text-sm mb-4 text-left">
-                  We couldn&apos;t send the invitation email (check that MailerSend is configured with{' '}
-                  <code className="rounded bg-discovery-beige-100 px-1 text-xs">MAILERSEND_API_KEY</code>). Your request
-                  is saved—copy the link below and send it to your instructor.
-                </p>
+                <div className="text-discovery-grey text-sm mb-4 text-left space-y-2">
+                  <p>
+                    We couldn&apos;t send the invitation email. Your request is saved—copy the link below and send it
+                    to your instructor.
+                  </p>
+                  {emailFailureReason ? (
+                    isMissingMailerSendKeyMessage(emailFailureReason) ? (
+                      <p className="rounded-lg bg-discovery-beige-100 p-3 text-xs text-discovery-black">
+                        Server email isn&apos;t configured: add{' '}
+                        <code className="rounded bg-discovery-white-100 px-1">MAILERSEND_API_KEY</code> (and a verified
+                        sender in <code className="rounded bg-discovery-white-100 px-1">EMAIL_FROM</code>) to your
+                        hosting environment, then redeploy.
+                      </p>
+                    ) : (
+                      <p className="rounded-lg bg-discovery-beige-100 p-3 text-xs text-discovery-black">
+                        <span className="font-medium text-discovery-black">Details: </span>
+                        {emailFailureReason}
+                      </p>
+                    )
+                  ) : (
+                    <p className="rounded-lg bg-discovery-beige-100 p-3 text-xs text-discovery-black">
+                      If emails usually work, check MailerSend activity logs and that your sender domain is verified.
+                    </p>
+                  )}
+                </div>
               )}
               {(outcome === 'copy_link' || outcome === 'skipped') && endorseUrl ? (
                 <div className="mb-4 space-y-2 text-left">

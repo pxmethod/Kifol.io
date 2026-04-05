@@ -14,6 +14,14 @@ function isUuid(value: unknown): value is string {
   return typeof value === 'string' && UUID_RE.test(value);
 }
 
+/** Safe one-line detail for the client when email send fails (no secrets). */
+function sanitizeEmailErrorForClient(message: string | undefined): string | undefined {
+  if (!message || typeof message !== 'string') return undefined;
+  const oneLine = message.replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!oneLine) return undefined;
+  return oneLine.slice(0, 400);
+}
+
 /**
  * After a browser-side insert, the server may occasionally not see the row on the first read.
  * Short backoff retries avoid a false 404 and a skipped invitation email.
@@ -127,6 +135,7 @@ export async function POST(request: NextRequest) {
         id: requestRecord.id,
         emailSent: false,
         endorseUrl,
+        emailError: sanitizeEmailErrorForClient(emailResult.error),
         message:
           'Endorsement request saved. The invitation email could not be sent—copy the link below to share with your instructor.',
       });

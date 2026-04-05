@@ -3,10 +3,20 @@ import { MailerSend, Sender, Recipient, EmailParams } from 'mailersend';
 /** Personalization for MailerSend templates: { email, data: { var_name: value } } */
 export type TemplatePersonalization = { email: string; data: Record<string, string> };
 
-/** MailerSend client; null if MAILERSEND_API_KEY is not set (app can still start, email sends will fail with a clear error). */
-export const mailerSend: MailerSend | null = process.env.MAILERSEND_API_KEY
-  ? new MailerSend({ apiKey: process.env.MAILERSEND_API_KEY })
-  : null;
+let mailerSendSingleton: MailerSend | null | undefined;
+
+/**
+ * Lazy MailerSend client so the API key is read at send time (after env is loaded) and trimmed
+ * (avoids a null client when the key was set with accidental whitespace).
+ */
+export function getMailerSend(): MailerSend | null {
+  if (mailerSendSingleton !== undefined) {
+    return mailerSendSingleton;
+  }
+  const key = process.env.MAILERSEND_API_KEY?.trim();
+  mailerSendSingleton = key ? new MailerSend({ apiKey: key }) : null;
+  return mailerSendSingleton;
+}
 
 // Email configuration
 const fromRaw = process.env.EMAIL_FROM || 'Kifolio <noreply@kifol.io>';

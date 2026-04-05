@@ -222,7 +222,7 @@ export default function PortfolioPage() {
       if (endorsementInvite === 'no_email') {
         setToastVariant('warning');
         setToastMessage(
-          'Highlight added successfully. Your endorsement request was saved, but the invitation email could not be sent—we copied the instructor link to your clipboard when possible. Configure MailerSend (MAILERSEND_API_KEY) on the server to send emails.'
+          'Highlight added successfully. Your endorsement request was saved, but the invitation email could not be sent—we copied the instructor link when possible. Check MailerSend (API key, verified sender domain) or use Request endorsement to see the detailed error.'
         );
       } else if (endorsementInvite === 'error') {
         setToastVariant('warning');
@@ -240,7 +240,7 @@ export default function PortfolioPage() {
       if (endorsementInvite === 'no_email') {
         setToastVariant('warning');
         setToastMessage(
-          'Highlight updated. Your endorsement request was saved, but the invitation email could not be sent—we copied the instructor link when possible. Configure MailerSend (MAILERSEND_API_KEY) on the server to send emails.'
+          'Highlight updated. Your endorsement request was saved, but the invitation email could not be sent—we copied the instructor link when possible. Check MailerSend (API key, verified sender domain) or use Request endorsement to see the detailed error.'
         );
       } else if (endorsementInvite === 'error') {
         setToastVariant('warning');

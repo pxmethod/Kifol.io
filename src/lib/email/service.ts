@@ -1,4 +1,4 @@
-import { mailerSend, emailConfig, EMAIL_CATEGORIES, createEmailParams, createTemplateEmailParams } from './client';
+import { getMailerSend, emailConfig, EMAIL_CATEGORIES, createEmailParams, createTemplateEmailParams } from './client';
 import { getAppUrl } from '@/config/domains';
 import { 
   EmailResult, 
@@ -24,6 +24,7 @@ async function sendEmail(
   tags?: string[],
   options?: { replyTo?: string }
 ): Promise<EmailResult> {
+  const mailerSend = getMailerSend();
   if (!mailerSend) {
     return {
       success: false,
@@ -71,6 +72,7 @@ async function sendEmailWithTemplate(
   personalization: { email: string; data: Record<string, string> }[],
   subject: string
 ): Promise<EmailResult> {
+  const mailerSend = getMailerSend();
   if (!mailerSend) {
     return {
       success: false,
