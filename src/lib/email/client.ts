@@ -6,14 +6,33 @@ export type TemplatePersonalization = { email: string; data: Record<string, stri
 let mailerSendSingleton: MailerSend | null | undefined;
 
 /**
- * Lazy MailerSend client so the API key is read at send time (after env is loaded) and trimmed
- * (avoids a null client when the key was set with accidental whitespace).
+ * Normalize MAILERSEND_API_KEY from env. MailerSend uses `Authorization: Bearer <token>`;
+ * if the value includes a duplicate `Bearer ` prefix or wrapping quotes, the API returns 401 Unauthenticated.
+ */
+export function normalizeMailerSendApiKey(raw: string | undefined): string {
+  if (raw == null) return '';
+  let k = String(raw).trim();
+  if (
+    (k.startsWith('"') && k.endsWith('"')) ||
+    (k.startsWith("'") && k.endsWith("'"))
+  ) {
+    k = k.slice(1, -1).trim();
+  }
+  const bearerMatch = k.match(/^bearer\s+(.+)$/i);
+  if (bearerMatch) {
+    k = bearerMatch[1].trim();
+  }
+  return k;
+}
+
+/**
+ * Lazy MailerSend client so the API key is read at send time (after env is loaded).
  */
 export function getMailerSend(): MailerSend | null {
   if (mailerSendSingleton !== undefined) {
     return mailerSendSingleton;
   }
-  const key = process.env.MAILERSEND_API_KEY?.trim();
+  const key = normalizeMailerSendApiKey(process.env.MAILERSEND_API_KEY);
   mailerSendSingleton = key ? new MailerSend({ apiKey: key }) : null;
   return mailerSendSingleton;
 }

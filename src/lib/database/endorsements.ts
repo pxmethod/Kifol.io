@@ -4,7 +4,10 @@ import type { Database } from '@/types/database';
 type EndorsementRequest = Database['public']['Tables']['endorsement_requests']['Row'];
 type NewEndorsementRequest = Database['public']['Tables']['endorsement_requests']['Insert'];
 
-const MAX_REQUESTS_PER_ACHIEVEMENT = 3;
+/** Open invitation links allowed at once per highlight (anti-spam). */
+const MAX_ACTIVE_PENDING_INVITES_PER_ACHIEVEMENT = 3;
+/** Must stay aligned with endorsement link expiry in API routes and submitByToken. */
+const INVITE_VALID_DAYS = 30;
 
 export class EndorsementService {
   constructor(private supabase: SupabaseClient<Database>) {}
@@ -20,19 +23,30 @@ export class EndorsementService {
     relationship: string;
     token: string;
   }): Promise<EndorsementRequest> {
-    // Anti-spam: max 3 requests per achievement
+    // Anti-spam: cap *open* invitations only. Submitted endorsements do not consume a slot (parents
+    // would otherwise hit the limit with 3 completed endorsements and see none in the “pending” sense).
+    // Stale `pending` rows past the link window are excluded so expired links free a slot even if the
+    // row was never updated to `expired` in the database.
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - INVITE_VALID_DAYS);
+
     const { count, error: countError } = await this.supabase
       .from('endorsement_requests')
       .select('*', { count: 'exact', head: true })
-      .eq('achievement_id', data.achievementId);
+      .eq('achievement_id', data.achievementId)
+      .eq('status', 'pending')
+      .gte('created_at', cutoff.toISOString());
 
     if (countError) {
       console.error('Error counting endorsement requests:', countError);
       throw new Error('Failed to create endorsement request');
     }
 
-    if ((count ?? 0) >= MAX_REQUESTS_PER_ACHIEVEMENT) {
-      throw new Error(`Maximum ${MAX_REQUESTS_PER_ACHIEVEMENT} endorsement requests per achievement`);
+    if ((count ?? 0) >= MAX_ACTIVE_PENDING_INVITES_PER_ACHIEVEMENT) {
+      throw new Error(
+        `Maximum ${MAX_ACTIVE_PENDING_INVITES_PER_ACHIEVEMENT} open invitation links per highlight. ` +
+          `You may already have pending requests from the last ${INVITE_VALID_DAYS} days—they are not shown as endorsements until the instructor completes the form.`
+      );
     }
 
     const insert: NewEndorsementRequest = {
@@ -104,7 +118,7 @@ export class EndorsementService {
     // Expiry check at read time: created_at + 30 days
     const createdAt = new Date(existing.created_at);
     const expiresAt = new Date(createdAt);
-    expiresAt.setDate(expiresAt.getDate() + 30);
+    expiresAt.setDate(expiresAt.getDate() + INVITE_VALID_DAYS);
     if (new Date() > expiresAt) {
       throw new Error('This endorsement link has expired');
     }

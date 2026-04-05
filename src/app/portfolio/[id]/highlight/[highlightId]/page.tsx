@@ -685,7 +685,7 @@ export default function EditHighlight() {
                   Request instructor endorsement (optional)
                 </label>
                 <p className="text-discovery-grey text-sm mb-4">
-                Invite an instructor or teacher to leave a comment about this achievement. You can request up to 3 endorsements at any time for this highlight.
+                Invite an instructor or teacher to leave a comment about this achievement. You can have up to 3 open invitation links at a time (completed endorsements do not count toward this limit).
                 </p>
                 <div className="space-y-4">
                   <div>

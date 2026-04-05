@@ -87,7 +87,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid instructor email' }, { status: 400 });
     }
 
-    const achievement = await fetchHighlightForEndorsement(supabase, achievementId, portfolioId);
+    let achievement = await fetchHighlightForEndorsement(supabase, achievementId, portfolioId);
+    // If the client sent a mismatched portfolioId (or a race after save), retry without the
+    // portfolio filter—RLS still restricts rows to highlights the user may access.
+    if (!achievement && portfolioId) {
+      achievement = await fetchHighlightForEndorsement(supabase, achievementId, undefined);
+    }
 
     if (!achievement) {
       return NextResponse.json({ error: 'Achievement not found' }, { status: 404 });

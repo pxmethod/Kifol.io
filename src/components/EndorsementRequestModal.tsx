@@ -45,8 +45,7 @@ export default function EndorsementRequestModal({
     setEmailFailureReason('');
 
     try {
-      const base = typeof window !== 'undefined' ? window.location.origin : '';
-      const res = await fetch(`${base}/api/endorsements/create`, {
+      const res = await fetch('/api/endorsements/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

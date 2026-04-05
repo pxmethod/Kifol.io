@@ -13,6 +13,15 @@ import {
 // Import email template loader
 import { EmailTemplates } from './template-loader';
 
+/** Turn MailerSend’s terse 401 into actionable copy for logs and API responses. */
+function clarifyMailerSendError(message: string | undefined): string {
+  if (!message) return 'Unknown error';
+  if (/unauthenticated/i.test(message)) {
+    return 'MailerSend rejected your API token (401). Put only the token in MAILERSEND_API_KEY—no "Bearer " prefix and no quotes. Create a new API token with sending permission in MailerSend, assign it to Production on your host, and redeploy.';
+  }
+  return message;
+}
+
 /**
  * Base email sending function
  */
@@ -59,7 +68,7 @@ async function sendEmail(
         : undefined) ||
       (err instanceof Error ? err.message : undefined) ||
       'Unknown error';
-    return { success: false, error: message };
+    return { success: false, error: clarifyMailerSendError(message) };
   }
 }
 
@@ -107,7 +116,7 @@ async function sendEmailWithTemplate(
         : undefined) ||
       (err instanceof Error ? err.message : undefined) ||
       'Unknown error';
-    return { success: false, error: message };
+    return { success: false, error: clarifyMailerSendError(message) };
   }
 }
 
