@@ -11,6 +11,22 @@ export const mailerSend: MailerSend | null = process.env.MAILERSEND_API_KEY
 // Email configuration
 const fromRaw = process.env.EMAIL_FROM || 'Kifolio <noreply@kifol.io>';
 
+/** Strip HTML to a short plain-text body (MailerSend / inbox clients often expect a text part). */
+export function htmlToPlainText(html: string): string {
+  const stripped = html
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const out = stripped.slice(0, 15000);
+  return out.length > 0 ? out : ' ';
+}
+
 /** Parse "Name <email>" into { email, name } for MailerSend Sender. */
 function parseFrom(raw: string): { email: string; name: string } {
   const match = raw.match(/^(.+?)\s*<([^>]+)>$/);
@@ -54,6 +70,7 @@ export function createEmailParams(
     .setFrom(sender)
     .setTo(recipients)
     .setSubject(subject)
+    .setText(htmlToPlainText(html))
     .setHtml(html);
   if (options?.replyTo) {
     params.setReplyTo(new Recipient(options.replyTo, options.replyTo.split('@')[0]));

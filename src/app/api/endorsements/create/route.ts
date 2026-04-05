@@ -4,6 +4,43 @@ import { generateToken } from '@/lib/crypto';
 import { EndorsementService } from '@/lib/database/endorsements';
 import { sendEndorsementRequestEmail } from '@/lib/email/service';
 import { getAppUrl } from '@/config/domains';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/database';
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function isUuid(value: unknown): value is string {
+  return typeof value === 'string' && UUID_RE.test(value);
+}
+
+/**
+ * After a browser-side insert, the server may occasionally not see the row on the first read.
+ * Short backoff retries avoid a false 404 and a skipped invitation email.
+ */
+async function fetchHighlightForEndorsement(
+  supabase: SupabaseClient<Database>,
+  achievementId: string,
+  portfolioId?: string
+): Promise<{ id: string; title: string | null } | null> {
+  const delaysMs = [0, 80, 160, 320, 640, 1280];
+  for (const delay of delaysMs) {
+    if (delay > 0) {
+      await new Promise((r) => setTimeout(r, delay));
+    }
+    let q = supabase.from('highlights').select('id, title').eq('id', achievementId);
+    if (portfolioId) {
+      q = q.eq('portfolio_id', portfolioId);
+    }
+    const { data, error } = await q.maybeSingle();
+    if (error) {
+      console.error('[Endorsements] Highlight fetch error:', error);
+      return null;
+    }
+    if (data) return data;
+  }
+  return null;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +52,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { achievementId, instructorName, instructorEmail, relationship } = body;
+    const { achievementId, portfolioId: portfolioIdRaw, instructorName, instructorEmail, relationship } = body;
 
     if (!achievementId || !instructorName || !instructorEmail || !relationship) {
       return NextResponse.json(
@@ -24,20 +61,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!isUuid(achievementId)) {
+      return NextResponse.json({ error: 'Invalid achievement id' }, { status: 400 });
+    }
+
+    const portfolioId =
+      portfolioIdRaw !== undefined && portfolioIdRaw !== null && String(portfolioIdRaw).trim() !== ''
+        ? String(portfolioIdRaw).trim()
+        : undefined;
+    if (portfolioId !== undefined && !isUuid(portfolioId)) {
+      return NextResponse.json({ error: 'Invalid portfolio id' }, { status: 400 });
+    }
+
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(String(instructorEmail).trim())) {
       return NextResponse.json({ error: 'Invalid instructor email' }, { status: 400 });
     }
 
-    // Fetch achievement (highlight) for title and to verify it exists (RLS ensures user owns it)
-    const { data: achievement, error: fetchError } = await supabase
-      .from('highlights')
-      .select('id, title')
-      .eq('id', achievementId)
-      .single();
+    const achievement = await fetchHighlightForEndorsement(supabase, achievementId, portfolioId);
 
-    if (fetchError || !achievement) {
+    if (!achievement) {
       return NextResponse.json({ error: 'Achievement not found' }, { status: 404 });
     }
 
@@ -60,8 +104,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         id: requestRecord.id,
-        message: 'Endorsement request created',
-        endorseUrl, // Include in response for local testing
+        emailSent: false,
+        emailSkipped: true,
+        message: 'Endorsement request created (email send skipped for this environment)',
+        endorseUrl,
       });
     }
 
@@ -69,21 +115,27 @@ export async function POST(request: NextRequest) {
       to: requestRecord.instructor_email,
       subject: 'Leave a comment about a student achievement - Kifolio',
       instructorName: requestRecord.instructor_name,
-      achievementTitle: achievement.title,
+      achievementTitle: achievement.title?.trim() || 'this highlight',
       endorseUrl,
     });
 
     if (!emailResult.success) {
       console.error('[Endorsements] Email send failed:', emailResult.error);
-      return NextResponse.json(
-        { error: 'Endorsement request created but email failed to send', details: emailResult.error },
-        { status: 500 }
-      );
+      // Request is persisted; do not 500—client can copy endorseUrl for the instructor
+      return NextResponse.json({
+        success: true,
+        id: requestRecord.id,
+        emailSent: false,
+        endorseUrl,
+        message:
+          'Endorsement request saved. The invitation email could not be sent—copy the link below to share with your instructor.',
+      });
     }
 
     return NextResponse.json({
       success: true,
       id: requestRecord.id,
+      emailSent: true,
       message: 'Endorsement request sent',
     });
   } catch (error) {

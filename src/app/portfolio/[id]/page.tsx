@@ -7,7 +7,7 @@ import Header from '@/components/Header';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import DeletePortfolioModal from '@/components/DeletePortfolioModal';
-import Toast from '@/components/Toast';
+import Toast, { type ToastVariant } from '@/components/Toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { portfolioService, achievementService } from '@/lib/database';
 import { createClient } from '@/lib/supabase/client';
@@ -124,6 +124,7 @@ export default function PortfolioPage() {
   const [showCopyNotification, setShowCopyNotification] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [toastVariant, setToastVariant] = useState<ToastVariant>('success');
   const [showPrivateTooltip, setShowPrivateTooltip] = useState(false);
   const [endorsementModalAchievement, setEndorsementModalAchievement] = useState<Achievement | null>(null);
   const [highlightTypeFilter, setHighlightTypeFilter] = useState<HighlightType[] | null>(null);
@@ -209,18 +210,47 @@ export default function PortfolioPage() {
     const highlightAdded = searchParams.get('highlightAdded') === 'true';
     const highlightUpdated = searchParams.get('highlightUpdated') === 'true';
     
+    const endorsementInvite = searchParams.get('endorsementInvite');
+
     if (wasCreated) {
+      setToastVariant('success');
       setToastMessage('Portfolio created successfully!');
       setShowToast(true);
       loadPortfolio();
       router.replace(`/portfolio/${params.id}`);
     } else if (highlightAdded) {
-      setToastMessage('Highlight added successfully!');
+      if (endorsementInvite === 'no_email') {
+        setToastVariant('warning');
+        setToastMessage(
+          'Highlight added successfully. Your endorsement request was saved, but the invitation email could not be sent—we copied the instructor link to your clipboard when possible. Configure MailerSend (MAILERSEND_API_KEY) on the server to send emails.'
+        );
+      } else if (endorsementInvite === 'error') {
+        setToastVariant('warning');
+        setToastMessage(
+          'Highlight added successfully, but the endorsement request failed. Use Request endorsement on the highlight to try again.'
+        );
+      } else {
+        setToastVariant('success');
+        setToastMessage('Highlight added successfully!');
+      }
       setShowToast(true);
       loadPortfolio();
       router.replace(`/portfolio/${params.id}`);
     } else if (highlightUpdated) {
-      setToastMessage('Highlight updated successfully!');
+      if (endorsementInvite === 'no_email') {
+        setToastVariant('warning');
+        setToastMessage(
+          'Highlight updated. Your endorsement request was saved, but the invitation email could not be sent—we copied the instructor link when possible. Configure MailerSend (MAILERSEND_API_KEY) on the server to send emails.'
+        );
+      } else if (endorsementInvite === 'error') {
+        setToastVariant('warning');
+        setToastMessage(
+          'Highlight updated, but the endorsement request failed. Use Request endorsement on the highlight to try again.'
+        );
+      } else {
+        setToastVariant('success');
+        setToastMessage('Highlight updated successfully!');
+      }
       setShowToast(true);
       loadPortfolio();
       router.replace(`/portfolio/${params.id}`);
@@ -324,6 +354,7 @@ export default function PortfolioPage() {
       throw new Error(data.error || 'Failed to remove endorsement');
     }
     await loadPortfolio();
+    setToastVariant('success');
     setToastMessage('Endorsement removed');
     setShowToast(true);
   };
@@ -764,6 +795,7 @@ export default function PortfolioPage() {
           isOpen={!!endorsementModalAchievement}
           onClose={() => setEndorsementModalAchievement(null)}
           achievement={endorsementModalAchievement}
+          portfolioId={params.id as string}
         />
       )}
 
@@ -780,9 +812,10 @@ export default function PortfolioPage() {
       {/* Toast Notification */}
       <Toast
         message={toastMessage}
-        variant="success"
+        variant={toastVariant}
         isVisible={showToast}
         onDismiss={() => setShowToast(false)}
+        duration={toastVariant === 'warning' ? 10000 : 3000}
       />
     </div>
   );

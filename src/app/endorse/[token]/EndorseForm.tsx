@@ -103,7 +103,7 @@ export default function EndorseForm({ token }: EndorseFormProps) {
         {pageState === 'form' && info && (
           <div className="bg-white rounded-xl shadow-md p-8">
             <h1 className="text-2xl font-semibold text-discovery-black mb-2">
-              Endorsement request
+              Kifolio - Endorsement Request
             </h1>
             <p className="text-discovery-grey mb-6">
               Hi {info.instructorName}, a parent has requested an endorsement from you. Please share a comment about the following achievement for <strong className="text-discovery-black font-semibold">{info.childName || 'this student'}</strong>:

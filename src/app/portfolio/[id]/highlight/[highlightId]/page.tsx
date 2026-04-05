@@ -12,6 +12,7 @@ import { deriveTypeAndCustomLabelFromHighlightRow } from '@/lib/highlightDbRow';
 import { HighlightType, HighlightFormData } from '@/types/achievement';
 import { FormFieldError } from '@/components/forms/FormFieldError';
 import HighlightMetadataSection from '@/components/highlight/HighlightMetadataSection';
+import { submitEndorsementInviteRequest } from '@/lib/endorsementInviteRequest';
 import { validateHighlightMetadata } from '@/lib/highlightFormValidation';
 import { Video, FileText, Music, Image } from 'lucide-react';
 
@@ -369,26 +370,22 @@ export default function EditHighlight() {
         endorsementData.instructorName.trim() &&
         endorsementData.instructorEmail.trim() &&
         endorsementData.relationship.trim();
+      let endorsementInvite: 'no_email' | 'error' | null = null;
       if (hasEndorsement) {
-        try {
-          await fetch('/api/endorsements/create', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({
-              achievementId: highlightId,
-              instructorName: endorsementData.instructorName.trim(),
-              instructorEmail: endorsementData.instructorEmail.trim(),
-              relationship: endorsementData.relationship.trim(),
-            }),
-          });
-        } catch (err) {
-          console.error('Endorsement request failed:', err);
-        }
+        const inviteResult = await submitEndorsementInviteRequest({
+          achievementId: highlightId,
+          portfolioId,
+          instructorName: endorsementData.instructorName.trim(),
+          instructorEmail: endorsementData.instructorEmail.trim(),
+          relationship: endorsementData.relationship.trim(),
+        });
+        if (inviteResult === 'no_email') endorsementInvite = 'no_email';
+        else if (inviteResult === 'error') endorsementInvite = 'error';
       }
 
-      // Redirect back to portfolio
-      router.push(`/portfolio/${portfolioId}?highlightUpdated=true`);
+      const q = new URLSearchParams({ highlightUpdated: 'true' });
+      if (endorsementInvite) q.set('endorsementInvite', endorsementInvite);
+      router.push(`/portfolio/${portfolioId}?${q.toString()}`);
     } catch (error) {
       console.error('Error updating highlight:', error);
       setErrors({ submit: 'Failed to update highlight. Please try again.' });
@@ -547,7 +544,7 @@ export default function EditHighlight() {
                 </div>
 
                 <p className="text-discovery-grey text-xs mt-1">
-                  The Kifolio free plan allows for photos (JPEG and PNG), PDFs, and audio files up to 50MB each.
+                  Accepts JPEG, PNG, PDF, and audio files up to 50MB each.
                 </p>
 
                 {uploadingMedia && (
@@ -688,7 +685,7 @@ export default function EditHighlight() {
                   Request instructor endorsement (optional)
                 </label>
                 <p className="text-discovery-grey text-sm mb-4">
-                  Invite an instructor or teacher to leave a comment about this achievement.
+                Invite an instructor or teacher to leave a comment about this achievement. You can request up to 3 endorsements at any time for this highlight.
                 </p>
                 <div className="space-y-4">
                   <div>
