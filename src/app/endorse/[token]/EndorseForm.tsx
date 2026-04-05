@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { FormFieldError } from '@/components/forms/FormFieldError';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -160,10 +161,6 @@ export default function EndorseForm({ token }: EndorseFormProps) {
                 />
               </div>
 
-              {error && (
-                <p className="text-red-600 text-sm">{error}</p>
-              )}
-
               <button
                 type="submit"
                 disabled={isSubmitting || !isFormValid}
@@ -171,6 +168,7 @@ export default function EndorseForm({ token }: EndorseFormProps) {
               >
                 {isSubmitting ? 'Submitting...' : 'Submit endorsement'}
               </button>
+              <FormFieldError message={error} placement="form-submit" />
             </form>
           </div>
         )}

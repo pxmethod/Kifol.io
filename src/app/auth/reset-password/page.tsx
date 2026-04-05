@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { FormFieldError } from '@/components/forms/FormFieldError';
 import { createClient } from '@/lib/supabase/client';
 
 function ResetPasswordForm() {
@@ -127,18 +128,13 @@ function ResetPasswordForm() {
               </div>
             )}
 
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-800 text-sm">{error}</p>
-              </div>
-            )}
-
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* New Password Field */}
               <div>
                 <label htmlFor="password" className="block text-md font-medium text-discovery-black mb-2">
                   New Password
                 </label>
+                <FormFieldError message={error} />
                 <input
                   type="password"
                   id="password"

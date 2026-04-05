@@ -8,8 +8,11 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { useAuth } from '@/contexts/AuthContext';
 import { storageService } from '@/lib/storage';
 import { HighlightService } from '@/lib/database/achievements';
-import { HIGHLIGHT_TYPES, HighlightType, HighlightFormData } from '@/types/achievement';
-import { HighlightTypeIcon } from '@/lib/highlightTypeIcons';
+import { deriveTypeAndCustomLabelFromHighlightRow } from '@/lib/highlightDbRow';
+import { HighlightType, HighlightFormData } from '@/types/achievement';
+import { FormFieldError } from '@/components/forms/FormFieldError';
+import HighlightMetadataSection from '@/components/highlight/HighlightMetadataSection';
+import { validateHighlightMetadata } from '@/lib/highlightFormValidation';
 import { Video, FileText, Music, Image } from 'lucide-react';
 
 export default function EditHighlight() {
@@ -22,6 +25,9 @@ export default function EditHighlight() {
   const [formData, setFormData] = useState<HighlightFormData>({
     title: '',
     date: new Date().toISOString().split('T')[0],
+    dateEnd: '',
+    ongoing: false,
+    customTypeLabel: '',
     description: '',
     type: '' as HighlightType,
     media: []
@@ -105,10 +111,6 @@ export default function EditHighlight() {
     return 'image'; // fallback
   };
 
-  const getSelectedType = () => {
-    return HIGHLIGHT_TYPES.find(type => type.id === formData.type);
-  };
-
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!loading && !user) {
@@ -155,11 +157,15 @@ export default function EditHighlight() {
       setLoadingHighlight(true);
       const highlight = await highlightService.getHighlight(highlightId);
       if (highlight) {
+        const { type, customTypeLabel } = deriveTypeAndCustomLabelFromHighlightRow(highlight);
         setFormData({
           title: highlight.title,
           date: highlight.date_achieved.split('T')[0],
+          dateEnd: highlight.date_end ? highlight.date_end.split('T')[0] : '',
+          ongoing: highlight.ongoing ?? (highlight.date_end ? false : true),
+          customTypeLabel: customTypeLabel ?? '',
           description: highlight.description || '',
-          type: highlight.type as HighlightType,
+          type,
           media: []
         });
         setExistingMedia((highlight.media_urls || []).map((url, index) => ({
@@ -188,13 +194,7 @@ export default function EditHighlight() {
       newErrors.title = 'Title must be 100 characters or less';
     }
 
-    if (!formData.type) {
-      newErrors.type = 'Please select a highlight type';
-    }
-
-    if (!formData.date) {
-      newErrors.date = 'Date is required';
-    }
+    Object.assign(newErrors, validateHighlightMetadata(formData));
 
     if (formData.description && formData.description.length > 500) {
       newErrors.description = 'Description must be 500 characters or less';
@@ -209,6 +209,9 @@ export default function EditHighlight() {
       formData.title.trim() !== '' ||
       formData.description.trim() !== '' ||
       formData.type !== ('' as HighlightType) ||
+      formData.dateEnd !== '' ||
+      formData.ongoing ||
+      formData.customTypeLabel.trim() !== '' ||
       formData.media.length > 0 ||
       existingMedia.length > 0
     );
@@ -227,11 +230,19 @@ export default function EditHighlight() {
     router.push(`/portfolio/${portfolioId}`);
   };
 
-  const handleInputChange = (field: keyof HighlightFormData, value: string | File[]) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
+  const handleInputChange = (field: keyof HighlightFormData, value: string | File[] | boolean) => {
+    setFormData((prev) => {
+      const next = { ...prev, [field]: value } as HighlightFormData;
+      if (field === 'ongoing' && value === true) {
+        next.dateEnd = '';
+      }
+      if (field === 'type' && value !== 'custom') {
+        next.customTypeLabel = '';
+      }
+      return next;
+    });
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: '' }));
     }
   };
 
@@ -340,13 +351,15 @@ export default function EditHighlight() {
       const allMediaUrls = [...existingMedia.map(m => m.url), ...mediaUrls];
 
       const highlightData = {
-        portfolio_id: portfolioId,
         title: formData.title,
         description: formData.description || null,
         date_achieved: formData.date,
+        date_end: formData.ongoing ? null : formData.dateEnd || null,
+        ongoing: formData.ongoing,
+        custom_type_label: formData.type === 'custom' ? formData.customTypeLabel.trim() : null,
         media_urls: allMediaUrls,
         type: formData.type,
-        category: null // We can add category later if needed
+        category: null
       };
 
       await highlightService.updateHighlight(highlightId, highlightData);
@@ -452,75 +465,20 @@ export default function EditHighlight() {
 
           <div className="px-6 py-6">
             <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Type Selection */}
-              <div>
-                <label htmlFor="type" className="block text-md font-medium text-discovery-black mb-2">
-                  Type *
-                </label>
-                <div className="type-dropdown relative">
-                  <button
-                    type="button"
-                    onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
-                    className={`w-full px-4 py-3 text-left rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors cursor-pointer text-discovery-black ${
-                      errors.type ? 'border border-red-500' : ''
-                    } ${isTypeDropdownOpen ? 'ring-2 ring-discovery-primary border-transparent' : ''}`}
-                    style={!errors.type && !isTypeDropdownOpen ? { border: '1px solid #DDDDE1', backgroundColor: '#ffffff' } : {}}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        {formData.type ? (
-                          <HighlightTypeIcon
-                            type={formData.type as HighlightType}
-                            className="w-5 h-5 shrink-0 text-discovery-black"
-                          />
-                        ) : null}
-                        <span className={`ml-2 ${formData.type ? 'text-discovery-black' : 'text-discovery-grey'}`}>
-                          {getSelectedType()?.name || 'Select a type...'}
-                        </span>
-                      </div>
-                      <svg
-                        className={`w-5 h-5 text-discovery-grey transition-transform ${isTypeDropdownOpen ? 'rotate-180' : ''}`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </div>
-                  </button>
-
-                  {isTypeDropdownOpen && (
-                    <div className="absolute z-10 w-full mt-1 bg-discovery-white-100 border border-discovery-grey-300 rounded-lg shadow-lg">
-                      {HIGHLIGHT_TYPES.map((type) => (
-                        <button
-                          key={type.id}
-                          type="button"
-                          onClick={() => {
-                            handleInputChange('type', type.id);
-                            setIsTypeDropdownOpen(false);
-                          }}
-                          className="w-full px-3 py-3 text-left hover:bg-discovery-beige-100 first:rounded-t-lg last:rounded-b-lg flex items-center transition-colors"
-                        >
-                          <div className="flex items-center">
-                            <HighlightTypeIcon type={type.id} className="w-5 h-5 shrink-0 text-discovery-black" />
-                            <div className="ml-3">
-                              <div className="text-base font-medium text-discovery-black">{type.name}</div>
-                              <div className="text-xs text-discovery-grey">{type.description}</div>
-                            </div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                {errors.type && <p className="text-red-500 text-sm mt-1">{errors.type}</p>}
-              </div>
+              <HighlightMetadataSection
+                formData={formData}
+                errors={errors}
+                isTypeDropdownOpen={isTypeDropdownOpen}
+                setIsTypeDropdownOpen={setIsTypeDropdownOpen}
+                onChange={handleInputChange}
+              />
 
               {/* Title */}
               <div>
                 <label htmlFor="title" className="block text-md font-medium text-discovery-black mb-2">
                   Title *
                 </label>
+                <FormFieldError message={errors.title} />
                 <input
                   type="text"
                   id="title"
@@ -532,25 +490,7 @@ export default function EditHighlight() {
                     errors.title ? 'border-red-500' : 'border-discovery-grey-300'
                   }`}
                 />
-                {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
                 <p className="text-discovery-grey text-sm mt-1">{formData.title.length}/100 characters</p>
-              </div>
-
-              {/* Date */}
-              <div>
-                <label htmlFor="date" className="block text-md font-medium text-discovery-black mb-2">
-                  Date *
-                </label>
-                <input
-                  type="date"
-                  id="date"
-                  value={formData.date}
-                  onChange={(e) => handleInputChange('date', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-discovery-primary focus:border-transparent transition-colors text-discovery-black cursor-pointer ${
-                    errors.date ? 'border-red-500' : 'border-discovery-grey-300'
-                  }`}
-                />
-                {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date}</p>}
               </div>
 
               {/* Description */}
@@ -558,6 +498,7 @@ export default function EditHighlight() {
                 <label htmlFor="description" className="block text-md font-medium text-discovery-black mb-2">
                   Description (Optional)
                 </label>
+                <FormFieldError message={errors.description} />
                 <textarea
                   id="description"
                   value={formData.description}
@@ -569,13 +510,13 @@ export default function EditHighlight() {
                     errors.description ? 'border-red-500' : 'border-discovery-grey-300'
                   }`}
                 />
-                {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
                 <p className="text-discovery-grey text-sm mt-1">{formData.description.length}/500 characters</p>
               </div>
 
               {/* Media Upload */}
               <div>
                 <label className="block text-md font-medium text-discovery-black mb-2">Add Media (Optional)</label>
+                <FormFieldError message={errors.media} />
 
                 <div className="relative">
                   <input
@@ -618,7 +559,6 @@ export default function EditHighlight() {
                   </div>
                 )}
 
-                {errors.media && <p className="text-red-500 text-sm mt-1">{errors.media}</p>}
               </div>
 
               {/* Media Preview */}
@@ -820,7 +760,7 @@ export default function EditHighlight() {
                 </button>
               </div>
 
-              {errors.submit && <p className="text-red-500 text-sm text-center mt-2">{errors.submit}</p>}
+              <FormFieldError message={errors.submit} placement="form-submit" />
             </form>
           </div>
         </div>

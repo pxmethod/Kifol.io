@@ -4,12 +4,18 @@ import { useState, useEffect, useMemo, type KeyboardEvent } from 'react';
 import Image from 'next/image';
 import { TemplateConfig, PortfolioTemplateProps } from '@/types/template';
 import { getTemplateNextFont } from '@/lib/templateFonts';
-import { Achievement, HighlightType } from '@/types/achievement';
+import { Achievement, HighlightType, getHighlightTypeDisplayName } from '@/types/achievement';
 import HighlightDetailModal from '@/components/HighlightDetailModal';
 import EndorsementBlock from '@/components/EndorsementBlock';
 import HighlightTypeFilter, { filterAchievementsByTypes } from '@/components/HighlightTypeFilter';
 import { HighlightTypeIcon } from '@/lib/highlightTypeIcons';
 import { formatTextWithLinks } from '@/utils/text-formatting';
+import {
+  formatHighlightDateDisplay,
+  formatHighlightMonthYearFromSortKey,
+  highlightDateToMonthSortKey,
+  parseHighlightDateLocal,
+} from '@/lib/highlightDates';
 
 interface BaseTemplateProps extends PortfolioTemplateProps {
   config: TemplateConfig;
@@ -43,17 +49,17 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
   }, []);
 
   const sortedHighlights = [...highlights].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    (a, b) =>
+      parseHighlightDateLocal(b.date).getTime() - parseHighlightDateLocal(a.date).getTime()
   );
 
   const groupedHighlights = sortedHighlights.reduce(
     (groups: { [key: string]: Achievement[] }, highlight) => {
-      const date = new Date(highlight.date);
-      const monthYear = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-      if (!groups[monthYear]) {
-        groups[monthYear] = [];
+      const sortKey = highlightDateToMonthSortKey(highlight.date);
+      if (!groups[sortKey]) {
+        groups[sortKey] = [];
       }
-      groups[monthYear].push(highlight);
+      groups[sortKey].push(highlight);
       return groups;
     },
     {}
@@ -90,14 +96,6 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
     ? 'rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]'
     : 'cursor-pointer rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-shadow duration-200 hover:shadow-md md:p-6';
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
   const handleViewHighlight = (highlight: Achievement) => {
     setSelectedHighlight(highlight);
     setShowDetailModal(true);
@@ -106,18 +104,6 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
   const handleCloseModal = () => {
     setShowDetailModal(false);
     setSelectedHighlight(null);
-  };
-
-  const getTypeName = (type: string) => {
-    const typeMap: { [key: string]: string } = {
-      achievement: 'Achievement',
-      creative_work: 'Creative work',
-      milestone: 'Milestone',
-      activity: 'Activity',
-      volunteer_work: 'Volunteer work',
-      reflection_note: 'Reflection/Note',
-    };
-    return typeMap[type] || 'Achievement';
   };
 
   const getMediaIcon = (mediaType: string) => {
@@ -266,15 +252,17 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
             </div>
           )}
 
-          {Object.entries(groupedHighlights).map(([dateHeader, dateHighlights]) => (
+          {Object.entries(groupedHighlights)
+            .sort(([a], [b]) => b.localeCompare(a))
+            .map(([sortKey, dateHighlights]) => (
             <section
-              key={dateHeader}
+              key={sortKey}
               className={previewMode ? 'rounded-lg p-6' : 'rounded-lg p-6 sm:p-6 md:p-6'}
               style={{ backgroundColor: surface.sectionTray }}
             >
               <div className={previewMode ? 'mb-6' : 'mb-6 md:mb-8'}>
                 <h2 className="text-lg font-semibold text-neutral-700 sm:text-lg">
-                  {dateHeader}
+                  {formatHighlightMonthYearFromSortKey(sortKey)}
                 </h2>
               </div>
 
@@ -311,7 +299,7 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
                               className="h-3.5 w-3.5 shrink-0 text-neutral-700"
                               strokeWidth={2}
                             />
-                            <span className="truncate">{getTypeName(highlight.type)}</span>
+                            <span className="truncate">{getHighlightTypeDisplayName(highlight)}</span>
                           </span>
                           <div className="flex shrink-0 items-center gap-1.5 text-neutral-500">
                             <svg
@@ -328,7 +316,9 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                               />
                             </svg>
-                            <span className="text-xs sm:text-sm text-neutral-600">{formatDate(highlight.date)}</span>
+                            <span className="text-xs sm:text-sm text-neutral-600">
+                              {formatHighlightDateDisplay(highlight)}
+                            </span>
                           </div>
                         </div>
                         <h3 className="w-full min-w-0 text-lg font-semibold leading-snug text-neutral-900 sm:text-xl">

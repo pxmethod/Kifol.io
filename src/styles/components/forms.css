@@ -39,8 +39,9 @@
   @apply text-sm text-gray-600 mt-1;
 }
 
+/* Prefer <FormFieldError /> in TSX; this matches its “below label” styling for legacy markup */
 .form-field__error {
-  @apply text-sm text-red-600 mt-1;
+  @apply text-sm text-red-600 text-left leading-snug mb-2 -mt-1;
 }
 
 /* Input Block */
@@ -225,6 +226,33 @@
   line-height: var(--line-height-normal);
   cursor: pointer;
   padding-top: 0.3rem;
+}
+
+/* Smaller checkbox (e.g. highlight form) — matches filter popup pattern, tighter scale */
+.checkbox--sm {
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.checkbox--sm .checkbox__input {
+  width: 1.375rem;
+  height: 1.375rem;
+  margin-top: 0;
+  border-width: 2px;
+}
+
+.checkbox--sm .checkbox__input:checked::after {
+  top: 2px;
+  left: 6px;
+  width: 5px;
+  height: 9px;
+  border-width: 2px;
+}
+
+.checkbox--sm .checkbox__label {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  padding-top: 0;
 }
 
 .checkbox__description {

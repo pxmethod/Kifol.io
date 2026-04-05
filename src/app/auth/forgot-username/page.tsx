@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { FormFieldError } from '@/components/forms/FormFieldError';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -80,18 +81,13 @@ export default function ForgotUsernamePage() {
               </div>
             )}
 
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-800 text-sm">{error}</p>
-              </div>
-            )}
-
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email Field */}
               <div>
                 <label htmlFor="email" className="block text-md font-medium text-discovery-black mb-2">
                   Email address
                 </label>
+                <FormFieldError message={error} />
                 <input
                   type="email"
                   id="email"

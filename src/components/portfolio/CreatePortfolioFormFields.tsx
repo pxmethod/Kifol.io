@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo } from 'react';
+import { FormFieldError } from '@/components/forms/FormFieldError';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { PORTFOLIO_TEMPLATES, type PortfolioFormState } from '@/config/portfolio-form';
 
@@ -59,6 +60,7 @@ export default function CreatePortfolioFormFields({
           <label htmlFor="childName" className="block text-md font-medium text-discovery-black mb-2">
             Child or student&apos;s name *
           </label>
+          <FormFieldError message={errors.childName} />
           <input
             type="text"
             id="childName"
@@ -70,7 +72,6 @@ export default function CreatePortfolioFormFields({
             placeholder="Enter child or student's name..."
             maxLength={100}
           />
-          {errors.childName && <p className="text-red-500 text-sm mt-1">{errors.childName}</p>}
           <p className="text-discovery-grey text-sm mt-1">{formData.childName.length}/100 characters</p>
         </div>
 
@@ -79,6 +80,7 @@ export default function CreatePortfolioFormFields({
           <label htmlFor="portfolioTitle" className="block text-md font-medium text-discovery-black mb-2">
             Portfolio title *
           </label>
+          <FormFieldError message={errors.portfolioTitle} />
           <input
             type="text"
             id="portfolioTitle"
@@ -90,9 +92,6 @@ export default function CreatePortfolioFormFields({
             placeholder={portfolioTitlePlaceholder}
             maxLength={100}
           />
-          {errors.portfolioTitle && (
-            <p className="text-red-500 text-sm mt-1">{errors.portfolioTitle}</p>
-          )}
           <p className="text-discovery-grey text-sm mt-1">{formData.portfolioTitle.length}/100 characters</p>
         </div>
 
@@ -101,6 +100,7 @@ export default function CreatePortfolioFormFields({
           <label className="block text-md font-medium text-discovery-black mb-2">
             Add a photo
           </label>
+          <FormFieldError message={errors.photo} />
 
           <div className="relative">
             <input
@@ -164,13 +164,13 @@ export default function CreatePortfolioFormFields({
               <span className="text-sm text-kifolio-text">Uploading photo...</span>
             </div>
           )}
-          {errors.photo && <p className="form-field__error">{errors.photo}</p>}
           <p className="form-field__help text-xs">JPEG, PNG, GIF, or SVG. Max size of 50MB</p>
         </div>
 
         {/* Theme selection */}
         <div>
           <label className="block text-md font-medium text-discovery-black mb-2">Choose a theme *</label>
+          <FormFieldError message={errors.template} />
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3">
             {PORTFOLIO_TEMPLATES.map((template) => {
               const selected = formData.template === template.id;
@@ -207,7 +207,6 @@ export default function CreatePortfolioFormFields({
               );
             })}
           </div>
-          {errors.template && <p className="text-red-500 text-sm mt-1">{errors.template}</p>}
         </div>
 
         {/* Privacy Settings */}
@@ -241,6 +240,7 @@ export default function CreatePortfolioFormFields({
                 <label htmlFor="password" className="block text-sm font-medium text-discovery-black mb-2">
                   Enter a password *
                 </label>
+                <FormFieldError message={errors.password} />
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -279,7 +279,6 @@ export default function CreatePortfolioFormFields({
                     )}
                   </button>
                 </div>
-                {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
               </div>
             )}
           </div>

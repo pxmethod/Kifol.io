@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
+import { FormFieldError } from '@/components/forms/FormFieldError';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface SignUpFormData {
@@ -194,6 +195,7 @@ function SignUpContent() {
                     <label htmlFor="email" className="text-md font-medium text-discovery-grey leading-relaxed">
                       Email address
                     </label>
+                    <FormFieldError message={errors.email} />
                     <input
                       type="email"
                       id="email"
@@ -202,9 +204,6 @@ function SignUpContent() {
                       className={`input ${errors.email ? 'input--error' : ''}`}
                       placeholder="Enter your email address"
                     />
-                    {errors.email && (
-                      <p className="form-field__error">{errors.email}</p>
-                    )}
                   </div>
 
                   {/* Password Field */}
@@ -212,6 +211,7 @@ function SignUpContent() {
                     <label htmlFor="password" className="text-md font-medium text-discovery-grey leading-relaxed">
                       Password
                     </label>
+                    <FormFieldError message={errors.password} />
                     <div className="relative">
                       <input
                         type={showPassword ? 'text' : 'password'}
@@ -241,9 +241,6 @@ function SignUpContent() {
                         </span>
                       </button>
                     </div>
-                    {errors.password && (
-                      <p className="form-field__error">{errors.password}</p>
-                    )}
                   </div>
 
                   {/* Password Requirements */}
@@ -294,9 +291,7 @@ function SignUpContent() {
                     {isSubmitting ? 'Creating account...' : 'Sign up'}
                   </button>
 
-                  {errors.submit && (
-                    <p className="form-field__error text-center">{errors.submit}</p>
-                  )}
+                  <FormFieldError message={errors.submit} placement="form-submit" />
                 </form>
 
 

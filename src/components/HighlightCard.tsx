@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { CircleStar } from 'lucide-react';
-import { Achievement, HIGHLIGHT_TYPES, type HighlightType } from '@/types/achievement';
+import { Achievement, getHighlightTypeDisplayName, type HighlightType } from '@/types/achievement';
 import { HighlightTypeIcon } from '@/lib/highlightTypeIcons';
 import EndorsementBlock from './EndorsementBlock';
 import { formatTextWithLinks } from '@/utils/text-formatting';
+import { formatHighlightDateDisplay } from '@/lib/highlightDates';
 
 interface HighlightCardProps {
   achievement: Achievement;
@@ -30,15 +31,6 @@ export default function HighlightCard({
   const [selectedVideoUrl, setSelectedVideoUrl] = useState('');
   const [videoError, setVideoError] = useState<string | null>(null);
   const [showAllThumbnails, setShowAllThumbnails] = useState(false);
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
 
   const renderMediaThumbnails = () => {
     const imageMedia = achievement.media.filter(m => m.type === 'image');
@@ -178,8 +170,7 @@ export default function HighlightCard({
   };
 
   const highlightType = achievement.type as HighlightType;
-  const typeLabel =
-    HIGHLIGHT_TYPES.find((t) => t.id === highlightType)?.name ?? 'Achievement';
+  const typeLabel = getHighlightTypeDisplayName(achievement);
 
   return (
     <div
@@ -223,7 +214,7 @@ export default function HighlightCard({
           </div>
           
           <p className="text-sm text-discovery-grey mt-1">
-            {formatDate(achievement.date)}
+            {formatHighlightDateDisplay(achievement)}
           </p>
         </div>
       </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
+import { FormFieldError } from '@/components/forms/FormFieldError';
 import CreatePortfolioFormFields from '@/components/portfolio/CreatePortfolioFormFields';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -234,7 +235,7 @@ export default function CreatePortfolio() {
                 {isSubmitting ? 'Creating Portfolio...' : 'Create Portfolio'}
               </button>
             </div>
-            {errors.submit && <p className="form-field__error text-center mt-4">{errors.submit}</p>}
+            <FormFieldError message={errors.submit} placement="form-submit" className="mt-4" />
           </div>
         </div>
       </main>

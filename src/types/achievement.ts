@@ -1,9 +1,22 @@
-export type HighlightType = 'achievement' | 'creative_work' | 'milestone' | 'activity' | 'volunteer_work' | 'reflection_note';
+export type HighlightType =
+  | 'achievement'
+  | 'creative_work'
+  | 'milestone'
+  | 'activity'
+  | 'volunteer_work'
+  | 'reflection_note'
+  | 'custom';
 
 export interface Highlight {
   id: string;
   title: string;
-  date: string; // ISO date string
+  date: string; // Start date (ISO date string, from date_achieved)
+  /** End date when not ongoing (ISO YYYY-MM-DD or full ISO) */
+  dateEnd?: string | null;
+  /** When true, display "present" instead of an end date */
+  ongoing?: boolean;
+  /** Label when type is custom */
+  customTypeLabel?: string | null;
   description?: string;
   media: HighlightMedia[];
   type: HighlightType;
@@ -21,7 +34,12 @@ export interface HighlightMedia {
 
 export interface HighlightFormData {
   title: string;
+  /** Start date YYYY-MM-DD */
   date: string;
+  /** End date YYYY-MM-DD (ignored when ongoing) */
+  dateEnd: string;
+  ongoing: boolean;
+  customTypeLabel: string;
   description: string;
   type: HighlightType;
   media: File[];
@@ -63,8 +81,23 @@ export const HIGHLIGHT_TYPES: HighlightTypeOption[] = [
     id: 'reflection_note',
     name: 'Reflection/Note',
     description: 'a parent\'s written reflection, or even a child\'s own words'
+  },
+  {
+    id: 'custom',
+    name: 'Custom',
+    description: 'name your own category'
   }
 ];
+
+export function getHighlightTypeDisplayName(h: {
+  type: HighlightType;
+  customTypeLabel?: string | null;
+}): string {
+  if (h.type === 'custom' && h.customTypeLabel?.trim()) {
+    return h.customTypeLabel.trim();
+  }
+  return HIGHLIGHT_TYPES.find((t) => t.id === h.type)?.name ?? 'Highlight';
+}
 
 // Legacy types for backward compatibility during migration
 export interface Achievement extends Highlight {

@@ -6,6 +6,7 @@ import TemplateFactory from '@/components/templates/TemplateFactory';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import PortfolioPasswordPrompt from '@/components/PortfolioPasswordPrompt';
+import { deriveTypeAndCustomLabelFromHighlightRow } from '@/lib/highlightDbRow';
 import { Achievement } from '@/types/achievement';
 import { portfolioService, achievementService } from '@/lib/database';
 import { portfolioAccessService } from '@/lib/services/portfolio-access';
@@ -112,10 +113,15 @@ export default function ShortPortfolioPageClient() {
         createdAt: dbPortfolio.created_at,
         isPrivate: dbPortfolio.is_private,
         password: dbPortfolio.password || undefined,
-        achievements: highlights.map((highlight: any) => ({
+        achievements: highlights.map((highlight: any) => {
+          const { type, customTypeLabel } = deriveTypeAndCustomLabelFromHighlightRow(highlight);
+          return {
           id: highlight.id,
           title: highlight.title,
           date: highlight.date_achieved,
+          dateEnd: highlight.date_end ?? null,
+          ongoing: highlight.ongoing ?? (highlight.date_end ? false : true),
+          customTypeLabel,
           description: highlight.description || undefined,
           media: (highlight.media_urls || []).map((url: string, index: number) => ({
             id: `media-${index}`,
@@ -124,12 +130,13 @@ export default function ShortPortfolioPageClient() {
             fileName: url.split('/').pop() || 'file',
             fileSize: 0,
           })),
-          type: highlight.type,
-          isMilestone: highlight.type === 'milestone',
+          type,
+          isMilestone: type === 'milestone',
           createdAt: highlight.created_at,
           updatedAt: highlight.updated_at,
           endorsements: endorsementsByAchievement[highlight.id] || [],
-        })),
+        };
+        }),
       };
 
       setPortfolio(portfolioData);

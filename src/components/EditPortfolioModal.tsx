@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { FormFieldError } from '@/components/forms/FormFieldError';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { storageService } from '@/lib/storage';
 import { templates } from '@/config/templates';
@@ -258,6 +259,7 @@ export default function EditPortfolioModal({
               <label htmlFor="editChildName" className="block text-sm font-medium text-kifolio-text mb-2">
                 Child or student&apos;s name *
               </label>
+              <FormFieldError message={errors.childName} />
               <input
                 type="text"
                 id="editChildName"
@@ -269,9 +271,6 @@ export default function EditPortfolioModal({
                 placeholder="Enter your child's name"
                 maxLength={100}
               />
-              {errors.childName && (
-                <p className="text-red-500 text-sm mt-1">{errors.childName}</p>
-              )}
               <p className="text-gray-500 text-sm mt-1">
                 {formData.childName.length}/100 characters
               </p>
@@ -282,6 +281,7 @@ export default function EditPortfolioModal({
               <label htmlFor="editPortfolioTitle" className="block text-sm font-medium text-kifolio-text mb-2">
                 Portfolio Title *
               </label>
+              <FormFieldError message={errors.portfolioTitle} />
               <input
                 type="text"
                 id="editPortfolioTitle"
@@ -293,9 +293,6 @@ export default function EditPortfolioModal({
                 placeholder="Enter portfolio title"
                 maxLength={100}
               />
-              {errors.portfolioTitle && (
-                <p className="text-red-500 text-sm mt-1">{errors.portfolioTitle}</p>
-              )}
               <p className="text-gray-500 text-sm mt-1">
                 {formData.portfolioTitle.length}/100 characters
               </p>
@@ -306,7 +303,8 @@ export default function EditPortfolioModal({
               <label className="block text-sm font-medium text-kifolio-text mb-2">
                 Child&apos;s Photo (Optional)
               </label>
-              
+              <FormFieldError message={errors.photo} />
+
               {/* Current Photo Thumbnail */}
               {formData.photoUrl && (
                 <div className="mb-4">
@@ -352,9 +350,6 @@ export default function EditPortfolioModal({
                   <span className="text-sm text-kifolio-text">Uploading photo...</span>
                 </div>
               )}
-              {errors.photo && (
-                <p className="text-red-500 text-sm mt-1">{errors.photo}</p>
-              )}
               <p className="text-gray-500 text-sm mt-1">
                 JPEG, PNG, GIF, or SVG. Max size of 50MB
               </p>
@@ -365,6 +360,7 @@ export default function EditPortfolioModal({
               <label className="block text-sm font-medium text-kifolio-text mb-2">
                 Choose a theme *
               </label>
+              <FormFieldError message={errors.template} />
               <div className="grid grid-cols-2 gap-4">
                 {templates.map((template) => {
                   const selected = formData.template === template.id;
@@ -401,9 +397,6 @@ export default function EditPortfolioModal({
                   );
                 })}
               </div>
-              {errors.template && (
-                <p className="text-red-500 text-sm mt-1">{errors.template}</p>
-              )}
             </div>
 
             {/* Privacy Settings */}
@@ -439,6 +432,7 @@ export default function EditPortfolioModal({
                     <label htmlFor="password" className="block text-sm font-medium text-kifolio-text mb-2">
                       Portfolio Password *
                     </label>
+                    <FormFieldError message={errors.password} />
                     <div className="relative">
                       <input
                         type={showPassword ? 'text' : 'password'}
@@ -467,9 +461,6 @@ export default function EditPortfolioModal({
                         )}
                       </button>
                     </div>
-                    {errors.password && (
-                      <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-                    )}
                   </div>
                 )}
               </div>
@@ -484,9 +475,7 @@ export default function EditPortfolioModal({
               >
                 {isSubmitting ? 'Saving changes...' : 'Save changes'}
               </button>
-              {errors.submit && (
-                <p className="text-red-500 text-sm mt-2 text-center">{errors.submit}</p>
-              )}
+              <FormFieldError message={errors.submit} placement="form-submit" />
             </div>
 
             {/* Delete Button */}

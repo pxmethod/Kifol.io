@@ -1,5 +1,6 @@
 'use client';
 
+import { highlightDateToMonthSortKey, parseHighlightDateLocal } from '@/lib/highlightDates';
 import { Achievement } from '@/types/achievement';
 import HighlightCard from './HighlightCard';
 
@@ -29,52 +30,53 @@ export default function HighlightsTimeline({
     const grouped: GroupedHighlights = {};
     
     highlights.forEach(highlight => {
-      const date = new Date(highlight.date);
-      const dateKey = date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long'
-      });
-      
-      if (!grouped[dateKey]) {
-        grouped[dateKey] = [];
+      const sortKey = highlightDateToMonthSortKey(highlight.date);
+
+      if (!grouped[sortKey]) {
+        grouped[sortKey] = [];
       }
-      grouped[dateKey].push(highlight);
+      grouped[sortKey].push(highlight);
     });
-    
+
     // Sort highlights within each group by date (newest first)
     Object.keys(grouped).forEach(key => {
-      grouped[key].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      grouped[key].sort(
+        (a, b) =>
+          parseHighlightDateLocal(b.date).getTime() - parseHighlightDateLocal(a.date).getTime()
+      );
     });
     
     return grouped;
   };
 
-  const formatGroupDate = (dateKey: string) => {
-    const [month, year] = dateKey.split(' ');
-    const date = new Date(`${month} 1, ${year}`);
+  const formatGroupDate = (sortKey: string) => {
+    const parts = sortKey.split('-');
+    if (parts.length !== 2) return sortKey;
+    const year = Number(parts[0]);
+    const monthIndex = Number(parts[1]) - 1;
+    if (Number.isNaN(year) || Number.isNaN(monthIndex)) return sortKey;
+    const date = new Date(year, monthIndex, 1);
     const now = new Date();
-    const isCurrentMonth = date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-    
+    const isCurrentMonth =
+      date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+
     if (isCurrentMonth) {
       return 'This Month';
     }
-    
+
     const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const isLastMonth = date.getMonth() === lastMonth.getMonth() && date.getFullYear() === lastMonth.getFullYear();
-    
+    const isLastMonth =
+      date.getMonth() === lastMonth.getMonth() && date.getFullYear() === lastMonth.getFullYear();
+
     if (isLastMonth) {
       return 'Last Month';
     }
-    
-    return dateKey;
+
+    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   };
 
   const groupedHighlights = groupHighlightsByDate(highlights);
-  const sortedGroups = Object.keys(groupedHighlights).sort((a, b) => {
-    const dateA = new Date(a);
-    const dateB = new Date(b);
-    return dateB.getTime() - dateA.getTime(); // Newest first
-  });
+  const sortedGroups = Object.keys(groupedHighlights).sort((a, b) => b.localeCompare(a));
 
   if (highlights.length === 0) {
     if (emptyFilterMessage) {

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { FormFieldError } from '@/components/forms/FormFieldError';
 import CreatePortfolioFormFields from '@/components/portfolio/CreatePortfolioFormFields';
 import OnboardingPortfolioPreview from '@/components/onboarding/OnboardingPortfolioPreview';
 import { validatePortfolioForm, type PortfolioFormState } from '@/config/portfolio-form';
@@ -219,9 +220,11 @@ export default function OnboardingPage() {
                   saved once you successfully create your account.
                 </p>
                 <div className="flex flex-col sm:flex-row sm:justify-end gap-3">
-                  {errors.submit && (
-                    <p className="form-field__error sm:flex-1 sm:self-center">{errors.submit}</p>
-                  )}
+                  <FormFieldError
+                    message={errors.submit}
+                    placement="form-submit"
+                    className="sm:flex-1 sm:self-center sm:text-left"
+                  />
                   <button
                     type="submit"
                     form="onboardingPortfolioForm"

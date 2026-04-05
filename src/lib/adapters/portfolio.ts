@@ -1,5 +1,6 @@
 import { Database } from '@/types/database'
 import { Achievement } from '@/types/achievement'
+import { deriveTypeAndCustomLabelFromHighlightRow } from '@/lib/highlightDbRow'
 
 // Database types
 type DbPortfolio = Database['public']['Tables']['portfolios']['Row']
@@ -57,10 +58,14 @@ export function legacyPortfolioToDb(
 
 // Transform database highlight to legacy format
 function dbHighlightToLegacy(dbHighlight: DbHighlight): Achievement {
+  const { type, customTypeLabel } = deriveTypeAndCustomLabelFromHighlightRow(dbHighlight)
   return {
     id: dbHighlight.id,
     title: dbHighlight.title,
     date: dbHighlight.date_achieved,
+    dateEnd: dbHighlight.date_end ?? null,
+    ongoing: dbHighlight.ongoing ?? (dbHighlight.date_end ? false : true),
+    customTypeLabel,
     description: dbHighlight.description || undefined,
     media: (dbHighlight.media_urls || []).map((url, index) => {
       const urlLower = url.toLowerCase();
@@ -94,8 +99,8 @@ function dbHighlightToLegacy(dbHighlight: DbHighlight): Achievement {
         fileSize: 0 // We don't store file size in current schema
       };
     }),
-    type: dbHighlight.type,
-    isMilestone: dbHighlight.type === 'milestone',
+    type,
+    isMilestone: type === 'milestone',
     createdAt: dbHighlight.created_at,
     updatedAt: dbHighlight.updated_at
   }
@@ -111,6 +116,9 @@ export function legacyAchievementToDb(
     title: legacy.title,
     description: legacy.description || null,
     date_achieved: legacy.date,
+    date_end: legacy.ongoing ? null : legacy.dateEnd ?? null,
+    ongoing: legacy.ongoing ?? false,
+    custom_type_label: legacy.customTypeLabel ?? null,
     media_urls: legacy.media.map(m => m.url),
     category: legacy.isMilestone ? 'milestone' : null,
     type: legacy.type

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { FormFieldError } from '@/components/forms/FormFieldError';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface LoginFormData {
@@ -168,6 +169,7 @@ export default function LoginPage() {
                 <label htmlFor="email" className="text-md font-medium text-discovery-grey leading-relaxed">
                   Email address
                 </label>
+                <FormFieldError message={errors.email} />
                 <input
                   type="email"
                   id="email"
@@ -177,9 +179,6 @@ export default function LoginPage() {
                   placeholder="Enter your email address"
                   required
                 />
-                {errors.email && (
-                  <p className="form-field__error">{errors.email}</p>
-                )}
               </div>
 
               {/* Password Field */}
@@ -187,6 +186,7 @@ export default function LoginPage() {
                 <label htmlFor="password" className="text-md font-medium text-discovery-grey leading-relaxed">
                   Password
                 </label>
+                <FormFieldError message={errors.password} />
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -215,9 +215,6 @@ export default function LoginPage() {
                     )}
                   </button>
                 </div>
-                {errors.password && (
-                  <p className="form-field__error">{errors.password}</p>
-                )}
               </div>
 
               {/* Keep Me Logged In Checkbox */}
@@ -243,9 +240,7 @@ export default function LoginPage() {
                 {isSubmitting ? 'Signing in...' : 'Log in'}
               </button>
 
-              {errors.submit && (
-                <p className="form-field__error text-center">{errors.submit}</p>
-              )}
+              <FormFieldError message={errors.submit} placement="form-submit" />
             </form>
 
             {/* Forgot Password Link */}

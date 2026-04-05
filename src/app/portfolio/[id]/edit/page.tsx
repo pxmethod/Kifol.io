@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { FormFieldError } from '@/components/forms/FormFieldError';
 import Header from '@/components/Header';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -308,6 +309,7 @@ export default function EditPortfolio() {
                 <label htmlFor="childName" className="block text-md font-medium text-discovery-black mb-2">
                   Child or student&apos;s name *
                 </label>
+                <FormFieldError message={errors.childName} />
                 <input
                   type="text"
                   id="childName"
@@ -319,9 +321,6 @@ export default function EditPortfolio() {
                   placeholder="Enter your child's name"
                   maxLength={100}
                 />
-                {errors.childName && (
-                  <p className="text-red-500 text-sm mt-1">{errors.childName}</p>
-                )}
                 <p className="text-discovery-grey text-sm mt-1">
                   {formData.childName.length}/100 characters
                 </p>
@@ -332,6 +331,7 @@ export default function EditPortfolio() {
                 <label htmlFor="portfolioTitle" className="block text-md font-medium text-discovery-black mb-2">
                   Portfolio title *
                 </label>
+                <FormFieldError message={errors.portfolioTitle} />
                 <input
                   type="text"
                   id="portfolioTitle"
@@ -343,9 +343,6 @@ export default function EditPortfolio() {
                   placeholder="Enter portfolio title"
                   maxLength={100}
                 />
-                {errors.portfolioTitle && (
-                  <p className="text-red-500 text-sm mt-1">{errors.portfolioTitle}</p>
-                )}
                 <p className="text-discovery-grey text-sm mt-1">
                   {formData.portfolioTitle.length}/100 characters
                 </p>
@@ -356,7 +353,8 @@ export default function EditPortfolio() {
                 <label className="block text-md font-medium text-discovery-black mb-2">
                   Child&apos;s photo (totally optional)
                 </label>
-                
+                <FormFieldError message={errors.photoUrl} />
+
                 {/* File Input */}
                 <div className="relative">
                   <input
@@ -453,9 +451,6 @@ export default function EditPortfolio() {
                     <span className="text-sm text-kifolio-text">Uploading photo...</span>
                   </div>
                 )}
-                {errors.photoUrl && (
-                  <p className="form-field__error">{errors.photoUrl}</p>
-                )}
                 <p className="form-field__help text-xs">
                   JPEG, PNG, GIF, or SVG. Max size of 50MB
                 </p>
@@ -466,6 +461,7 @@ export default function EditPortfolio() {
                 <label className="block text-md font-medium text-discovery-black mb-2">
                   Choose a theme *
                 </label>
+                <FormFieldError message={errors.template} />
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3">
                   {templates.map((template) => {
                     const selected = formData.template === template.id;
@@ -502,9 +498,6 @@ export default function EditPortfolio() {
                     );
                   })}
                 </div>
-                {errors.template && (
-                  <p className="text-red-500 text-sm mt-1">{errors.template}</p>
-                )}
               </div>
 
               {/* Privacy Settings */}
@@ -540,6 +533,7 @@ export default function EditPortfolio() {
                       <label htmlFor="password" className="block text-sm font-medium text-discovery-black mb-2">
                         Enter a password *
                       </label>
+                      <FormFieldError message={errors.password} />
                       <div className="relative">
                         <input
                           type={showPassword ? 'text' : 'password'}
@@ -568,9 +562,6 @@ export default function EditPortfolio() {
                           )}
                         </button>
                       </div>
-                      {errors.password && (
-                        <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-                      )}
                     </div>
                   )}
                 </div>
@@ -598,9 +589,7 @@ export default function EditPortfolio() {
                 {isSubmitting ? 'Saving changes...' : 'Save changes'}
               </button>
             </div>
-            {errors.general && (
-              <p className="form-field__error text-center mt-4">{errors.general}</p>
-            )}
+            <FormFieldError message={errors.general} placement="form-submit" className="mt-4" />
           </div>
         </div>
       </main>

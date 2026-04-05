@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Achievement } from '@/types/achievement';
 import EndorsementBlock from '@/components/EndorsementBlock';
 import { formatTextWithLinks } from '@/utils/text-formatting';
+import { formatHighlightDateDisplay } from '@/lib/highlightDates';
 
 interface HighlightDetailModalProps {
   isOpen: boolean;
@@ -29,16 +30,6 @@ export default function HighlightDetailModal({
   if (!isOpen || !achievement) return null;
 
   const fontFamily = fontFamilyProp || 'inherit';
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
 
   const imageMedia = achievement.media.filter(m => m.type === 'image' && !m.url.includes('.mp4') && !m.url.includes('.mov') && !m.url.includes('.avi'));
   const videoMedia = achievement.media.filter(m => m.type === 'video' || m.url.includes('.mp4') || m.url.includes('.mov') || m.url.includes('.avi'));
@@ -128,7 +119,7 @@ export default function HighlightDetailModal({
               {achievement.title}
             </h1>
             <p className="text-gray-500" style={{ fontFamily }}>
-              {formatDate(achievement.date)}
+              {formatHighlightDateDisplay(achievement)}
             </p>
           </div>
 

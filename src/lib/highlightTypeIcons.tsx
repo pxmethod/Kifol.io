@@ -8,6 +8,7 @@ import {
   Dumbbell,
   HeartHandshake,
   StickyNote,
+  Star,
 } from 'lucide-react';
 import type { HighlightType } from '@/types/achievement';
 
@@ -19,6 +20,7 @@ export const HIGHLIGHT_TYPE_LUCIDE: Record<HighlightType, LucideIcon> = {
   activity: Dumbbell,
   volunteer_work: HeartHandshake,
   reflection_note: StickyNote,
+  custom: Star,
 };
 
 export type HighlightTypeIconProps = {

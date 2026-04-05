@@ -84,9 +84,19 @@ export interface Database {
           title: string
           description: string | null
           date_achieved: string
+          date_end: string | null
+          ongoing: boolean
+          custom_type_label: string | null
           media_urls: string[]
           category: string | null
-          type: 'achievement' | 'creative_work' | 'milestone' | 'activity' | 'volunteer_work' | 'reflection_note'
+          type:
+            | 'achievement'
+            | 'creative_work'
+            | 'milestone'
+            | 'activity'
+            | 'volunteer_work'
+            | 'reflection_note'
+            | 'custom'
           created_at: string
           updated_at: string
         }
@@ -96,9 +106,19 @@ export interface Database {
           title: string
           description?: string | null
           date_achieved: string
+          date_end?: string | null
+          ongoing?: boolean
+          custom_type_label?: string | null
           media_urls?: string[]
           category?: string | null
-          type: 'achievement' | 'creative_work' | 'milestone' | 'activity' | 'volunteer_work' | 'reflection_note'
+          type:
+            | 'achievement'
+            | 'creative_work'
+            | 'milestone'
+            | 'activity'
+            | 'volunteer_work'
+            | 'reflection_note'
+            | 'custom'
           created_at?: string
           updated_at?: string
         }
@@ -108,9 +128,19 @@ export interface Database {
           title?: string
           description?: string | null
           date_achieved?: string
+          date_end?: string | null
+          ongoing?: boolean
+          custom_type_label?: string | null
           media_urls?: string[]
           category?: string | null
-          type?: 'achievement' | 'creative_work' | 'milestone' | 'activity' | 'volunteer_work' | 'reflection_note'
+          type?:
+            | 'achievement'
+            | 'creative_work'
+            | 'milestone'
+            | 'activity'
+            | 'volunteer_work'
+            | 'reflection_note'
+            | 'custom'
           updated_at?: string
         }
       }

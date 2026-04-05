@@ -5,6 +5,78 @@ type Highlight = Database['public']['Tables']['highlights']['Row']
 type NewHighlight = Database['public']['Tables']['highlights']['Insert']
 type UpdateHighlight = Database['public']['Tables']['highlights']['Update']
 
+function formatSupabaseError(error: unknown): string {
+  if (error == null) return 'Unknown error';
+  if (typeof error !== 'object') return String(error);
+  const e = error as {
+    message?: string
+    details?: string
+    hint?: string
+    code?: string
+  };
+  const parts = [e.message, e.details, e.hint, e.code].filter(Boolean).map(String);
+  return parts.join(' — ') || 'Unknown database error';
+}
+
+/** PostgREST / Postgres errors when new highlight columns or `custom` type are not migrated yet */
+function shouldRetryHighlightWithLegacyPayload(error: unknown): boolean {
+  const e = error as { message?: string; details?: string; hint?: string; code?: string }
+  const t = `${e.message || ''} ${e.details || ''} ${e.hint || ''}`.toLowerCase()
+  if (e.code === 'PGRST204') return true
+  if (t.includes('schema cache')) return true
+  if (t.includes('date_end') || t.includes('ongoing') || t.includes('custom_type')) return true
+  if (e.code === '23514' || t.includes('highlights_type_check') || (t.includes('check constraint') && t.includes('type')))
+    return true
+  return false
+}
+
+function toLegacyHighlightInsert(highlight: NewHighlight): Record<string, unknown> {
+  const {
+    portfolio_id,
+    title,
+    description,
+    date_achieved,
+    media_urls,
+    type,
+    category,
+    custom_type_label,
+  } = highlight as NewHighlight & { custom_type_label?: string | null }
+  if (type === 'custom') {
+    return {
+      portfolio_id,
+      title,
+      description: description ?? null,
+      date_achieved,
+      media_urls: media_urls ?? [],
+      type: 'achievement',
+      category: (custom_type_label && String(custom_type_label).trim()) || 'Custom',
+    }
+  }
+  return {
+    portfolio_id,
+    title,
+    description: description ?? null,
+    date_achieved,
+    media_urls: media_urls ?? [],
+    type,
+    category: category ?? null,
+  }
+}
+
+function toLegacyHighlightUpdate(updates: UpdateHighlight): Record<string, unknown> {
+  const u = { ...(updates as Record<string, unknown>) }
+  delete u.date_end
+  delete u.ongoing
+  delete u.custom_type_label
+  if (u.type === 'custom') {
+    u.type = 'achievement'
+    const label = updates.custom_type_label
+    u.category =
+      typeof label === 'string' && label.trim() ? label.trim() : (u.category as string | null) ?? 'Custom'
+  }
+  return u
+}
+
 export class HighlightService {
   private supabase = createClient()
 
@@ -61,18 +133,33 @@ export class HighlightService {
    * Create a new highlight
    */
   async createHighlight(highlight: NewHighlight): Promise<Highlight> {
-    const { data, error } = await this.supabase
+    let { data, error } = await this.supabase
       .from('highlights')
-      .insert([highlight])
+      .insert([highlight as unknown as Record<string, unknown>])
       .select()
       .single()
 
-    if (error) {
-      console.error('Error creating highlight:', error)
-      throw new Error('Failed to create highlight')
+    if (error && shouldRetryHighlightWithLegacyPayload(error)) {
+      const legacy = toLegacyHighlightInsert(highlight)
+      const second = await this.supabase
+        .from('highlights')
+        .insert([legacy])
+        .select()
+        .single()
+      data = second.data
+      error = second.error
     }
 
-    return data
+    if (error) {
+      const msg = formatSupabaseError(error)
+      console.error('Error creating highlight:', msg, error)
+      throw new Error(
+        msg ||
+          'Failed to create highlight. If you recently updated the app, run the latest database migration for highlights.'
+      )
+    }
+
+    return data as Highlight
   }
 
   // Legacy method for backward compatibility
@@ -84,19 +171,35 @@ export class HighlightService {
    * Update an existing highlight
    */
   async updateHighlight(id: string, updates: UpdateHighlight): Promise<Highlight> {
-    const { data, error } = await this.supabase
+    let { data, error } = await this.supabase
       .from('highlights')
-      .update(updates)
+      .update(updates as Record<string, unknown>)
       .eq('id', id)
       .select()
       .single()
 
-    if (error) {
-      console.error('Error updating highlight:', error)
-      throw new Error('Failed to update highlight')
+    if (error && shouldRetryHighlightWithLegacyPayload(error)) {
+      const legacy = toLegacyHighlightUpdate(updates)
+      const second = await this.supabase
+        .from('highlights')
+        .update(legacy)
+        .eq('id', id)
+        .select()
+        .single()
+      data = second.data
+      error = second.error
     }
 
-    return data
+    if (error) {
+      const msg = formatSupabaseError(error)
+      console.error('Error updating highlight:', msg, error)
+      throw new Error(
+        msg ||
+          'Failed to update highlight. If you recently updated the app, run the latest database migration for highlights.'
+      )
+    }
+
+    return data as Highlight
   }
 
   // Legacy method for backward compatibility

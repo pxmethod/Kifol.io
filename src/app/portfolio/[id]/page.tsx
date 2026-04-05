@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { portfolioService, achievementService } from '@/lib/database';
 import { createClient } from '@/lib/supabase/client';
 import { DOMAIN_CONFIG } from '@/config/domains';
+import { deriveTypeAndCustomLabelFromHighlightRow } from '@/lib/highlightDbRow';
 import { Achievement, HighlightType, HIGHLIGHT_TYPES } from '@/types/achievement';
 import HighlightTypeFilter, { filterAchievementsByTypes } from '@/components/HighlightTypeFilter';
 import Image from 'next/image';
@@ -164,10 +165,15 @@ export default function PortfolioPage() {
           isPrivate: dbPortfolio.is_private,
           password: dbPortfolio.password || undefined,
           short_id: dbPortfolio.short_id,
-          achievements: highlights.map((highlight: any) => ({
+          achievements: highlights.map((highlight: any) => {
+            const { type, customTypeLabel } = deriveTypeAndCustomLabelFromHighlightRow(highlight);
+            return {
             id: highlight.id,
             title: highlight.title,
             date: highlight.date_achieved,
+            dateEnd: highlight.date_end ?? null,
+            ongoing: highlight.ongoing ?? (highlight.date_end ? false : true),
+            customTypeLabel,
             description: highlight.description || undefined,
             media: (highlight.media_urls || []).map((url: string, index: number) => ({
               id: `media-${index}`,
@@ -176,12 +182,13 @@ export default function PortfolioPage() {
               fileName: url.split('/').pop() || 'file',
               fileSize: 0
             })),
-            type: highlight.type,
-            isMilestone: highlight.type === 'milestone',
+            type,
+            isMilestone: type === 'milestone',
             createdAt: highlight.created_at,
             updatedAt: highlight.updated_at,
             endorsements: endorsementsByAchievement[highlight.id] || []
-          }))
+          };
+          })
         };
         
         setPortfolio(portfolioData);
