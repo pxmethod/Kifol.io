@@ -159,7 +159,7 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
   };
 
   return (
-    <div
+    <div 
       className={`${templateFont.className} antialiased ${previewMode ? 'min-h-full w-full' : 'min-h-screen'}`}
       style={{ background: config.pageBackground, color: surface.text }}
     >
@@ -197,10 +197,10 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
             <div className={heroPhotoColClass}>
               <div
                 className="relative mx-auto h-[150px] w-[150px] shrink-0 overflow-hidden rounded-full bg-neutral-200 ring-4 ring-white shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
-              >
-                {portfolio.photoUrl ? (
-                  <Image
-                    src={portfolio.photoUrl}
+            >
+              {portfolio.photoUrl ? (
+                  <Image 
+                    src={portfolio.photoUrl} 
                     alt={portfolio.childName}
                     width={200}
                     height={200}
@@ -209,19 +209,19 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
                 ) : (
                   <div className={placeholderInitialClass}>
                     {portfolio.childName.charAt(0)}
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
+          </div>
 
             {/* Name + description below photo on mobile; left column on desktop */}
             <div className={heroTextColClass}>
               <h1 className={heroTitleClass}>
-                {portfolio.childName}
-              </h1>
+              {portfolio.childName}
+            </h1>
               <p className={heroSubtitleClass}>
-                {portfolio.portfolioTitle}
-              </p>
+              {portfolio.portfolioTitle}
+            </p>
             </div>
           </div>
         </header>
@@ -263,8 +263,8 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
               <div className={previewMode ? 'mb-6' : 'mb-6 md:mb-8'}>
                 <h2 className="text-lg font-semibold text-neutral-700 sm:text-lg">
                   {formatHighlightMonthYearFromSortKey(sortKey)}
-                </h2>
-              </div>
+              </h2>
+                    </div>
 
               <div className={previewMode ? 'flex flex-col gap-4' : 'flex flex-col gap-4 md:gap-5'}>
                 {dateHighlights.map((highlight: Achievement) => {
@@ -291,9 +291,9 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
                           })}
                       className={highlightCardClass}
                     >
-                      <div className="mb-3 flex flex-col items-stretch gap-2">
-                        <div className="flex w-full min-w-0 items-center justify-between gap-3">
-                          <span className="inline-flex min-w-0 shrink items-center gap-1.5 rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-800 sm:text-sm">
+                      <div className="mb-3 flex flex-col items-stretch gap-3">
+                        <div className="flex w-full min-w-0 flex-col items-start gap-1.5">
+                          <span className="inline-flex min-w-0 max-w-full shrink-0 items-center gap-1.5 rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-800 sm:text-sm">
                             <HighlightTypeIcon
                               type={highlight.type as HighlightType}
                               className="h-3.5 w-3.5 shrink-0 text-neutral-700"
@@ -301,7 +301,7 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
                             />
                             <span className="truncate">{getHighlightTypeDisplayName(highlight)}</span>
                           </span>
-                          <div className="flex shrink-0 items-center gap-1.5 text-neutral-500">
+                          <div className="flex w-full min-w-0 items-center justify-start gap-1.5 text-left text-neutral-500">
                             <svg
                               className="h-4 w-4 shrink-0"
                               fill="none"
@@ -316,7 +316,7 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                               />
                             </svg>
-                            <span className="text-xs sm:text-sm text-neutral-600">
+                            <span className="min-w-0 text-xs leading-snug text-neutral-600 sm:text-sm">
                               {formatHighlightDateDisplay(highlight)}
                             </span>
                           </div>
@@ -333,7 +333,7 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
                             : formatTextWithLinks(highlight.description, surface.textMuted)}
                         </p>
                       )}
-
+                      
                       {highlight.media.length > 0 && (
                         <div className="mb-2 flex flex-wrap gap-2">
                           {highlight.media.slice(0, 4).map((media: { type: string; url: string }, index: number) => (
@@ -345,8 +345,8 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
                               !media.url.includes('.mp4') &&
                               !media.url.includes('.mov') &&
                               !media.url.includes('.avi') ? (
-                                <Image
-                                  src={media.url}
+                                <Image 
+                                  src={media.url} 
                                   alt=""
                                   width={96}
                                   height={96}
@@ -408,9 +408,9 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
                             <div key={type} className="flex items-center gap-1 text-neutral-500">
                               {getMediaIcon(type)}
                               <span className="text-xs sm:text-sm">{count as number}</span>
-                            </div>
-                          ))}
-                        </div>
+                  </div>
+                ))}
+              </div>
                       )}
 
                       {highlight.endorsements && highlight.endorsements.length > 0 && (
@@ -423,8 +423,8 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
                             compact
                             publicVariant
                           />
-                        </div>
-                      )}
+            </div>
+          )}
                     </article>
                   );
                 })}
@@ -438,10 +438,10 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
             className={`mx-8 rounded-xl border border-[#e5e7eb] bg-neutral-50/80 px-5 py-14 text-center ${isLoaded ? 'sf-animate-in' : 'opacity-0'}`}
           >
             <p className="text-lg text-neutral-600">No highlights yet</p>
-          </div>
-        )}
+            </div>
+          )}
 
-        <footer
+      <footer 
           className={`mx-8 mt-10 border-t border-[#e5e7eb] ${
             previewMode ? 'pt-8' : 'pt-8 md:mt-12 md:pt-10'
           } ${isLoaded ? 'sf-animate-in' : 'opacity-0'}`}
@@ -458,7 +458,7 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
             <span aria-hidden>•</span>
             <span>{new Date().getFullYear()}</span>
           </div>
-        </footer>
+      </footer>
         </div>
       </div>
 
@@ -472,4 +472,4 @@ export default function BaseTemplate({ portfolio, config, previewMode }: BaseTem
       />
     </div>
   );
-}
+} 
