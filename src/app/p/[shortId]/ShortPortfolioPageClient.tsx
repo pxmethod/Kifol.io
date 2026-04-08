@@ -7,6 +7,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import PortfolioPasswordPrompt from '@/components/PortfolioPasswordPrompt';
 import { deriveTypeAndCustomLabelFromHighlightRow } from '@/lib/highlightDbRow';
+import { mediaFileSizeAtIndex } from '@/lib/highlightMediaSizes';
 import { Achievement } from '@/types/achievement';
 import { portfolioService, achievementService } from '@/lib/database';
 import { portfolioAccessService } from '@/lib/services/portfolio-access';
@@ -128,7 +129,7 @@ export default function ShortPortfolioPageClient() {
             url,
             type: url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
             fileName: url.split('/').pop() || 'file',
-            fileSize: 0,
+            fileSize: mediaFileSizeAtIndex(highlight.media_sizes, index),
           })),
           type,
           isMilestone: type === 'milestone',

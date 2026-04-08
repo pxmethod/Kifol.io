@@ -88,7 +88,7 @@ export default function HighlightDetailModal({
           animation: scaleOut 0.25s ease-in forwards;
         }
       `}</style>
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto modal-content">
+      <div className="bg-white rounded-lg max-w-2xl w-full min-w-0 max-h-[90vh] overflow-y-auto modal-content">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b sticky top-0 bg-white z-10">
           <div className="flex items-center space-x-2">
@@ -196,32 +196,35 @@ export default function HighlightDetailModal({
                 {pdfMedia.map((media) => (
                   <div
                     key={media.id}
-                    className="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
+                    className="flex gap-3 items-start p-3 border border-gray-200 rounded-lg"
                   >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-red-100 rounded flex items-center justify-center">
-                        <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-discovery-black" style={{ fontFamily }}>
-                          {media.fileName}
-                        </p>
-                        <p className="text-xs text-gray-500" style={{ fontFamily }}>
+                    <div className="w-10 h-10 shrink-0 bg-red-100 rounded flex items-center justify-center">
+                      <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p
+                        className="text-sm font-medium text-discovery-black break-all"
+                        style={{ fontFamily }}
+                      >
+                        {media.fileName}
+                      </p>
+                      {media.fileSize > 0 ? (
+                        <p className="text-xs text-gray-500 mt-0.5" style={{ fontFamily }}>
                           {formatFileSize(media.fileSize)}
                         </p>
-                      </div>
+                      ) : null}
+                      <a
+                        href={media.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 inline-flex text-sm font-medium text-kifolio-cta hover:text-kifolio-cta/80 py-1.5"
+                        style={{ fontFamily }}
+                      >
+                        View
+                      </a>
                     </div>
-                    <a
-                      href={media.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-kifolio-cta hover:text-kifolio-cta/80 text-sm font-medium"
-                      style={{ fontFamily }}
-                    >
-                      View
-                    </a>
                   </div>
                 ))}
               </div>
@@ -236,32 +239,35 @@ export default function HighlightDetailModal({
                 {videoMedia.map((media) => (
                   <div
                     key={media.id}
-                    className="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
+                    className="flex gap-3 items-start p-3 border border-gray-200 rounded-lg"
                   >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded flex items-center justify-center">
-                        <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-discovery-black" style={{ fontFamily }}>
-                          {media.fileName}
-                        </p>
-                        <p className="text-xs text-gray-500" style={{ fontFamily }}>
-                          Video • {formatFileSize(media.fileSize)}
-                        </p>
-                      </div>
+                    <div className="w-10 h-10 shrink-0 bg-blue-100 rounded flex items-center justify-center">
+                      <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
                     </div>
-                    <a
-                      href={media.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-kifolio-cta hover:text-kifolio-cta/80 text-sm font-medium"
-                      style={{ fontFamily }}
-                    >
-                      View
-                    </a>
+                    <div className="min-w-0 flex-1">
+                      <p
+                        className="text-sm font-medium text-discovery-black break-all"
+                        style={{ fontFamily }}
+                      >
+                        {media.fileName}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5" style={{ fontFamily }}>
+                        {media.fileSize > 0
+                          ? `Video • ${formatFileSize(media.fileSize)}`
+                          : 'Video'}
+                      </p>
+                      <a
+                        href={media.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 inline-flex text-sm font-medium text-kifolio-cta hover:text-kifolio-cta/80 py-1.5"
+                        style={{ fontFamily }}
+                      >
+                        View
+                      </a>
+                    </div>
                   </div>
                 ))}
               </div>

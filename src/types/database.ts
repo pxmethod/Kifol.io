@@ -88,6 +88,8 @@ export interface Database {
           ongoing: boolean
           custom_type_label: string | null
           media_urls: string[]
+          /** Byte sizes parallel to media_urls; null for legacy rows */
+          media_sizes: number[] | null
           category: string | null
           type:
             | 'achievement'
@@ -110,6 +112,7 @@ export interface Database {
           ongoing?: boolean
           custom_type_label?: string | null
           media_urls?: string[]
+          media_sizes?: number[] | null
           category?: string | null
           type:
             | 'achievement'
@@ -132,6 +135,7 @@ export interface Database {
           ongoing?: boolean
           custom_type_label?: string | null
           media_urls?: string[]
+          media_sizes?: number[] | null
           category?: string | null
           type?:
             | 'achievement'

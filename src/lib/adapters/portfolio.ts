@@ -1,6 +1,7 @@
 import { Database } from '@/types/database'
 import { Achievement } from '@/types/achievement'
 import { deriveTypeAndCustomLabelFromHighlightRow } from '@/lib/highlightDbRow'
+import { alignMediaSizesToUrls, mediaFileSizeAtIndex } from '@/lib/highlightMediaSizes'
 
 // Database types
 type DbPortfolio = Database['public']['Tables']['portfolios']['Row']
@@ -71,6 +72,7 @@ function dbHighlightToLegacy(dbHighlight: DbHighlight): Achievement {
       const urlLower = url.toLowerCase();
       const filename = url.split('/').pop() || 'file';
       const extension = filename.split('.').pop()?.toLowerCase() || '';
+      const fileSize = mediaFileSizeAtIndex(dbHighlight.media_sizes, index);
       
       // Determine media type based on URL and extension
       let mediaType: 'image' | 'pdf' | 'video' | 'audio' = 'image'; // default
@@ -96,7 +98,7 @@ function dbHighlightToLegacy(dbHighlight: DbHighlight): Achievement {
         url,
         type: mediaType,
         fileName: filename,
-        fileSize: 0 // We don't store file size in current schema
+        fileSize,
       };
     }),
     type,
@@ -119,8 +121,12 @@ export function legacyAchievementToDb(
     date_end: legacy.ongoing ? null : legacy.dateEnd ?? null,
     ongoing: legacy.ongoing ?? false,
     custom_type_label: legacy.customTypeLabel ?? null,
-    media_urls: legacy.media.map(m => m.url),
+    media_urls: legacy.media.map((m) => m.url),
+    media_sizes: alignMediaSizesToUrls(
+      legacy.media.map((m) => m.url),
+      legacy.media.map((m) => m.fileSize ?? 0)
+    ),
     category: legacy.isMilestone ? 'milestone' : null,
-    type: legacy.type
+    type: legacy.type,
   }
 }

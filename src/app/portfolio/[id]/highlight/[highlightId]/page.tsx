@@ -14,6 +14,7 @@ import { FormFieldError } from '@/components/forms/FormFieldError';
 import HighlightMetadataSection from '@/components/highlight/HighlightMetadataSection';
 import { submitEndorsementInviteRequest } from '@/lib/endorsementInviteRequest';
 import { MAX_OPEN_ENDORSEMENT_INVITES_PER_HIGHLIGHT } from '@/lib/database/endorsements';
+import { alignMediaSizesToUrls, mediaFileSizeAtIndex } from '@/lib/highlightMediaSizes';
 import { validateHighlightMetadata } from '@/lib/highlightFormValidation';
 import { Video, FileText, Music, Image } from 'lucide-react';
 
@@ -40,7 +41,9 @@ export default function EditHighlight() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [uploadingMedia, setUploadingMedia] = useState(false);
-  const [existingMedia, setExistingMedia] = useState<Array<{id: string, url: string, fileName: string}>>([]);
+  const [existingMedia, setExistingMedia] = useState<
+    Array<{ id: string; url: string; fileName: string; sizeBytes: number }>
+  >([]);
   const [mediaPreview, setMediaPreview] = useState<{ url: string; file: File }[]>([]);
   const [loadingHighlight, setLoadingHighlight] = useState(true);
   const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
@@ -174,6 +177,7 @@ export default function EditHighlight() {
           id: `existing-${index}`,
           url,
           fileName: getFileNameFromUrl(url),
+          sizeBytes: mediaFileSizeAtIndex(highlight.media_sizes, index),
         })));
       } else {
         // Highlight not found, redirect back
@@ -350,7 +354,11 @@ export default function EditHighlight() {
       }
 
       // Combine existing media URLs with new ones
-      const allMediaUrls = [...existingMedia.map(m => m.url), ...mediaUrls];
+      const allMediaUrls = [...existingMedia.map((m) => m.url), ...mediaUrls];
+      const allMediaSizes = alignMediaSizesToUrls(allMediaUrls, [
+        ...existingMedia.map((m) => m.sizeBytes),
+        ...formData.media.map((f) => f.size),
+      ]);
 
       const highlightData = {
         title: formData.title,
@@ -360,8 +368,9 @@ export default function EditHighlight() {
         ongoing: formData.ongoing,
         custom_type_label: formData.type === 'custom' ? formData.customTypeLabel.trim() : null,
         media_urls: allMediaUrls,
+        media_sizes: allMediaSizes,
         type: formData.type,
-        category: null
+        category: null,
       };
 
       await highlightService.updateHighlight(highlightId, highlightData);

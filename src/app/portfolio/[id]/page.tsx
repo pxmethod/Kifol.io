@@ -13,6 +13,7 @@ import { portfolioService, achievementService } from '@/lib/database';
 import { createClient } from '@/lib/supabase/client';
 import { DOMAIN_CONFIG } from '@/config/domains';
 import { deriveTypeAndCustomLabelFromHighlightRow } from '@/lib/highlightDbRow';
+import { mediaFileSizeAtIndex } from '@/lib/highlightMediaSizes';
 import { Achievement, HighlightType, HIGHLIGHT_TYPES } from '@/types/achievement';
 import HighlightTypeFilter, { filterAchievementsByTypes } from '@/components/HighlightTypeFilter';
 import Image from 'next/image';
@@ -181,7 +182,7 @@ export default function PortfolioPage() {
               url,
               type: url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
               fileName: url.split('/').pop() || 'file',
-              fileSize: 0
+              fileSize: mediaFileSizeAtIndex(highlight.media_sizes, index),
             })),
             type,
             isMilestone: type === 'milestone',
