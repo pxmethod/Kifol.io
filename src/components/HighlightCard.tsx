@@ -33,43 +33,57 @@ export default function HighlightCard({
   const [showAllThumbnails, setShowAllThumbnails] = useState(false);
 
   const renderMediaThumbnails = () => {
-    const imageMedia = achievement.media.filter(m => m.type === 'image');
-    const videoMedia = achievement.media.filter(m => m.type === 'video');
-    const allMedia = [...imageMedia, ...videoMedia];
-    
+    const isVideoUrl = (url: string) =>
+      url.includes('.mp4') || url.includes('.mov') || url.includes('.avi');
+    const thumbnailMedia = achievement.media.filter((m) => {
+      if (m.type === 'pdf') return true;
+      if (m.type === 'video' || isVideoUrl(m.url)) return true;
+      if (m.type === 'image' && !isVideoUrl(m.url)) return true;
+      return false;
+    });
+
+    const allMedia = thumbnailMedia;
+
     const maxDisplay = 4;
     const displayCount = showAllThumbnails ? allMedia.length : Math.min(maxDisplay, allMedia.length);
     const hasMore = allMedia.length > maxDisplay;
 
     if (allMedia.length === 0) return null;
 
-    const handleThumbnailClick = (media: any) => {
-      console.log('Thumbnail click debug:', {
-        mediaType: media.type,
-        mediaUrl: media.url,
-        isImage: media.type === 'image' && !media.url.includes('.mp4') && !media.url.includes('.mov') && !media.url.includes('.avi'),
-        isVideo: media.type === 'video' || media.url.includes('.mp4') || media.url.includes('.mov') || media.url.includes('.avi')
-      });
-      
-      if (media.type === 'image' && !media.url.includes('.mp4') && !media.url.includes('.mov') && !media.url.includes('.avi')) {
+    const openThumbnail = (media: (typeof achievement.media)[number]) => {
+      if (media.type === 'image' && !isVideoUrl(media.url)) {
         setSelectedImageUrl(media.url);
         setShowImageModal(true);
-      } else if (media.type === 'video' || media.url.includes('.mp4') || media.url.includes('.mov') || media.url.includes('.avi')) {
+      } else if (media.type === 'video' || isVideoUrl(media.url)) {
         setSelectedVideoUrl(media.url);
-        setVideoError(null); // Reset error when opening new video
+        setVideoError(null);
         setShowVideoModal(true);
+      } else if (media.type === 'pdf') {
+        window.open(media.url, '_blank', 'noopener,noreferrer');
       }
     };
 
     return (
       <div className="flex flex-wrap items-center gap-2 mt-3">
-        {allMedia.slice(0, displayCount).map((media, index) => (
+        {allMedia.slice(0, displayCount).map((media) => (
           <div
             key={media.id}
+            role="button"
+            tabIndex={0}
             className="w-24 h-24 rounded overflow-hidden bg-discovery-beige-100 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() => handleThumbnailClick(media)}
+            onClick={(e) => {
+              e.stopPropagation();
+              openThumbnail(media);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                e.stopPropagation();
+                openThumbnail(media);
+              }
+            }}
           >
-            {media.type === 'image' && !media.url.includes('.mp4') && !media.url.includes('.mov') && !media.url.includes('.avi') ? (
+            {media.type === 'image' && !isVideoUrl(media.url) ? (
               <Image
                 src={media.url}
                 alt=""
@@ -77,7 +91,7 @@ export default function HighlightCard({
                 height={96}
                 className="w-full h-full object-cover"
               />
-            ) : media.type === 'video' || media.url.includes('.mp4') || media.url.includes('.mov') || media.url.includes('.avi') ? (
+            ) : media.type === 'video' || isVideoUrl(media.url) ? (
               <div className="w-full h-full flex items-center justify-center bg-discovery-beige-200 relative">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-6 h-6 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
@@ -86,6 +100,26 @@ export default function HighlightCard({
                     </svg>
                   </div>
                 </div>
+              </div>
+            ) : media.type === 'pdf' ? (
+              <div className="flex h-full w-full flex-col items-center justify-center gap-1 bg-red-50 px-1 py-1.5 border border-red-100">
+                <svg
+                  className="h-7 w-7 shrink-0 text-red-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                  />
+                </svg>
+                <span className="line-clamp-3 w-full break-all text-center text-[10px] font-medium leading-tight text-discovery-grey">
+                  {media.fileName?.trim() || 'PDF'}
+                </span>
               </div>
             ) : null}
           </div>
@@ -226,11 +260,11 @@ export default function HighlightCard({
         </p>
       )}
 
-      {/* Media Thumbnails */}
-      {renderMediaThumbnails()}
-
-      {/* Media Icons */}
-      {renderMediaIcons()}
+      {/* Thumbnails + type counts sit above the full-card view overlay when onView is set */}
+      <div className={onView ? 'relative z-10' : undefined}>
+        {renderMediaThumbnails()}
+        {renderMediaIcons()}
+      </div>
 
       {/* Endorsements - relative z-10 so trash icon stays clickable above view overlay */}
       {achievement.endorsements && achievement.endorsements.length > 0 && (

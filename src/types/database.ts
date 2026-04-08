@@ -90,6 +90,8 @@ export interface Database {
           media_urls: string[]
           /** Byte sizes parallel to media_urls; null for legacy rows */
           media_sizes: number[] | null
+          /** Original display filenames parallel to media_urls; null for legacy rows */
+          media_display_names: string[] | null
           category: string | null
           type:
             | 'achievement'
@@ -113,6 +115,7 @@ export interface Database {
           custom_type_label?: string | null
           media_urls?: string[]
           media_sizes?: number[] | null
+          media_display_names?: string[] | null
           category?: string | null
           type:
             | 'achievement'
@@ -136,6 +139,7 @@ export interface Database {
           custom_type_label?: string | null
           media_urls?: string[]
           media_sizes?: number[] | null
+          media_display_names?: string[] | null
           category?: string | null
           type?:
             | 'achievement'

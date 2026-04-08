@@ -7,7 +7,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import PortfolioPasswordPrompt from '@/components/PortfolioPasswordPrompt';
 import { deriveTypeAndCustomLabelFromHighlightRow } from '@/lib/highlightDbRow';
-import { mediaFileSizeAtIndex } from '@/lib/highlightMediaSizes';
+import { mapHighlightMediaForPortfolioView } from '@/lib/mapHighlightMediaForPortfolio';
 import { Achievement } from '@/types/achievement';
 import { portfolioService, achievementService } from '@/lib/database';
 import { portfolioAccessService, PortfolioAccess } from '@/lib/services/portfolio-access';
@@ -121,13 +121,7 @@ export default function PreviewPage() {
             ongoing: highlight.ongoing ?? (highlight.date_end ? false : true),
             customTypeLabel,
             description: highlight.description || undefined,
-            media: (highlight.media_urls || []).map((url: string, index: number) => ({
-              id: `media-${index}`,
-              url,
-              type: url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
-              fileName: url.split('/').pop() || 'file',
-              fileSize: mediaFileSizeAtIndex(highlight.media_sizes, index),
-            })),
+            media: mapHighlightMediaForPortfolioView(highlight),
             type,
             isMilestone: type === 'milestone',
             createdAt: highlight.created_at,

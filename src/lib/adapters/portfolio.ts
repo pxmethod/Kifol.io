@@ -2,6 +2,7 @@ import { Database } from '@/types/database'
 import { Achievement } from '@/types/achievement'
 import { deriveTypeAndCustomLabelFromHighlightRow } from '@/lib/highlightDbRow'
 import { alignMediaSizesToUrls, mediaFileSizeAtIndex } from '@/lib/highlightMediaSizes'
+import { mediaDisplayNameAtIndex, alignMediaDisplayNamesToUrls } from '@/lib/highlightMediaDisplayNames'
 
 // Database types
 type DbPortfolio = Database['public']['Tables']['portfolios']['Row']
@@ -70,7 +71,7 @@ function dbHighlightToLegacy(dbHighlight: DbHighlight): Achievement {
     description: dbHighlight.description || undefined,
     media: (dbHighlight.media_urls || []).map((url, index) => {
       const urlLower = url.toLowerCase();
-      const filename = url.split('/').pop() || 'file';
+      const filename = mediaDisplayNameAtIndex(dbHighlight.media_display_names, index, url);
       const extension = filename.split('.').pop()?.toLowerCase() || '';
       const fileSize = mediaFileSizeAtIndex(dbHighlight.media_sizes, index);
       
@@ -125,6 +126,10 @@ export function legacyAchievementToDb(
     media_sizes: alignMediaSizesToUrls(
       legacy.media.map((m) => m.url),
       legacy.media.map((m) => m.fileSize ?? 0)
+    ),
+    media_display_names: alignMediaDisplayNamesToUrls(
+      legacy.media.map((m) => m.url),
+      legacy.media.map((m) => m.fileName)
     ),
     category: legacy.isMilestone ? 'milestone' : null,
     type: legacy.type,

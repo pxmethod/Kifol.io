@@ -16,6 +16,7 @@ import HighlightMetadataSection from '@/components/highlight/HighlightMetadataSe
 import { submitEndorsementInviteRequest } from '@/lib/endorsementInviteRequest';
 import { MAX_OPEN_ENDORSEMENT_INVITES_PER_HIGHLIGHT } from '@/lib/database/endorsements';
 import { alignMediaSizesToUrls, mediaFileSizeAtIndex } from '@/lib/highlightMediaSizes';
+import { alignMediaDisplayNamesToUrls, mediaDisplayNameAtIndex } from '@/lib/highlightMediaDisplayNames';
 import { validateHighlightMetadata } from '@/lib/highlightFormValidation';
 import { Video, FileText, Music, Image } from 'lucide-react';
 
@@ -215,7 +216,7 @@ export default function HighlightForm() {
         setExistingMedia((highlight.media_urls || []).map((url, index) => ({
           id: `existing-${index}`,
           url,
-          fileName: getFileNameFromUrl(url),
+          fileName: mediaDisplayNameAtIndex(highlight.media_display_names, index, url),
           sizeBytes: mediaFileSizeAtIndex(highlight.media_sizes, index),
         })));
         setIsEditMode(true);
@@ -297,7 +298,8 @@ export default function HighlightForm() {
 
     try {
       const uploadedFiles: File[] = [];
-      
+      const previewAccum: { url: string; file: File }[] = [];
+
       for (const file of files) {
         // Validate file
         const validation = storageService.validateFile(file);
@@ -389,26 +391,26 @@ export default function HighlightForm() {
           }
           
           uploadedFiles.push(fileToUpload);
-          
-          // Build preview in order (await for images to preserve order)
+
           if (fileToUpload.type.startsWith('image/')) {
             try {
-              const url = await new Promise<string>((resolve, reject) => {
+              const url = await new Promise<string>((resolve) => {
                 const reader = new FileReader();
                 reader.onload = (e) => resolve((e.target?.result as string) || '');
                 reader.onerror = () => resolve('');
                 reader.readAsDataURL(fileToUpload);
               });
-              setMediaPreview(prev => [...prev, { url, file: fileToUpload }]);
+              previewAccum.push({ url, file: fileToUpload });
             } catch {
-              setMediaPreview(prev => [...prev, { url: '', file: fileToUpload }]);
+              previewAccum.push({ url: '', file: fileToUpload });
             }
           } else {
-            setMediaPreview(prev => [...prev, { url: '', file: fileToUpload }]);
+            previewAccum.push({ url: '', file: fileToUpload });
           }
       }
 
-      setFormData(prev => ({ ...prev, media: [...prev.media, ...uploadedFiles] }));
+      setMediaPreview((prev) => [...prev, ...previewAccum]);
+      setFormData((prev) => ({ ...prev, media: [...prev.media, ...uploadedFiles] }));
     } catch (error) {
       console.error('Media upload error:', error);
       setErrors(prev => ({ 
@@ -416,6 +418,7 @@ export default function HighlightForm() {
         media: 'Failed to upload media. Please try again.' 
       }));
     } finally {
+      event.target.value = '';
       setUploadingMedia(false);
     }
   };
@@ -448,8 +451,12 @@ export default function HighlightForm() {
     try {
       // Process media files
       const mediaUrls: string[] = [];
-      for (const file of formData.media) {
-        const url = await storageService.uploadFile(file, `${formData.title}-${Date.now()}`);
+      for (let i = 0; i < formData.media.length; i++) {
+        const url = await storageService.uploadHighlightMedia(
+          formData.media[i],
+          i,
+          formData.media
+        );
         mediaUrls.push(url);
       }
 
@@ -458,6 +465,10 @@ export default function HighlightForm() {
       const allMediaSizes = alignMediaSizesToUrls(allMediaUrls, [
         ...existingMedia.map((m) => m.sizeBytes),
         ...formData.media.map((f) => f.size),
+      ]);
+      const allMediaDisplayNames = alignMediaDisplayNamesToUrls(allMediaUrls, [
+        ...existingMedia.map((m) => m.fileName),
+        ...formData.media.map((f) => f.name),
       ]);
 
       const highlightData = {
@@ -470,6 +481,7 @@ export default function HighlightForm() {
         custom_type_label: formData.type === 'custom' ? formData.customTypeLabel.trim() : null,
         media_urls: allMediaUrls,
         media_sizes: allMediaSizes,
+        media_display_names: allMediaDisplayNames,
         type: formData.type,
         category: null,
       };
@@ -679,7 +691,7 @@ export default function HighlightForm() {
                 {/* Existing Media */}
                 {existingMedia.map((media, index) => {
                   const fileType = getFileTypeFromUrl(media.url);
-                  const filename = getFileNameFromUrl(media.url);
+                  const filename = media.fileName;
                   
                   // Use the detected file type
                   const displayFileType = fileType;
@@ -746,7 +758,10 @@ export default function HighlightForm() {
                 {formData.media.map((file, index) => {
                   const preview = mediaPreview[index];
                   return (
-                    <div key={index} className="relative">
+                    <div
+                      key={`new-media-${file.name}-${file.size}-${file.lastModified}-${index}`}
+                      className="relative"
+                    >
                       <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
                         {file.type.startsWith('image/') && preview ? (
                           <img 

@@ -25,7 +25,7 @@ function shouldRetryHighlightWithLegacyPayload(error: unknown): boolean {
   if (e.code === 'PGRST204') return true
   if (t.includes('schema cache')) return true
   if (t.includes('date_end') || t.includes('ongoing') || t.includes('custom_type')) return true
-  if (t.includes('media_sizes')) return true
+  if (t.includes('media_sizes') || t.includes('media_display_names')) return true
   if (e.code === '23514' || t.includes('highlights_type_check') || (t.includes('check constraint') && t.includes('type')))
     return true
   return false
@@ -70,6 +70,7 @@ function toLegacyHighlightUpdate(updates: UpdateHighlight): Record<string, unkno
   delete u.ongoing
   delete u.custom_type_label
   delete u.media_sizes
+  delete u.media_display_names
   if (u.type === 'custom') {
     u.type = 'achievement'
     const label = updates.custom_type_label

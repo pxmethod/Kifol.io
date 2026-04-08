@@ -15,6 +15,7 @@ import HighlightMetadataSection from '@/components/highlight/HighlightMetadataSe
 import { submitEndorsementInviteRequest } from '@/lib/endorsementInviteRequest';
 import { MAX_OPEN_ENDORSEMENT_INVITES_PER_HIGHLIGHT } from '@/lib/database/endorsements';
 import { alignMediaSizesToUrls, mediaFileSizeAtIndex } from '@/lib/highlightMediaSizes';
+import { alignMediaDisplayNamesToUrls, mediaDisplayNameAtIndex } from '@/lib/highlightMediaDisplayNames';
 import { validateHighlightMetadata } from '@/lib/highlightFormValidation';
 import { Video, FileText, Music, Image } from 'lucide-react';
 
@@ -176,7 +177,7 @@ export default function EditHighlight() {
         setExistingMedia((highlight.media_urls || []).map((url, index) => ({
           id: `existing-${index}`,
           url,
-          fileName: getFileNameFromUrl(url),
+          fileName: mediaDisplayNameAtIndex(highlight.media_display_names, index, url),
           sizeBytes: mediaFileSizeAtIndex(highlight.media_sizes, index),
         })));
       } else {
@@ -252,6 +253,24 @@ export default function EditHighlight() {
     }
   };
 
+  const readImagePreviewUrl = async (file: File): Promise<string> => {
+    const dataUrl = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve((e.target?.result as string) || '');
+      reader.onerror = () => resolve('');
+      reader.readAsDataURL(file);
+    });
+    if (dataUrl) return dataUrl;
+    try {
+      const previewUrl = URL.createObjectURL(file);
+      console.log('Fallback to blob URL for:', file.name);
+      return previewUrl;
+    } catch (blobError) {
+      console.error('Blob URL also failed for:', file.name, blobError);
+      return '';
+    }
+  };
+
   const handleMediaUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     if (files.length === 0) return;
@@ -261,62 +280,35 @@ export default function EditHighlight() {
 
     try {
       const uploadedFiles: File[] = [];
-      
+      const newPreviews: { url: string; file: File }[] = [];
+
       for (const file of files) {
         const validation = storageService.validateFile(file);
         if (!validation.valid) {
           setErrors(prev => ({ ...prev, media: validation.error || 'Invalid file' }));
           return;
         }
-        
+
         uploadedFiles.push(file);
-        
-        // Create preview URL for images
+
         if (file.type.startsWith('image/')) {
-            try {
-              // Use FileReader to create data URL (more reliable than blob URL)
-              const reader = new FileReader();
-              reader.onload = (e) => {
-                if (e.target?.result) {
-                  console.log('Created preview using FileReader for:', file.name);
-                  setMediaPreview(prev => [...prev, {
-                    url: e.target?.result as string,
-                    file
-                  }]);
-                }
-              };
-              reader.onerror = (error) => {
-                console.error('FileReader failed for:', file.name, error);
-                // Fallback to blob URL
-                try {
-                  const previewUrl = URL.createObjectURL(file);
-                  console.log('Fallback to blob URL for:', file.name);
-                  setMediaPreview(prev => [...prev, {
-                    url: previewUrl,
-                    file
-                  }]);
-                } catch (blobError) {
-                  console.error('Blob URL also failed for:', file.name, blobError);
-                }
-              };
-              reader.readAsDataURL(file);
-            } catch {
-              // Preview optional
-            }
-          } else {
-            setMediaPreview(prev => [...prev, { url: '', file }]);
-          }
+          const url = await readImagePreviewUrl(file);
+          newPreviews.push({ url, file });
+        } else {
+          newPreviews.push({ url: '', file });
+        }
       }
 
-      setFormData(prev => ({ ...prev, media: [...prev.media, ...uploadedFiles] }));
-      // Note: mediaPreview is now updated asynchronously via FileReader callbacks
+      setMediaPreview((prev) => [...prev, ...newPreviews]);
+      setFormData((prev) => ({ ...prev, media: [...prev.media, ...uploadedFiles] }));
     } catch (error) {
       console.error('Media upload error:', error);
-      setErrors(prev => ({ 
-        ...prev, 
-        media: 'Failed to upload media. Please try again.' 
+      setErrors((prev) => ({
+        ...prev,
+        media: 'Failed to upload media. Please try again.',
       }));
     } finally {
+      event.target.value = '';
       setUploadingMedia(false);
     }
   };
@@ -348,8 +340,12 @@ export default function EditHighlight() {
 
     try {
       const mediaUrls: string[] = [];
-      for (const file of formData.media) {
-        const url = await storageService.uploadFile(file, `${formData.title}-${Date.now()}`);
+      for (let i = 0; i < formData.media.length; i++) {
+        const url = await storageService.uploadHighlightMedia(
+          formData.media[i],
+          i,
+          formData.media
+        );
         mediaUrls.push(url);
       }
 
@@ -358,6 +354,10 @@ export default function EditHighlight() {
       const allMediaSizes = alignMediaSizesToUrls(allMediaUrls, [
         ...existingMedia.map((m) => m.sizeBytes),
         ...formData.media.map((f) => f.size),
+      ]);
+      const allMediaDisplayNames = alignMediaDisplayNamesToUrls(allMediaUrls, [
+        ...existingMedia.map((m) => m.fileName),
+        ...formData.media.map((f) => f.name),
       ]);
 
       const highlightData = {
@@ -369,6 +369,7 @@ export default function EditHighlight() {
         custom_type_label: formData.type === 'custom' ? formData.customTypeLabel.trim() : null,
         media_urls: allMediaUrls,
         media_sizes: allMediaSizes,
+        media_display_names: allMediaDisplayNames,
         type: formData.type,
         category: null,
       };
@@ -575,7 +576,7 @@ export default function EditHighlight() {
                   <div className="grid grid-cols-4 gap-3">
                     {existingMedia.map((media, index) => {
                       const fileType = getFileTypeFromUrl(media.url);
-                      const filename = getFileNameFromUrl(media.url);
+                      const filename = media.fileName;
                       const displayFileType = fileType;
 
                       return (
@@ -638,7 +639,10 @@ export default function EditHighlight() {
                     {formData.media.map((file, index) => {
                       const preview = mediaPreview[index];
                       return (
-                        <div key={index} className="relative">
+                        <div
+                          key={`new-media-${file.name}-${file.size}-${file.lastModified}-${index}`}
+                          className="relative"
+                        >
                           <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
                             {file.type.startsWith('image/') && preview ? (
                               <img

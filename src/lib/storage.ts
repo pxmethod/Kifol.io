@@ -50,6 +50,18 @@ export class StorageService {
   }
 
   /**
+   * Upload highlight attachment using the file's original name in the storage key so thumbnails
+   * and lists can show the real filename (URL path is used as display name).
+   * When multiple files in one batch share the same name, prefixes the index to avoid collisions.
+   */
+  async uploadHighlightMedia(file: File, index: number, batch: File[]): Promise<string> {
+    const duplicate =
+      batch.filter((f) => f.name === file.name).length > 1
+    const label = duplicate ? `${index + 1}-${file.name}` : file.name
+    return this.uploadFile(file, label)
+  }
+
+  /**
    * Delete a file from storage
    */
   async deleteFile(url: string): Promise<void> {
