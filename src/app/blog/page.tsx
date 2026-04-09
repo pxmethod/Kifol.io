@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import Image from 'next/image';
 import MarketingNav from '@/components/MarketingNav';
-import { getAllPostsSorted, getCanonicalBlogUrl } from '@/content/blog';
+import BlogPostCard from '@/components/BlogPostCard';
+import {
+  BLOG_INTRO_COPY,
+  getAllPostsSorted,
+  getCanonicalBlogUrl,
+} from '@/content/blog';
 import { SITE_ORIGIN } from '@/lib/seo';
 
 const siteUrl = SITE_ORIGIN;
@@ -78,87 +81,14 @@ export default function BlogPage() {
         <header className="mb-12 text-center lg:text-left">
           <h1 className="text-4xl lg:text-5xl font-medium text-discovery-black mb-4">Blog</h1>
           <p className="text-lg text-discovery-grey max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-            Ideas for documenting milestones, building portfolios, and sharing your child&apos;s story with
-            confidence.
+            {BLOG_INTRO_COPY}
           </p>
         </header>
 
         <ul className="space-y-10 list-none p-0 m-0">
           {posts.map((post) => (
             <li key={post.slug}>
-              <article className="bg-discovery-white-100 rounded-2xl shadow-md overflow-hidden border border-discovery-beige-100 flex flex-col sm:flex-row">
-                <div className="relative w-full sm:w-56 md:w-64 shrink-0 aspect-[16/10] sm:aspect-auto sm:min-h-[200px] bg-discovery-beige-100">
-                  {post.thumbnail.endsWith('.svg') ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={post.thumbnail}
-                      alt={post.thumbnailAlt}
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  ) : (
-                    <Image
-                      src={post.thumbnail}
-                      alt={post.thumbnailAlt}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 640px) 100vw, 256px"
-                    />
-                  )}
-                </div>
-                <div className="flex flex-col flex-1 p-6 sm:p-8">
-                  <time
-                    dateTime={post.publishedAt}
-                    className="text-sm text-discovery-grey mb-2"
-                  >
-                    {new Date(post.publishedAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </time>
-                  <h2 className="text-2xl font-semibold text-discovery-black mb-3 leading-tight">
-                    <Link
-                      href={`/blog/${post.slug}`}
-                      className="hover:text-discovery-primary transition-colors"
-                    >
-                      {post.title}
-                    </Link>
-                  </h2>
-                  <p className="text-discovery-grey leading-relaxed mb-4 flex-1">{post.description}</p>
-                  <div className="flex flex-wrap gap-2 mb-5">
-                    {post.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-discovery-beige-200 text-discovery-black/80"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <div>
-                    <Link
-                      href={`/blog/${post.slug}`}
-                      className="inline-flex items-center text-discovery-orange font-semibold hover:text-discovery-orange-light transition-colors"
-                    >
-                      Read more
-                      <svg
-                        className="w-4 h-4 ml-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </Link>
-                  </div>
-                </div>
-              </article>
+              <BlogPostCard post={post} variant="list" />
             </li>
           ))}
         </ul>

@@ -2,7 +2,9 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import BlogPostCard from '@/components/BlogPostCard';
 import MarketingNav from '@/components/MarketingNav';
+import { BLOG_INTRO_COPY, getAllPostsSorted } from '@/content/blog';
 import { SITE_ORIGIN } from '@/lib/seo';
 import {
   useFadeUpOnLoad,
@@ -11,7 +13,8 @@ import {
 } from '@/hooks/useSimpleAnimations';
 
 export default function MarketingPage() {
-  
+  const blogPreviewPosts = getAllPostsSorted().slice(0, 3);
+
   // Load animations for above-the-fold content
   const heroAnimation = useFadeUpOnLoad(200);
 
@@ -20,6 +23,7 @@ export default function MarketingPage() {
   const howItWorksSection = useFadeUpOnScroll(0.3);
   const benefitsSection = useFadeUpOnScroll(0.3);
   const testimonialsSection = useFadeUpOnScroll(0.3);
+  const fromBlogSection = useFadeUpOnScroll(0.3);
   const faqSection = useFadeUpOnScroll(0.3);
   
   // Staggered animations
@@ -626,6 +630,32 @@ export default function MarketingPage() {
                   We could easily share her projects, awards, and activities in a polished way. It showed more than grades—it told her story.&rdquo;
                 </p>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="from-the-blog"
+          ref={fromBlogSection.ref}
+          className={`py-20 px-4 bg-discovery-beige-200 ${fromBlogSection.className}`}
+          aria-labelledby="from-the-blog-heading"
+        >
+          <div className="max-w-7xl mx-auto">
+            <header className="mb-12 text-center">
+              <h2
+                id="from-the-blog-heading"
+                className="text-5xl lg:text-5xl sm:text-center lg:text-center font-medium text-discovery-black mb-4"
+              >
+                From the blog
+              </h2>
+              <p className="text-lg text-discovery-grey max-w-2xl mx-auto leading-relaxed">
+                {BLOG_INTRO_COPY}
+              </p>
+            </header>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {blogPreviewPosts.map((post) => (
+                <BlogPostCard key={post.slug} post={post} variant="grid" />
+              ))}
             </div>
           </div>
         </section>

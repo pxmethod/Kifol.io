@@ -66,6 +66,18 @@ function ArticleBody({ post }: { post: BlogPost }) {
         ) : (
           <p key={i} className="text-lg text-discovery-grey leading-relaxed mb-6">
             {section.text}
+            {section.trailingLink ? (
+              <>
+                {' '}
+                <a
+                  href={section.trailingLink.href}
+                  className="font-semibold text-discovery-orange hover:text-discovery-orange-light underline underline-offset-2"
+                >
+                  {section.trailingLink.label}
+                </a>
+                .
+              </>
+            ) : null}
           </p>
         )
       )}
@@ -147,7 +159,8 @@ export default async function BlogArticlePage({ params }: Props) {
                 fill
                 className="object-cover"
                 priority
-                sizes="(max-width: 768px) 100vw, 768px"
+                sizes="(max-width: 768px) 100vw, min(768px, 100vw)"
+                quality={80}
               />
             )}
           </div>
@@ -169,7 +182,7 @@ export default async function BlogArticlePage({ params }: Props) {
             {post.tags.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-discovery-beige-200 text-discovery-black/80"
+                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-discovery-beige-100 text-discovery-black/80"
               >
                 {tag}
               </span>
