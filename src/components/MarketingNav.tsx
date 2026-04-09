@@ -39,7 +39,7 @@ export default function MarketingNav() {
           <Link href="/" className="flex items-center flex-shrink-0">
             <Image
               src="/kifolio_logo_dark.svg"
-              alt="Kifolio"
+              alt="Kifolio — free digital portfolio for kids and students"
               width={130}
               height={34}
               className="h-9 w-auto"

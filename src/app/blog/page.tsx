@@ -3,14 +3,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import MarketingNav from '@/components/MarketingNav';
 import { getAllPostsSorted, getCanonicalBlogUrl } from '@/content/blog';
+import { SITE_ORIGIN } from '@/lib/seo';
 
-const siteUrl = 'https://kifol.io';
+const siteUrl = SITE_ORIGIN;
 
 const blogPageDescription =
   'Ideas and guides for building digital portfolios, documenting childhood milestones, and sharing progress with teachers and coaches.';
 
 export const metadata: Metadata = {
-  title: 'Blog | Kifolio — Tips and best practices for using Kifolio',
+  title: {
+    absolute: 'Blog | Kifolio — Tips and best practices for using Kifolio',
+  },
   description: blogPageDescription,
   keywords: [
     'children portfolio',

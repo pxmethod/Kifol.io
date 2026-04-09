@@ -3,61 +3,108 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import MarketingNav from '@/components/MarketingNav';
-import { 
-  useFadeUpOnLoad, 
-  useFadeUpOnScroll, 
-  useScaleInOnScroll,
-  useStaggeredLoadAnimation 
+import { SITE_ORIGIN } from '@/lib/seo';
+import {
+  useFadeUpOnLoad,
+  useFadeUpOnScroll,
+  useStaggeredLoadAnimation,
 } from '@/hooks/useSimpleAnimations';
 
 export default function MarketingPage() {
   
   // Load animations for above-the-fold content
   const heroAnimation = useFadeUpOnLoad(200);
-  const portfolioShowcase = useFadeUpOnLoad(600);
 
   // Scroll animations for below-the-fold content
   const whatSection = useFadeUpOnScroll(0.3);
   const howItWorksSection = useFadeUpOnScroll(0.3);
   const benefitsSection = useFadeUpOnScroll(0.3);
-  const demoSection = useFadeUpOnScroll(0.3);
   const testimonialsSection = useFadeUpOnScroll(0.3);
-  const ctaSection = useScaleInOnScroll(0.3);
   const faqSection = useFadeUpOnScroll(0.3);
   
   // Staggered animations
-  const benefitItems = useStaggeredLoadAnimation(8, 1000, 100);
   const featureCards = useStaggeredLoadAnimation(4, 800, 150);
-  
+
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': `${SITE_ORIGIN}/#organization`,
+        name: 'Kifolio',
+        description:
+          "Digital portfolio platform for children's achievements, creativity, and milestones",
+        url: SITE_ORIGIN,
+        logo: `${SITE_ORIGIN}/kifolio_logo_dark.svg`,
+        contactPoint: {
+          '@type': 'ContactPoint',
+          contactType: 'customer service',
+          email: 'support@kifol.io',
+        },
+      },
+      {
+        '@type': 'SoftwareApplication',
+        '@id': `${SITE_ORIGIN}/#softwareapplication`,
+        name: 'Kifolio',
+        url: SITE_ORIGIN,
+        applicationCategory: 'EducationalApplication',
+        operatingSystem: 'Web browser',
+        description:
+          'Free digital portfolio for kids and students. Capture milestones, school projects, sports achievements, artwork, and academic records in one shareable place.',
+        offers: {
+          '@type': 'Offer',
+          price: '0',
+          priceCurrency: 'USD',
+          description: 'Free',
+        },
+        publisher: { '@id': `${SITE_ORIGIN}/#organization` },
+      },
+      {
+        '@type': 'FAQPage',
+        '@id': `${SITE_ORIGIN}/#faq`,
+        mainEntity: [
+          {
+            '@type': 'Question',
+            name: 'How much does Kifolio cost?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Kifolio is completely free! Parents have access to all features and can create unlimited portfolios and highlights for their children.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: "What can I include in my child's portfolio?",
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: "You can include artwork, school projects, sports achievements, academic milestones, creative writing, photos, videos, and any other accomplishments that showcase your child's growth and development.",
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'Can I share the portfolio with family and friends?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Yes! Kifolio portfolios are fully responsive and can be shared with anyone. You can control privacy settings and choose whether to make portfolios public or password-protected.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'How do I get started?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: "Getting started is simple! Visit the onboarding page to create a free account, choose a template, add your child's information, and start documenting milestones and achievements in minutes.",
+            },
+          },
+        ],
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-white">
-      {/* Structured Data for SEO */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": "Kifolio",
-            "description": "Digital portfolio platform for children's achievements, creativity, and milestones",
-            "url": "https://kifol.io",
-            "logo": "https://kifol.io/kifolio_logo_dark.svg",
-            "sameAs": [
-              "https://kifol.io/auth/signup"
-            ],
-            "contactPoint": {
-              "@type": "ContactPoint",
-              "contactType": "customer service",
-              "email": "support@kifol.io"
-            },
-            "offers": {
-              "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "USD",
-              "description": "Free digital portfolio creation for children"
-            }
-          })
-        }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
       <MarketingNav />
@@ -71,7 +118,7 @@ export default function MarketingPage() {
               {/* Left Column - Content */}
               <div className="text-left pb-20 lg:flex-1 lg:max-w-2xl">
                 <h1 className="text-5xl lg:text-7xl font-semibold text-discovery-black mb-6">
-                  Every milestone matters. Capture them all with Kifolio.
+                The free digital portfolio for your child's milestones & achievements.
                 </h1>
                 <p className="text-lg text-discovery-grey mb-8 leading-relaxed">
                   Build beautiful portfolios for your children or students that showcase their work, 
@@ -91,10 +138,14 @@ export default function MarketingPage() {
               
               {/* Right Column - Image */}
               <div className="flex justify-center lg:justify-end lg:flex-1 lg:-ml-16">
-                <div className="max-w-6xl">
-                  <img 
-                    src="/marketing/hero-img.png" 
-                    alt="Image of an example child portfolio" 
+                <div className="max-w-6xl w-full">
+                  <Image
+                    src="/marketing/hero-img.png"
+                    alt="Digital portfolio for kids and students: phone and tablet mockup showing a child’s milestones, artwork, and achievements in Kifolio"
+                    width={1200}
+                    height={928}
+                    priority
+                    sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 55vw, 840px"
                     className="w-full h-auto object-contain"
                   />
                 </div>
@@ -131,9 +182,13 @@ export default function MarketingPage() {
             <div className="grid md:grid-cols-2 gap-12 justify-items-center">
               <div className={`text-center ${featureCards.getItemClassName(0)}`}>
                 <div className="mx-auto mb-6" style={{ width: '200px', height: '200px' }}>
-                  <img 
-                    src="/marketing/academic-transitions.png" 
-                    alt="Academic Transitions" 
+                  <Image
+                    src="/marketing/academic-transitions.png"
+                    alt="Illustration: student digital portfolio supporting academic transitions and school applications"
+                    width={200}
+                    height={200}
+                    loading="lazy"
+                    sizes="200px"
                     className="w-full h-full object-contain"
                   />
                 </div>
@@ -145,9 +200,13 @@ export default function MarketingPage() {
 
               <div className={`text-center ${featureCards.getItemClassName(0)}`}>
                 <div className="mx-auto mb-6" style={{ width: '200px', height: '200px' }}>
-                  <img 
-                    src="/marketing/athletic-dev.png" 
-                    alt="Athletic Development" 
+                  <Image
+                    src="/marketing/athletic-dev.png"
+                    alt="Illustration: tracking sports achievements and athletic development in a child’s digital portfolio"
+                    width={200}
+                    height={200}
+                    loading="lazy"
+                    sizes="200px"
                     className="w-full h-full object-contain"
                   />
                 </div>
@@ -159,9 +218,13 @@ export default function MarketingPage() {
               
               <div className={`text-center ${featureCards.getItemClassName(1)}`}>
                 <div className="mx-auto mb-6" style={{ width: '200px', height: '200px' }}>
-                  <img 
-                    src="/marketing/scholarships-awards.png" 
-                    alt="Scholarships & Awards" 
+                  <Image
+                    src="/marketing/scholarships-awards.png"
+                    alt="Illustration: scholarships and awards documented in a student portfolio for applications"
+                    width={200}
+                    height={200}
+                    loading="lazy"
+                    sizes="200px"
                     className="w-full h-full object-contain"
                   />
                 </div>
@@ -173,9 +236,13 @@ export default function MarketingPage() {
               
               <div className={`text-center ${featureCards.getItemClassName(2)}`}>
                 <div className="mx-auto mb-6" style={{ width: '200px', height: '200px' }}>
-                  <img 
-                    src="/marketing/community.png" 
-                    alt="Community Service & Leadership" 
+                  <Image
+                    src="/marketing/community.png"
+                    alt="Illustration: community service and leadership highlights in a digital portfolio for students"
+                    width={200}
+                    height={200}
+                    loading="lazy"
+                    sizes="200px"
                     className="w-full h-full object-contain"
                   />
                 </div>
@@ -187,9 +254,13 @@ export default function MarketingPage() {
 
               <div className={`text-center ${featureCards.getItemClassName(3)}`}>
                 <div className="mx-auto mb-6" style={{ width: '200px', height: '200px' }}>
-                  <img 
-                    src="/marketing/competitions.png" 
-                    alt="Competitions & Achievements" 
+                  <Image
+                    src="/marketing/competitions.png"
+                    alt="Illustration: competitions, science fairs, and student achievements organized in one portfolio"
+                    width={200}
+                    height={200}
+                    loading="lazy"
+                    sizes="200px"
                     className="w-full h-full object-contain"
                   />
                 </div>
@@ -201,9 +272,13 @@ export default function MarketingPage() {
 
               <div className={`text-center ${featureCards.getItemClassName(3)}`}>
                 <div className="mx-auto mb-6" style={{ width: '200px', height: '200px' }}>
-                  <img 
-                    src="/marketing/growth-tracking.png" 
-                    alt="Personal Growth Tracking" 
+                  <Image
+                    src="/marketing/growth-tracking.png"
+                    alt="Illustration: personal growth and confidence tracked over time in a child’s digital portfolio"
+                    width={200}
+                    height={200}
+                    loading="lazy"
+                    sizes="200px"
                     className="w-full h-full object-contain"
                   />
                 </div>
@@ -297,16 +372,12 @@ export default function MarketingPage() {
         </section>
 
         {/* Benefits Section */}
-        <section 
+        <section
           id="why-kifolio"
           ref={benefitsSection.ref}
-          className={`py-20 px-4 relative ${benefitsSection.className}`} 
-          style={{ backgroundImage: 'url(/marketing/kifolio_mobile_hand.png)' }}
+          className={`py-20 px-4 relative bg-discovery-blue-100 ${benefitsSection.className}`}
           aria-labelledby="benefits-heading"
         >
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-discovery-blue-100"></div>
-          
           <div className="text-5xl lg:text-5xl text-center relative z-10">
             <h2 id="benefits-heading" className="text-5xl lg:text-5xl sm:text-center lg:text-center font-medium text-discovery-black mb-12">
               Why parents choose Kifolio
@@ -316,9 +387,13 @@ export default function MarketingPage() {
               {/* Left Column - Child Photo */}
               <div className="flex items-center justify-center">
                 <div className="w-[360px] h-[480px] overflow-hidden">
-                  <img 
-                    src="/marketing/child-photo-why.jpg" 
-                    alt="Child showcasing their portfolio and achievements" 
+                  <Image
+                    src="/marketing/child-photo-why.jpg"
+                    alt="Smiling child with headphones — parents use Kifolio to build a digital portfolio of their child’s milestones and achievements"
+                    width={360}
+                    height={480}
+                    loading="lazy"
+                    sizes="(max-width: 768px) 100vw, 360px"
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -425,8 +500,14 @@ export default function MarketingPage() {
             <div className="grid md:grid-cols-2 gap-8">
               <div className="bg-white rounded-lg p-6 shadow-md">
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4">
-                    <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100">K</span>
+                  <div
+                    className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4"
+                    role="img"
+                    aria-label="Kelli W., parent of a 4-year-old, testimonial for Kifolio digital portfolios for kids"
+                  >
+                    <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100" aria-hidden="true">
+                      K
+                    </span>
                   </div>
                   <div>
                     <h4 className="text-3xl lg:text-2xl font-medium text-discovery-orange">Kelli W.</h4>
@@ -440,8 +521,14 @@ export default function MarketingPage() {
 
               <div className="bg-white rounded-lg p-6 shadow-md">
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4">
-                    <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100">S</span>
+                  <div
+                    className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4"
+                    role="img"
+                    aria-label="Sarah M., parent of a 10-year-old, testimonial for Kifolio student portfolios"
+                  >
+                    <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100" aria-hidden="true">
+                      S
+                    </span>
                   </div>
                   <div>
                     <h4 className="text-3xl lg:text-2xl font-medium text-discovery-orange">Sarah M.</h4>
@@ -456,8 +543,14 @@ export default function MarketingPage() {
 
               <div className="bg-white rounded-lg p-6 shadow-md">
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4">
-                    <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100">R</span>
+                  <div
+                    className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4"
+                    role="img"
+                    aria-label="Robert K., parent of a 16-year-old, testimonial for Kifolio digital portfolios"
+                  >
+                    <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100" aria-hidden="true">
+                      R
+                    </span>
                   </div>
                   <div>
                     <h4 className="text-3xl lg:text-2xl font-medium text-discovery-orange">Robert K.</h4>
@@ -472,8 +565,14 @@ export default function MarketingPage() {
 
               <div className="bg-white rounded-lg p-6 shadow-md">
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4">
-                    <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100">S</span>
+                  <div
+                    className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4"
+                    role="img"
+                    aria-label="Steven K., parent of an 8-year-old, testimonial for Kifolio sports and student highlights"
+                  >
+                    <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100" aria-hidden="true">
+                      S
+                    </span>
                   </div>
                   <div>
                     <h4 className="text-3xl lg:text-2xl font-medium text-discovery-orange">Steven K.</h4>
@@ -487,8 +586,14 @@ export default function MarketingPage() {
 
               <div className="bg-white rounded-lg p-6 shadow-md">
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4">
-                    <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100">C</span>
+                  <div
+                    className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4"
+                    role="img"
+                    aria-label="Cassandra G., parent of a 13-year-old, testimonial for Kifolio milestone tracking"
+                  >
+                    <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100" aria-hidden="true">
+                      C
+                    </span>
                   </div>
                   <div>
                     <h4 className="text-3xl lg:text-2xl font-medium text-discovery-orange">Cassandra G.</h4>
@@ -502,8 +607,14 @@ export default function MarketingPage() {
 
               <div className="bg-white rounded-lg p-6 shadow-md">
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4">
-                    <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100">D</span>
+                  <div
+                    className="w-12 h-12 bg-discovery-orange rounded-full flex items-center justify-center mr-4"
+                    role="img"
+                    aria-label="Daniel R., parent of a 15-year-old, testimonial for Kifolio portfolios for applications"
+                  >
+                    <span className="text-2xl lg:text-2xl font-medium text-discovery-white-100" aria-hidden="true">
+                      D
+                    </span>
                   </div>
                   <div>
                     <h4 className="text-3xl lg:text-2xl font-medium text-discovery-orange">Daniel R.</h4>
@@ -530,48 +641,44 @@ export default function MarketingPage() {
             <h2 id="faq-heading" className="text-5xl lg:text-5xl sm:text-center lg:text-center font-medium text-discovery-black mb-12">
               Frequently asked questions
             </h2>
-            <div className="space-y-8" itemScope itemType="https://schema.org/FAQPage">
-              <div className="bg-white rounded-lg p-6 shadow-sm" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
-                <h3 className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight" itemProp="name">
+            <div className="space-y-8">
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <h3 className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight">
                   How much does Kifolio cost?
                 </h3>
-                <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
-                  <div className="text-lg text-discovery-grey leading-relaxed" itemProp="text">
-                    Kifolio is completely free! Parent's will have access to all features and will be able to create unlimited portfolios and highlights for their children.
-                  </div>
+                <div className="text-lg text-discovery-grey leading-relaxed">
+                  Kifolio is completely free! Parents have access to all features and can create unlimited portfolios and highlights for their children.
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg p-6 shadow-sm" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
-                <h3 className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight" itemProp="name">
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <h3 className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight">
                   What can I include in my child&apos;s portfolio?
                 </h3>
-                <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
-                  <div className="text-lg text-discovery-grey leading-relaxed" itemProp="text">
-                    You can include artwork, school projects, sports achievements, academic milestones, creative writing, photos, videos, and any other accomplishments that showcase your child&apos;s growth and development.
-                  </div>
+                <div className="text-lg text-discovery-grey leading-relaxed">
+                  You can include artwork, school projects, sports achievements, academic milestones, creative writing, photos, videos, and any other accomplishments that showcase your child&apos;s growth and development.
                 </div>
-      </div>
+              </div>
 
-              <div className="bg-white rounded-lg p-6 shadow-sm" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
-                <h3 className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight" itemProp="name">
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <h3 className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight">
                   Can I share the portfolio with family and friends?
                 </h3>
-                <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
-                  <div className="text-lg text-discovery-grey leading-relaxed" itemProp="text">
-                    Yes! Kifolio portfolios are fully responsive and can be shared with anyone. You can control privacy settings and choose whether to make portfolios public or password-protected.
-                  </div>
+                <div className="text-lg text-discovery-grey leading-relaxed">
+                  Yes! Kifolio portfolios are fully responsive and can be shared with anyone. You can control privacy settings and choose whether to make portfolios public or password-protected.
                 </div>
-      </div>
+              </div>
 
-              <div className="bg-white rounded-lg p-6 shadow-sm" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
-                <h3 className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight" itemProp="name">
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <h3 className="text-2xl lg:text-2xl font-medium text-discovery-black mb-2 leading-tight">
                   How do I get started?
                 </h3>
-                <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
-                  <div className="text-lg text-discovery-grey leading-relaxed" itemProp="text">
-                    Getting started is simple! <a href="/onboarding" className="text-discovery-primary hover:underline">Start building your portfolio</a>, then create a free account. You can choose a template, add your child&apos;s information, and start documenting their milestones and achievements in minutes.
-                  </div>
+                <div className="text-lg text-discovery-grey leading-relaxed">
+                  Getting started is simple!{' '}
+                  <Link href="/onboarding" className="text-discovery-primary hover:underline">
+                    Start building your portfolio
+                  </Link>
+                  , then create a free account. You can choose a template, add your child&apos;s information, and start documenting their milestones and achievements in minutes.
                 </div>
               </div>
             </div>
@@ -584,9 +691,9 @@ export default function MarketingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
-              <Image 
-                src="/kifolio_logo.svg" 
-                alt="Kifolio Logo" 
+              <Image
+                src="/kifolio_logo.svg"
+                alt="Kifolio — digital portfolio platform for children and students"
                 width={144}
                 height={38}
                 className="h-10 w-auto mb-4"

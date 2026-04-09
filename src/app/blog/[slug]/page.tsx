@@ -4,8 +4,9 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import MarketingNav from '@/components/MarketingNav';
 import { blogPosts, getPostBySlug, getCanonicalPostUrl, type BlogPost } from '@/content/blog';
+import { SITE_ORIGIN } from '@/lib/seo';
 
-const siteUrl = 'https://kifol.io';
+const siteUrl = SITE_ORIGIN;
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -17,14 +18,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = getPostBySlug(slug);
   if (!post) {
-    return { title: 'Article | Kifolio' };
+    return { title: { absolute: 'Article | Kifolio' } };
   }
 
   const url = `${siteUrl}/blog/${post.slug}`;
   const ogImage = post.thumbnail.startsWith('http') ? post.thumbnail : `${siteUrl}${post.thumbnail}`;
 
   return {
-    title: `${post.title} | Kifolio Blog`,
+    title: { absolute: `${post.title} | Kifolio Blog` },
     description: post.description,
     keywords: post.tags,
     authors: [{ name: post.author }],

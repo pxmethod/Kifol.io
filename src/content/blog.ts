@@ -1,3 +1,5 @@
+import { SITE_ORIGIN } from '@/lib/seo';
+
 export type BlogSection = { type: 'h2' | 'p'; text: string };
 
 export type BlogPost = {
@@ -12,7 +14,7 @@ export type BlogPost = {
   sections: BlogSection[];
 };
 
-const siteUrl = 'https://kifol.io';
+const siteUrl = SITE_ORIGIN;
 
 export const blogPosts: BlogPost[] = [
   {
