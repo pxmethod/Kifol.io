@@ -24,16 +24,16 @@ Kifolio uses **MailerSend templates exclusively** for signup verification emails
 
 ### Supabase Send Email Hook (Required)
 
-To prevent duplicate emails (Supabase's default + ours), we use Supabase's **Send Email Hook**. When enabled, Supabase sends auth email payloads to our API instead of sending them itself. Our hook returns 200 without sending for signup (we already sent via MailerSend).
+To prevent duplicate emails (Supabase's default + ours), we use Supabase's **Send Email Hook**. When enabled, Supabase sends auth email payloads to our API instead of sending them itself. Our hook verifies the payload with `SEND_EMAIL_HOOK_SECRET`, then returns 200 without sending for signup (we already sent via MailerSend).
 
 **Setup:**
 
 1. **Deploy your app** so the hook URL is publicly accessible (e.g. `https://yourdomain.com/api/auth/supabase-email-hook`).
 
-2. **Add the secret to Vercel** (and `.env.local` for local dev):
+2. **Add the secret to Vercel** (and `.env.local` for local dev) **before** enabling the hook in Supabase:
    - Vercel → Project → Settings → Environment Variables
    - Add `SEND_EMAIL_HOOK_SECRET` = `v1,whsec_<your_secret>` (from Supabase when configuring the hook)
-   - **Required for production** — without it you'll see: `[supabase-email-hook] SEND_EMAIL_HOOK_SECRET not set`
+   - If the hook is enabled but this variable is missing, the endpoint returns **503** and logs an error — **disable the hook** until the secret is deployed, or Supabase may retry the failing response.
 
 3. **Configure the hook in Supabase:**
    - Go to [Supabase Dashboard](https://supabase.com/dashboard) → your project

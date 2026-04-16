@@ -1,12 +1,17 @@
 import { NextResponse } from 'next/server';
 import { getAppUrl } from '@/config/domains';
 import { normalizeMailerSendApiKey } from '@/lib/email/client';
+import { isProductionBuild } from '@/lib/env/deploy';
 
 /**
- * Diagnostic endpoint to verify email config in production.
- * Visit /api/debug/email-config — returns no secrets.
+ * Diagnostic endpoint for local / non-production builds only.
+ * Disabled in production builds to avoid reconnaissance (key length, template flags, etc.).
  */
 export async function GET() {
+  if (isProductionBuild()) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   const raw = process.env.MAILERSEND_API_KEY;
   const normalized = normalizeMailerSendApiKey(raw);
   const hasWelcomeTemplate = !!process.env.MAILERSEND_TEMPLATE_WELCOME;

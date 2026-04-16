@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server';
 import { EmailTemplates } from '@/lib/email/template-loader';
+import { isProductionBuild } from '@/lib/env/deploy';
 
 /**
- * Preview the endorsement-completed email template with sample data.
- * Visit GET /api/email/preview/endorsement-completed in your browser.
+ * Preview the endorsement-completed email template with sample data (non-production builds only).
  */
 export async function GET() {
+  if (isProductionBuild()) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   try {
     const html = await EmailTemplates.endorsementCompleted({
       PARENT_NAME: 'Sarah',

@@ -23,11 +23,16 @@ export async function POST(request: NextRequest) {
   const hookSecret = process.env.SEND_EMAIL_HOOK_SECRET;
 
   if (!hookSecret) {
-    console.warn(
-      '[supabase-email-hook] SEND_EMAIL_HOOK_SECRET not set. Hook should not be configured in Supabase until this is set.'
+    console.error(
+      '[supabase-email-hook] SEND_EMAIL_HOOK_SECRET is not set. Disable the Send Email Hook in Supabase until this variable is configured, or Supabase may retry this failing response.'
     );
-    // Return 200 so Supabase doesn't retry; signup will have already sent our MailerSend email
-    return NextResponse.json({}, { status: 200 });
+    return NextResponse.json(
+      {
+        error:
+          'Send Email Hook is not configured (missing SEND_EMAIL_HOOK_SECRET). Do not enable this hook until the secret is set.',
+      },
+      { status: 503 }
+    );
   }
 
   try {

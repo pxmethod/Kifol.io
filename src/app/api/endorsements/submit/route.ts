@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { EndorsementService } from '@/lib/database/endorsements';
 import { sendEndorsementCompletedEmail } from '@/lib/email/service';
 import { getAppUrl } from '@/config/domains';
+import { isDeployProduction } from '@/lib/env/deploy';
 
 export async function POST(request: NextRequest) {
   try {
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
 
             const parentName = profile?.name?.trim() || 'there';
 
-            if (process.env.ENDORSEMENT_SKIP_SEND === 'true') {
+            if (process.env.ENDORSEMENT_SKIP_SEND === 'true' && !isDeployProduction()) {
               console.log('[Endorsements] Skipping parent notification (ENDORSEMENT_SKIP_SEND=true)');
             } else {
               await sendEndorsementCompletedEmail({

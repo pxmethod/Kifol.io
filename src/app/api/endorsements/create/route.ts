@@ -4,6 +4,7 @@ import { generateToken } from '@/lib/crypto';
 import { EndorsementService } from '@/lib/database/endorsements';
 import { sendEndorsementRequestEmail } from '@/lib/email/service';
 import { getAppUrl } from '@/config/domains';
+import { isDeployProduction } from '@/lib/env/deploy';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/database';
 
@@ -111,8 +112,8 @@ export async function POST(request: NextRequest) {
 
     const endorseUrl = `${getAppUrl()}/endorse/${token}`;
 
-    // Skip email when hitting MailerSend trial limits (local dev)
-    if (process.env.ENDORSEMENT_SKIP_SEND === 'true') {
+    // Skip email for local/preview only — never in customer-facing production (avoids leaking endorseUrl in API responses)
+    if (process.env.ENDORSEMENT_SKIP_SEND === 'true' && !isDeployProduction()) {
       console.log('[Endorsements] Skipping send (ENDORSEMENT_SKIP_SEND=true). Endorse URL:', endorseUrl);
       return NextResponse.json({
         success: true,
