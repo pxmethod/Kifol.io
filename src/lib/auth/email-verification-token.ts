@@ -4,21 +4,36 @@ const HMAC_ALG = 'sha256';
 /** Links expire after this window (aligned with typical verification expectations). */
 const TOKEN_MAX_AGE_MS = 72 * 60 * 60 * 1000;
 
+/**
+ * Minimum UTF-8 length after normalization. 24 allows `openssl rand -base64 16` (~128 bits).
+ * Prefer 32+ (e.g. `openssl rand -base64 24` or `-base64 32`) for extra margin.
+ */
+export const EMAIL_VERIFICATION_SECRET_MIN_LENGTH = 24;
+
 function normalizeVerificationSecret(raw: string | undefined): string {
   if (raw == null) return '';
   let s = String(raw).trim();
+  // Strip BOM / zero-width characters (common when pasting from docs or password managers)
+  s = s.replace(/^\uFEFF/, '').replace(/[\u200B-\u200D\uFEFF]/g, '');
+  // Single-line secret (newlines from Vercel multiline paste break HMAC)
+  s = s.replace(/\r\n/g, '\n').replace(/[\r\n]+/g, '');
+  s = s.trim();
   if (
     (s.startsWith('"') && s.endsWith('"')) ||
     (s.startsWith("'") && s.endsWith("'"))
   ) {
     s = s.slice(1, -1).trim();
   }
+  const bearer = s.match(/^bearer\s+(.+)$/i);
+  if (bearer) {
+    s = bearer[1].trim();
+  }
   return s;
 }
 
 function getSecret(): string | null {
   const s = normalizeVerificationSecret(process.env.EMAIL_VERIFICATION_SECRET);
-  if (!s || s.length < 32) return null;
+  if (!s || s.length < EMAIL_VERIFICATION_SECRET_MIN_LENGTH) return null;
   return s;
 }
 
@@ -29,23 +44,30 @@ export function isEmailVerificationConfigured(): boolean {
 /** For server logs only — does not expose the secret. */
 export function emailVerificationSecretDiagnostics(): {
   envVarPresent: boolean;
+  isEmptyString: boolean;
   normalizedLength: number;
+  meetsMinimum: boolean;
 } {
   const raw = process.env.EMAIL_VERIFICATION_SECRET;
+  const normalized = normalizeVerificationSecret(raw);
   return {
     envVarPresent: raw !== undefined,
-    normalizedLength: normalizeVerificationSecret(raw).length,
+    isEmptyString: raw === '',
+    normalizedLength: normalized.length,
+    meetsMinimum: normalized.length >= EMAIL_VERIFICATION_SECRET_MIN_LENGTH,
   };
 }
 
 /**
  * Create a signed verification token for the signup email link.
- * Requires EMAIL_VERIFICATION_SECRET (min 32 characters).
+ * Requires EMAIL_VERIFICATION_SECRET (see EMAIL_VERIFICATION_SECRET_MIN_LENGTH).
  */
 export function createEmailVerificationToken(email: string, userId: string): string {
   const secret = getSecret();
   if (!secret) {
-    throw new Error('EMAIL_VERIFICATION_SECRET must be set (min 32 characters)');
+    throw new Error(
+      `EMAIL_VERIFICATION_SECRET must be set (min ${EMAIL_VERIFICATION_SECRET_MIN_LENGTH} characters)`
+    );
   }
 
   const normalizedEmail = email.trim().toLowerCase();

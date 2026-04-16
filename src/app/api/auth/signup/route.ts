@@ -4,6 +4,7 @@ import { sendEmailVerification } from '@/lib/email/service'
 import { getAppUrl } from '@/config/domains'
 import {
   createEmailVerificationToken,
+  EMAIL_VERIFICATION_SECRET_MIN_LENGTH,
   emailVerificationSecretDiagnostics,
   isEmailVerificationConfigured,
 } from '@/lib/auth/email-verification-token'
@@ -23,23 +24,28 @@ export async function POST(request: NextRequest) {
     }
 
     if (!isEmailVerificationConfigured()) {
-      if (process.env.NODE_ENV === 'development') {
-        const d = emailVerificationSecretDiagnostics();
-        console.warn('[signup] EMAIL_VERIFICATION_SECRET:', {
-          ...d,
-          meetsMin32: d.normalizedLength >= 32,
-        });
-      }
+      const d = emailVerificationSecretDiagnostics();
+      console.error('[signup] EMAIL_VERIFICATION_SECRET not usable (no secret value logged):', d);
+
+      const diagnosticCode: 'MISSING' | 'TOO_SHORT' = !d.envVarPresent
+        ? 'MISSING'
+        : 'TOO_SHORT';
+
       const payload: {
         error: string;
-        hint?: string;
+        hint: string;
+        diagnosticCode: 'MISSING' | 'TOO_SHORT';
+        normalizedLength?: number;
       } = {
-        error:
-          'Email verification is not configured. Set EMAIL_VERIFICATION_SECRET (min 32 characters) on the server.',
+        error: `Email verification is not configured. Set EMAIL_VERIFICATION_SECRET on the server (at least ${EMAIL_VERIFICATION_SECRET_MIN_LENGTH} characters after trimming; 32+ recommended).`,
+        diagnosticCode,
+        hint:
+          'Vercel: Project → Settings → Environment Variables → exact name EMAIL_VERIFICATION_SECRET → enable for the environment you deploy to (Production and/or Preview) → Save → redeploy. Paste the raw secret only (no Bearer prefix). If the value was copied from a file, remove accidental line breaks.',
       };
       if (process.env.NODE_ENV === 'development') {
-        payload.hint =
-          'Use the exact dev URL from your terminal (including port, e.g. http://localhost:3001). Restart `npm run dev` after editing .env.local. For production, set the same variable in your host (e.g. Vercel).';
+        payload.normalizedLength = d.normalizedLength;
+        payload.hint +=
+          ' Local: use the URL from the terminal (correct port), restart `npm run dev` after changing .env.local.';
       }
       return NextResponse.json(payload, { status: 503 });
     }

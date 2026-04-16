@@ -49,13 +49,15 @@ NEXTAUTH_URL=https://kifol.io
 
 ### 6. Email verification (signup links)
 ```bash
-# Min 32 characters; used to sign verification links in signup emails. Generate with:
+# At least 24 characters after the app trims the value (32+ recommended). Generate e.g.:
 # openssl rand -base64 32
 EMAIL_VERIFICATION_SECRET=your_long_random_secret_here
 ```
 Signup will return **503** until this is set. It must stay stable across deploys (changing it invalidates only links issued before the change).
 
 **Troubleshooting “Email verification is not configured” locally:** Open the app at the **same origin** `next dev` prints (for example `http://localhost:3001` if 3000 is busy). A different port is a different server and will not see your `.env.local`. After changing env vars, stop and restart `npm run dev`. Do not wrap the secret in extra quotes unless the whole value is quoted as a single `.env` string.
+
+**Troubleshooting on Vercel:** The name must be exactly `EMAIL_VERIFICATION_SECRET`. Enable it for **Production** (and **Preview** if you test signups on preview URLs). **Redeploy** after saving—existing deployments do not pick up new variables. Check the deployment **Runtime Logs** for `[signup] EMAIL_VERIFICATION_SECRET not usable` (lengths are logged, never the secret). If the UI shows `diagnosticCode: TOO_SHORT`, the value is missing, empty, or under the minimum length after trimming (paste errors, line breaks, or wrong variable).
 
 ## Portfolio Domain System
 

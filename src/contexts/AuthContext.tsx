@@ -62,7 +62,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!response.ok) {
         const base = data.error || 'Signup failed';
         const hint = typeof data.hint === 'string' ? data.hint : '';
-        return { error: hint ? `${base} ${hint}` : base };
+        const code =
+          typeof data.diagnosticCode === 'string' ? ` (${String(data.diagnosticCode)})` : '';
+        const devLen =
+          typeof data.normalizedLength === 'number' ? ` [length: ${data.normalizedLength}]` : '';
+        return { error: `${base}${code}${devLen}${hint ? ` ${hint}` : ''}`.trim() };
       }
 
       return {}

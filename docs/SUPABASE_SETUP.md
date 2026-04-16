@@ -41,7 +41,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
 # Send Email Hook (required for signup — see docs/EMAIL_SETUP.md)
 SEND_EMAIL_HOOK_SECRET=v1,whsec_your_signing_secret_here
 
-# Signup verification links (min 32 chars — see docs/ENVIRONMENT_SETUP.md)
+# Signup verification links (min length — see docs/ENVIRONMENT_SETUP.md)
 EMAIL_VERIFICATION_SECRET=your_long_random_secret_here
 ```
 

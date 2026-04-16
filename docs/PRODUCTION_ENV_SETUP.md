@@ -26,7 +26,7 @@ NEXT_PUBLIC_APP_URL=https://yourdomain.com
 
 ### 4. Signup verification links
 ```bash
-# Min 32 characters; must match the value used in development if you test the same links
+# Min length per ENVIRONMENT_SETUP.md (32+ chars recommended); production vs local may differ
 EMAIL_VERIFICATION_SECRET=your_long_random_secret_here
 ```
 
