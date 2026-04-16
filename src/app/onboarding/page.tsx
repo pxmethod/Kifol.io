@@ -191,7 +191,7 @@ export default function OnboardingPage() {
                 Create your first portfolio
               </h1>
               <p className="text-md text-discovery-grey leading-relaxed max-w-xl">
-                This portfoliowill be saved after signing up and can be updated
+                This portfolio will be saved after signing up and can be updated
                 at anytime. <Link href="/auth/signup" className="text-discovery-orange hover:underline">Click here</Link> if you're ready to sign up now. 
               </p>
             </div>
