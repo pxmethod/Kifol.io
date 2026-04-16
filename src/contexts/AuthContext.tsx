@@ -4,8 +4,6 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 import { portfolioAccessService } from '@/lib/services/portfolio-access';
-import { getAppUrl } from '@/config/domains';
-
 interface AuthContextType {
   user: User | null
   loading: boolean
@@ -45,13 +43,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, name?: string) => {
     try {
-      // Use our custom signup API that handles email verification
-      // Use relative URL for local development, full URL for production
-      const apiUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost'
-        ? '/api/auth/signup'
-        : `${getAppUrl()}/api/auth/signup`
-      
-      const response = await fetch(apiUrl, {
+      // Same-origin API (works on localhost, 127.0.0.1, preview hosts, production).
+      // Avoid hostname === 'localhost' only — that sent dev traffic to getAppUrl() and the wrong env.
+      const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -106,11 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const resetPassword = async (email: string) => {
     try {
-      const apiUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost'
-        ? '/api/auth/forgot-password'
-        : `${getAppUrl()}/api/auth/forgot-password`
-
-      const response = await fetch(apiUrl, {
+      const response = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
