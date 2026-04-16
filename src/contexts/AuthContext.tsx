@@ -60,7 +60,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await response.json()
 
       if (!response.ok) {
-        return { error: data.error || 'Signup failed' }
+        const base = data.error || 'Signup failed';
+        const hint = typeof data.hint === 'string' ? data.hint : '';
+        return { error: hint ? `${base} ${hint}` : base };
       }
 
       return {}

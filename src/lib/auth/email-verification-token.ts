@@ -4,14 +4,38 @@ const HMAC_ALG = 'sha256';
 /** Links expire after this window (aligned with typical verification expectations). */
 const TOKEN_MAX_AGE_MS = 72 * 60 * 60 * 1000;
 
+function normalizeVerificationSecret(raw: string | undefined): string {
+  if (raw == null) return '';
+  let s = String(raw).trim();
+  if (
+    (s.startsWith('"') && s.endsWith('"')) ||
+    (s.startsWith("'") && s.endsWith("'"))
+  ) {
+    s = s.slice(1, -1).trim();
+  }
+  return s;
+}
+
 function getSecret(): string | null {
-  const s = process.env.EMAIL_VERIFICATION_SECRET?.trim();
+  const s = normalizeVerificationSecret(process.env.EMAIL_VERIFICATION_SECRET);
   if (!s || s.length < 32) return null;
   return s;
 }
 
 export function isEmailVerificationConfigured(): boolean {
   return getSecret() !== null;
+}
+
+/** For server logs only — does not expose the secret. */
+export function emailVerificationSecretDiagnostics(): {
+  envVarPresent: boolean;
+  normalizedLength: number;
+} {
+  const raw = process.env.EMAIL_VERIFICATION_SECRET;
+  return {
+    envVarPresent: raw !== undefined,
+    normalizedLength: normalizeVerificationSecret(raw).length,
+  };
 }
 
 /**

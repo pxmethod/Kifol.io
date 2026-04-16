@@ -55,6 +55,8 @@ EMAIL_VERIFICATION_SECRET=your_long_random_secret_here
 ```
 Signup will return **503** until this is set. It must stay stable across deploys (changing it invalidates only links issued before the change).
 
+**Troubleshooting “Email verification is not configured” locally:** Open the app at the **same origin** `next dev` prints (for example `http://localhost:3001` if 3000 is busy). A different port is a different server and will not see your `.env.local`. After changing env vars, stop and restart `npm run dev`. Do not wrap the secret in extra quotes unless the whole value is quoted as a single `.env` string.
+
 ## Portfolio Domain System
 
 The portfolio domain system allows users to share portfolios at:

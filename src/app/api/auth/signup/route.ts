@@ -4,6 +4,7 @@ import { sendEmailVerification } from '@/lib/email/service'
 import { getAppUrl } from '@/config/domains'
 import {
   createEmailVerificationToken,
+  emailVerificationSecretDiagnostics,
   isEmailVerificationConfigured,
 } from '@/lib/auth/email-verification-token'
 
@@ -22,13 +23,25 @@ export async function POST(request: NextRequest) {
     }
 
     if (!isEmailVerificationConfigured()) {
-      return NextResponse.json(
-        {
-          error:
-            'Email verification is not configured. Set EMAIL_VERIFICATION_SECRET (min 32 characters) on the server.',
-        },
-        { status: 503 }
-      )
+      if (process.env.NODE_ENV === 'development') {
+        const d = emailVerificationSecretDiagnostics();
+        console.warn('[signup] EMAIL_VERIFICATION_SECRET:', {
+          ...d,
+          meetsMin32: d.normalizedLength >= 32,
+        });
+      }
+      const payload: {
+        error: string;
+        hint?: string;
+      } = {
+        error:
+          'Email verification is not configured. Set EMAIL_VERIFICATION_SECRET (min 32 characters) on the server.',
+      };
+      if (process.env.NODE_ENV === 'development') {
+        payload.hint =
+          'Use the exact dev URL from your terminal (including port, e.g. http://localhost:3001). Restart `npm run dev` after editing .env.local. For production, set the same variable in your host (e.g. Vercel).';
+      }
+      return NextResponse.json(payload, { status: 503 });
     }
 
     const supabase = await createClient()
