@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({
           email,
           password,
-          name: name || email.split('@')[0]
+          name: typeof name === 'string' ? name.trim() : '',
         }),
       })
 

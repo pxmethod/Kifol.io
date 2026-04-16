@@ -9,6 +9,8 @@ export type OnboardingPortfolioDraft = Pick<
   PortfolioFormState,
   'childName' | 'portfolioTitle' | 'template' | 'isPrivate' | 'password'
 > & {
+  /** Account holder display name — prefilled on /auth/signup */
+  parentName?: string;
   /** data URL from FileReader, optional */
   photoDataUrl?: string;
 };

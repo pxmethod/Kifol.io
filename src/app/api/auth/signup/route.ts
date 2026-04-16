@@ -18,9 +18,19 @@ import {
 export async function POST(request: NextRequest) {
   try {
     const { email, password, name } = await request.json()
-    
+
+    const displayName = typeof name === 'string' ? name.trim() : ''
+
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
+    }
+
+    if (!displayName) {
+      return NextResponse.json({ error: 'Your name is required' }, { status: 400 })
+    }
+
+    if (displayName.length > 100) {
+      return NextResponse.json({ error: 'Your name must be 100 characters or less' }, { status: 400 })
     }
 
     if (!isEmailVerificationConfigured()) {
@@ -59,8 +69,8 @@ export async function POST(request: NextRequest) {
       options: {
         emailRedirectTo: `${getAppUrl()}/auth/verify`,
         data: {
-          name: name || email.split('@')[0]
-        }
+          name: displayName,
+        },
       }
     })
 
@@ -95,8 +105,8 @@ export async function POST(request: NextRequest) {
         const emailResult = await sendEmailVerification({
           to: email,
           subject: 'Verify your email - Kifolio',
-          userName: name || email.split('@')[0],
-          verificationUrl: verificationUrl
+          userName: displayName,
+          verificationUrl: verificationUrl,
         })
 
         if (!emailResult.success) {

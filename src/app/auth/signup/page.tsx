@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
+import { loadOnboardingDraft } from '@/lib/onboardingPortfolioDraft';
 import { FormFieldError } from '@/components/forms/FormFieldError';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface SignUpFormData {
+  name: string;
   email: string;
   password: string;
 }
@@ -26,9 +28,11 @@ function SignUpContent() {
   const searchParams = useSearchParams();
   const { signUp } = useAuth();
   const [formData, setFormData] = useState<SignUpFormData>({
+    name: '',
     email: '',
-    password: ''
+    password: '',
   });
+  const prefilledNameFromDraft = useRef(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,6 +48,16 @@ function SignUpContent() {
 
   const isInvited = searchParams.get('invited') === 'true';
 
+  useEffect(() => {
+    if (prefilledNameFromDraft.current) return;
+    const draft = loadOnboardingDraft();
+    const fromDraft = draft?.parentName?.trim();
+    if (fromDraft) {
+      prefilledNameFromDraft.current = true;
+      setFormData((prev) => ({ ...prev, name: fromDraft }));
+    }
+  }, []);
+
   // Validate password requirements
   useEffect(() => {
     const password = formData.password;
@@ -58,6 +72,12 @@ function SignUpContent() {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Your name is required';
+    } else if (formData.name.trim().length > 100) {
+      newErrors.name = 'Please use 100 characters or fewer';
+    }
 
     // Email validation
     if (!formData.email.trim()) {
@@ -100,7 +120,7 @@ function SignUpContent() {
 
     try {
       // Create account with Supabase Auth
-      const { error } = await signUp(formData.email, formData.password);
+      const { error } = await signUp(formData.email, formData.password, formData.name.trim());
       
       if (error) {
         setErrors({ submit: error });
@@ -123,7 +143,8 @@ function SignUpContent() {
   };
 
 
-  const allRequirementsMet = Object.values(passwordRequirements).every(req => req);
+  const allRequirementsMet =
+    Object.values(passwordRequirements).every((req) => req) && !!formData.name.trim();
 
   return (
     <div className="min-h-screen bg-discovery-beige-200">
@@ -190,6 +211,23 @@ function SignUpContent() {
           /* Sign Up Form */
           <div className="bg-white rounded-lg p-6 shadow-md">
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="form-field">
+                    <label htmlFor="name" className="text-md font-medium text-discovery-grey leading-relaxed">
+                      Your name
+                    </label>
+                    <FormFieldError message={errors.name} />
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      autoComplete="name"
+                      value={formData.name}
+                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      className={`input ${errors.name ? 'input--error' : ''}`}
+                      placeholder="Enter your name"
+                    />
+                  </div>
+
                   {/* Email Field */}
                   <div className="form-field">
                     <label htmlFor="email" className="text-md font-medium text-discovery-grey leading-relaxed">

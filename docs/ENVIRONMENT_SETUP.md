@@ -26,7 +26,7 @@ MAILERSEND_TEMPLATE_PASSWORD_RESET=template_id_for_forgot_password
 See [MailerSend](https://www.mailersend.com) for API keys. Add and verify your sending domain in the MailerSend dashboard.
 
 **Template variable names** (must match your MailerSend templates):
-- **Welcome**: `user_name`, `verification_url`, `support_email`, `app_url`
+- **Welcome**: `user_name` (from the **Your name** field at signup), `verification_url`, `support_email`, `app_url`
 - **Password reset**: `user_name`, `reset_url`, `expires_at`, `app_url`
 
 ### 3. App URLs and Domains

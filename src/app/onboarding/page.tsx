@@ -52,6 +52,7 @@ export default function OnboardingPage() {
     password: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [parentName, setParentName] = useState('');
   const [showPassword, setShowPassword] = useState(true);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewObjectUrl, setPreviewObjectUrl] = useState<string | null>(null);
@@ -121,12 +122,26 @@ export default function OnboardingPage() {
     if (fileInput) fileInput.value = '';
   };
 
+  const handleParentNameChange = (value: string) => {
+    setParentName(value);
+    setErrors((prev) => (prev.parentName ? { ...prev, parentName: '' } : prev));
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newErrors = validatePortfolioForm(formData);
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) return;
+    const nameErrors: Record<string, string> = {};
+    const trimmedParent = parentName.trim();
+    if (!trimmedParent) {
+      nameErrors.parentName = 'Your name is required';
+    } else if (trimmedParent.length > 100) {
+      nameErrors.parentName = 'Please use 100 characters or fewer';
+    }
+
+    const portfolioErrors = validatePortfolioForm(formData);
+    const merged = { ...nameErrors, ...portfolioErrors };
+    setErrors(merged);
+    if (Object.keys(merged).length > 0) return;
 
     let photoDataUrl: string | undefined;
     if (selectedFile) {
@@ -146,6 +161,7 @@ export default function OnboardingPage() {
     }
 
     saveOnboardingDraft({
+      parentName: trimmedParent,
       childName: formData.childName.trim(),
       portfolioTitle: formData.portfolioTitle.trim(),
       template: formData.template,
@@ -197,7 +213,24 @@ export default function OnboardingPage() {
             </div>
 
             <div className="bg-discovery-white-100 rounded-lg shadow-md overflow-hidden">
-              <div className="px-6 py-6">
+              <div className="px-6 py-6 space-y-6">
+                <div className="form-field">
+                  <label htmlFor="parent-name" className="text-md font-medium text-discovery-grey leading-relaxed">
+                    Your name
+                  </label>
+                  <FormFieldError message={errors.parentName} />
+                  <input
+                    type="text"
+                    id="parent-name"
+                    name="parentName"
+                    autoComplete="name"
+                    value={parentName}
+                    onChange={(e) => handleParentNameChange(e.target.value)}
+                    className={`input ${errors.parentName ? 'input--error' : ''}`}
+                    placeholder="Enter your name"
+                  />
+                </div>
+
                 <CreatePortfolioFormFields
                   formData={formData}
                   errors={errors}
