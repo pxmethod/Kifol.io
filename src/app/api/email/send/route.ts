@@ -1,103 +1,79 @@
+import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { 
-  sendPasswordResetEmail, 
-  sendEngagementEmail, 
-  sendInvitationEmail,
-  sendEmailVerification,
-  sendTestEmail
-} from '@/lib/email/service';
-import { 
-  PasswordResetEmailData, 
-  EngagementEmailData, 
-  InvitationEmailData,
-  EmailVerificationData
-} from '@/lib/email/types';
+import { sendInvitationEmail, sendTestEmail } from '@/lib/email/service';
+import type { InvitationEmailData } from '@/lib/email/types';
 
-interface EmailRequest {
-  type: 'password-reset' | 'engagement' | 'invitation' | 'email-verification' | 'test';
-  data: PasswordResetEmailData | EngagementEmailData | InvitationEmailData | EmailVerificationData | { to: string };
+interface InvitationEmailRequest {
+  type: 'invitation';
+  data: InvitationEmailData;
 }
 
+/**
+ * Authenticated email send. Only `invitation` is supported — other transactional
+ * flows use dedicated routes (e.g. forgot-password, signup verification).
+ */
 export async function POST(request: NextRequest) {
   try {
-    const body: EmailRequest = await request.json();
-    const { type, data } = body;
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
-    let result;
-
-    switch (type) {
-      // Not used by app UI; forgot-password uses Supabase. Available for custom flows.
-      case 'password-reset':
-        result = await sendPasswordResetEmail(data as PasswordResetEmailData);
-        break;
-      // Not used by app; no caller. Available for future cron/scheduled emails.
-      case 'engagement':
-        result = await sendEngagementEmail(data as EngagementEmailData);
-        break;
-        
-      case 'invitation':
-        result = await sendInvitationEmail(data as InvitationEmailData);
-        break;
-        
-      case 'email-verification':
-        result = await sendEmailVerification(data as EmailVerificationData);
-        break;
-        
-      case 'test':
-        if (!data.to) {
-          return NextResponse.json(
-            { error: 'Email address is required for test emails' }, 
-            { status: 400 }
-          );
-        }
-        const testEmail = Array.isArray(data.to) ? data.to[0] : data.to;
-        result = await sendTestEmail(testEmail);
-        break;
-        
-      default:
-        return NextResponse.json(
-          { error: `Unknown email type: ${type}` }, 
-          { status: 400 }
-        );
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (result.success) {
-      return NextResponse.json({ 
-        success: true, 
-        messageId: result.messageId 
-      });
-    } else {
+    const body = (await request.json()) as Partial<InvitationEmailRequest>;
+    if (body.type !== 'invitation') {
       return NextResponse.json(
-        { error: result.error }, 
-        { status: 500 }
+        { error: 'Only invitation emails are supported from this endpoint.' },
+        { status: 403 }
       );
     }
+
+    const data = body.data;
+    if (!data?.to || !data.inviteUrl || !data.inviteeEmail) {
+      return NextResponse.json({ error: 'Invalid invitation payload' }, { status: 400 });
+    }
+
+    const result = await sendInvitationEmail(data as InvitationEmailData);
+
+    if (result.success) {
+      return NextResponse.json({
+        success: true,
+        messageId: result.messageId,
+      });
+    }
+
+    return NextResponse.json({ error: result.error }, { status: 500 });
   } catch (error) {
     console.error('Email API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' }, 
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// GET endpoint for testing (development only)
+/** Dev-only test send; requires a logged-in session. */
 export async function GET(request: NextRequest) {
   if (process.env.NODE_ENV === 'production') {
-    return NextResponse.json(
-      { error: 'Test endpoint not available in production' }, 
-      { status: 403 }
-    );
+    return NextResponse.json({ error: 'Test endpoint not available in production' }, { status: 403 });
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const { searchParams } = new URL(request.url);
   const email = searchParams.get('email');
 
   if (!email) {
-    return NextResponse.json(
-      { error: 'Email parameter is required' }, 
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'Email parameter is required' }, { status: 400 });
   }
 
   try {
@@ -105,9 +81,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     console.error('Test email error:', error);
-    return NextResponse.json(
-      { error: 'Failed to send test email' }, 
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to send test email' }, { status: 500 });
   }
 }

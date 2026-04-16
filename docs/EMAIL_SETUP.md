@@ -18,8 +18,8 @@ Kifolio uses **MailerSend** as the email service provider for sending transactio
 Kifolio uses **MailerSend templates exclusively** for signup verification emails (brand consistency). The flow:
 
 1. User signs up → account created in Supabase (unconfirmed)
-2. Our API sends a branded MailerSend verification email with link: `/auth/verify?email=...&token=verify`
-3. User clicks link → email confirmed via `/api/auth/confirm-email`
+2. Our API sends a branded MailerSend verification email with a signed link: `/auth/verify?token=...` (requires `EMAIL_VERIFICATION_SECRET` in env — see [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md))
+3. User clicks link → `/api/auth/confirm-email` validates the signature and confirms the email
 4. User can now log in
 
 ### Supabase Send Email Hook (Required)
@@ -146,16 +146,23 @@ if (result.success) {
 
 ### Send via API
 
+`POST /api/email/send` requires a **logged-in session** (cookies). Only `type: 'invitation'` is supported.
+
 ```typescript
 const response = await fetch('/api/email/send', {
   method: 'POST',
+  credentials: 'include',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    type: 'welcome',
+    type: 'invitation',
     data: {
-      to: 'user@example.com',
-      userName: 'John Doe',
-    }
+      to: 'friend@example.com',
+      inviterName: 'Alex',
+      inviteeEmail: 'friend@example.com',
+      inviteUrl: `${window.location.origin}/auth/signup?invited=true`,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      subject: 'You are invited to Kifolio!',
+    },
   }),
 });
 ```
@@ -181,8 +188,8 @@ All email templates are built with React Email and support:
 ### Development Testing
 
 ```bash
-# Test email service (development only)
-curl "http://localhost:3000/api/email/send?email=test@example.com"
+# Test email (development only): you must be logged in — pass your session cookie, e.g.:
+# curl -b "sb-..." "http://localhost:3000/api/email/send?email=test@example.com"
 ```
 
 ### Preview Templates

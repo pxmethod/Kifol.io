@@ -47,6 +47,14 @@ NEXTAUTH_SECRET=your_nextauth_secret
 NEXTAUTH_URL=https://kifol.io
 ```
 
+### 6. Email verification (signup links)
+```bash
+# Min 32 characters; used to sign verification links in signup emails. Generate with:
+# openssl rand -base64 32
+EMAIL_VERIFICATION_SECRET=your_long_random_secret_here
+```
+Signup will return **503** until this is set. It must stay stable across deploys (changing it invalidates only links issued before the change).
+
 ## Portfolio Domain System
 
 The portfolio domain system allows users to share portfolios at:

@@ -6,9 +6,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 /**
- * Email verification page - uses custom MailerSend template flow only.
- * Verification links come from our MailerSend email (see /api/auth/signup).
- * Link format: /auth/verify?email=...&token=verify
+ * Email verification page — MailerSend template flow.
+ * Link format: `/auth/verify?token=<signed>` (see EMAIL_VERIFICATION_SECRET).
  */
 function EmailVerificationContent() {
   const router = useRouter();
@@ -19,27 +18,29 @@ function EmailVerificationContent() {
   useEffect(() => {
     const verifyEmail = async () => {
       try {
-        const token = searchParams.get('token');
-        const email = searchParams.get('email');
+        const signedToken = searchParams.get('token');
 
-        if (!token || !email) {
+        // Old insecure links used `?email=...&token=verify` (no cryptographic secret)
+        if (signedToken === 'verify') {
           setStatus('error');
-          setMessage('Invalid verification link. Please use the link from your verification email, or sign up again.');
+          setMessage(
+            'This verification link is out of date. Please sign up again to receive a new verification email, or contact support if you already have an account.'
+          );
           return;
         }
 
-        // We use only the custom MailerSend verification flow (token=verify)
-        if (token !== 'verify') {
+        if (!signedToken) {
           setStatus('error');
-          setMessage('This link format is no longer supported. Please use the link from your verification email, or sign up again.');
+          setMessage(
+            'Invalid verification link. Please use the link from your verification email, or sign up again.'
+          );
           return;
         }
 
-        // Confirm the user's email in Supabase via our API
         const confirmRes = await fetch('/api/auth/confirm-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
+          body: JSON.stringify({ token: signedToken }),
         });
 
         if (!confirmRes.ok) {
@@ -49,15 +50,12 @@ function EmailVerificationContent() {
           return;
         }
 
-        // Success
         setStatus('success');
         setMessage('Email verified successfully! Redirecting to login...');
 
-        // Redirect to login page after 3 seconds
         setTimeout(() => {
           router.push('/auth/login?verified=true');
         }, 3000);
-
       } catch (error) {
         console.error('Verification error:', error);
         setStatus('error');
@@ -71,12 +69,11 @@ function EmailVerificationContent() {
   return (
     <div className="min-h-screen bg-kifolio-bg flex items-center justify-center px-4">
       <div className="max-w-md w-full">
-        {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
-            <Image 
-              src="/kifolio_logo_dark.svg" 
-              alt="Kifolio Logo" 
+            <Image
+              src="/kifolio_logo_dark.svg"
+              alt="Kifolio Logo"
               width={120}
               height={32}
               className="h-8 w-auto mx-auto"
@@ -84,7 +81,6 @@ function EmailVerificationContent() {
           </Link>
         </div>
 
-        {/* Verification Card */}
         <div className="bg-white rounded-xl shadow-lg p-8 text-center">
           {status === 'verifying' && (
             <>
@@ -108,15 +104,10 @@ function EmailVerificationContent() {
               <h1 className="text-2xl font-bold text-green-600 mb-4">Email Verified!</h1>
               <p className="text-gray-600 mb-6">{message}</p>
               <div className="space-y-3">
-                <Link 
-                  href="/auth/login?verified=true"
-                  className="btn btn--primary btn--full"
-                >
+                <Link href="/auth/login?verified=true" className="btn btn--primary btn--full">
                   Go to Login
                 </Link>
-                <p className="text-sm text-gray-500">
-                  Redirecting automatically in a few seconds...
-                </p>
+                <p className="text-sm text-gray-500">Redirecting automatically in a few seconds...</p>
               </div>
             </>
           )}
@@ -131,16 +122,10 @@ function EmailVerificationContent() {
               <h1 className="text-2xl font-bold text-red-600 mb-4">Verification Failed</h1>
               <p className="text-gray-600 mb-6">{message}</p>
               <div className="space-y-3">
-                <Link 
-                  href="/auth/signup"
-                  className="btn btn--primary btn--full"
-                >
+                <Link href="/auth/signup" className="btn btn--primary btn--full">
                   Try Signing Up Again
                 </Link>
-                <Link 
-                  href="/auth/login"
-                  className="btn btn--secondary btn--full"
-                >
+                <Link href="/auth/login" className="btn btn--secondary btn--full">
                   Go to Login
                 </Link>
               </div>
@@ -148,10 +133,12 @@ function EmailVerificationContent() {
           )}
         </div>
 
-        {/* Footer */}
         <div className="text-center mt-8">
           <p className="text-sm text-gray-500">
-            Need help? <Link href="/give-feedback" className="text-primary hover:underline">Contact Support</Link>
+            Need help?{' '}
+            <Link href="/give-feedback" className="text-primary hover:underline">
+              Contact Support
+            </Link>
           </p>
         </div>
       </div>
@@ -161,32 +148,34 @@ function EmailVerificationContent() {
 
 export default function EmailVerificationPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-kifolio-bg flex items-center justify-center px-4">
-        <div className="max-w-md w-full">
-          <div className="text-center mb-8">
-            <Link href="/" className="inline-block">
-              <Image 
-                src="/kifolio_logo_dark.svg" 
-                alt="Kifolio Logo" 
-                width={120}
-                height={32}
-                className="h-8 w-auto mx-auto"
-              />
-            </Link>
-          </div>
-          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-            <div className="w-16 h-16 mx-auto mb-6 bg-blue-100 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-blue-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-kifolio-bg flex items-center justify-center px-4">
+          <div className="max-w-md w-full">
+            <div className="text-center mb-8">
+              <Link href="/" className="inline-block">
+                <Image
+                  src="/kifolio_logo_dark.svg"
+                  alt="Kifolio Logo"
+                  width={120}
+                  height={32}
+                  className="h-8 w-auto mx-auto"
+                />
+              </Link>
             </div>
-            <h1 className="text-2xl font-bold text-kifolio-text mb-4">Loading...</h1>
-            <p className="text-gray-600">Please wait while we verify your email.</p>
+            <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+              <div className="w-16 h-16 mx-auto mb-6 bg-blue-100 rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-blue-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </div>
+              <h1 className="text-2xl font-bold text-kifolio-text mb-4">Loading...</h1>
+              <p className="text-gray-600">Please wait while we verify your email.</p>
+            </div>
           </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <EmailVerificationContent />
     </Suspense>
   );

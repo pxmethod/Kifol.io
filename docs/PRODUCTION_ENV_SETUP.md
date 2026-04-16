@@ -24,6 +24,12 @@ SUPPORT_EMAIL=support@yourdomain.com
 NEXT_PUBLIC_APP_URL=https://yourdomain.com
 ```
 
+### 4. Signup verification links
+```bash
+# Min 32 characters; must match the value used in development if you test the same links
+EMAIL_VERIFICATION_SECRET=your_long_random_secret_here
+```
+
 ## Setup Steps
 
 ### Step 1: Supabase Production Database

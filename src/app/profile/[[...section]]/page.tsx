@@ -174,6 +174,7 @@ export default function ProfilePage() {
       // Send invitation email using our email service
       const emailResponse = await fetch('/api/email/send', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
