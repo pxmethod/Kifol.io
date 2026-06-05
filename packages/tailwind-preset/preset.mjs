@@ -1,0 +1,178 @@
+/**
+ * Shared Tailwind v3 preset for Kifolio apps and `packages/ui` class names.
+ * @type {import('tailwindcss').Config}
+ */
+export default {
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['var(--font-inter)', 'Inter', 'sans-serif'],
+        heading: ['var(--font-inter-tight)', 'Inter Tight', 'sans-serif'],
+        tight: ['var(--font-inter-tight)', 'Inter Tight', 'sans-serif'],
+      },
+      fontSize: {
+        xs: '0.75rem',
+        sm: '0.875rem',
+        base: '1rem',
+        lg: '1.125rem',
+        xl: '1.25rem',
+        '2xl': '1.5rem',
+        '3xl': '1.875rem',
+        '4xl': '2.25rem',
+      },
+      colors: {
+        discovery: {
+          primary: '#00664e',
+          'primary-light': '#008a6b',
+          'primary-dark': '#004d3a',
+          black: '#1b1b1b',
+          grey: '#2e2e2e',
+          yellow: '#ffe549',
+          'yellow-dark': '#dabe16',
+          orange: '#ff5938',
+          'orange-light': '#ff7a59',
+          'orange-dark': '#e55a2b',
+          blue: {
+            100: '#9fdbcd',
+            200: '#7fc0b1',
+            900: '#385f56',
+          },
+          beige: {
+            100: '#E9E8E2',
+            200: '#fcf9eb',
+            300: '#dfd6d2',
+            800: '#747271',
+            900: '#625e5b',
+          },
+          white: {
+            100: '#ffffff',
+            80: '#ffffffcc',
+            40: '#ffffff66',
+          },
+          gray: {
+            300: '#DDDDE1',
+            400: '#3c3c3f',
+            600: '#363636',
+            700: '#7d7d88',
+          },
+        },
+        kifolio: {
+          bg: '#f0f8f6',
+          header: '#1a5f5f',
+          cta: '#ff5938',
+          text: '#2d5a5a',
+          primary: '#ff5938',
+          'primary-dark': '#e55a2b',
+          'primary-hover': '#ff7a59',
+          'primary-light': 'rgba(255, 89, 56, 0.1)',
+        },
+        shared: {
+          white: '#ffffff',
+          black: '#1b1b1b',
+          gray: {
+            50: '#f9fafb',
+            100: '#f3f4f6',
+            200: '#e5e7eb',
+            300: '#d1d5db',
+            400: '#9ca3af',
+            500: '#6b7280',
+            600: '#4b5563',
+            700: '#374151',
+            800: '#1f2937',
+            900: '#111827',
+          },
+        },
+        success: {
+          DEFAULT: '#16a34a',
+          light: 'rgba(22, 163, 74, 0.1)',
+        },
+        danger: {
+          DEFAULT: '#dc2626',
+          light: 'rgba(220, 38, 38, 0.1)',
+        },
+        warning: '#f59e0b',
+        info: '#3b82f6',
+      },
+      spacing: {
+        18: '4.5rem',
+        88: '22rem',
+        0: '0',
+        1: '0.25rem',
+        2: '0.5rem',
+        3: '0.75rem',
+        4: '1rem',
+        5: '1.25rem',
+        6: '1.5rem',
+        8: '2rem',
+        10: '2.5rem',
+        12: '3rem',
+        16: '4rem',
+        20: '5rem',
+        24: '6rem',
+      },
+      boxShadow: {
+        kifolio: '0 4px 6px -1px rgba(255, 107, 53, 0.1), 0 2px 4px -1px rgba(255, 107, 53, 0.06)',
+        sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+        md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06)',
+        lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05)',
+        xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04)',
+      },
+      borderRadius: {
+        none: '0',
+        sm: '0.375rem',
+        md: '0.5rem',
+        lg: '0.75rem',
+        xl: '1rem',
+        full: '9999px',
+        pill: '9rem',
+      },
+      fontWeight: {
+        normal: '400',
+        medium: '500',
+        semibold: '600',
+        bold: '700',
+      },
+      lineHeight: {
+        tight: '1.25',
+        normal: '1.5',
+        relaxed: '1.75',
+      },
+      zIndex: {
+        dropdown: '99999',
+        modal: '100000',
+        popover: '100001',
+        tooltip: '100002',
+        toast: '100003',
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.2s ease-in-out',
+        'slide-up': 'slideUp 0.2s ease-in-out',
+        'scale-in': 'scaleIn 0.2s ease-in-out',
+        'onboarding-preview-in': 'onboardingPreviewIn 0.45s ease-out both',
+        'spin-slow': 'spin 2s linear infinite',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { transform: 'translateY(1rem)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        scaleIn: {
+          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        onboardingPreviewIn: {
+          '0%': { opacity: '0', transform: 'translateY(8px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
+      transitionProperty: {
+        height: 'height',
+        spacing: 'margin, padding',
+      },
+    },
+  },
+}

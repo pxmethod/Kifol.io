@@ -1,0 +1,128 @@
+'use client';
+
+import { useState } from 'react';
+import { Button, Input } from '@kifolio/ui';
+import { FormFieldError } from '@/components/forms/FormFieldError';
+import Link from 'next/link';
+import Image from 'next/image';
+
+export default function ForgotUsernamePage() {
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email.trim()) {
+      setError('Please enter your email address');
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError('');
+    setMessage('');
+
+    try {
+      // For now, we'll show a helpful message since username recovery
+      // would require additional backend functionality
+      setMessage('Your login is your email address. Use the part before @ as a reminder of your username. If you still can\'t sign in, use "Forgot password" or contact support.');
+      setEmail('');
+    } catch (error) {
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-discovery-beige-200">
+      {/* Header */}
+      <header className="bg-discovery-beige-200 text-white px-9 py-4 top-0 z-50">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          <div className="flex items-center">
+            <Link href="/auth/login" className="flex items-center">
+              <Image 
+                src="/kifolio_logo_dark.svg" 
+                alt="Kifolio Logo" 
+                width={144}
+                height={38}
+                className="h-10 w-auto"
+                priority
+              />
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="flex justify-center min-h-screen pt-24 pb-10">
+        <div className="w-full max-w-md">
+          {/* Header Section */}
+          <div className="text-center mb-8">
+            <h1 className="text-5xl lg:text-5xl font-medium text-discovery-black mb-6">
+              Login help
+            </h1>
+            <p className="text-lg text-discovery-grey leading-relaxed">
+              We don&apos;t send an email for this. Enter your email and we&apos;ll show a hint to help you sign in.
+            </p>
+          </div>
+
+          {/* Form Card */}
+          <div className="bg-discovery-white-100 rounded-lg p-8 shadow-md">
+            {message && (
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-blue-800 text-sm">{message}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Email Field */}
+              <div>
+                <label htmlFor="email" className="block text-md font-medium text-discovery-black mb-2">
+                  Email address
+                </label>
+                <FormFieldError message={error} />
+                <Input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  error={!!error}
+                  placeholder="Enter your email address"
+                  required
+                />
+              </div>
+
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                variant="discovery"
+                disabled={isSubmitting || !email.trim()}
+                className="w-full text-center"
+              >
+                {isSubmitting ? 'Looking up...' : 'Show hint'}
+              </Button>
+            </form>
+
+            {/* Back to Login */}
+            <div className="mt-6 pt-6 border-t border-discovery-beige-300 text-center">
+              <Link 
+                href="/auth/login" 
+                className="text-discovery-orange hover:text-discovery-orange-light font-medium"
+              >
+                Back to Login
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

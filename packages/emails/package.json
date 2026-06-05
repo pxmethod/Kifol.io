@@ -1,0 +1,22 @@
+{
+  "name": "@kifolio/emails",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@kifolio/tsconfig": "*"
+  },
+  "exports": {
+    ".": "./src/service.ts",
+    "./client": "./src/client.ts",
+    "./types": "./src/types.ts",
+    "./template-loader": "./src/template-loader.ts"
+  },
+  "dependencies": {
+    "@kifolio/utils": "*",
+    "mailersend": "^2.6.0"
+  }
+}

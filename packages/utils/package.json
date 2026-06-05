@@ -1,0 +1,15 @@
+{
+  "name": "@kifolio/utils",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@kifolio/tsconfig": "*"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

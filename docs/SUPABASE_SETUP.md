@@ -203,6 +203,11 @@ CREATE TRIGGER handle_updated_at BEFORE UPDATE ON public.email_preferences FOR E
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
+  -- Org dashboard signups set raw_user_meta_data.org_signup = true; they use org_members only.
+  IF COALESCE((NEW.raw_user_meta_data->>'org_signup')::boolean, false) THEN
+    RETURN NEW;
+  END IF;
+
   INSERT INTO public.users (id, email, name)
   VALUES (NEW.id, NEW.email, NEW.raw_user_meta_data->>'name');
   

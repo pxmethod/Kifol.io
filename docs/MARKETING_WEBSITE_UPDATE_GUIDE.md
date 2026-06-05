@@ -4,7 +4,7 @@
 The marketing website is now live at the root route (`/`) and follows the Carrd structure with Kifolio branding. This guide shows you exactly where to make changes for common updates.
 
 ## File Location
-**Main marketing page**: `src/app/page.tsx`
+**Main marketing page**: `src/app/(marketing)/page.tsx` (route group; URL remains `/`)
 
 ## Quick Updates Guide
 

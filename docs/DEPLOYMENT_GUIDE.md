@@ -14,7 +14,10 @@
 2. Sign up/login with GitHub
 3. Click "New Project"
 4. Import your Kifolio repository
-5. Vercel will auto-detect Next.js settings
+5. **Monorepo:** set **Root Directory** to `apps/web` (not the repository root). The app ships a `vercel.json` that installs from the repo root (`npm ci`) and runs `turbo run build --filter=@kifolio/web`, so workspace packages under `packages/*` resolve correctly.
+6. **Single host:** the live site is entirely **`apps/web`**. Public marketing lives in the App Router route group **`src/app/(marketing)/`** (the home page is `(marketing)/page.tsx` → URL `/`). Product routes stay alongside it under `src/app/`. There is no separate marketing Next app in this repo.
+7. **Optional — deploy on every push:** in Vercel → Project → Settings → Git → **Ignored Build Step**, use a command that exits **1** to always run a build, or **0** to skip. Exit **1** = proceed with build; exit **0** = skip build.
+8. Vercel will pick up **Framework Preset** Next.js from `apps/web` once the root directory is set.
 
 #### 2. Add Environment Variables
 In Vercel dashboard > Project > Settings > Environment Variables, add:

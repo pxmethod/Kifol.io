@@ -78,12 +78,17 @@ The portfolio domain system allows users to share portfolios at:
 ## Setup Steps
 
 ### 1. Local Development
+
+The only deployed Next app is **`apps/web`** (single host on Vercel). Public marketing routes live under **`apps/web/src/app/(marketing)/`** (parentheses are a route group; they do not change URLs — the home page is still `/`).
+
+Next.js loads **`.env.local` from `apps/web/.env.local`** (next to `apps/web/next.config.ts`), not from the monorepo root. Put `NEXT_PUBLIC_*` and server secrets there when running `npm run dev` from the repository root.
+
 ```bash
-# Copy environment variables
-cp .env.example .env.local
+# From repo root — typical location for local secrets
+cp .env.example apps/web/.env.local
 
 # Edit with your values
-nano .env.local
+nano apps/web/.env.local
 ```
 
 ### 2. Vercel Deployment
