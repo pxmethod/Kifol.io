@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import { FormFieldError } from '@/components/forms/FormFieldError';
 import CreatePortfolioFormFields from '@/components/portfolio/CreatePortfolioFormFields';
@@ -15,6 +15,10 @@ import { validatePortfolioForm, type PortfolioFormState } from '@/config/portfol
 
 export default function CreatePortfolio() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get('returnTo');
+  const safeReturnTo =
+    returnTo && returnTo.startsWith('/') ? returnTo : '/dashboard';
   const { user, loading } = useAuth();
   const { createPortfolio } = usePortfolios();
   const [formData, setFormData] = useState<PortfolioFormState>({
@@ -60,13 +64,13 @@ export default function CreatePortfolio() {
     if (hasChanges()) {
       setShowConfirmModal(true);
     } else {
-      router.push('/dashboard');
+      router.push(safeReturnTo);
     }
   };
 
   const handleConfirmNavigation = () => {
     setShowConfirmModal(false);
-    router.push('/dashboard');
+    router.push(safeReturnTo);
   };
 
   const handleCancelNavigation = () => {
@@ -137,7 +141,11 @@ export default function CreatePortfolio() {
         password: formData.password,
       });
 
-      router.push(`/portfolio/${newPortfolio.id}?created=true`);
+      if (returnTo) {
+        router.push(safeReturnTo);
+      } else {
+        router.push(`/portfolio/${newPortfolio.id}?created=true`);
+      }
     } catch (error) {
       console.error('Error creating portfolio:', error);
       setErrors({ submit: 'Failed to create portfolio. Please try again.' });

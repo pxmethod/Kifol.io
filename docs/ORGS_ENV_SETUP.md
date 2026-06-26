@@ -21,16 +21,21 @@ SUPPORT_EMAIL=support@kifol.io
 # Stripe (server)
 STRIPE_SECRET_KEY=
 STRIPE_WEBHOOK_SECRET=
-STRIPE_PRICE_SOLO_MONTHLY=
-STRIPE_PRICE_SOLO_ANNUAL=
-STRIPE_PRICE_TEAM_MONTHLY=
-STRIPE_PRICE_TEAM_ANNUAL=
+STRIPE_PRICE_STARTER_MONTHLY=
+STRIPE_PRICE_STARTER_ANNUAL=
+STRIPE_PRICE_GROWTH_MONTHLY=
+STRIPE_PRICE_GROWTH_ANNUAL=
+STRIPE_PRICE_STUDIO_MONTHLY=
+STRIPE_PRICE_STUDIO_ANNUAL=
 
 # Stripe (client — billing page buttons)
-NEXT_PUBLIC_STRIPE_PRICE_SOLO_MONTHLY=
-NEXT_PUBLIC_STRIPE_PRICE_SOLO_ANNUAL=
-NEXT_PUBLIC_STRIPE_PRICE_TEAM_MONTHLY=
-NEXT_PUBLIC_STRIPE_PRICE_TEAM_ANNUAL=
+NEXT_PUBLIC_STRIPE_PRICE_STARTER_MONTHLY=
+NEXT_PUBLIC_STRIPE_PRICE_STARTER_ANNUAL=
+NEXT_PUBLIC_STRIPE_PRICE_GROWTH_MONTHLY=
+NEXT_PUBLIC_STRIPE_PRICE_GROWTH_ANNUAL=
+NEXT_PUBLIC_STRIPE_PRICE_STUDIO_MONTHLY=
+NEXT_PUBLIC_STRIPE_PRICE_STUDIO_ANNUAL=
+
 ```
 
 ## URLs
@@ -52,7 +57,9 @@ NEXT_PUBLIC_ORGS_APP_URL=http://localhost:3001
 
 ## Database
 
-Run `supabase/migrations/20260527120000_orgs_foundation.sql` in the Supabase SQL editor (dashboard).
+Run migrations in order in the Supabase SQL editor (dashboard), including:
+- `supabase/migrations/20260527120000_orgs_foundation.sql`
+- `supabase/migrations/20260605120000_member_volume_pricing.sql`
 
 ## Stripe webhook
 
@@ -62,7 +69,7 @@ Local: `stripe listen --forward-to localhost:3001/orgs/api/webhooks/stripe`
 
 ## Free trial
 
-- Every new org signup gets `subscription_status=trialing` and `trial_ends_at` set automatically.
+- Every new org signup gets `subscription_status=trialing`, `plan_tier=starter`, `member_limit=30`, and `trial_ends_at` set automatically.
 - No Stripe setup required until the admin subscribes from **Billing**.
 - Existing orgs created before this change: run in Supabase SQL editor if you want to grant a trial:
 

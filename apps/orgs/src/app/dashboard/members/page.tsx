@@ -1,29 +1,30 @@
 import { redirect } from "next/navigation";
 import type { Database } from "@kifolio/db-types";
 import { createClient } from "@kifolio/supabase/server";
-import { InviteStatusBadge } from "@/components/members/InviteStatusBadge";
+import { DashboardCard } from "@/components/shell/DashboardCard";
 import {
-  DashboardCard,
-  DashboardCardHeader,
-} from "@/components/shell/DashboardCard";
-import {
-  DashboardPage,
-  DashboardPageHeader,
-} from "@/components/shell/DashboardPage";
+  ParentManagement,
+  type ParentInviteRow,
+} from "@/components/members/ParentManagement";
 import { getOrgContextForUser } from "@/lib/orgs/context";
+import { getActiveMemberCount } from "@/lib/orgs/members";
+import { resolveParentInviteDisplayStatus } from "@/lib/orgs/parentInvites";
 
-type OrgInviteRow = Pick<
-  Database["public"]["Tables"]["org_invites"]["Row"],
-  "id" | "email" | "status" | "created_at" | "expires_at"
+type InviteRow = Pick<
+  Database["public"]["Tables"]["org_parent_invites"]["Row"],
+  | "id"
+  | "email"
+  | "student_first_name"
+  | "student_last_name"
+  | "status"
+  | "expires_at"
+  | "created_at"
 >;
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
+type ConnectionRow = Pick<
+  Database["public"]["Tables"]["portfolio_org_connections"]["Row"],
+  "invited_via" | "status"
+>;
 
 export default async function MembersPage() {
   const supabase = await createClient();
@@ -36,110 +37,58 @@ export default async function MembersPage() {
   if (!ctx) redirect("/login");
 
   const isAdmin = ctx.member.role === "admin";
+  const orgId = ctx.organization.id;
 
-  if (!isAdmin) {
-    return (
-      <DashboardPage>
-        <DashboardPageHeader
-          title="Members"
-          description="Instructor invites sent from your organization."
-        />
-        <DashboardCard padding="lg" className="text-center">
-          <p className="text-discovery-grey">
-            Only organization admins can view and manage invites.
-          </p>
-        </DashboardCard>
-      </DashboardPage>
-    );
+  const [invitesResult, connectionsResult, memberUsed] = await Promise.all([
+    supabase
+      .from("org_parent_invites")
+      .select(
+        "id, email, student_first_name, student_last_name, status, expires_at, created_at"
+      )
+      .eq("org_id", orgId)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("portfolio_org_connections")
+      .select("invited_via, status")
+      .eq("org_id", orgId),
+    getActiveMemberCount(orgId),
+  ]);
+
+  const invites = (invitesResult.data ?? []) as InviteRow[];
+  const connections = (connectionsResult.data ?? []) as ConnectionRow[];
+
+  const connectionByInvite = new Map<string, string>();
+  for (const conn of connections) {
+    if (conn.invited_via) {
+      connectionByInvite.set(conn.invited_via, conn.status);
+    }
   }
 
-  const { data: invites } = await supabase
-    .from("org_invites")
-    .select("id, email, status, created_at, expires_at")
-    .eq("org_id", ctx.organization.id)
-    .order("created_at", { ascending: false });
+  const rows: ParentInviteRow[] = invites.map((invite) => ({
+    id: invite.id,
+    email: invite.email,
+    studentFirstName: invite.student_first_name ?? "",
+    studentLastName: invite.student_last_name ?? "",
+    status: resolveParentInviteDisplayStatus({
+      inviteStatus: invite.status,
+      expiresAt: invite.expires_at,
+      connectionStatus: connectionByInvite.get(invite.id),
+    }),
+    createdAt: invite.created_at,
+  }));
 
-  const rows = (invites ?? []) as OrgInviteRow[];
-  const pending = rows.filter((r) => r.status === "pending");
-  const active = rows.filter((r) => r.status === "accepted");
-  const other = rows.filter(
-    (r) => r.status !== "pending" && r.status !== "accepted"
-  );
+  const memberLimit = ctx.organization.member_limit ?? 30;
 
   return (
-    <DashboardPage>
-      <DashboardPageHeader
-        title="Members"
-        description="Instructor invites sent from your organization — active, pending, and past."
+    <DashboardCard padding="lg">
+      <ParentManagement
+        orgName={ctx.organization.name}
+        planTier={ctx.organization.plan_tier ?? "starter"}
+        isAdmin={isAdmin}
+        memberUsed={memberUsed}
+        memberLimit={memberLimit}
+        invites={rows}
       />
-
-      {rows.length === 0 ? (
-        <DashboardCard padding="lg" className="text-center">
-          <p className="text-discovery-grey">
-            No invites yet. When you invite instructors, they will appear here.
-          </p>
-        </DashboardCard>
-      ) : (
-        <div className="space-y-6">
-          {pending.length > 0 && (
-            <InviteSection
-              title="Pending"
-              description="Invites sent and awaiting acceptance."
-              rows={pending}
-            />
-          )}
-          {active.length > 0 && (
-            <InviteSection
-              title="Active"
-              description="Invites that have been accepted."
-              rows={active}
-            />
-          )}
-          {other.length > 0 && (
-            <InviteSection
-              title="Other"
-              description="Expired or revoked invites."
-              rows={other}
-            />
-          )}
-        </div>
-      )}
-    </DashboardPage>
-  );
-}
-
-function InviteSection({
-  title,
-  description,
-  rows,
-}: {
-  title: string;
-  description: string;
-  rows: OrgInviteRow[];
-}) {
-  return (
-    <DashboardCard padding="none">
-      <DashboardCardHeader title={title} description={description} />
-      <ul className="divide-y divide-gray-100">
-        {rows.map((invite) => (
-          <li
-            key={invite.id}
-            className="flex flex-col gap-2 px-6 py-4 sm:flex-row sm:items-center sm:justify-between"
-          >
-            <div className="min-w-0">
-              <p className="truncate font-medium text-discovery-black">
-                {invite.email}
-              </p>
-              <p className="text-sm text-discovery-grey">
-                Sent {formatDate(invite.created_at)}
-                {invite.status === "pending" &&
-                  ` · Expires ${formatDate(invite.expires_at)}`}
-              </p>
-            </div>
-            <InviteStatusBadge status={invite.status} />
-          </li>
-        ))}
-      </ul>
     </DashboardCard>
   );
 }

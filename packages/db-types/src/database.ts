@@ -259,8 +259,9 @@ export interface Database {
           seal_template_id: string | null
           about: string | null
           location: string | null
-          plan_tier: 'solo' | 'team'
-          seat_limit: number
+          plan_tier: 'starter' | 'growth' | 'studio'
+          member_limit: number | null
+          member_limit_exceeded_at: string | null
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           stripe_price_id: string | null
@@ -283,8 +284,9 @@ export interface Database {
           seal_template_id?: string | null
           about?: string | null
           location?: string | null
-          plan_tier?: 'solo' | 'team'
-          seat_limit?: number
+          plan_tier?: 'starter' | 'growth' | 'studio'
+          member_limit?: number | null
+          member_limit_exceeded_at?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           stripe_price_id?: string | null
@@ -307,8 +309,9 @@ export interface Database {
           seal_template_id?: string | null
           about?: string | null
           location?: string | null
-          plan_tier?: 'solo' | 'team'
-          seat_limit?: number
+          plan_tier?: 'starter' | 'growth' | 'studio'
+          member_limit?: number | null
+          member_limit_exceeded_at?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           stripe_price_id?: string | null
@@ -375,6 +378,8 @@ export interface Database {
           status: 'pending' | 'accepted' | 'expired' | 'revoked'
           expires_at: string
           invited_by: string | null
+          display_name: string | null
+          job_title: string | null
           created_at: string
         }
         Insert: {
@@ -386,6 +391,8 @@ export interface Database {
           status?: 'pending' | 'accepted' | 'expired' | 'revoked'
           expires_at?: string
           invited_by?: string | null
+          display_name?: string | null
+          job_title?: string | null
           created_at?: string
         }
         Update: {
@@ -397,6 +404,8 @@ export interface Database {
           status?: 'pending' | 'accepted' | 'expired' | 'revoked'
           expires_at?: string
           invited_by?: string | null
+          display_name?: string | null
+          job_title?: string | null
         }
         Relationships: []
       }
@@ -407,9 +416,14 @@ export interface Database {
           email: string
           token: string
           status: 'pending' | 'accepted' | 'expired' | 'revoked'
+          student_first_name: string | null
+          student_last_name: string | null
+          personal_note: string | null
           org_name_snapshot: string | null
           org_logo_snapshot: string | null
           expires_at: string
+          opened_at: string | null
+          accepted_at: string | null
           invited_by: string | null
           created_at: string
         }
@@ -419,9 +433,14 @@ export interface Database {
           email: string
           token?: string
           status?: 'pending' | 'accepted' | 'expired' | 'revoked'
+          student_first_name?: string | null
+          student_last_name?: string | null
+          personal_note?: string | null
           org_name_snapshot?: string | null
           org_logo_snapshot?: string | null
           expires_at?: string
+          opened_at?: string | null
+          accepted_at?: string | null
           invited_by?: string | null
           created_at?: string
         }
@@ -431,9 +450,14 @@ export interface Database {
           email?: string
           token?: string
           status?: 'pending' | 'accepted' | 'expired' | 'revoked'
+          student_first_name?: string | null
+          student_last_name?: string | null
+          personal_note?: string | null
           org_name_snapshot?: string | null
           org_logo_snapshot?: string | null
           expires_at?: string
+          opened_at?: string | null
+          accepted_at?: string | null
           invited_by?: string | null
         }
         Relationships: []
@@ -445,6 +469,8 @@ export interface Database {
           org_id: string
           status: 'connected' | 'disconnected'
           connected_at: string
+          invited_via: string | null
+          disconnected_at: string | null
         }
         Insert: {
           id?: string
@@ -452,6 +478,8 @@ export interface Database {
           org_id: string
           status?: 'connected' | 'disconnected'
           connected_at?: string
+          invited_via?: string | null
+          disconnected_at?: string | null
         }
         Update: {
           id?: string
@@ -459,6 +487,8 @@ export interface Database {
           org_id?: string
           status?: 'connected' | 'disconnected'
           connected_at?: string
+          invited_via?: string | null
+          disconnected_at?: string | null
         }
         Relationships: []
       }

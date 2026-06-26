@@ -20,6 +20,7 @@ import Image from 'next/image';
 import { HighlightTypeIcon } from '@/lib/highlightTypeIcons';
 import HighlightsTimeline from '@/components/HighlightsTimeline';
 import EndorsementRequestModal from '@/components/EndorsementRequestModal';
+import { OrgConnectionsSection } from '@/components/portfolio/OrgConnectionsSection';
 
 interface PortfolioData {
   id: string;
@@ -628,6 +629,7 @@ export default function PortfolioPage() {
                 onRequestEndorsement={handleRequestEndorsement}
                 onRemoveEndorsement={handleRemoveEndorsement}
               />
+              <OrgConnectionsSection portfolioId={params.id as string} />
             </div>
           </div>
         </div>
@@ -793,6 +795,7 @@ export default function PortfolioPage() {
                   onRequestEndorsement={handleRequestEndorsement}
                   onRemoveEndorsement={handleRemoveEndorsement}
                 />
+                <OrgConnectionsSection portfolioId={params.id as string} />
               </div>
             </div>
           </div>

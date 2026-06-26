@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@kifolio/supabase/server";
+import { DashboardProviders } from "@/components/providers/DashboardProviders";
 import { OrgShell } from "@/components/shell/OrgShell";
 import { resolveOrgBillingState } from "@/lib/orgs/billing";
+import { syncMemberLimitExceededAt } from "@/lib/orgs/members";
 import { getOrgContextForUser } from "@/lib/orgs/context";
 
 export default async function DashboardLayout({
@@ -31,16 +33,25 @@ export default async function DashboardLayout({
     ? billing.trialDaysRemaining
     : null;
 
+  const memberLimitState = isAdmin
+    ? await syncMemberLimitExceededAt(ctx.organization.id, ctx.organization)
+    : null;
+
   return (
-    <OrgShell
-      orgName={ctx.organization.name}
-      orgLogoUrl={ctx.organization.logo_url}
-      planTier={ctx.organization.plan_tier}
-      userLabel={userLabel}
-      isAdmin={isAdmin}
-      trialDaysRemaining={trialDaysRemaining}
-    >
-      {children}
-    </OrgShell>
+    <DashboardProviders>
+      <OrgShell
+        orgName={ctx.organization.name}
+        orgLogoUrl={ctx.organization.logo_url}
+        planTier={ctx.organization.plan_tier}
+        userLabel={userLabel}
+        isAdmin={isAdmin}
+        trialDaysRemaining={trialDaysRemaining}
+        memberLimitState={
+          memberLimitState?.isOverLimit ? memberLimitState : null
+        }
+      >
+        {children}
+      </OrgShell>
+    </DashboardProviders>
   );
 }

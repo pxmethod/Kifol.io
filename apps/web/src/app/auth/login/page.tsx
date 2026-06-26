@@ -46,6 +46,11 @@ export default function LoginPage() {
       const urlParams = new URLSearchParams(window.location.search);
       const message = urlParams.get('message');
       const verified = urlParams.get('verified');
+      const email = urlParams.get('email')?.trim();
+
+      if (email) {
+        setFormData((prev) => ({ ...prev, email }));
+      }
       
       if (message) {
         setSuccessMessage(message);
@@ -55,12 +60,20 @@ export default function LoginPage() {
     }
   }, []);
 
+  const getRedirectPath = () => {
+    if (typeof window === "undefined") return "/dashboard";
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get("redirect")?.trim();
+    if (!redirect || !redirect.startsWith("/")) return "/dashboard";
+    return redirect;
+  };
+
   // Redirect if already logged in (but don't redirect when we have a message/verified param — user should see it)
   useEffect(() => {
     if (!user) return;
     const params = new URLSearchParams(window.location.search);
     if (params.get('message') || params.get('verified')) return;
-    router.push('/dashboard');
+    router.push(getRedirectPath());
   }, [user, router]);
 
   const handleInputChange = (field: string, value: string | boolean) => {
@@ -110,7 +123,7 @@ export default function LoginPage() {
       }
 
       router.refresh();
-      router.push('/dashboard');
+      router.push(getRedirectPath());
     } catch (error) {
       setErrors({ ...errors, submit: 'An unexpected error occurred. Please try again.' });
     } finally {

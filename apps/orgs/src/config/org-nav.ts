@@ -2,6 +2,7 @@ import {
   CreditCard,
   GraduationCap,
   Home,
+  Settings,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -15,8 +16,18 @@ export type OrgNavItem = {
 
 export const ORG_NAV_ITEMS: OrgNavItem[] = [
   { label: "Home", href: "/dashboard/overview", icon: Home },
+  {
+    label: "Instructors",
+    href: "/dashboard/instructors",
+    icon: GraduationCap,
+  },
   { label: "Members", href: "/dashboard/members", icon: Users },
-  { label: "Instructors", href: "/dashboard/instructors", icon: GraduationCap },
+  {
+    label: "Settings",
+    href: "/dashboard/settings/profile",
+    icon: Settings,
+    adminOnly: true,
+  },
   {
     label: "Billing",
     href: "/dashboard/billing",

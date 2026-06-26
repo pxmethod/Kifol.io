@@ -20,23 +20,30 @@
 - `declined` → parent declined; org notified, not shown on timeline.
 - `expired` → 30 days elapsed with no action; treated as declined.
 
-## Seat counting
-- `seat_count` = count of `org_members` where `org_id = X` and `status = 'active'`.
-- Admin always counts as a seat.
-- Solo plan: `seat_limit = 1`. Admin is the only member; `role = admin`.
-- Team plan: `seat_limit` up to 10 (admin + up to 9 others).
-- Enforce at service layer before insert into `org_members`.
+## Member counting (billing)
+- `member_count` = count of `org_parent_invites` where `org_id = X` and `status` in (`pending`, `accepted`).
+- Archived, removed, expired, and revoked parent invites do **not** count toward the cap.
+- Instructors are **unlimited** on all plans (`org_members` / `org_invites` are not capped).
+- Plans set `organizations.member_limit` (30, 75, or 150 by tier).
+- Orgs that exceed their tier are **prompted to upgrade, not hard-blocked**.
+- A **7-day grace period** begins when `member_count > member_limit`; `member_limit_exceeded_at` tracks the start. After grace, upgrade prompts intensify but the org is never blocked.
 
 ## Billing
 - New org signups receive a **14-day free trial** (no payment required).
   - `subscription_status = trialing`
   - `trial_ends_at = now() + 14 days` (override length with `ORG_TRIAL_DAYS` env on server)
+  - Default plan: `starter` with `member_limit = 30`
   - No Stripe customer/subscription is created until the admin chooses a plan.
 - After trial expires without a paid subscription, the org sees billing prompts (`trial_expired`).
-- Plans: `solo` | `team` (`organizations.plan_tier`).
-- Solo: $9.99/mo or $105/yr — 1 seat.
-- Team: $19.99/mo or $220/yr — up to 10 seats (admin included).
-- Stripe webhooks update `plan_tier`, `seat_limit`, `subscription_status`, and `stripe_*` fields when a plan is purchased.
+- Plans: `starter` | `growth` | `studio` (`organizations.plan_tier`).
+
+| Plan | Members | Monthly | Annual |
+|------|---------|---------|--------|
+| Starter | 30 | $14.99/mo | $159/yr ($13.25/mo) |
+| Growth | 75 | $29.99/mo | $319/yr ($26.58/mo) |
+| Studio | 150 | $49.99/mo | $531/yr ($44.25/mo) |
+
+- Stripe webhooks update `plan_tier`, `member_limit`, `subscription_status`, and `stripe_*` fields when a plan is purchased.
 
 ## Permissions matrix
 
@@ -45,7 +52,6 @@
 | Manage billing | ✅ | ❌ |
 | Edit org profile & seal | ✅ | ❌ |
 | Invite / remove instructors | ✅ | ❌ |
-| Manage seats | ✅ | ❌ |
 | Invite parents | ✅ | ❌ |
 | Create achievement requests | ✅ | ✅ |
 | View org dashboard | ✅ | ✅ |

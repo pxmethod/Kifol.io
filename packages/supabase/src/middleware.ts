@@ -54,6 +54,7 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/preview/') ||
     request.nextUrl.pathname.startsWith('/p/') ||
     request.nextUrl.pathname.startsWith('/endorse/') ||
+    request.nextUrl.pathname.startsWith('/invite/org') ||
     request.nextUrl.pathname.startsWith('/privacy') ||
     request.nextUrl.pathname.startsWith('/terms') ||
     request.nextUrl.pathname.startsWith('/blog') ||

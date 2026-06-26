@@ -76,8 +76,10 @@ export function OrgAuthProvider({ children }: { children: React.ReactNode }) {
         credentials: "same-origin",
         body: JSON.stringify({ email, password }),
       });
-      const data = await response.json();
+      const data = (await response.json()) as { error?: string };
       if (!response.ok) {
+        await supabase.auth.signOut();
+        setUser(null);
         return { error: data.error || "Sign in failed" };
       }
       const {

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@kifolio/supabase/server";
 import { redirect } from "next/navigation";
 import { GettingStartedChecklist } from "@/components/onboarding/GettingStartedChecklist";
@@ -48,7 +49,8 @@ export default async function DashboardOverviewPage({
     supabase
       .from("org_parent_invites")
       .select("*", { count: "exact", head: true })
-      .eq("org_id", org.id),
+      .eq("org_id", org.id)
+      .in("status", ["pending", "accepted"]),
   ]);
 
   const checklist = resolveOnboardingChecklist({
@@ -74,7 +76,7 @@ export default async function DashboardOverviewPage({
         description={
           onboardingComplete
             ? "Your organization is all set."
-            : "Get your organization set up and ready to go"
+            : "Get your organization set up and ready to go."
         }
       />
 
@@ -86,24 +88,47 @@ export default async function DashboardOverviewPage({
       {onboardingComplete && <BillingBanner status={billing.bannerStatus} />}
 
       {onboardingComplete ? (
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <DashboardCard>
-            <h3 className="text-lg font-semibold text-discovery-black">Members</h3>
+            <h3 className="text-lg font-semibold text-discovery-black">
+              Instructors
+            </h3>
             <p className="mt-2 text-sm text-discovery-grey">
-              View pending invites and active members from the Members page.
+              Verified staff who can endorse achievements and send promotions.
             </p>
+            <Link
+              href="/dashboard/instructors"
+              className="mt-3 inline-block text-sm font-medium text-discovery-primary hover:underline"
+            >
+              Manage instructors →
+            </Link>
+          </DashboardCard>
+          <DashboardCard>
+            <h3 className="text-lg font-semibold text-discovery-black">
+              Members
+            </h3>
+            <p className="mt-2 text-sm text-discovery-grey">
+              Your customers — families linked via parent email. Counts toward your
+              plan limit.
+            </p>
+            <Link
+              href="/dashboard/members"
+              className="mt-3 inline-block text-sm font-medium text-discovery-primary hover:underline"
+            >
+              View members →
+            </Link>
           </DashboardCard>
           <DashboardCard>
             <h3 className="text-lg font-semibold text-discovery-black">
               Achievements
             </h3>
             <p className="mt-2 text-sm text-discovery-grey">
-              Endorsements and promotions will appear here in Phase 4.
+              Endorsements and promotions will appear here in a future phase.
             </p>
           </DashboardCard>
         </div>
       ) : (
-        <GettingStartedChecklist items={checklist} />
+        <GettingStartedChecklist items={checklist} orgId={org.id} />
       )}
     </DashboardPage>
   );

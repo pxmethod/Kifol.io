@@ -2,6 +2,7 @@
 
 import { OrgAvatar } from "./OrgAvatar";
 import { OrgUserMenu } from "./OrgUserMenu";
+import type { PlanTier } from "@/lib/plans";
 import { PlanBadge } from "./PlanBadge";
 
 /** Desktop header — hidden on mobile (see OrgShell mobile bar). */
@@ -13,7 +14,7 @@ export function OrgTopBar({
 }: {
   orgName: string;
   orgLogoUrl?: string | null;
-  planTier: "solo" | "team";
+  planTier: PlanTier;
   userLabel: string;
 }) {
   return (

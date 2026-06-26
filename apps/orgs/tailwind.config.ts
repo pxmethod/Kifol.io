@@ -14,7 +14,7 @@ const config: Config = {
       colors: {
         discovery: {
           green: "#1AC85D",
-          orange: "#FF8138",
+          orange: "#FF5938",
           blue: "#4A53E2",
           gray: "#FAFAFD",
         },

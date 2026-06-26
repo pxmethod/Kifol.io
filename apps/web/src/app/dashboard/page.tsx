@@ -10,6 +10,7 @@ import DeletePortfolioModal from '@/components/DeletePortfolioModal';
 import Toast from '@/components/Toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorDisplay from '@/components/ErrorDisplay';
+import { PendingOrgInvites } from '@/components/orgs/PendingOrgInvites';
 import { usePortfolios } from '@/hooks/usePortfolios';
 import { useAuth } from '@/contexts/AuthContext';
 import { LegacyPortfolioData } from '@/lib/adapters/portfolio';
@@ -126,8 +127,24 @@ export default function Dashboard() {
       <div className="min-h-screen bg-discovery-beige-200">
         <Header animateLogo={true} />
         <main className="container mx-auto px-4 py-8">
+          <div className="mx-auto mb-8 max-w-3xl">
+            <PendingOrgInvites
+              onAccepted={(message) => {
+                setToastMessage(message);
+                setShowToast(true);
+              }}
+            />
+          </div>
           <EmptyState />
         </main>
+        {showToast && (
+          <Toast
+            message={toastMessage}
+            variant="success"
+            isVisible={showToast}
+            onDismiss={handleDismissToast}
+          />
+        )}
       </div>
     );
   }
@@ -137,6 +154,14 @@ export default function Dashboard() {
       <Header animateLogo={true} />
       
       <main className="max-w-7xl mx-auto px-4 py-12">
+        <div className="mb-8">
+          <PendingOrgInvites
+            onAccepted={(message) => {
+              setToastMessage(message);
+              setShowToast(true);
+            }}
+          />
+        </div>
         <div className="space-y-8 portfolio-grid-container">
           {/* Header with Create Button */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 animate-fade-in">

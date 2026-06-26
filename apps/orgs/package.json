@@ -11,12 +11,13 @@
   },
   "dependencies": {
     "@kifolio/database": "*",
+    "@kifolio/emails": "*",
     "@kifolio/db-types": "*",
     "@kifolio/supabase": "*",
     "@kifolio/ui": "*",
     "@kifolio/utils": "*",
     "lucide-react": "^0.544.0",
-    "next": "^9.3.3",
+    "next": "^16.0.7",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "stripe": "^17.7.0"

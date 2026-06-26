@@ -11,7 +11,9 @@ async function updateOrgFromSubscription(
   sub: Stripe.Subscription
 ) {
   const priceId = sub.items.data[0]?.price.id;
-  const plan = priceId ? planFromStripePriceId(priceId) : { tier: "solo" as const, seats: 1 };
+  const plan = priceId
+    ? planFromStripePriceId(priceId)
+    : { tier: "starter" as const, memberLimit: 30 };
 
   const admin = createAdminClient();
   await admin
@@ -20,7 +22,8 @@ async function updateOrgFromSubscription(
       stripe_subscription_id: sub.id,
       stripe_price_id: priceId ?? null,
       plan_tier: plan.tier,
-      seat_limit: plan.seats,
+      member_limit: plan.memberLimit,
+      member_limit_exceeded_at: null,
       subscription_status: sub.status as
         | "incomplete"
         | "trialing"
@@ -74,8 +77,9 @@ export async function POST(request: NextRequest) {
           .from("organizations")
           .update({
             subscription_status: "canceled",
-            plan_tier: "solo",
-            seat_limit: 1,
+            plan_tier: "starter",
+            member_limit: 30,
+            member_limit_exceeded_at: null,
             stripe_subscription_id: null,
           })
           .eq("id", orgId);

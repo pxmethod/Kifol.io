@@ -1,31 +1,32 @@
 import { redirect } from "next/navigation";
 import type { Database } from "@kifolio/db-types";
 import { createClient } from "@kifolio/supabase/server";
-import { MemberStatusBadge } from "@/components/members/MemberStatusBadge";
-import {
-  DashboardCard,
-  DashboardCardHeader,
-} from "@/components/shell/DashboardCard";
-import {
-  DashboardPage,
-  DashboardPageHeader,
-} from "@/components/shell/DashboardPage";
+import { InstructorManagement } from "@/components/instructors/InstructorManagement";
+import { DashboardCard } from "@/components/shell/DashboardCard";
 import { getOrgContextForUser } from "@/lib/orgs/context";
+import { resolveOrgMemberDisplayName } from "@/lib/orgs/onboarding";
 
-type InstructorRow = Pick<
+type StaffRow = Pick<
   Database["public"]["Tables"]["org_members"]["Row"],
-  "id" | "display_name" | "job_title" | "status" | "joined_at" | "invited_at"
+  "id" | "user_id" | "role" | "display_name" | "job_title" | "photo_url" | "status"
 >;
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+type InviteRow = Pick<
+  Database["public"]["Tables"]["org_invites"]["Row"],
+  "id" | "email" | "created_at" | "status"
+>;
+
+function formatInviteSent(iso: string, nowMs: number) {
+  const days = Math.floor(
+    (nowMs - new Date(iso).getTime()) / (24 * 60 * 60 * 1000)
+  );
+  if (days === 0) return "Sent today";
+  if (days === 1) return "Sent 1 day ago";
+  return `Sent ${days} days ago`;
 }
 
 export default async function InstructorsPage() {
+  const nowMs = new Date().getTime();
   const supabase = await createClient();
   const {
     data: { user },
@@ -35,77 +36,51 @@ export default async function InstructorsPage() {
   const ctx = await getOrgContextForUser(user.id);
   if (!ctx) redirect("/login");
 
-  const { data: instructors } = await supabase
-    .from("org_members")
-    .select("id, display_name, job_title, status, joined_at, invited_at")
-    .eq("org_id", ctx.organization.id)
-    .eq("role", "instructor")
-    .order("joined_at", { ascending: false });
+  const isAdmin = ctx.member.role === "admin";
 
-  const rows = (instructors ?? []) as InstructorRow[];
-  const active = rows.filter((r) => r.status === "active");
-  const inactive = rows.filter((r) => r.status !== "active");
+  const [staffResult, invitesResult] = await Promise.all([
+    supabase
+      .from("org_members")
+      .select("id, user_id, role, display_name, job_title, photo_url, status")
+      .eq("org_id", ctx.organization.id)
+      .eq("status", "active")
+      .order("joined_at", { ascending: true }),
+    supabase
+      .from("org_invites")
+      .select("id, email, created_at, status")
+      .eq("org_id", ctx.organization.id)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false }),
+  ]);
+
+  const staff = (staffResult.data ?? []) as StaffRow[];
+  const pendingInvites = (invitesResult.data ?? []) as InviteRow[];
+
+  const instructors = staff.map((member) => ({
+    id: member.id,
+    displayName:
+      member.display_name?.trim() ||
+      (member.user_id === user.id
+        ? resolveOrgMemberDisplayName(member, user)
+        : "Team member"),
+    jobTitle: member.job_title,
+    photoUrl: member.photo_url,
+    role: member.role,
+    isCurrentUser: member.user_id === user.id,
+  }));
 
   return (
-    <DashboardPage>
-      <DashboardPageHeader
-        title="Instructors"
-        description="Team members who can endorse and manage student achievements."
+    <DashboardCard padding="lg">
+      <InstructorManagement
+        orgName={ctx.organization.name}
+        isAdmin={isAdmin}
+        instructors={instructors}
+        pendingInvites={pendingInvites.map((invite) => ({
+          id: invite.id,
+          email: invite.email,
+          sentLabel: formatInviteSent(invite.created_at, nowMs),
+        }))}
       />
-
-      {rows.length === 0 ? (
-        <DashboardCard padding="lg" className="text-center">
-          <p className="text-discovery-grey">
-            No instructors yet. Accepted invites will show up here.
-          </p>
-        </DashboardCard>
-      ) : (
-        <div className="space-y-6">
-          {active.length > 0 && (
-            <InstructorSection title="Active" rows={active} />
-          )}
-          {inactive.length > 0 && (
-            <InstructorSection title="Inactive" rows={inactive} />
-          )}
-        </div>
-      )}
-    </DashboardPage>
-  );
-}
-
-function InstructorSection({
-  title,
-  rows,
-}: {
-  title: string;
-  rows: InstructorRow[];
-}) {
-  return (
-    <DashboardCard padding="none">
-      <DashboardCardHeader title={title} />
-      <ul className="divide-y divide-gray-100">
-        {rows.map((member) => (
-          <li
-            key={member.id}
-            className="flex flex-col gap-2 px-6 py-4 sm:flex-row sm:items-center sm:justify-between"
-          >
-            <div className="min-w-0">
-              <p className="font-medium text-discovery-black">
-                {member.display_name ?? "Instructor"}
-              </p>
-              {member.job_title && (
-                <p className="text-sm text-discovery-grey">{member.job_title}</p>
-              )}
-              <p className="text-sm text-discovery-grey">
-                Joined {formatDate(member.joined_at)}
-                {member.invited_at &&
-                  ` · Invited ${formatDate(member.invited_at)}`}
-              </p>
-            </div>
-            <MemberStatusBadge status={member.status} />
-          </li>
-        ))}
-      </ul>
     </DashboardCard>
   );
 }

@@ -30,9 +30,23 @@ export default function OrgLoginPage() {
     }
   }, []);
 
+  const getRedirectPath = () => {
+    if (typeof window === "undefined") return null;
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get("redirect")?.trim();
+    if (!redirect || !redirect.startsWith("/")) return null;
+    return redirect;
+  };
+
   useEffect(() => {
     if (loading || !user) return;
     const checkMembership = async () => {
+      const redirectPath = getRedirectPath();
+      if (redirectPath) {
+        router.push(redirectPath);
+        return;
+      }
+
       const supabase = createClient();
       const { data } = await supabase
         .from("org_members")
@@ -45,7 +59,7 @@ export default function OrgLoginPage() {
         setErrors((e) => ({
           ...e,
           submit:
-            "No organization is linked to this account. Create one to get started.",
+            "No organization is linked to this account. Sign in with the email you used to create your org, or sign up for a new organization.",
         }));
         return;
       }
@@ -75,26 +89,9 @@ export default function OrgLoginPage() {
       return;
     }
 
-    const supabase = createClient();
-    const { data: member } = await supabase
-      .from("org_members")
-      .select("id")
-      .eq("user_id", (await supabase.auth.getUser()).data.user?.id ?? "")
-      .eq("status", "active")
-      .maybeSingle();
-
-    if (!member) {
-      setErrors((prev) => ({
-        ...prev,
-        submit:
-          "No organization is linked to this account.",
-      }));
-      setIsSubmitting(false);
-      return;
-    }
-
+    const redirectPath = getRedirectPath() ?? "/dashboard/overview";
     router.refresh();
-    router.push("/dashboard/overview");
+    router.push(redirectPath);
     setIsSubmitting(false);
   };
 

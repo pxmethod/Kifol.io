@@ -7,22 +7,28 @@ import { orgsPublicAsset } from "@/lib/paths";
 export function ChecklistImage({
   imageFile,
   label,
+  done = false,
 }: {
   imageFile: string;
   label: string;
+  done?: boolean;
 }) {
   const [failed, setFailed] = useState(false);
   const src = orgsPublicAsset(`/onboarding/${imageFile}`);
 
   return (
-    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-discovery-beige-300">
+    <div
+      className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-white ${
+        done ? "opacity-30" : ""
+      }`}
+    >
       {!failed && (
         <Image
           src={src}
           alt=""
           width={80}
           height={80}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-contain p-1"
           unoptimized
           onError={() => setFailed(true)}
         />

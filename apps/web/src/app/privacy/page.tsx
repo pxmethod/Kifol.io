@@ -272,7 +272,7 @@ export default function PrivacyPolicyPage() {
                 className="h-10 w-auto mb-4"
               />
               <p className="text-discovery-white-100 leading-relaxed">
-                Create beautiful portfolios to showcase your children&apos;s work, 
+                Create live digital records to showcase your children&apos;s work, 
                 milestones, and achievements.
               </p>
             </div>

@@ -9,6 +9,7 @@ import {
   emailVerificationSecretDiagnostics,
   isEmailVerificationConfigured,
 } from "@/lib/auth/email-verification-token";
+import { sendOrgAdminWelcomeEmail } from "@/lib/orgs/parentInvites";
 import { getOrgTrialEndsAt } from "@/lib/orgs/billing";
 import { resolveUniqueSlug } from "@/lib/orgs/slug-unique";
 import { generateSlug } from "@/lib/orgs/slug";
@@ -107,8 +108,8 @@ export async function POST(request: NextRequest) {
       .insert({
         name: orgName,
         slug,
-        plan_tier: "solo",
-        seat_limit: 1,
+        plan_tier: "starter",
+        member_limit: 30,
         subscription_status: "trialing",
         trial_ends_at: trialEndsAt,
       })
@@ -156,6 +157,8 @@ export async function POST(request: NextRequest) {
     } catch (emailError) {
       console.error("[orgs signup] verification email exception:", emailError);
     }
+
+    void sendOrgAdminWelcomeEmail({ email, orgName });
 
     return NextResponse.json({
       success: true,

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join {{ORG_NAME}} on Kifolio</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: Arial, sans-serif;">
+  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="text-align: center; margin-bottom: 30px;">
+      {{#ORG_LOGO}}
+      <img src="{{ORG_LOGO}}" alt="{{ORG_NAME}}" style="height: 48px; max-width: 200px; object-fit: contain;" />
+      {{/ORG_LOGO}}
+    </div>
+
+    <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+      <h1 style="color: #1f2937; font-size: 24px; margin-bottom: 20px; text-align: center;">
+        You're invited to join {{ORG_NAME}}
+      </h1>
+
+      <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+        <strong>{{INVITER_NAME}}</strong> invited you to join <strong>{{ORG_NAME}}</strong> as an instructor on Kifolio for Orgs.
+      </p>
+
+      <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+        Accept the invite to endorse achievements, collaborate with your team, and help families celebrate student milestones.
+      </p>
+
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="{{INVITE_URL}}" style="display: inline-block; background-color: #7c3aed; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
+          Accept invite
+        </a>
+      </div>
+
+      <p style="color: #6b7280; font-size: 14px; line-height: 1.6; text-align: center;">
+        This invite expires in {{EXPIRES_IN_DAYS}} days.
+      </p>
+    </div>
+
+    <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 24px;">
+      If you didn't expect this invite, you can ignore this email.
+    </p>
+  </div>
+</body>
+</html>

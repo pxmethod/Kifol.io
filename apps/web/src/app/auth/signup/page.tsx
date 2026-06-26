@@ -48,6 +48,20 @@ function SignUpContent() {
 
 
   const isInvited = searchParams.get('invited') === 'true';
+  const inviteToken = searchParams.get('invite_token')?.trim() ?? '';
+  const inviteEmail = searchParams.get('email')?.trim() ?? '';
+
+  useEffect(() => {
+    if (inviteToken) {
+      sessionStorage.setItem('org_invite_token', inviteToken);
+    }
+  }, [inviteToken]);
+
+  useEffect(() => {
+    if (inviteEmail) {
+      setFormData((prev) => ({ ...prev, email: inviteEmail }));
+    }
+  }, [inviteEmail]);
 
   useEffect(() => {
     if (prefilledNameFromDraft.current) return;

@@ -122,13 +122,13 @@ export default function MarketingPage() {
               {/* Left Column - Content */}
               <div className="text-left pb-20 lg:flex-1 lg:max-w-2xl">
                 <h1 className="text-5xl lg:text-7xl font-semibold text-discovery-black mb-6">
-                The free digital portfolio for your child's milestones & achievements.
+                The free digital record of your child's milestones & achievements.
                 </h1>
                 <p className="text-lg text-discovery-grey mb-8 leading-relaxed">
-                  Build beautiful portfolios for your children or students that showcase their work, 
+                  Create live digital records for your children that showcase their work, 
                   milestones, and achievements. Whether it&apos;s artwork, school projects, 
                   sports accomplishments, or personal growth, Kifolio has you covered. 
-                  Simple, responsive, and totally free.
+                  Simple to set up, mobile-friendly, and always free.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 mb-6">
                   <Link
@@ -729,7 +729,7 @@ export default function MarketingPage() {
                 className="h-10 w-auto mb-4"
               />
               <p className="text-discovery-white-100 leading-relaxed">
-                Create beautiful portfolios to showcase your children&apos;s work, 
+                Create live digital records to showcase your children&apos;s work, 
                 milestones, and achievements.
               </p>
             </div>

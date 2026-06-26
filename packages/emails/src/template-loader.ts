@@ -146,6 +146,42 @@ export interface EndorsementCompletedVariables extends Record<string, string> {
   PORTFOLIO_URL: string;
 }
 
+export interface InstructorInviteVariables extends Record<string, string> {
+  ORG_NAME: string;
+  ORG_LOGO: string;
+  INVITER_NAME: string;
+  INVITE_URL: string;
+  EXPIRES_IN_DAYS: string;
+}
+
+export interface OrgParentInviteVariables extends Record<string, string> {
+  ORG_NAME: string;
+  ORG_LOGO: string;
+  STUDENT_NAME: string;
+  PERSONAL_NOTE: string;
+  INVITE_URL: string;
+  EXPIRES_IN_DAYS: string;
+}
+
+export interface OrgParentConnectedVariables extends Record<string, string> {
+  ORG_NAME: string;
+  ORG_LOGO: string;
+  CHILD_NAME: string;
+  PORTFOLIO_URL: string;
+}
+
+export interface OrgParentAcceptedVariables extends Record<string, string> {
+  ORG_NAME: string;
+  PARENT_EMAIL: string;
+  STUDENT_NAME: string;
+  MEMBERS_URL: string;
+}
+
+export interface OrgAdminWelcomeVariables extends Record<string, string> {
+  ORG_NAME: string;
+  DASHBOARD_URL: string;
+}
+
 /**
  * Pre-configured template loaders with type safety
  */
@@ -177,4 +213,19 @@ export const EmailTemplates = {
 
   endorsementCompleted: (variables: EndorsementCompletedVariables) =>
     loadEmailTemplate('endorsement-completed', variables),
+
+  instructorInvite: (variables: InstructorInviteVariables) =>
+    loadEmailTemplate('instructor-invite', variables),
+
+  orgParentInvite: (variables: OrgParentInviteVariables) =>
+    loadEmailTemplate('org-parent-invite', variables),
+
+  orgParentConnected: (variables: OrgParentConnectedVariables) =>
+    loadEmailTemplate('org-parent-connected', variables),
+
+  orgParentAccepted: (variables: OrgParentAcceptedVariables) =>
+    loadEmailTemplate('org-parent-accepted', variables),
+
+  orgAdminWelcome: (variables: OrgAdminWelcomeVariables) =>
+    loadEmailTemplate('org-admin-welcome', variables),
 };

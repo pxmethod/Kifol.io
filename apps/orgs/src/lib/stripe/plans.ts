@@ -1,29 +1,41 @@
-export type PlanTier = "solo" | "team";
+import {
+  memberLimitForTier,
+  type PlanTier,
+} from "@/lib/plans";
+
+export type { PlanTier };
 
 export type PlanFromPrice = {
   tier: PlanTier;
-  seats: number;
+  memberLimit: number;
 };
 
 export function planFromStripePriceId(priceId: string): PlanFromPrice {
   const map: Record<string, PlanFromPrice> = {};
 
-  const soloMonthly = process.env.STRIPE_PRICE_SOLO_MONTHLY;
-  const soloAnnual = process.env.STRIPE_PRICE_SOLO_ANNUAL;
-  const teamMonthly = process.env.STRIPE_PRICE_TEAM_MONTHLY;
-  const teamAnnual = process.env.STRIPE_PRICE_TEAM_ANNUAL;
+  const pairs: [string | undefined, PlanTier][] = [
+    [process.env.STRIPE_PRICE_STARTER_MONTHLY, "starter"],
+    [process.env.STRIPE_PRICE_STARTER_ANNUAL, "starter"],
+    [process.env.STRIPE_PRICE_GROWTH_MONTHLY, "growth"],
+    [process.env.STRIPE_PRICE_GROWTH_ANNUAL, "growth"],
+    [process.env.STRIPE_PRICE_STUDIO_MONTHLY, "studio"],
+    [process.env.STRIPE_PRICE_STUDIO_ANNUAL, "studio"],
+  ];
 
-  if (soloMonthly) map[soloMonthly] = { tier: "solo", seats: 1 };
-  if (soloAnnual) map[soloAnnual] = { tier: "solo", seats: 1 };
-  if (teamMonthly) map[teamMonthly] = { tier: "team", seats: 10 };
-  if (teamAnnual) map[teamAnnual] = { tier: "team", seats: 10 };
+  for (const [id, tier] of pairs) {
+    if (id) {
+      map[id] = { tier, memberLimit: memberLimitForTier(tier) };
+    }
+  }
 
-  return map[priceId] ?? { tier: "solo", seats: 1 };
+  return map[priceId] ?? { tier: "starter", memberLimit: 30 };
 }
 
 export const STRIPE_PRICES = {
-  soloMonthly: () => process.env.STRIPE_PRICE_SOLO_MONTHLY,
-  soloAnnual: () => process.env.STRIPE_PRICE_SOLO_ANNUAL,
-  teamMonthly: () => process.env.STRIPE_PRICE_TEAM_MONTHLY,
-  teamAnnual: () => process.env.STRIPE_PRICE_TEAM_ANNUAL,
+  starterMonthly: () => process.env.STRIPE_PRICE_STARTER_MONTHLY,
+  starterAnnual: () => process.env.STRIPE_PRICE_STARTER_ANNUAL,
+  growthMonthly: () => process.env.STRIPE_PRICE_GROWTH_MONTHLY,
+  growthAnnual: () => process.env.STRIPE_PRICE_GROWTH_ANNUAL,
+  studioMonthly: () => process.env.STRIPE_PRICE_STUDIO_MONTHLY,
+  studioAnnual: () => process.env.STRIPE_PRICE_STUDIO_ANNUAL,
 } as const;

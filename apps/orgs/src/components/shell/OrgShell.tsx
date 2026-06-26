@@ -7,6 +7,9 @@ import { OrgMobileNavModal } from "./OrgMobileNavModal";
 import { OrgSidebar } from "./OrgSidebar";
 import { OrgTopBar } from "./OrgTopBar";
 import { OrgUserMenu } from "./OrgUserMenu";
+import type { MemberLimitState } from "@/lib/orgs/members";
+import type { PlanTier } from "@/lib/plans";
+import { MemberLimitBanner } from "./MemberLimitBanner";
 import { TrialBanner } from "./TrialBanner";
 
 export function OrgShell({
@@ -17,14 +20,16 @@ export function OrgShell({
   userLabel,
   isAdmin,
   trialDaysRemaining,
+  memberLimitState,
 }: {
   children: React.ReactNode;
   orgName: string;
   orgLogoUrl?: string | null;
-  planTier: "solo" | "team";
+  planTier: PlanTier;
   userLabel: string;
   isAdmin: boolean;
   trialDaysRemaining?: number | null;
+  memberLimitState?: MemberLimitState | null;
 }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const showTrialBanner =
@@ -72,7 +77,14 @@ export function OrgShell({
             planTier={planTier}
             userLabel={userLabel}
           />
-          <main className="flex-1 p-4 sm:p-6">{children}</main>
+          <main className="flex-1 p-4 sm:p-6">
+            {memberLimitState && (
+              <div className="mb-4">
+                <MemberLimitBanner state={memberLimitState} />
+              </div>
+            )}
+            {children}
+          </main>
         </div>
       </div>
     </div>
