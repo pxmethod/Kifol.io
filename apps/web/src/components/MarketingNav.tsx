@@ -7,7 +7,6 @@ import Image from 'next/image';
 /** Hash links use `/#…` so they work from any page (e.g. /blog). */
 const NAV_LINKS = [
   { label: 'How it works', href: '/#how-it-works' },
-  { label: 'For Organizations', href: '/orgs' },
   { label: 'Testimonials', href: '/#testimonials' },
   { label: 'Blog', href: '/blog' },
   { label: 'FAQ', href: '/#faq' },
