@@ -16,7 +16,6 @@ export default async function OrgInviteLandingPage({
 }) {
   const params = await searchParams;
   const token = params.token?.trim();
-  const nowMs = Date.now();
 
   if (!token) {
     return <InviteError message="Missing invite token." orgName={null} />;
@@ -55,7 +54,7 @@ export default async function OrgInviteLandingPage({
     );
   }
 
-  if (new Date(invite.expires_at).getTime() < nowMs) {
+  if (invite.isExpired) {
     return (
       <InviteError
         message="This invite has expired. Request a new invite from your organization."

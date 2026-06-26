@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import { FormFieldError } from '@/components/forms/FormFieldError';
@@ -13,7 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { storageService } from '@/lib/storage';
 import { validatePortfolioForm, type PortfolioFormState } from '@/config/portfolio-form';
 
-export default function CreatePortfolio() {
+function CreatePortfolioContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const returnTo = searchParams.get('returnTo');
@@ -257,5 +257,24 @@ export default function CreatePortfolio() {
         confirmLabel="Discard changes"
       />
     </div>
+  );
+}
+
+export default function CreatePortfolio() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-discovery-beige-200">
+          <Header animateLogo={true} />
+          <main className="container mx-auto px-4 py-8">
+            <div className="flex items-center justify-center min-h-[60vh]">
+              <LoadingSpinner size="lg" label="Loading..." />
+            </div>
+          </main>
+        </div>
+      }
+    >
+      <CreatePortfolioContent />
+    </Suspense>
   );
 }

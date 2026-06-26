@@ -95,5 +95,11 @@ export async function getParentInviteByToken(token: string) {
     .select("*")
     .eq("token", token)
     .maybeSingle();
-  return data;
+
+  if (!data) return null;
+
+  return {
+    ...data,
+    isExpired: new Date(data.expires_at).getTime() < Date.now(),
+  };
 }
