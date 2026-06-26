@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // When Vercel deploys from the monorepo root (not apps/web), emit .next at repo root.
+  ...(process.env.VERCEL_MONOREPO_ROOT ? { distDir: "../../.next" } : {}),
   transpilePackages: [
     "@kifolio/database",
     "@kifolio/db-types",
