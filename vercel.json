@@ -3,11 +3,6 @@
   "buildCommand": "VERCEL_MONOREPO_ROOT=1 npx turbo run build --filter=@kifolio/web",
   "devCommand": "npm run dev --workspace=@kifolio/web",
   "framework": "nextjs",
-  "functions": {
-    "apps/web/src/app/api/**/*.ts": {
-      "maxDuration": 30
-    }
-  },
   "headers": [
     {
       "source": "/(.*)",
